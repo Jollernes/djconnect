@@ -207,9 +207,15 @@ function headlineFor(
   etaPhrase: string | null,
 ): string {
   if (agg.quotesReady === 0) {
+    // Only DJs still in-flight count toward "awaiting" — declined DJs have
+    // already responded.
+    const active = agg.total - agg.declined;
+    if (active === 0) {
+      return "All matched DJs have responded — none were available this date.";
+    }
     return etaPhrase
-      ? `Awaiting quotes from ${agg.total} matched DJ${agg.total === 1 ? "" : "s"}. Expected ${etaPhrase}.`
-      : `Awaiting quotes from ${agg.total} matched DJ${agg.total === 1 ? "" : "s"}.`;
+      ? `Awaiting quotes from ${active} matched DJ${active === 1 ? "" : "s"}. Expected ${etaPhrase}.`
+      : `Awaiting quotes from ${active} matched DJ${active === 1 ? "" : "s"}.`;
   }
   if (agg.quotesReady >= 3) {
     return "Your 3 personal quotes are ready below.";
