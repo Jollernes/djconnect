@@ -36,6 +36,8 @@ import { CustomerBookingsPage } from "@/pages/customer/BookingsPage";
 import { CustomerBookingDetailPage } from "@/pages/customer/BookingDetailPage";
 import { CustomerFavouritesPage } from "@/pages/customer/FavouritesPage";
 import { CustomerSettingsPage } from "@/pages/customer/SettingsPage";
+import { CustomerRequestsListPage } from "@/pages/customer/RequestsListPage";
+import { CustomerRequestDetailPage } from "@/pages/customer/RequestDetailPage";
 
 import { DJDashboardPage } from "@/pages/dj/DashboardPage";
 import { DJBookingsPage } from "@/pages/dj/BookingsPage";
@@ -93,6 +95,11 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<CustomerDashboardPage />} />
+            <Route path="/dashboard/requests" element={<CustomerRequestsListPage />} />
+            <Route
+              path="/dashboard/requests/:requestId"
+              element={<CustomerRequestDetailPage />}
+            />
             <Route path="/dashboard/bookings" element={<CustomerBookingsPage />} />
             <Route path="/dashboard/bookings/:id" element={<CustomerBookingDetailPage />} />
             <Route path="/dashboard/favourites" element={<CustomerFavouritesPage />} />
