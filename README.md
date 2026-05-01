@@ -5,6 +5,7 @@ Two-sided marketplace for booking professional DJs with full mobile disco setups
 ## Features
 
 - Customer flow: search → DJ profile → booking request → Stripe Checkout → confirmation → review.
+- "Get 3 offers" wizard: 8-step interactive brief at `/get-offers`, persistent live progress page at `/my-requests/:id`, side-by-side quote comparison with on-platform messaging, callback requests, and escrow booking. Currently runs as a client-side simulation with the timeline compressed to ~3 minutes for demo purposes; thresholds and orchestration logic match the production spec (12h expansion / 36h alert / 3-of-N quotes surfaced).
 - DJ flow: multi-step onboarding → admin verification → dashboard (bookings, availability, earnings, messages) → Stripe Connect payouts.
 - Admin: verification queue, user management, booking overview, financials, review moderation, featured DJs.
 - Email triggers wired via a single `send-email` edge function (Resend) covering every event in the spec.
