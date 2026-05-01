@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check, MessageSquare, PhoneCall, Star } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import type { DJSlot, OfferRequestRecord } from "@/lib/offerRequestStore";
 import type { DJProfileWithRelations, Review } from "@/types/domain";
@@ -109,29 +108,51 @@ function QuoteCard({
   const eventLabel = eventTypeLabel(eventTypes);
   const booked = Boolean(slot.bookedAtMs);
 
+  const initials = dj.stage_name
+    .split(" ")
+    .map((p) => p[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
   return (
     <article
       className={cn(
-        "flex h-full flex-col rounded-2xl border border-border/70 bg-card p-5 transition-colors",
+        "flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card transition-colors",
         booked && "border-emerald-300 bg-emerald-50/30",
       )}
     >
-      {/* DJ identity */}
-      <header className="flex items-start gap-3">
-        <Avatar className="h-11 w-11">
-          <AvatarImage src={dj.profile.avatar_url ?? undefined} alt={dj.stage_name} />
-          <AvatarFallback className="bg-muted text-foreground">
-            {dj.stage_name.slice(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
+      {/* Hero image — DJ photo as the dominant visual of the card */}
+      <Link
+        to={`/djs/${dj.username}`}
+        aria-label={dj.stage_name}
+        className="relative block aspect-[4/3] w-full overflow-hidden bg-muted"
+      >
+        {dj.profile.avatar_url ? (
+          <img
+            src={dj.profile.avatar_url}
+            alt={dj.stage_name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-3xl font-medium tracking-wide text-muted-foreground">
+            {initials}
+          </div>
+        )}
+      </Link>
+
+      <div className="flex flex-1 flex-col p-5">
+        {/* DJ identity */}
+        <header>
           <Link
             to={`/djs/${dj.username}`}
             className="block truncate text-[15px] font-semibold text-foreground hover:underline"
           >
             {dj.stage_name}
           </Link>
-          <p className="truncate text-xs text-muted-foreground">
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {[
               eventLabel,
               dj.events_performed ? `${dj.events_performed} events` : null,
@@ -140,76 +161,76 @@ function QuoteCard({
               .filter(Boolean)
               .join(" · ")}
           </p>
+        </header>
+
+        {/* Price — typography is the hierarchy, no coloured box */}
+        <div className="mt-5">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
+            Quoted price
+          </p>
+          <p className="mt-0.5 text-[28px] font-semibold tabular-nums leading-none text-foreground">
+            {formatPrice(quote.priceMinor)}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {packageDescription(quote.packageId)}
+          </p>
         </div>
-      </header>
 
-      {/* Price — typography is the hierarchy, no coloured box */}
-      <div className="mt-5">
-        <p className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
-          Quoted price
+        {/* Personal message */}
+        <p className="mt-5 text-[13px] leading-relaxed text-foreground/85">
+          &ldquo;{quote.message}&rdquo;
         </p>
-        <p className="mt-0.5 text-[28px] font-semibold tabular-nums leading-none text-foreground">
-          {formatPrice(quote.priceMinor)}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          {packageDescription(quote.packageId)}
-        </p>
-      </div>
 
-      {/* Personal message */}
-      <p className="mt-5 text-[13px] leading-relaxed text-foreground/85">
-        &ldquo;{quote.message}&rdquo;
-      </p>
+        {/* Reviews — two quiet lines */}
+        {reviews.length > 0 && (
+          <ul className="mt-5 space-y-2 border-t border-border/60 pt-4">
+            {reviews.map((r) => (
+              <ReviewLine key={r.id} review={r} />
+            ))}
+          </ul>
+        )}
 
-      {/* Reviews — two quiet lines */}
-      {reviews.length > 0 && (
-        <ul className="mt-5 space-y-2 border-t border-border/60 pt-4">
-          {reviews.map((r) => (
-            <ReviewLine key={r.id} review={r} />
-          ))}
-        </ul>
-      )}
-
-      {/* Actions */}
-      <footer className="mt-auto pt-5">
-        <Button
-          onClick={onBook}
-          disabled={booked}
-          className={cn(
-            "h-10 w-full font-medium",
-            booked
-              ? "bg-emerald-600 text-white hover:bg-emerald-600"
-              : "bg-foreground text-background hover:bg-foreground/90",
-          )}
-        >
-          {booked ? (
-            <>
-              <Check className="mr-1.5 h-4 w-4" /> Booked
-            </>
-          ) : (
-            "Book with escrow"
-          )}
-        </Button>
-        <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-          <button
-            type="button"
-            onClick={onMessage}
+        {/* Actions */}
+        <footer className="mt-auto pt-5">
+          <Button
+            onClick={onBook}
             disabled={booked}
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+            className={cn(
+              "h-10 w-full font-medium",
+              booked
+                ? "bg-emerald-600 text-white hover:bg-emerald-600"
+                : "bg-foreground text-background hover:bg-foreground/90",
+            )}
           >
-            <MessageSquare className="h-3.5 w-3.5" /> Message
-          </button>
-          <button
-            type="button"
-            onClick={onCallback}
-            disabled={booked || slot.callbackRequested}
-            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
-          >
-            <PhoneCall className="h-3.5 w-3.5" />
-            {slot.callbackRequested ? "Call requested" : "Request a call"}
-          </button>
-        </div>
-      </footer>
+            {booked ? (
+              <>
+                <Check className="mr-1.5 h-4 w-4" /> Booked
+              </>
+            ) : (
+              "Book with escrow"
+            )}
+          </Button>
+          <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+            <button
+              type="button"
+              onClick={onMessage}
+              disabled={booked}
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+            >
+              <MessageSquare className="h-3.5 w-3.5" /> Message
+            </button>
+            <button
+              type="button"
+              onClick={onCallback}
+              disabled={booked || slot.callbackRequested}
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+            >
+              <PhoneCall className="h-3.5 w-3.5" />
+              {slot.callbackRequested ? "Call requested" : "Request a call"}
+            </button>
+          </div>
+        </footer>
+      </div>
     </article>
   );
 }

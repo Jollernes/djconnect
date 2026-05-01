@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail } from "lucide-react";
 import { aggregateOf } from "@/lib/offerRequestOrchestrator";
-import type { DJSlot, OfferRequestRecord } from "@/lib/offerRequestStore";
+import type { OfferRequestRecord } from "@/lib/offerRequestStore";
 import type { DJProfileWithRelations } from "@/types/domain";
 import {
   deriveActivityEvents,
@@ -83,8 +83,6 @@ export function CalmFocalView({
   const allDone = agg.quotesReady >= 3;
   const hasAnyQuote = agg.quotesReady > 0;
 
-  const sortedSlots = useMemo(() => orderSlots(record.slots), [record.slots]);
-
   return (
     <div className="space-y-12">
       <section className="rounded-3xl border border-border/40 bg-card/30 px-6 py-12 md:px-10 md:py-16">
@@ -150,28 +148,6 @@ export function CalmFocalView({
           )}
         </div>
       </section>
-
-      {/* Per-DJ cards with prominent imagery — avatars are the focal element
-          of each card so the customer can quickly recognise who is on the
-          job. Status text and dot stay quiet underneath. */}
-      {sortedSlots.length > 0 && (
-        <section>
-          <header className="mb-4 flex items-baseline justify-between">
-            <h2 className="text-sm font-medium tracking-tight text-foreground">
-              Your matched DJs
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              {agg.quotesReady} of {agg.total} {agg.total === 1 ? "has" : "have"}{" "}
-              sent a quote
-            </p>
-          </header>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {sortedSlots.map((slot) => (
-              <DJAvatarCard key={slot.djId} slot={slot} djCatalog={djCatalog} />
-            ))}
-          </ul>
-        </section>
-      )}
 
       {/* Quotes appear quietly below once any have arrived */}
       {hasAnyQuote && quotesSection ? (
@@ -342,108 +318,4 @@ function buildStages(agg: ReturnType<typeof aggregateOf>): {
   }));
 }
 
-function orderSlots(slots: DJSlot[]): DJSlot[] {
-  const order = (s: DJSlot) =>
-    s.status === "quote_received"
-      ? 0
-      : s.status === "confirmed_preparing"
-        ? 1
-        : s.status === "awaiting_response"
-          ? 2
-          : 3;
-  return [...slots].sort((a, b) => order(a) - order(b));
-}
 
-const STATUS_COPY: Record<DJSlot["status"], string> = {
-  awaiting_response: "Waiting",
-  confirmed_preparing: "Preparing quote",
-  quote_received: "Quote sent",
-  declined: "Unavailable",
-};
-
-function DJAvatarCard({
-  slot,
-  djCatalog,
-}: {
-  slot: DJSlot;
-  djCatalog: DJProfileWithRelations[];
-}) {
-  const dj = djCatalog.find((d) => d.id === slot.djId);
-  const name = dj?.stage_name ?? slot.username;
-  const city = dj?.profile?.city ?? dj?.base_location;
-  const avatar = dj?.profile?.avatar_url ?? null;
-  const isReady = slot.status === "quote_received";
-  const isDeclined = slot.status === "declined";
-  const initials = (dj?.stage_name ?? slot.username ?? "DJ")
-    .split(" ")
-    .map((p) => p[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-
-  return (
-    <li
-      className={cn(
-        "group relative overflow-hidden rounded-2xl border bg-card transition-colors",
-        isReady
-          ? "border-emerald-300/60"
-          : isDeclined
-            ? "border-border/40"
-            : "border-border/60",
-      )}
-    >
-      {/* Larger image area — about 4:3 portrait crop */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-muted">
-        {avatar ? (
-          <img
-            src={avatar}
-            alt={name}
-            loading="lazy"
-            className={cn(
-              "h-full w-full object-cover transition-opacity",
-              isDeclined && "opacity-60 grayscale",
-            )}
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-muted text-2xl font-medium tracking-wide text-muted-foreground">
-            {initials}
-          </div>
-        )}
-
-        {/* Single tiny status dot, top-right */}
-        <span
-          aria-hidden
-          className={cn(
-            "absolute right-2 top-2 h-2 w-2 rounded-full ring-2 ring-background",
-            isReady && "bg-emerald-500",
-            slot.status === "confirmed_preparing" && "bg-amber-500",
-            slot.status === "awaiting_response" && "bg-muted-foreground/40",
-            isDeclined && "bg-destructive/60",
-          )}
-        />
-      </div>
-
-      <div className="px-3 py-3">
-        <p className="truncate text-sm font-medium text-foreground">{name}</p>
-        {city && (
-          <p className="mt-0.5 truncate text-[11px] text-muted-foreground">
-            {city}
-          </p>
-        )}
-        <p
-          className={cn(
-            "mt-2 text-[11px] uppercase tracking-[0.12em]",
-            isReady
-              ? "text-emerald-700"
-              : isDeclined
-                ? "text-muted-foreground"
-                : "text-muted-foreground",
-          )}
-        >
-          {STATUS_COPY[slot.status]}
-        </p>
-      </div>
-    </li>
-  );
-}
