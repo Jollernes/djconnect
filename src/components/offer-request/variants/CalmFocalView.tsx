@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail } from "lucide-react";
+import {
+  ChevronDown,
+  CreditCard,
+  FileText,
+  Mail,
+  MessageSquareText,
+  Users,
+} from "lucide-react";
 import { aggregateOf } from "@/lib/offerRequestOrchestrator";
 import type { OfferRequestRecord } from "@/lib/offerRequestStore";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -149,11 +156,117 @@ export function CalmFocalView({
         </div>
       </section>
 
+      {/* "What happens now?" — quiet collapsible disclosure. Closed by
+          default so it doesn't compete with the focal animation, but
+          discoverable for first-time customers who want reassurance. */}
+      <WhatHappensNow agg={agg} />
+
       {/* Quotes appear quietly below once any have arrived */}
       {hasAnyQuote && quotesSection ? (
         <section>{quotesSection}</section>
       ) : null}
     </div>
+  );
+}
+
+/**
+ * Closed-by-default disclosure explaining the 4 steps from brief to
+ * booking. Uses the same accordion visual language as `BriefRecap` so
+ * the customer immediately understands how it behaves.
+ */
+function WhatHappensNow({ agg }: { agg: ReturnType<typeof aggregateOf> }) {
+  const [open, setOpen] = useState(false);
+
+  const steps: { icon: typeof FileText; title: string; body: string }[] = [
+    {
+      icon: FileText,
+      title: "Your brief is sent",
+      body:
+        agg.total > 0
+          ? `We've forwarded your details to ${agg.total} matched DJ${agg.total === 1 ? "" : "s"} who fit your event, date and budget.`
+          : "We've forwarded your details to the DJs who fit your event, date and budget.",
+    },
+    {
+      icon: Users,
+      title: "DJs review and respond",
+      body:
+        "Each DJ checks availability and either prepares a personal quote or lets us know they're not available. Most reply within a few hours.",
+    },
+    {
+      icon: MessageSquareText,
+      title: "Up to 3 personal quotes arrive",
+      body:
+        "You'll get up to 3 quotes within 24 hours — by email and on this page. No need to refresh; new quotes appear automatically.",
+    },
+    {
+      icon: CreditCard,
+      title: "Compare and book with escrow",
+      body:
+        "Compare prices and personal messages, ask the DJs questions, and book your favourite. The deposit is held in secure escrow until after your event.",
+    },
+  ];
+
+  return (
+    <section className="rounded-2xl border border-border/60 bg-card/40">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left"
+      >
+        <div className="min-w-0">
+          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
+            While you wait
+          </p>
+          <p className="mt-0.5 truncate text-sm font-medium text-foreground">
+            What happens now?
+          </p>
+        </div>
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className="overflow-hidden border-t border-border/60"
+          >
+            <ol className="space-y-5 px-5 py-5">
+              {steps.map((s, idx) => (
+                <li key={s.title} className="flex gap-4">
+                  <span
+                    aria-hidden
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/60 bg-background text-foreground/80"
+                  >
+                    <s.icon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-baseline gap-2 text-sm font-medium text-foreground">
+                      <span className="tabular-nums text-muted-foreground">
+                        {idx + 1}.
+                      </span>
+                      {s.title}
+                    </p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
+                      {s.body}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </section>
   );
 }
 
