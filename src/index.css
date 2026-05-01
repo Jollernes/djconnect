@@ -6,7 +6,6 @@
 
 @layer base {
   :root {
-    /* Navy base (#0F172A = slate-900) */
     --background: 0 0% 100%;
     --foreground: 222 47% 11%;
 
@@ -16,18 +15,15 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Primary = Deep navy */
     --primary: 222 47% 11%;
     --primary-foreground: 210 40% 98%;
 
-    /* Secondary = muted slate */
     --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
 
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    /* Accent = vibrant coral/orange (#F97316 = orange-500) */
     --accent: 21 90% 53%;
     --accent-foreground: 0 0% 100%;
 
@@ -54,6 +50,7 @@
   html {
     font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    scroll-behavior: smooth;
   }
 
   body {
@@ -69,4 +66,68 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .hero-gradient {
+    background:
+      radial-gradient(ellipse 60% 55% at 20% 30%, hsla(21, 90%, 53%, 0.55), transparent 60%),
+      radial-gradient(ellipse 55% 55% at 85% 20%, hsla(280, 85%, 60%, 0.45), transparent 60%),
+      radial-gradient(ellipse 80% 50% at 50% 100%, hsla(199, 89%, 60%, 0.35), transparent 70%),
+      linear-gradient(135deg, hsl(222 47% 9%), hsl(222 47% 14%) 45%, hsl(222 47% 11%));
+    background-size: 220% 220%, 220% 220%, 200% 200%, 100% 100%;
+    animation: hero-shift 18s ease-in-out infinite alternate;
+  }
+
+  .noise-overlay {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: screen;
+  }
+
+  .marquee-track {
+    animation: marquee 28s linear infinite;
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 0 0 hsla(21, 90%, 53%, 0.55);
+    animation: pulse-glow 2.6s ease-in-out infinite;
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(hsla(0, 0%, 100%, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, hsla(0, 0%, 100%, 0.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse at center, black 50%, transparent 75%);
+  }
+}
+
+@keyframes hero-shift {
+  0%   { background-position:   0% 0%,  100% 0%,  50% 100%, 0 0; }
+  50%  { background-position: 100% 50%,   0% 50%,  50%   0%, 0 0; }
+  100% { background-position:  50% 100%, 50%  0%,  100%  50%, 0 0; }
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes eq-bounce {
+  0%, 100% { transform: scaleY(0.3); }
+  50%      { transform: scaleY(1); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -14px, 0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0     hsla(21, 90%, 53%, 0.55); }
+  50%      { box-shadow: 0 0 0 18px  hsla(21, 90%, 53%, 0);    }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }

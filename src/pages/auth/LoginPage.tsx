@@ -94,9 +94,26 @@ export function LoginPage() {
           {!isConfigured && (
             <div className="space-y-2 rounded-md border p-3 text-xs">
               <div className="font-medium">Demo logins (no backend):</div>
-              <div className="grid grid-cols-3 gap-2">
-                <Button size="sm" variant="secondary" onClick={() => { mockLogin("customer"); navigate("/dashboard"); }}>
-                  As customer
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    mockLogin("customer", { customerKind: "private" });
+                    navigate("/dashboard");
+                  }}
+                >
+                  Private customer
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    mockLogin("customer", { customerKind: "corporate" });
+                    navigate("/dashboard");
+                  }}
+                >
+                  Corporate customer
                 </Button>
                 <Button size="sm" variant="secondary" onClick={() => { mockLogin("dj"); navigate("/dj/dashboard"); }}>
                   As DJ

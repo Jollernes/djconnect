@@ -1,23 +1,26 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search as SearchIcon, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DJCard } from "@/components/common/DJCard";
 import { EmptyState } from "@/components/common/EmptyState";
-import { EVENT_TYPES, SETUP_SIZES } from "@/lib/constants";
+import { EventContextBanner } from "@/components/common/EventContextBanner";
+import { EventContextModal } from "@/components/common/EventContextModal";
+import { useEventContext } from "@/hooks/useEventContext";
+import { SETUP_SIZES } from "@/lib/constants";
 import { useDJs } from "@/hooks/useDJs";
 import type { SearchFilters } from "@/types/domain";
 
 export function SearchPage() {
   const [params, setParams] = useSearchParams();
+  const { eventTypeId, set: setEventType } = useEventContext();
 
   const filters = useMemo<SearchFilters>(() => {
-    const eventTypes = params.get("eventType")?.split(",").filter(Boolean) ?? [];
+    const eventTypes = eventTypeId ? [eventTypeId] : [];
     return {
       query: params.get("q") ?? undefined,
       city: params.get("city") ?? undefined,
@@ -28,7 +31,7 @@ export function SearchPage() {
       maxPriceMinor: params.get("maxPrice") ? Number(params.get("maxPrice")) : undefined,
       sortBy: (params.get("sort") as SearchFilters["sortBy"]) ?? "relevance",
     };
-  }, [params]);
+  }, [params, eventTypeId]);
 
   const { djs, loading } = useDJs(filters);
 
@@ -47,14 +50,23 @@ export function SearchPage() {
     setParams(next);
   }
 
-  function toggleEventType(id: string) {
-    const current = filters.eventTypes ?? [];
-    const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
-    update({ eventType: next });
+  function clearAllFilters() {
+    const next = new URLSearchParams();
+    if (eventTypeId) next.set("eventType", eventTypeId);
+    setParams(next);
   }
 
+  // First-visit picker: if user lands on /search with no event context, prompt once.
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerDismissed, setPickerDismissed] = useState(false);
+  useEffect(() => {
+    if (!eventTypeId && !pickerDismissed) {
+      const timer = setTimeout(() => setPickerOpen(true), 250);
+      return () => clearTimeout(timer);
+    }
+  }, [eventTypeId, pickerDismissed]);
+
   const activeCount =
-    (filters.eventTypes?.length ?? 0) +
     (filters.city ? 1 : 0) +
     (filters.setupSize ? 1 : 0) +
     (filters.minRating ? 1 : 0) +
@@ -62,7 +74,7 @@ export function SearchPage() {
 
   return (
     <div className="container py-8">
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold sm:text-3xl">Browse DJs</h1>
           <p className="text-sm text-muted-foreground">
@@ -91,6 +103,13 @@ export function SearchPage() {
         </div>
       </div>
 
+      <EventContextBanner
+        eventTypeId={eventTypeId}
+        onChange={setEventType}
+        variant="search"
+        className="mb-6"
+      />
+
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
         <aside className="space-y-6 rounded-xl border bg-card p-5">
           <div className="flex items-center justify-between">
@@ -98,25 +117,10 @@ export function SearchPage() {
               <Filter className="h-4 w-4" /> Filters
             </h2>
             {activeCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={() => setParams(new URLSearchParams())}>
+              <Button variant="ghost" size="sm" onClick={clearAllFilters}>
                 <X className="h-3.5 w-3.5" /> Clear
               </Button>
             )}
-          </div>
-
-          <div>
-            <Label className="mb-2 block">Event type</Label>
-            <div className="space-y-2">
-              {EVENT_TYPES.map((et) => (
-                <label key={et.id} className="flex items-center gap-2 text-sm">
-                  <Checkbox
-                    checked={filters.eventTypes?.includes(et.id) ?? false}
-                    onCheckedChange={() => toggleEventType(et.id)}
-                  />
-                  {et.label}
-                </label>
-              ))}
-            </div>
           </div>
 
           <div>
@@ -183,6 +187,10 @@ export function SearchPage() {
               onChange={(e) => update({ maxPrice: e.target.value ? String(Number(e.target.value) * 100) : undefined })}
             />
           </div>
+
+          <p className="text-xs text-muted-foreground">
+            The event type is set above and applies to every DJ shown. Tap "Change event" to switch.
+          </p>
         </aside>
 
         <div>
@@ -196,17 +204,28 @@ export function SearchPage() {
             <EmptyState
               title="No DJs match your filters"
               description="Try loosening some filters or expanding your location."
-              action={<Button onClick={() => setParams(new URLSearchParams())}>Clear filters</Button>}
+              action={<Button onClick={clearAllFilters}>Clear filters</Button>}
             />
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {djs.map((dj) => (
-                <DJCard key={dj.id} dj={dj} />
+                <DJCard key={dj.id} dj={dj} eventTypeId={eventTypeId || undefined} />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      <EventContextModal
+        open={pickerOpen}
+        onOpenChange={(o) => {
+          setPickerOpen(o);
+          if (!o) setPickerDismissed(true);
+        }}
+        value={eventTypeId}
+        onSelect={setEventType}
+        onBrowseAll={() => setPickerDismissed(true)}
+      />
     </div>
   );
 }

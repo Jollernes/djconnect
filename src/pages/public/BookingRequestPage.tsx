@@ -1,23 +1,26 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ChevronLeft, ChevronRight, Lock, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock, CheckCircle2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useDJ } from "@/hooks/useDJs";
 import { useAuth } from "@/hooks/useAuth";
+import { useEventContext } from "@/hooks/useEventContext";
+import { EventContextModal } from "@/components/common/EventContextModal";
 import { EVENT_TYPES, PLATFORM_FEE_PERCENT, CANCELLATION_POLICY } from "@/lib/constants";
+import { getEventTypeOption } from "@/lib/eventTypeOptions";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const eventSchema = z.object({
   eventTypeId: z.string().min(1, "Required"),
@@ -36,14 +39,25 @@ export function BookingRequestPage() {
   const { username } = useParams<{ username: string }>();
   const { dj, loading } = useDJ(username ?? "");
   const { profile } = useAuth();
+  const { eventTypeId: contextEventTypeId, set: setEventType } = useEventContext();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [eventPickerOpen, setEventPickerOpen] = useState(false);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
-    defaultValues: { eventTypeId: "", eventDate: "", startTime: "", endTime: "", venueName: "", venueAddress: "", notes: "" },
+    defaultValues: { eventTypeId: contextEventTypeId, eventDate: "", startTime: "", endTime: "", venueName: "", venueAddress: "", notes: "" },
   });
+
+  // Keep the form's event type in sync with context (URL / sessionStorage).
+  useEffect(() => {
+    if (contextEventTypeId && form.getValues("eventTypeId") !== contextEventTypeId) {
+      form.setValue("eventTypeId", contextEventTypeId, { shouldValidate: true });
+    }
+  }, [contextEventTypeId, form]);
+
+  const selectedOption = getEventTypeOption(form.watch("eventTypeId"));
 
   const totals = useMemo(() => {
     if (!dj || dj.price_on_request) return null;
@@ -109,13 +123,49 @@ export function BookingRequestPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <Label>Event type</Label>
-                <Select value={form.watch("eventTypeId")} onValueChange={(v) => form.setValue("eventTypeId", v, { shouldValidate: true })}>
-                  <SelectTrigger className="mt-1"><SelectValue placeholder="Select an event type" /></SelectTrigger>
-                  <SelectContent>
-                    {EVENT_TYPES.map((e) => <SelectItem key={e.id} value={e.id}>{e.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <div
+                  className={cn(
+                    "mt-1 flex items-center justify-between gap-3 rounded-md border bg-muted/30 px-3 py-2.5",
+                    selectedOption ? "border-accent/30" : "border-input",
+                  )}
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    {selectedOption ? (
+                      <>
+                        <span
+                          className={cn(
+                            "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br",
+                            selectedOption.tint,
+                          )}
+                        >
+                          <selectedOption.Icon className="h-4 w-4" />
+                        </span>
+                        <div className="min-w-0">
+                          <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            Booking for
+                          </div>
+                          <div className="truncate text-sm font-semibold">{selectedOption.label}</div>
+                        </div>
+                      </>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">No event selected yet</span>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEventPickerOpen(true)}
+                    className="rounded-full"
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    {selectedOption ? "Change" : "Choose event"}
+                  </Button>
+                </div>
                 {form.formState.errors.eventTypeId && <p className="mt-1 text-xs text-destructive">{form.formState.errors.eventTypeId.message}</p>}
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  Set on the homepage. Switching events may change the DJ's pricing or what they bring.
+                </p>
               </div>
               <div>
                 <Label htmlFor="eventDate">Event date</Label>
@@ -204,6 +254,18 @@ export function BookingRequestPage() {
           </CardContent>
         </Card>
       )}
+
+      <EventContextModal
+        open={eventPickerOpen}
+        onOpenChange={setEventPickerOpen}
+        value={form.watch("eventTypeId")}
+        onSelect={(id) => {
+          form.setValue("eventTypeId", id, { shouldValidate: true });
+          setEventType(id);
+        }}
+        title="Change the event you're booking"
+        description="Switching events may change the DJ's pricing or what they bring."
+      />
 
       {step === 2 && (
         <Card>

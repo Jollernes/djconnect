@@ -12,17 +12,24 @@ import {
   DollarSign,
   Star,
   Clapperboard,
+  PartyPopper,
 } from "lucide-react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import type { UserRole } from "@/types/domain";
+import { getCustomerType } from "@/lib/customerType";
+import type { Profile, UserRole } from "@/types/domain";
 
-const customerNav = [
+const corporateCustomerNav = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
   { to: "/dashboard/bookings", label: "Bookings", icon: Calendar },
   { to: "/dashboard/favourites", label: "Favourites", icon: Heart },
+  { to: "/dashboard/settings", label: "Settings", icon: Settings },
+];
+
+const privateCustomerNav = [
+  { to: "/dashboard", label: "My event", icon: PartyPopper, end: true },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
@@ -45,10 +52,10 @@ const adminNav = [
   { to: "/admin/featured", label: "Featured DJs", icon: Clapperboard },
 ];
 
-function navFor(role: UserRole) {
+function navFor(role: UserRole, profile: Profile) {
   if (role === "dj") return djNav;
   if (role === "admin") return adminNav;
-  return customerNav;
+  return getCustomerType(profile) === "corporate" ? corporateCustomerNav : privateCustomerNav;
 }
 
 export function DashboardLayout() {
@@ -56,7 +63,7 @@ export function DashboardLayout() {
   const location = useLocation();
 
   if (!profile) return null;
-  const nav = navFor(profile.role);
+  const nav = navFor(profile.role, profile);
 
   return (
     <div className="flex min-h-screen flex-col">

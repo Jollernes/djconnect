@@ -7,6 +7,12 @@ import { RoleGuard } from "@/components/common/RoleGuard";
 
 import { HomePage } from "@/pages/public/HomePage";
 import { SearchPage } from "@/pages/public/SearchPage";
+import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
+import { GetOffersPage } from "@/pages/public/GetOffersPage";
+import { MyRequestPage } from "@/pages/public/MyRequestPage";
+import { WeddingDJsTestAPage } from "@/pages/public/WeddingDJsTestAPage";
+import { WeddingDJsTestBPage } from "@/pages/public/WeddingDJsTestBPage";
+import { WeddingDJsTestCPage } from "@/pages/public/WeddingDJsTestCPage";
 import { DJProfilePage } from "@/pages/public/DJProfilePage";
 import { BookingRequestPage } from "@/pages/public/BookingRequestPage";
 import { AboutPage } from "@/pages/public/AboutPage";
@@ -38,6 +44,8 @@ import { DJAvailabilityPage } from "@/pages/dj/AvailabilityPage";
 import { DJEarningsPage } from "@/pages/dj/EarningsPage";
 import { DJMessagesPage } from "@/pages/dj/MessagesPage";
 import { DJProfileEditorPage } from "@/pages/dj/ProfileEditorPage";
+import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
+import { DJGuideGate } from "@/components/common/DJGuideGate";
 
 import { AdminDashboardPage } from "@/pages/admin/DashboardPage";
 import { VerificationQueuePage, VerificationDetailPage } from "@/pages/admin/VerificationPage";
@@ -55,6 +63,10 @@ function App() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/wedding-djs" element={<WeddingDJsPage />} />
+            <Route path="/wedding-djs-test-a" element={<WeddingDJsTestAPage />} />
+            <Route path="/wedding-djs-test-b" element={<WeddingDJsTestBPage />} />
+            <Route path="/wedding-djs-test-c" element={<WeddingDJsTestCPage />} />
             <Route path="/djs/:username" element={<DJProfilePage />} />
             <Route path="/book/:username" element={<BookingRequestPage />} />
             <Route path="/about" element={<AboutPage />} />
@@ -88,9 +100,20 @@ function App() {
           </Route>
 
           <Route
+            path="/dj/onboarding"
             element={
               <RoleGuard allow={["dj"]}>
-                <DashboardLayout />
+                <DJOnboardingGuidePage />
+              </RoleGuard>
+            }
+          />
+
+          <Route
+            element={
+              <RoleGuard allow={["dj"]}>
+                <DJGuideGate>
+                  <DashboardLayout />
+                </DJGuideGate>
               </RoleGuard>
             }
           >
@@ -119,6 +142,13 @@ function App() {
             <Route path="/admin/reviews" element={<AdminReviewsPage />} />
             <Route path="/admin/featured" element={<AdminFeaturedPage />} />
           </Route>
+
+          {/* Get-3-offers wizard owns its own full-screen layout (no site header/footer) */}
+          <Route path="/get-offers" element={<GetOffersPage />} />
+
+          {/* Live progress page for an offer request — public for now;
+              eventually gated behind a magic link. */}
+          <Route path="/my-requests/:requestId" element={<MyRequestPage />} />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

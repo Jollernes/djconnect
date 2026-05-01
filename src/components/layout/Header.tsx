@@ -1,5 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, Search, User, LogOut, LayoutDashboard, Settings, Music2, Shield } from "lucide-react";
+import { Menu, Search, User, LogOut, LayoutDashboard, Settings, Shield } from "lucide-react";
+import { BrandMark } from "@/components/common/BrandMark";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -17,6 +18,7 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { to: "/search", label: "Browse DJs" },
+  { to: "/get-offers", label: "Get 3 offers", highlight: true },
   { to: "/how-it-works", label: "How it works" },
   { to: "/about", label: "About" },
   { to: "/faq", label: "FAQ" },
@@ -34,11 +36,9 @@ export function Header() {
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
       <div className="container flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-8">
-          <Link to="/" className="flex items-center gap-2 font-semibold">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-              <Music2 className="h-4 w-4" />
-            </span>
-            <span className="text-lg">{PLATFORM_NAME}</span>
+          <Link to="/" className="group flex items-center gap-2.5 font-semibold">
+            <BrandMark size="sm" className="transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
+            <span className="text-lg tracking-tight">{PLATFORM_NAME}</span>
           </Link>
           <nav className="hidden md:flex md:items-center md:gap-6">
             {navLinks.map((link) => (
@@ -48,7 +48,14 @@ export function Header() {
                 className={({ isActive }) =>
                   cn(
                     "text-sm font-medium transition-colors hover:text-foreground",
-                    isActive ? "text-foreground" : "text-muted-foreground",
+                    link.highlight
+                      ? cn(
+                          "rounded-full bg-gradient-to-r from-rose-500 to-rose-600 px-3.5 py-1.5 text-white shadow-sm hover:from-rose-600 hover:to-rose-700 hover:text-white",
+                          isActive && "ring-2 ring-rose-300",
+                        )
+                      : isActive
+                        ? "text-foreground"
+                        : "text-muted-foreground",
                   )
                 }
               >

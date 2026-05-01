@@ -19,12 +19,13 @@ interface AuthContextValue {
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   /** Mock login (only used when Supabase is not configured, for UI demos) */
-  mockLogin: (role: UserRole) => void;
+  mockLogin: (role: UserRole, opts?: { customerKind?: "private" | "corporate" }) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 const MOCK_STORAGE_KEY = "djconnect.mockRole";
+const MOCK_CUSTOMER_KIND_KEY = "djconnect.mockCustomerKind";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -55,16 +56,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase) {
       const mockRole = localStorage.getItem(MOCK_STORAGE_KEY) as UserRole | null;
       if (mockRole) {
+        const kind = localStorage.getItem(MOCK_CUSTOMER_KIND_KEY) as "private" | "corporate" | null;
+        const isCorporate = mockRole === "customer" && kind === "corporate";
         setProfile({
-          id: `mock-${mockRole}`,
+          id: isCorporate ? "user-customer-2" : mockRole === "customer" ? "user-customer-1" : `mock-${mockRole}`,
           role: mockRole,
-          email: `${mockRole}@djconnect.example`,
-          full_name: mockRole === "admin" ? "Platform Admin" : mockRole === "dj" ? "DJ Alex Holm" : "Sara Jensen",
+          email: isCorporate ? "tom@acme.example" : `${mockRole}@djconnect.example`,
+          full_name:
+            mockRole === "admin"
+              ? "Platform Admin"
+              : mockRole === "dj"
+                ? "DJ Alex Holm"
+                : isCorporate
+                  ? "Tom Bergmann"
+                  : "Sara Jensen",
           phone: null,
           avatar_url: null,
           city: "Copenhagen",
           country: "Denmark",
-          company_name: null,
+          company_name: isCorporate ? "Acme A/S" : null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
@@ -143,6 +153,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut();
     }
     localStorage.removeItem(MOCK_STORAGE_KEY);
+    localStorage.removeItem(MOCK_CUSTOMER_KIND_KEY);
     setProfile(null);
     setUser(null);
     setSession(null);
@@ -152,22 +163,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await loadProfile(user);
   }, [loadProfile, user]);
 
-  const mockLogin = useCallback((role: UserRole) => {
-    localStorage.setItem(MOCK_STORAGE_KEY, role);
-    setProfile({
-      id: `mock-${role}`,
-      role,
-      email: `${role}@djconnect.example`,
-      full_name: role === "admin" ? "Platform Admin" : role === "dj" ? "DJ Alex Holm" : "Sara Jensen",
-      phone: null,
-      avatar_url: null,
-      city: "Copenhagen",
-      country: "Denmark",
-      company_name: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-  }, []);
+  const mockLogin = useCallback(
+    (role: UserRole, opts?: { customerKind?: "private" | "corporate" }) => {
+      localStorage.setItem(MOCK_STORAGE_KEY, role);
+      const kind = opts?.customerKind ?? "private";
+      if (role === "customer") {
+        localStorage.setItem(MOCK_CUSTOMER_KIND_KEY, kind);
+      } else {
+        localStorage.removeItem(MOCK_CUSTOMER_KIND_KEY);
+      }
+      const isCorporate = role === "customer" && kind === "corporate";
+      setProfile({
+        id: isCorporate ? "user-customer-2" : role === "customer" ? "user-customer-1" : `mock-${role}`,
+        role,
+        email: isCorporate ? "tom@acme.example" : `${role}@djconnect.example`,
+        full_name:
+          role === "admin"
+            ? "Platform Admin"
+            : role === "dj"
+              ? "DJ Alex Holm"
+              : isCorporate
+                ? "Tom Bergmann"
+                : "Sara Jensen",
+        phone: null,
+        avatar_url: null,
+        city: "Copenhagen",
+        country: "Denmark",
+        company_name: isCorporate ? "Acme A/S" : null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    },
+    [],
+  );
 
   const value = useMemo<AuthContextValue>(
     () => ({
