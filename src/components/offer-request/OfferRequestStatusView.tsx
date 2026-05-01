@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronDown, Pencil } from "lucide-react";
-import { OfferProgressTracker } from "@/components/offer-request/OfferProgressTracker";
 import { QuoteComparisonGrid } from "@/components/offer-request/QuoteComparisonGrid";
 import { CalmFocalView } from "@/components/offer-request/variants/CalmFocalView";
 import { SteppedTrackerView } from "@/components/offer-request/variants/SteppedTrackerView";
@@ -157,26 +156,6 @@ export function OfferRequestStatusView({
 
       {/* Brief recap is the same for every variant */}
       {briefRecap}
-
-      {/* Show the original "minimal table" tracker once any variant is
-          rendered, in collapsed/secondary form, only for variants that
-          don't already display a per-DJ list. Currently that's only
-          variant A. */}
-      {variant === "A" && (
-        <details className="rounded-2xl border border-border/60 bg-card/30">
-          <summary className="cursor-pointer select-none px-5 py-4 text-sm text-muted-foreground hover:text-foreground">
-            See per-DJ status
-          </summary>
-          <div className="px-5 pb-5">
-            <OfferProgressTracker
-              record={record}
-              djCatalog={djCatalog}
-              elapsedHours={0}
-              remainingHours={remainingHours}
-            />
-          </div>
-        </details>
-      )}
 
       <FootNote record={record} />
 
