@@ -9,6 +9,61 @@
  * `profiles` row + `dj_profiles` row.
  */
 
+/** Per-event-type sub-profile that customers see based on what they're booking. */
+export type DemoDJSubProfileKey = "general" | "wedding" | "birthday" | "corporate";
+
+export type DemoDJSubProfile = {
+  /** Headline displayed at the top of the public profile for this event type. */
+  tagline: string;
+  /** Long-form bio framed for this event type. */
+  bio: string;
+  /** Music style summary (e.g. "House, disco, funk — high-energy peaks"). */
+  musicStyle: string;
+  /** Crowd-pleaser tracks the DJ is known for at this event type. */
+  signatureTracks: string;
+  /** Concrete approach / story so customers know what to expect. */
+  approach: string;
+  /** Optional starting price in major units (e.g. DKK). 0 = use account default. */
+  priceFromMajor: number;
+};
+
+export const SUB_PROFILE_KEYS: DemoDJSubProfileKey[] = [
+  "general",
+  "wedding",
+  "birthday",
+  "corporate",
+];
+
+export const SUB_PROFILE_META: Record<
+  DemoDJSubProfileKey,
+  { label: string; eyebrow: string; helper: string }
+> = {
+  general: {
+    label: "General",
+    eyebrow: "Shown to customers searching for any other event",
+    helper:
+      "This is the fallback profile used whenever a customer isn't searching for a wedding, birthday or corporate event. Keep it broad and confident.",
+  },
+  wedding: {
+    label: "Wedding",
+    eyebrow: "Shown to couples searching for wedding DJs",
+    helper:
+      "Couples want a DJ who reads multi-generational rooms. Talk about ceremony / dinner / dancefloor flow, requests, and how you handle key moments.",
+  },
+  birthday: {
+    label: "Birthday",
+    eyebrow: "Shown to customers booking a birthday party",
+    helper:
+      "Birthday hosts want energy. Highlight crowd-pleasers, milestone parties (30th, 40th, 50th), and how you keep the dancefloor moving.",
+  },
+  corporate: {
+    label: "Corporate Event",
+    eyebrow: "Shown to companies booking corporate events & parties",
+    helper:
+      "Corporate clients want professionalism. Talk about brand-appropriate music, tasteful volume control, and your experience with company parties.",
+  },
+};
+
 export type DemoDJProfile = {
   /** ISO timestamp the profile was created. */
   createdAt: string;
@@ -18,7 +73,7 @@ export type DemoDJProfile = {
   phone?: string;
   city: string;
   country: string;
-  /** Public DJ fields */
+  /** Public DJ fields (shared across all sub-profiles) */
   stageName: string;
   bio: string;
   yearsExperience: string;
@@ -36,7 +91,37 @@ export type DemoDJProfile = {
    */
   profilePhotoDataUrl?: string;
   equipmentPhotoDataUrls?: string[];
+  /**
+   * Per-event-type sub-profiles. Customers see one of these depending on
+   * what kind of event they're searching for. All four are optional at
+   * signup time — the DJ fills them in after onboarding from the profile
+   * editor (`/dj/profile`).
+   */
+  subProfiles?: Partial<Record<DemoDJSubProfileKey, DemoDJSubProfile>>;
 };
+
+/** Returns true when every required field on a sub-profile has been filled in. */
+export function isSubProfileComplete(sp: DemoDJSubProfile | undefined): boolean {
+  if (!sp) return false;
+  return Boolean(
+    sp.tagline.trim() &&
+      sp.bio.trim().length >= 80 &&
+      sp.musicStyle.trim() &&
+      sp.signatureTracks.trim() &&
+      sp.approach.trim(),
+  );
+}
+
+export function emptySubProfile(): DemoDJSubProfile {
+  return {
+    tagline: "",
+    bio: "",
+    musicStyle: "",
+    signatureTracks: "",
+    approach: "",
+    priceFromMajor: 0,
+  };
+}
 
 const STORAGE_KEY = "djconnect.demoDJProfile";
 

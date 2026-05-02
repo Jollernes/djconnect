@@ -320,11 +320,11 @@ export function BookingRequestPage() {
               Reference: <span className="font-mono font-semibold">{submittedRef ?? "—"}</span>
             </div>
             <div className="flex flex-wrap justify-center gap-2">
-              <Button asChild variant="outline">
-                <a href={profile?.role === "customer" ? "/dashboard/requests" : "/dashboard"}>
-                  View my requests
-                </a>
-              </Button>
+              {profile?.role === "customer" && (
+                <Button asChild variant="outline">
+                  <a href="/dashboard/requests">View my requests</a>
+                </Button>
+              )}
               <Button asChild variant="accent">
                 <a href="/search">Browse more DJs</a>
               </Button>
