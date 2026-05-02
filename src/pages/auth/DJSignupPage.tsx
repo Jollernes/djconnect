@@ -41,6 +41,7 @@ import { FilePicker, type FileWithPreview } from "@/components/dj-signup/FilePic
 import { OptionCards } from "@/components/dj-signup/OptionCards";
 import { LivePreview } from "@/components/dj-signup/LivePreview";
 import { cn } from "@/lib/utils";
+import { fileToDataUrl, writeDemoDJProfile } from "@/lib/demoDJProfile";
 
 type Draft = {
   fullName: string;
@@ -120,7 +121,7 @@ const EQUIPMENT_PRESETS = [
 const DRAFT_KEY = "djconnect.djsignup.draft";
 
 export function DJSignupPage() {
-  const { signUpWithPassword, isConfigured } = useAuth();
+  const { signUpWithPassword, isConfigured, mockLogin } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(0);
@@ -217,11 +218,54 @@ export function DJSignupPage() {
           role: "dj",
         });
       }
+
+      // Persist everything the user just entered as a "demo DJ profile" so
+      // the new DJ panel can render their data straight away. Photos are
+      // converted to data URLs so they survive a page reload.
+      const profilePhotoDataUrl = profilePhoto[0]
+        ? (await fileToDataUrl(profilePhoto[0])) ?? undefined
+        : undefined;
+      const equipmentPhotoDataUrls = (
+        await Promise.all(equipmentPhotos.map((p) => fileToDataUrl(p)))
+      ).filter((u): u is string => typeof u === "string");
+
+      writeDemoDJProfile({
+        createdAt: new Date().toISOString(),
+        fullName: draft.fullName,
+        email: draft.email,
+        phone: draft.phone || undefined,
+        city: draft.city,
+        country: draft.country,
+        stageName: draft.stageName,
+        bio: draft.bio,
+        yearsExperience: draft.yearsExperience,
+        eventTypes: draft.eventTypes,
+        equipmentOwned: draft.equipmentOwned,
+        equipmentPresets: draft.equipmentPresets,
+        equipmentDescription: draft.equipmentDescription,
+        setupSize: draft.setupSize,
+        eventsPerformed: draft.eventsPerformed,
+        notableClients: draft.notableClients,
+        profilePhotoDataUrl,
+        equipmentPhotoDataUrls,
+      });
+
       setCompleted((c) => new Set(c).add(step));
       setSubmitted(true);
       fireConfetti();
       localStorage.removeItem(DRAFT_KEY);
-      setTimeout(() => navigate("/dj/pending-verification"), 2800);
+
+      // In demo mode (no Supabase) we drop the user straight into the new
+      // DJ panel so they can see the profile they just built. With a real
+      // backend they still go to pending-verification first.
+      if (isConfigured) {
+        setTimeout(() => navigate("/dj/pending-verification"), 2800);
+      } else {
+        setTimeout(() => {
+          mockLogin("dj");
+          navigate("/dj/dashboard");
+        }, 1800);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Submission failed");
       setLoading(false);

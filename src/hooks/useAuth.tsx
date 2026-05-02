@@ -3,6 +3,8 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Profile, UserRole } from "@/types/domain";
 import type { UserRole as RoleEnum } from "@/types/database";
+import { readDemoDJProfile } from "@/lib/demoDJProfile";
+import { markDJGuideCompleted } from "@/lib/djGuide";
 
 interface AuthContextValue {
   user: User | null;
@@ -58,22 +60,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (mockRole) {
         const kind = localStorage.getItem(MOCK_CUSTOMER_KIND_KEY) as "private" | "corporate" | null;
         const isCorporate = mockRole === "customer" && kind === "corporate";
+        const demoDJ = mockRole === "dj" ? readDemoDJProfile() : null;
         setProfile({
           id: isCorporate ? "user-customer-2" : mockRole === "customer" ? "user-customer-1" : `mock-${mockRole}`,
           role: mockRole,
-          email: isCorporate ? "tom@acme.example" : `${mockRole}@djconnect.example`,
+          email: demoDJ?.email
+            ? demoDJ.email
+            : isCorporate
+              ? "tom@acme.example"
+              : `${mockRole}@djconnect.example`,
           full_name:
             mockRole === "admin"
               ? "Platform Admin"
               : mockRole === "dj"
-                ? "DJ Alex Holm"
+                ? demoDJ?.fullName?.trim() || demoDJ?.stageName?.trim() || "DJ Alex Holm"
                 : isCorporate
                   ? "Tom Bergmann"
                   : "Sara Jensen",
-          phone: null,
-          avatar_url: null,
-          city: "Copenhagen",
-          country: "Denmark",
+          phone: demoDJ?.phone ?? null,
+          avatar_url: demoDJ?.profilePhotoDataUrl ?? null,
+          city: demoDJ?.city ?? "Copenhagen",
+          country: demoDJ?.country ?? "Denmark",
           company_name: isCorporate ? "Acme A/S" : null,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -173,22 +180,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(MOCK_CUSTOMER_KIND_KEY);
       }
       const isCorporate = role === "customer" && kind === "corporate";
+      // Demo DJs created via the signup flow override the canned profile so
+      // the dashboard shows "their" name, photo and city instead of the
+      // built-in seed ("DJ Alex Holm"). Logging in as DJ also marks the
+      // educational onboarding guide complete — demo accounts skip that.
+      const demoDJ = role === "dj" ? readDemoDJProfile() : null;
+      if (role === "dj") {
+        markDJGuideCompleted();
+      }
       setProfile({
         id: isCorporate ? "user-customer-2" : role === "customer" ? "user-customer-1" : `mock-${role}`,
         role,
-        email: isCorporate ? "tom@acme.example" : `${role}@djconnect.example`,
+        email: demoDJ?.email
+          ? demoDJ.email
+          : isCorporate
+            ? "tom@acme.example"
+            : `${role}@djconnect.example`,
         full_name:
           role === "admin"
             ? "Platform Admin"
             : role === "dj"
-              ? "DJ Alex Holm"
+              ? demoDJ?.fullName?.trim() || demoDJ?.stageName?.trim() || "DJ Alex Holm"
               : isCorporate
                 ? "Tom Bergmann"
                 : "Sara Jensen",
-        phone: null,
-        avatar_url: null,
-        city: "Copenhagen",
-        country: "Denmark",
+        phone: demoDJ?.phone ?? null,
+        avatar_url: demoDJ?.profilePhotoDataUrl ?? null,
+        city: demoDJ?.city ?? "Copenhagen",
+        country: demoDJ?.country ?? "Denmark",
         company_name: isCorporate ? "Acme A/S" : null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
