@@ -136,9 +136,11 @@ export function BookingRequestPage() {
 
   return (
     <div className="container max-w-3xl py-8">
-      <Button variant="ghost" onClick={() => (step > 0 ? setStep(step - 1) : navigate(-1))} className="mb-4">
-        <ChevronLeft className="h-4 w-4" /> Back
-      </Button>
+      {step < 2 && (
+        <Button variant="ghost" onClick={() => (step > 0 ? setStep(step - 1) : navigate(-1))} className="mb-4">
+          <ChevronLeft className="h-4 w-4" /> Back
+        </Button>
+      )}
 
       <div className="mb-6 flex items-center gap-3">
         <img src={dj.equipment_photos[0]?.url ?? dj.profile.avatar_url ?? ""} alt="" className="h-14 w-14 rounded-md object-cover" />
