@@ -1,9 +1,11 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, Navigate, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OfferRequestStatusView } from "@/components/offer-request/OfferRequestStatusView";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { useOfferRequestRecord } from "@/hooks/useOfferRequestRecord";
+import { useAuth } from "@/hooks/useAuth";
+import { recordIsVisibleTo } from "@/lib/offerRequestStore";
 
 /**
  * Live progress page for a single offer request, embedded in the customer
@@ -14,12 +16,21 @@ export function CustomerRequestDetailPage() {
   const { requestId } = useParams<{ requestId: string }>();
   const { record, loading, elapsedHours, remainingHours } =
     useOfferRequestRecord(requestId);
+  const { profile } = useAuth();
+  const customerId = profile?.role === "customer" ? profile.id : null;
 
   useDocumentHead({
     title: "Your DJ offers · DJConnect",
     description:
       "Track your matched DJs and incoming personal quotes — quietly, in real time.",
   });
+
+  // Belt-and-braces guard: don't let a logged-in customer open someone
+  // else's request via a guessed URL. Legacy un-tagged records remain
+  // visible to everyone for continuity.
+  if (record && !recordIsVisibleTo(record, customerId)) {
+    return <Navigate to="/dashboard/requests" replace />;
+  }
 
   if (loading) {
     return (

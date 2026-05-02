@@ -96,7 +96,9 @@ export function GetOffersPage() {
     if (submitting) return;
     setSubmitting(true);
     const catalog = djs.length > 0 ? djs : mockDJs;
-    const record = createRequestRecord(request, catalog);
+    const record = createRequestRecord(request, catalog, {
+      customerId: profile?.role === "customer" ? profile.id : null,
+    });
     // Wizard answers are no longer needed — the record now owns the brief.
     reset();
     // Logged-in customers land on the dashboard-embedded view; guests land on

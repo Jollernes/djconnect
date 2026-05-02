@@ -5,18 +5,20 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/EmptyState";
 import { aggregateOf } from "@/lib/offerRequestOrchestrator";
 import {
-  listRequestIds,
-  readRecord,
+  listRecordsForCustomer,
   type OfferRequestRecord,
 } from "@/lib/offerRequestStore";
+import { useAuth } from "@/hooks/useAuth";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { EVENT_TYPE_OPTIONS } from "@/lib/eventTypeOptions";
 import { CITY_OPTIONS } from "@/lib/offerRequestContent";
 
 /**
- * Customer-dashboard list of all offer requests this device has submitted.
- * Each row is a quiet line — no avatars, no big tiles. Drill into a row to
- * open the live progress view at /dashboard/requests/:id.
+ * Customer-dashboard list of all offer requests for the current customer.
+ * Logged-in customers see only their own submissions (scoped via
+ * `record.customerId`); legacy / pre-auth records are also surfaced for
+ * continuity. Each row is a quiet line — no avatars, no big tiles. Drill
+ * into a row to open the live progress view at /dashboard/requests/:id.
  */
 export function CustomerRequestsListPage() {
   useDocumentHead({
@@ -24,16 +26,14 @@ export function CustomerRequestsListPage() {
     description: "All your offer requests in one place.",
   });
 
+  const { profile } = useAuth();
+  const customerId = profile?.role === "customer" ? profile.id : null;
+
   const [records, setRecords] = useState<OfferRequestRecord[]>([]);
 
   useEffect(() => {
     function load() {
-      const ids = listRequestIds();
-      const recs = ids
-        .map((id) => readRecord(id))
-        .filter((r): r is OfferRequestRecord => r !== null)
-        .sort((a, b) => b.createdAtMs - a.createdAtMs);
-      setRecords(recs);
+      setRecords(listRecordsForCustomer(customerId));
     }
     load();
     const onUpdate = () => load();
@@ -45,7 +45,7 @@ export function CustomerRequestsListPage() {
       window.removeEventListener("storage", onUpdate);
       clearInterval(t);
     };
-  }, []);
+  }, [customerId]);
 
   if (records.length === 0) {
     return (
@@ -68,7 +68,7 @@ export function CustomerRequestsListPage() {
           My requests
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Every offer request from this device. Open one to see live progress.
+          Open any request to see live progress and incoming quotes.
         </p>
       </header>
 

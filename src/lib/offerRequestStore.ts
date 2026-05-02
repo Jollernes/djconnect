@@ -53,6 +53,12 @@ export type DJSlot = {
 export type OfferRequestRecord = {
   id: string;
   createdAtMs: number;
+  /**
+   * The logged-in customer's profile id at the time of submission, if any.
+   * Anonymous submissions leave this undefined. Used to scope "My requests"
+   * to the current user without a real backend.
+   */
+  customerId?: string;
   brief: OfferRequest;
   matchedEventType?: OfferEventTypeId;
   // Time-compression for the demo: 1 wall-clock second = `compressionFactor` real seconds.
@@ -116,6 +122,44 @@ export function listRequestIds(): string[] {
   } catch {
     return [];
   }
+}
+
+/**
+ * Returns every record stored on this device, sorted newest first.
+ */
+export function listRecords(): OfferRequestRecord[] {
+  return listRequestIds()
+    .map((id) => readRecord(id))
+    .filter((r): r is OfferRequestRecord => r !== null)
+    .sort((a, b) => b.createdAtMs - a.createdAtMs);
+}
+
+/**
+ * Returns the records visible to the given customer. Pass `null` for the
+ * anonymous (logged-out) view, which only sees legacy / un-tagged records.
+ * Logged-in customers see records they created plus any legacy records that
+ * pre-date user-scoped persistence.
+ */
+export function listRecordsForCustomer(
+  customerId: string | null,
+): OfferRequestRecord[] {
+  const all = listRecords();
+  if (customerId === null) {
+    return all.filter((r) => !r.customerId);
+  }
+  return all.filter((r) => !r.customerId || r.customerId === customerId);
+}
+
+/**
+ * Cheap ownership check used to gate dashboard detail pages. A record with
+ * no `customerId` is treated as legacy / anonymous and visible to everyone.
+ */
+export function recordIsVisibleTo(
+  record: OfferRequestRecord,
+  customerId: string | null,
+): boolean {
+  if (!record.customerId) return true;
+  return record.customerId === customerId;
 }
 
 function addToIndex(id: string): void {
