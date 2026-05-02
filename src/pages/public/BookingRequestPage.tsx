@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ChevronLeft, ChevronRight, Lock, CheckCircle2, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight, Send, CheckCircle2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,11 @@ import { EVENT_TYPES, PLATFORM_FEE_PERCENT, CANCELLATION_POLICY } from "@/lib/co
 import { getEventTypeOption } from "@/lib/eventTypeOptions";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import {
+  newBookingRequestId,
+  writeBookingRequest,
+  type BookingRequest,
+} from "@/lib/bookingRequestStore";
 
 const eventSchema = z.object({
   eventTypeId: z.string().min(1, "Required"),
@@ -44,6 +49,7 @@ export function BookingRequestPage() {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [eventPickerOpen, setEventPickerOpen] = useState(false);
+  const [submittedRef, setSubmittedRef] = useState<string | null>(null);
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -77,24 +83,52 @@ export function BookingRequestPage() {
     setStep(1);
   }
 
-  async function handlePay() {
-    if (!profile) {
-      toast.error("Please log in first.");
-      navigate("/login");
-      return;
-    }
+  async function handleSendRequest() {
+    if (!dj) return;
     setSubmitting(true);
     try {
-      form.getValues();
-      // In production: call create-checkout-session edge function, redirect to Stripe.
-      //   const { sessionId } = await fetch("/api/create-checkout-session", { ... }).then(r => r.json());
-      //   const stripe = await getStripe();
-      //   await stripe!.redirectToCheckout({ sessionId });
-      await new Promise((r) => setTimeout(r, 800));
-      toast.success(`Booking submitted (${dj?.price_on_request ? "awaiting quote" : "paid, confirming"})`);
+      const values = form.getValues();
+      const id = newBookingRequestId();
+      const pricing = totals
+        ? {
+            basePriceMinor: totals.price,
+            feePercent: PLATFORM_FEE_PERCENT,
+            feeMinor: totals.fee,
+            totalMinor: totals.total,
+          }
+        : null;
+      const customerId = profile?.role === "customer" ? profile.id : undefined;
+      const record: BookingRequest = {
+        id,
+        customerId,
+        createdAtMs: Date.now(),
+        status: "pending_dj",
+        djId: dj.id,
+        djUsername: dj.username,
+        djStageName: dj.stage_name,
+        djAvatarUrl: dj.profile.avatar_url ?? undefined,
+        djCity: dj.base_location ?? undefined,
+        djCurrency: dj.currency,
+        pricing,
+        event: {
+          eventTypeId: values.eventTypeId,
+          eventDate: values.eventDate,
+          startTime: values.startTime,
+          endTime: values.endTime || undefined,
+          venueName: values.venueName,
+          venueAddress: values.venueAddress,
+          estimatedGuests: values.estimatedGuests,
+          notes: values.notes || undefined,
+        },
+      };
+      writeBookingRequest(record);
+      // Tiny delay so the button shows its loading state and feels deliberate.
+      await new Promise((r) => setTimeout(r, 400));
+      setSubmittedRef(id);
+      toast.success(`Booking request sent to ${dj.stage_name}`);
       setStep(2);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Payment failed");
+      toast.error(err instanceof Error ? err.message : "Could not send request");
     } finally {
       setSubmitting(false);
     }
@@ -206,7 +240,7 @@ export function BookingRequestPage() {
       {step === 1 && (
         <Card>
           <CardContent className="space-y-5 p-6">
-            <h2 className="text-lg font-semibold">Step 2 · Review and pay</h2>
+            <h2 className="text-lg font-semibold">Step 2 · Review and send request</h2>
             <ReviewRow label="DJ" value={dj.stage_name} />
             <ReviewRow label="Event type" value={EVENT_TYPES.find((e) => e.id === form.getValues("eventTypeId"))?.label ?? ""} />
             <ReviewRow label="Event date" value={formatDate(form.getValues("eventDate"))} />
@@ -224,8 +258,7 @@ export function BookingRequestPage() {
               <div className="rounded-md bg-muted/40 p-4 text-sm">
                 <Badge variant="warning" className="mb-2">Price on request</Badge>
                 <p>
-                  You won't be charged yet. Your request will go to {dj.stage_name}, who will reply with a quote.
-                  Once you approve, you'll be asked to pay.
+                  You won't be charged yet. Your request will go to {dj.stage_name}, who will reply with a quote. Once you accept, you'll be asked to pay the deposit into escrow.
                 </p>
               </div>
             ) : totals ? (
@@ -233,9 +266,10 @@ export function BookingRequestPage() {
                 <div className="flex justify-between"><span className="text-muted-foreground">DJ price</span><span>{formatCurrency(totals.price, dj.currency)}</span></div>
                 <div className="flex justify-between"><span className="text-muted-foreground">Platform service fee ({PLATFORM_FEE_PERCENT}%)</span><span>{formatCurrency(totals.fee, dj.currency)}</span></div>
                 <Separator />
-                <div className="flex justify-between text-base font-semibold"><span>Total today</span><span>{formatCurrency(totals.total, dj.currency)}</span></div>
+                <div className="flex justify-between text-base font-semibold"><span>Estimated total</span><span>{formatCurrency(totals.total, dj.currency)}</span></div>
                 <p className="text-xs text-muted-foreground">
-                  Your DJ is paid 24 hours after your event, provided everything goes well. Funds are held securely by Stripe.
+                  <strong className="font-semibold text-foreground">You won't be charged yet.</strong>{" "}
+                  We'll only ask for the deposit once {dj.stage_name} confirms availability. Funds are then held securely in escrow and released to the DJ 24 hours after the event.
                 </p>
               </div>
             ) : null}
@@ -247,10 +281,13 @@ export function BookingRequestPage() {
               </ul>
             </div>
 
-            <Button variant="accent" className="w-full" onClick={handlePay} disabled={submitting}>
-              <Lock className="h-4 w-4" />
-              {dj.price_on_request ? "Submit request" : submitting ? "Redirecting to Stripe…" : "Pay securely with Stripe"}
+            <Button variant="accent" className="w-full" onClick={handleSendRequest} disabled={submitting}>
+              <Send className="h-4 w-4" />
+              {submitting ? "Sending request…" : "Send booking request"}
             </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              No payment now. {dj.stage_name} typically responds within a few hours.
+            </p>
           </CardContent>
         </Card>
       )}
@@ -273,20 +310,18 @@ export function BookingRequestPage() {
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success/20 text-success">
               <CheckCircle2 className="h-6 w-6" />
             </div>
-            <h2 className="text-xl font-semibold">
-              {dj.price_on_request ? "Request sent" : "Booking confirmed"}
-            </h2>
+            <h2 className="text-xl font-semibold">Request sent to {dj.stage_name}</h2>
             <p className="max-w-md text-sm text-muted-foreground">
-              {dj.price_on_request
-                ? `${dj.stage_name} will review your event details and send you a quote shortly.`
-                : `We've emailed your confirmation. ${dj.stage_name} has been notified.`}
+              {dj.stage_name} will review your event details and respond shortly. As soon as they accept, we'll email you a payment link to hold the date with a deposit in escrow.
             </p>
             <div className="rounded-md bg-muted/40 px-4 py-2 text-sm">
-              Booking reference: <span className="font-mono font-semibold">DJC-{Math.random().toString(36).slice(2, 8).toUpperCase()}</span>
+              Reference: <span className="font-mono font-semibold">{submittedRef ?? "—"}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap justify-center gap-2">
               <Button asChild variant="outline">
-                <a href="/dashboard">View dashboard</a>
+                <a href={profile?.role === "customer" ? "/dashboard/requests" : "/dashboard"}>
+                  View my requests
+                </a>
               </Button>
               <Button asChild variant="accent">
                 <a href="/search">Browse more DJs</a>

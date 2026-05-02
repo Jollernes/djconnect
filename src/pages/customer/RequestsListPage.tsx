@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/EmptyState";
 import { aggregateOf } from "@/lib/offerRequestOrchestrator";
@@ -8,86 +8,157 @@ import {
   listRecordsForCustomer,
   type OfferRequestRecord,
 } from "@/lib/offerRequestStore";
+import {
+  listBookingRequestsForCustomer,
+  type BookingRequest,
+  type BookingRequestStatus,
+} from "@/lib/bookingRequestStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { EVENT_TYPE_OPTIONS } from "@/lib/eventTypeOptions";
 import { CITY_OPTIONS } from "@/lib/offerRequestContent";
+import { formatCurrency } from "@/lib/utils";
 
 /**
- * Customer-dashboard list of all offer requests for the current customer.
+ * Customer-dashboard list of all requests for the current customer.
+ *
+ * Shows two kinds of requests in separate sections:
+ *   1. **Offer requests** — multi-DJ briefs from the "Get 3 offers" wizard.
+ *   2. **Booking requests** — direct requests sent to a single DJ from
+ *      their profile page. These are *not* paid yet; the customer is
+ *      waiting for the DJ to accept before any deposit is taken.
+ *
  * Logged-in customers see only their own submissions (scoped via
- * `record.customerId`); legacy / pre-auth records are also surfaced for
+ * `record.customerId`); legacy / pre-auth records are surfaced for
  * continuity. Each row is a quiet line — no avatars, no big tiles. Drill
  * into a row to open the live progress view at /dashboard/requests/:id.
  */
 export function CustomerRequestsListPage() {
   useDocumentHead({
     title: "My requests · DJConnect",
-    description: "All your offer requests in one place.",
+    description: "All your offer and booking requests in one place.",
   });
 
   const { profile } = useAuth();
   const customerId = profile?.role === "customer" ? profile.id : null;
 
-  const [records, setRecords] = useState<OfferRequestRecord[]>([]);
+  const [offerRecords, setOfferRecords] = useState<OfferRequestRecord[]>([]);
+  const [bookingRecords, setBookingRecords] = useState<BookingRequest[]>([]);
 
   useEffect(() => {
     function load() {
-      setRecords(listRecordsForCustomer(customerId));
+      setOfferRecords(listRecordsForCustomer(customerId));
+      setBookingRecords(listBookingRequestsForCustomer(customerId));
     }
     load();
     const onUpdate = () => load();
     window.addEventListener("offerRequest:update", onUpdate);
+    window.addEventListener("bookingRequest:update", onUpdate);
     window.addEventListener("storage", onUpdate);
     const t = setInterval(load, 2000);
     return () => {
       window.removeEventListener("offerRequest:update", onUpdate);
+      window.removeEventListener("bookingRequest:update", onUpdate);
       window.removeEventListener("storage", onUpdate);
       clearInterval(t);
     };
   }, [customerId]);
 
-  if (records.length === 0) {
+  const isEmpty = offerRecords.length === 0 && bookingRecords.length === 0;
+
+  if (isEmpty) {
     return (
       <EmptyState
         title="No requests yet"
-        description="Send a brief and we'll match you with up to 3 DJs in 24 hours."
+        description="Send a brief and we'll match you with up to 3 DJs in 24 hours, or browse DJs and request one directly."
         action={
-          <Button asChild>
-            <Link to="/get-offers">Get 3 offers</Link>
-          </Button>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button asChild>
+              <Link to="/get-offers">Get 3 offers</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/search">Browse DJs</Link>
+            </Button>
+          </div>
         }
       />
     );
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
+    <div className="mx-auto max-w-3xl space-y-10">
       <header>
         <h1 className="text-[26px] font-semibold leading-tight tracking-tight md:text-[30px]">
           My requests
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Open any request to see live progress and incoming quotes.
+          Track every brief you've sent and every DJ you've requested directly.
         </p>
       </header>
 
-      <ul className="divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/40">
-        {records.map((r) => (
-          <RequestRow key={r.id} record={r} />
-        ))}
-      </ul>
+      {bookingRecords.length > 0 && (
+        <section className="space-y-3">
+          <SectionHeader
+            title="Booking requests"
+            count={bookingRecords.length}
+            description="Direct requests to a specific DJ. You'll be asked to pay only after the DJ accepts."
+          />
+          <ul className="divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/40">
+            {bookingRecords.map((r) => (
+              <BookingRequestRow key={r.id} record={r} />
+            ))}
+          </ul>
+        </section>
+      )}
 
-      <div className="flex justify-end">
+      {offerRecords.length > 0 && (
+        <section className="space-y-3">
+          <SectionHeader
+            title="Offer requests"
+            count={offerRecords.length}
+            description="Briefs sent to up to 3 matched DJs. Open one to see live progress."
+          />
+          <ul className="divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/40">
+            {offerRecords.map((r) => (
+              <OfferRequestRow key={r.id} record={r} />
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div className="flex flex-wrap justify-end gap-2">
         <Button asChild variant="outline">
-          <Link to="/get-offers">New request</Link>
+          <Link to="/search">Browse DJs</Link>
+        </Button>
+        <Button asChild>
+          <Link to="/get-offers">New offer request</Link>
         </Button>
       </div>
     </div>
   );
 }
 
-function RequestRow({ record }: { record: OfferRequestRecord }) {
+function SectionHeader({
+  title,
+  count,
+  description,
+}: {
+  title: string;
+  count: number;
+  description: string;
+}) {
+  return (
+    <div>
+      <div className="flex items-baseline gap-2">
+        <h2 className="text-base font-semibold tracking-tight">{title}</h2>
+        <span className="text-xs text-muted-foreground">{count}</span>
+      </div>
+      <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
+function OfferRequestRow({ record }: { record: OfferRequestRecord }) {
   const agg = useMemo(() => aggregateOf(record), [record]);
   const eventType = EVENT_TYPE_OPTIONS.find(
     (e) => e.id === record.brief.eventType,
@@ -138,6 +209,92 @@ function RequestRow({ record }: { record: OfferRequestRecord }) {
       </Link>
     </li>
   );
+}
+
+function BookingRequestRow({ record }: { record: BookingRequest }) {
+  const dateLabel = record.event.eventDate
+    ? new Date(record.event.eventDate).toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "Date TBD";
+
+  const status = statusLabel(record.status);
+  const statusTone = statusToneClass(record.status);
+
+  const priceLabel = record.pricing
+    ? formatCurrency(record.pricing.totalMinor, record.djCurrency)
+    : "On request";
+
+  return (
+    <li>
+      <Link
+        to={`/djs/${record.djUsername}`}
+        className="flex items-center justify-between gap-4 px-5 py-4 text-sm transition-colors hover:bg-muted/30"
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          {record.djAvatarUrl ? (
+            <img
+              src={record.djAvatarUrl}
+              alt=""
+              className="h-10 w-10 shrink-0 rounded-full object-cover"
+            />
+          ) : (
+            <div className="h-10 w-10 shrink-0 rounded-full bg-muted" />
+          )}
+          <div className="min-w-0">
+            <p className="truncate font-medium text-foreground">
+              {record.djStageName}
+              {record.djCity ? (
+                <span className="font-normal text-muted-foreground">
+                  {" · "}
+                  {record.djCity}
+                </span>
+              ) : null}
+            </p>
+            <p className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted-foreground">
+              <Clock className="h-3 w-3 shrink-0" />
+              {dateLabel} · {priceLabel} · sent {timeSince(record.createdAtMs)}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className={`shrink-0 text-xs ${statusTone}`}>{status}</span>
+          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+        </div>
+      </Link>
+    </li>
+  );
+}
+
+function statusLabel(status: BookingRequestStatus): string {
+  switch (status) {
+    case "pending_dj":
+      return "Awaiting DJ response";
+    case "accepted":
+      return "Accepted — pay deposit";
+    case "declined":
+      return "Declined";
+    case "expired":
+      return "Expired";
+    case "paid":
+      return "Booked";
+  }
+}
+
+function statusToneClass(status: BookingRequestStatus): string {
+  switch (status) {
+    case "pending_dj":
+      return "text-muted-foreground";
+    case "accepted":
+      return "text-amber-700";
+    case "declined":
+    case "expired":
+      return "text-muted-foreground";
+    case "paid":
+      return "text-emerald-700";
+  }
 }
 
 function timeSince(ms: number): string {
