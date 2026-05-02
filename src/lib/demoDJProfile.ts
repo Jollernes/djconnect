@@ -12,6 +12,16 @@
 /** Per-event-type sub-profile that customers see based on what they're booking. */
 export type DemoDJSubProfileKey = "general" | "wedding" | "birthday" | "corporate";
 
+/** A single photo or video uploaded for a sub-profile gallery. */
+export type DemoDJMediaItem = {
+  id: string;
+  type: "photo" | "video";
+  /** Base64 data URL — survives a page reload, unlike `URL.createObjectURL`. */
+  dataUrl: string;
+  /** Optional caption shown to customers under the asset. */
+  caption?: string;
+};
+
 export type DemoDJSubProfile = {
   /** Headline displayed at the top of the public profile for this event type. */
   tagline: string;
@@ -25,6 +35,18 @@ export type DemoDJSubProfile = {
   approach: string;
   /** Optional starting price in major units (e.g. DKK). 0 = use account default. */
   priceFromMajor: number;
+  /**
+   * Hero photo shown on the DJ search-result card and at the top of the
+   * public profile when a customer is searching for this event type. If
+   * empty, the account-wide profile photo is used as a fallback.
+   */
+  featuredPhotoDataUrl?: string;
+  /**
+   * Gallery of photos / short videos that customers see on the public
+   * profile. Each event type has its own gallery so a wedding DJ can lead
+   * with wedding moments and a corporate DJ can show conference setups.
+   */
+  gallery: DemoDJMediaItem[];
 };
 
 export const SUB_PROFILE_KEYS: DemoDJSubProfileKey[] = [
@@ -100,8 +122,8 @@ export type DemoDJProfile = {
   subProfiles?: Partial<Record<DemoDJSubProfileKey, DemoDJSubProfile>>;
 };
 
-/** Returns true when every required field on a sub-profile has been filled in. */
-export function isSubProfileComplete(sp: DemoDJSubProfile | undefined): boolean {
+/** Returns true when every required text field on a sub-profile has been filled in. */
+export function isSubProfileTextComplete(sp: DemoDJSubProfile | undefined): boolean {
   if (!sp) return false;
   return Boolean(
     sp.tagline.trim() &&
@@ -112,6 +134,37 @@ export function isSubProfileComplete(sp: DemoDJSubProfile | undefined): boolean 
   );
 }
 
+/** Returns true when the sub-profile has a featured photo and at least 3 gallery items. */
+export function isSubProfileMediaComplete(sp: DemoDJSubProfile | undefined): boolean {
+  if (!sp) return false;
+  return Boolean(sp.featuredPhotoDataUrl) && (sp.gallery?.length ?? 0) >= 3;
+}
+
+/** Returns true when text + media are both complete. */
+export function isSubProfileComplete(sp: DemoDJSubProfile | undefined): boolean {
+  return isSubProfileTextComplete(sp) && isSubProfileMediaComplete(sp);
+}
+
+/**
+ * 0–1 scalar measuring how close a sub-profile is to fully complete.
+ * Five required text fields + featured photo + 3 gallery slots = 9 weighted checks.
+ */
+export function subProfileCompleteness(sp: DemoDJSubProfile | undefined): number {
+  if (!sp) return 0;
+  const checks: boolean[] = [
+    sp.tagline.trim().length > 0,
+    sp.bio.trim().length >= 80,
+    sp.musicStyle.trim().length > 0,
+    sp.signatureTracks.trim().length > 0,
+    sp.approach.trim().length > 0,
+    Boolean(sp.featuredPhotoDataUrl),
+    (sp.gallery?.length ?? 0) >= 1,
+    (sp.gallery?.length ?? 0) >= 2,
+    (sp.gallery?.length ?? 0) >= 3,
+  ];
+  return checks.filter(Boolean).length / checks.length;
+}
+
 export function emptySubProfile(): DemoDJSubProfile {
   return {
     tagline: "",
@@ -120,6 +173,7 @@ export function emptySubProfile(): DemoDJSubProfile {
     signatureTracks: "",
     approach: "",
     priceFromMajor: 0,
+    gallery: [],
   };
 }
 
