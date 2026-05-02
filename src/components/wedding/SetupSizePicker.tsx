@@ -110,12 +110,12 @@ export function SetupSizePicker({
         value={value ?? SENTINEL_ANY}
         onValueChange={(v) => onChange(v === SENTINEL_ANY ? null : (v as SetupId))}
       >
-        <SelectTrigger className="h-11 w-full min-w-[180px] max-w-[220px] gap-2 rounded-full pl-1.5 pr-3 text-xs [&>span]:flex [&>span]:min-w-0 [&>span]:flex-1 [&>span]:items-center [&>span]:gap-2 [&>span]:overflow-hidden">
+        <SelectTrigger className="h-9 w-full min-w-[180px] max-w-[220px] gap-2 rounded-full pl-1.5 pr-3 text-xs [&>span]:flex [&>span]:min-w-0 [&>span]:flex-1 [&>span]:items-center [&>span]:gap-2 [&>span]:overflow-hidden">
           <SelectValue placeholder="Setup size" asChild>
             <span>
               {selected ? (
                 <>
-                  <span className="block h-7 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-rose-200">
+                  <span className="block h-6 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-rose-200">
                     <SetupSizeIcon size={selected.id} active />
                   </span>
                   <span className="flex min-w-0 flex-1 flex-col items-start leading-tight">
@@ -129,7 +129,7 @@ export function SetupSizePicker({
                 </>
               ) : (
                 <>
-                  <span className="block h-7 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
+                  <span className="block h-6 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
                     <SetupSizeIcon size="medium" />
                   </span>
                   <span className="truncate text-xs text-muted-foreground">Setup size</span>
@@ -164,7 +164,7 @@ export function SetupSizePicker({
           <button
             type="button"
             aria-label="What's included in each setup"
-            className="grid h-8 w-8 place-items-center rounded-full border bg-background text-muted-foreground shadow-sm transition-colors hover:bg-foreground hover:text-background"
+            className="grid h-9 w-9 place-items-center rounded-full border bg-background text-muted-foreground shadow-sm transition-colors hover:bg-foreground hover:text-background"
           >
             <Info className="h-4 w-4" />
           </button>
@@ -179,7 +179,7 @@ export function SetupSizePicker({
           type="button"
           onClick={() => onChange(null)}
           aria-label="Clear setup size"
-          className="grid h-8 w-8 place-items-center rounded-full border text-muted-foreground hover:bg-muted hover:text-foreground"
+          className="grid h-9 w-9 place-items-center rounded-full border text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <X className="h-3.5 w-3.5" />
         </button>
