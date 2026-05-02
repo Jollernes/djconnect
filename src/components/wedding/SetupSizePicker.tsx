@@ -105,7 +105,7 @@ export function SetupSizePicker({
   const selected = value ? SETUPS.find((s) => s.id === value) ?? null : null;
 
   return (
-    <div className="inline-flex max-w-full flex-wrap items-center gap-1.5">
+    <div className="inline-flex max-w-full flex-nowrap items-center gap-1.5">
       <Select
         value={value ?? SENTINEL_ANY}
         onValueChange={(v) => onChange(v === SENTINEL_ANY ? null : (v as SetupId))}
