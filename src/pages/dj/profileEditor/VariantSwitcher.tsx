@@ -1,18 +1,19 @@
 import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
-export type EditorVariant = "A" | "B" | "C";
+export type EditorVariant = "A" | "B" | "C" | "D";
 
 const VARIANT_META: Record<EditorVariant, { label: string; helper: string }> = {
   A: { label: "A · Tabs", helper: "Inline tabs with media + text per event" },
   B: { label: "B · Live preview", helper: "Editor on the left, customer preview on the right" },
   C: { label: "C · Card canvas", helper: "Pinterest-style cards open into a fullscreen editor" },
+  D: { label: "D · Guided wizard", helper: "Step-by-step journey with inheritance + benchmarks" },
 };
 
 export function useEditorVariant(): [EditorVariant, (next: EditorVariant) => void] {
   const [params, setParams] = useSearchParams();
   const raw = params.get("v");
-  const variant: EditorVariant = raw === "B" || raw === "C" ? raw : "A";
+  const variant: EditorVariant = raw === "B" || raw === "C" || raw === "D" ? raw : "A";
   function setVariant(next: EditorVariant) {
     const p = new URLSearchParams(params);
     p.set("v", next);
@@ -39,7 +40,7 @@ export function VariantSwitcher({
         <span className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           Demo variant
         </span>
-        {(["A", "B", "C"] as const).map((v) => (
+        {(["A", "B", "C", "D"] as const).map((v) => (
           <button
             key={v}
             type="button"

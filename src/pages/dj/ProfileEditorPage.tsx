@@ -2,6 +2,7 @@ import { useDJProfileEditor } from "./profileEditor/useEditorState";
 import { VariantA } from "./profileEditor/VariantA";
 import { VariantB } from "./profileEditor/VariantB";
 import { VariantC } from "./profileEditor/VariantC";
+import { VariantD } from "./profileEditor/VariantD";
 import { VariantSwitcher, useEditorVariant } from "./profileEditor/VariantSwitcher";
 
 /**
@@ -19,6 +20,7 @@ export function DJProfileEditorPage() {
       {variant === "A" && <VariantA state={state} />}
       {variant === "B" && <VariantB state={state} />}
       {variant === "C" && <VariantC state={state} />}
+      {variant === "D" && <VariantD state={state} />}
       <VariantSwitcher value={variant} onChange={setVariant} />
     </div>
   );
