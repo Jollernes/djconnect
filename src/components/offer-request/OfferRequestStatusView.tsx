@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ChevronDown, Pencil } from "lucide-react";
 import { QuoteComparisonGrid } from "@/components/offer-request/QuoteComparisonGrid";
 import { CalmFocalView } from "@/components/offer-request/variants/CalmFocalView";
-import { SteppedTrackerView } from "@/components/offer-request/variants/SteppedTrackerView";
-import { ActivityFeedView } from "@/components/offer-request/variants/ActivityFeedView";
 import {
   OnPlatformChatDialog,
   RequestCallbackDialog,
@@ -25,25 +23,15 @@ import { cn } from "@/lib/utils";
  * public page and by the dashboard-embedded page so the layout stays
  * identical regardless of how the customer arrived.
  *
- * Three "dummy" design variants live behind `?v=A|B|C`:
- *   - A "Calm focal point" (single pulsing animation + ticker)
- *   - B "Stepper" (Domino's-style horizontal progress tracker)
- *   - C "Activity feed" (Slack/iMessage-style live thread)
- *
- * A small floating switcher pill at the bottom lets the reviewer flip
- * between them on the same live data. Once we settle on one, the other
- * two will be deleted.
+ * Visual style: "calm focal point" — a single pulsing focal animation,
+ * a clear deadline, a quiet activity ticker, and a collapsible
+ * "What happens now?" disclosure. Quotes appear quietly below as they
+ * arrive.
  */
-export type StatusVariant = "A" | "B" | "C";
-
-const DEFAULT_VARIANT: StatusVariant = "A";
-
 export function OfferRequestStatusView({
   record,
-  requestId,
   remainingHours,
   showEditBriefLink = true,
-  showHeading = true,
   className,
 }: {
   record: OfferRequestRecord;
@@ -51,14 +39,12 @@ export function OfferRequestStatusView({
   remainingHours: number;
   elapsedHours: number;
   showEditBriefLink?: boolean;
+  /** Retained for call-site compatibility; the focal layout has its own header. */
   showHeading?: boolean;
   className?: string;
 }) {
   const { djs: liveDJs } = useDJs();
   const djCatalog = liveDJs.length > 0 ? liveDJs : mockDJs;
-
-  const [searchParams, setSearchParams] = useSearchParams();
-  const variant = parseVariant(searchParams.get("v"));
 
   const [activeSlot, setActiveSlot] = useState<DJSlot | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
@@ -96,12 +82,6 @@ export function OfferRequestStatusView({
     />
   );
 
-  function setVariant(v: StatusVariant) {
-    const next = new URLSearchParams(searchParams);
-    next.set("v", v);
-    setSearchParams(next, { replace: false });
-  }
-
   const briefRecap = useMemo(
     () => (
       <BriefRecap
@@ -116,51 +96,16 @@ export function OfferRequestStatusView({
 
   return (
     <div className={cn("space-y-8", className)}>
-      {showHeading && variant !== "A" && variant !== "C" && (
-        <header>
-          <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-            Your offer request
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Request ID <code className="font-mono text-foreground/70">{requestId}</code>
-          </p>
-        </header>
-      )}
+      <CalmFocalView
+        record={record}
+        djCatalog={djCatalog}
+        remainingHours={remainingHours}
+        quotesSection={quotes}
+      />
 
-      {variant === "A" && (
-        <CalmFocalView
-          record={record}
-          djCatalog={djCatalog}
-          remainingHours={remainingHours}
-          quotesSection={quotes}
-        />
-      )}
-
-      {variant === "B" && (
-        <SteppedTrackerView
-          record={record}
-          djCatalog={djCatalog}
-          remainingHours={remainingHours}
-          quotesSection={quotes}
-        />
-      )}
-
-      {variant === "C" && (
-        <ActivityFeedView
-          record={record}
-          djCatalog={djCatalog}
-          remainingHours={remainingHours}
-          quotesSection={quotes}
-        />
-      )}
-
-      {/* Brief recap is the same for every variant */}
       {briefRecap}
 
       <FootNote record={record} />
-
-      {/* Variant switcher (floating, dismissable in production later) */}
-      <VariantSwitcher current={variant} onSelect={setVariant} />
 
       <OnPlatformChatDialog
         open={chatOpen}
@@ -183,54 +128,6 @@ export function OfferRequestStatusView({
         slot={activeSlot}
         dj={offerDJ}
       />
-    </div>
-  );
-}
-
-function parseVariant(v: string | null): StatusVariant {
-  if (v === "A" || v === "B" || v === "C") return v;
-  return DEFAULT_VARIANT;
-}
-
-function VariantSwitcher({
-  current,
-  onSelect,
-}: {
-  current: StatusVariant;
-  onSelect: (v: StatusVariant) => void;
-}) {
-  const variants: { id: StatusVariant; label: string }[] = [
-    { id: "A", label: "A · Calm focal" },
-    { id: "B", label: "B · Stepper" },
-    { id: "C", label: "C · Activity feed" },
-  ];
-  return (
-    <div className="sticky bottom-4 z-30 mx-auto flex w-fit max-w-full justify-center">
-      <div
-        className="flex items-center gap-1 rounded-full border border-border/60 bg-background/95 p-1 text-xs shadow-md backdrop-blur"
-        role="tablist"
-        aria-label="Design variants"
-      >
-        <span className="px-2 text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
-          Demo variant
-        </span>
-        {variants.map((v) => (
-          <button
-            key={v.id}
-            type="button"
-            onClick={() => onSelect(v.id)}
-            className={cn(
-              "rounded-full px-3 py-1.5 transition-colors",
-              current === v.id
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-            aria-pressed={current === v.id}
-          >
-            {v.label}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
