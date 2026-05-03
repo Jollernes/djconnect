@@ -209,7 +209,7 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
 /* Live preview pieces                                                    */
 /* -------------------------------------------------------------------- */
 
-function CustomerCardPreview({
+export function CustomerCardPreview({
   stageName,
   tagline,
   featuredPhoto,
@@ -278,7 +278,7 @@ function CustomerCardPreview({
   );
 }
 
-function CustomerProfilePreview({
+export function CustomerProfilePreview({
   stageName,
   sub,
   profilePhoto,
