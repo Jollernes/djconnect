@@ -8,7 +8,6 @@ import {
 import { SUB_PROFILE_KEYS, SUB_PROFILE_META, type DemoDJSubProfileKey } from "@/lib/demoDJProfile";
 import { AccountWideSection } from "./AccountWideSection";
 import { FeaturedPhotoSlot, GalleryRow, ProgressRing } from "./MediaUploader";
-import { SubProfileTextFields } from "./SubProfileTextFields";
 import { CustomerCardPreview, CustomerProfilePreview } from "./VariantB";
 import type { DJProfileEditorState } from "./useEditorState";
 import { cn } from "@/lib/utils";
@@ -256,9 +255,9 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
 
             <div className="border-t border-border/40" />
 
-            {/* Tell + Vibe chapters share the existing text-fields component
-                but split into two visually anchored sections so the inheritance
-                links + inline tips can target each chapter individually. */}
+            {/* Tell + Vibe chapters split into two visually anchored sections
+                so each chapter's inheritance link + inline tip can target only
+                its own fields. */}
             <section ref={tellRef} className="space-y-4 scroll-mt-24">
               <SectionHeader
                 icon={<ImageIcon className="h-3.5 w-3.5" />}
@@ -267,12 +266,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
                 inheritEnabled={!isGeneral && generalHas.tell}
                 onInherit={() => copyFromGeneral("tell")}
               />
-              <SubProfileTextFields
-                value={{ ...sub, musicStyle: "", signatureTracks: "", approach: "", priceFromMajor: 0 }}
-                onChange={(field, value) => updateSubProfile(activeKey, field, value)}
-                eventLabel={meta.label}
-                compact
-              />
+              <SubProfileTellFields state={state} subKey={activeKey} />
             </section>
 
             <div className="border-t border-border/40" />
@@ -448,8 +442,66 @@ function ChapterRibbon({
 }
 
 /* -------------------------------------------------------------------- */
-/* Vibe-only fields (split from SubProfileTextFields so the section's    */
-/* "Copy from General" link can target only music/signature/approach).  */
+/* Tell-only fields (tagline + bio) — split out so the Tell section's   */
+/* "Copy from General" link only copies tagline/bio without polluting   */
+/* the page with duplicate vibe inputs.                                 */
+/* -------------------------------------------------------------------- */
+
+function SubProfileTellFields({
+  state,
+  subKey,
+}: {
+  state: DJProfileEditorState;
+  subKey: DemoDJSubProfileKey;
+}) {
+  const { subProfiles, updateSubProfile } = state;
+  const sub = subProfiles[subKey];
+  const meta = SUB_PROFILE_META[subKey];
+
+  return (
+    <div className="space-y-3">
+      <div>
+        <label htmlFor={`e-tagline-${subKey}`} className="text-sm font-medium">
+          Tagline
+        </label>
+        <input
+          id={`e-tagline-${subKey}`}
+          type="text"
+          maxLength={80}
+          placeholder={`e.g. "${meta.label} DJ — modern, warm, dancefloor-first"`}
+          value={sub.tagline}
+          onChange={(e) => updateSubProfile(subKey, "tagline", e.target.value)}
+          className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          {sub.tagline.length}/80 — shown right under your name.
+        </p>
+      </div>
+      <div>
+        <label htmlFor={`e-bio-${subKey}`} className="text-sm font-medium">
+          Bio
+        </label>
+        <textarea
+          id={`e-bio-${subKey}`}
+          rows={4}
+          placeholder={`Tell customers what makes you the right ${meta.label.toLowerCase()} DJ. Cover your style, experience, and what you do during the event.`}
+          value={sub.bio}
+          onChange={(e) => updateSubProfile(subKey, "bio", e.target.value)}
+          className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          {sub.bio.length} characters{" "}
+          {sub.bio.length < 80 ? `(${80 - sub.bio.length} more needed)` : "✓"}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* Vibe-only fields (music style + signature tracks + approach + price). */
+/* Mirrors the Tell-only split so each chapter has its own targeted      */
+/* inheritance link + inline tip.                                        */
 /* -------------------------------------------------------------------- */
 
 function SubProfileVibeFields({
