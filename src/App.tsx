@@ -9,6 +9,7 @@ import { HomePage } from "@/pages/public/HomePage";
 import { SearchPage } from "@/pages/public/SearchPage";
 import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
 import { GetOffersPage } from "@/pages/public/GetOffersPage";
+import { PersonalAdvicePage } from "@/pages/public/PersonalAdvicePage";
 import { MyRequestPage } from "@/pages/public/MyRequestPage";
 import { WeddingDJsTestAPage } from "@/pages/public/WeddingDJsTestAPage";
 import { WeddingDJsTestBPage } from "@/pages/public/WeddingDJsTestBPage";
@@ -38,6 +39,7 @@ import { CustomerFavouritesPage } from "@/pages/customer/FavouritesPage";
 import { CustomerSettingsPage } from "@/pages/customer/SettingsPage";
 import { CustomerRequestsListPage } from "@/pages/customer/RequestsListPage";
 import { CustomerRequestDetailPage } from "@/pages/customer/RequestDetailPage";
+import { PersonalAdviceDetailPage } from "@/pages/customer/PersonalAdviceDetailPage";
 
 import { DJDashboardPage } from "@/pages/dj/DashboardPage";
 import { DJBookingsPage } from "@/pages/dj/BookingsPage";
@@ -100,6 +102,10 @@ function App() {
               path="/dashboard/requests/:requestId"
               element={<CustomerRequestDetailPage />}
             />
+            <Route
+              path="/dashboard/personlig-radgivning/:adviceId"
+              element={<PersonalAdviceDetailPage />}
+            />
             <Route path="/dashboard/bookings" element={<CustomerBookingsPage />} />
             <Route path="/dashboard/bookings/:id" element={<CustomerBookingDetailPage />} />
             <Route path="/dashboard/favourites" element={<CustomerFavouritesPage />} />
@@ -152,6 +158,12 @@ function App() {
 
           {/* Get-3-offers wizard owns its own full-screen layout (no site header/footer) */}
           <Route path="/get-offers" element={<GetOffersPage />} />
+
+          {/* Personal advisory landing + form. Has the public site header
+              so the active nav tab stays visible while filling the brief. */}
+          <Route element={<PublicLayout />}>
+            <Route path="/personal-advice" element={<PersonalAdvicePage />} />
+          </Route>
 
           {/* Live progress page for an offer request — public for now;
               eventually gated behind a magic link. */}

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Clock } from "lucide-react";
+import { ArrowRight, Clock, Phone, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/common/EmptyState";
 import { aggregateOf } from "@/lib/offerRequestOrchestrator";
@@ -13,6 +13,10 @@ import {
   type BookingRequest,
   type BookingRequestStatus,
 } from "@/lib/bookingRequestStore";
+import {
+  listAdvisoryRecordsForCustomer,
+  type PersonalAdviceRecord,
+} from "@/lib/personalAdviceStore";
 import { useAuth } from "@/hooks/useAuth";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { EVENT_TYPE_OPTIONS } from "@/lib/eventTypeOptions";
@@ -44,27 +48,34 @@ export function CustomerRequestsListPage() {
 
   const [offerRecords, setOfferRecords] = useState<OfferRequestRecord[]>([]);
   const [bookingRecords, setBookingRecords] = useState<BookingRequest[]>([]);
+  const [advisoryRecords, setAdvisoryRecords] = useState<PersonalAdviceRecord[]>([]);
 
   useEffect(() => {
     function load() {
       setOfferRecords(listRecordsForCustomer(customerId));
       setBookingRecords(listBookingRequestsForCustomer(customerId));
+      setAdvisoryRecords(listAdvisoryRecordsForCustomer(customerId));
     }
     load();
     const onUpdate = () => load();
     window.addEventListener("offerRequest:update", onUpdate);
     window.addEventListener("bookingRequest:update", onUpdate);
+    window.addEventListener("personalAdvice:update", onUpdate);
     window.addEventListener("storage", onUpdate);
     const t = setInterval(load, 2000);
     return () => {
       window.removeEventListener("offerRequest:update", onUpdate);
       window.removeEventListener("bookingRequest:update", onUpdate);
+      window.removeEventListener("personalAdvice:update", onUpdate);
       window.removeEventListener("storage", onUpdate);
       clearInterval(t);
     };
   }, [customerId]);
 
-  const isEmpty = offerRecords.length === 0 && bookingRecords.length === 0;
+  const isEmpty =
+    offerRecords.length === 0 &&
+    bookingRecords.length === 0 &&
+    advisoryRecords.length === 0;
 
   if (isEmpty) {
     return (
@@ -75,6 +86,9 @@ export function CustomerRequestsListPage() {
           <div className="flex flex-wrap justify-center gap-2">
             <Button asChild>
               <Link to="/get-offers">Get 3 offers</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/personal-advice">Personlig rådgivning</Link>
             </Button>
             <Button asChild variant="outline">
               <Link to="/search">Browse DJs</Link>
@@ -95,6 +109,21 @@ export function CustomerRequestsListPage() {
           Track every brief you've sent and every DJ you've requested directly.
         </p>
       </header>
+
+      {advisoryRecords.length > 0 && (
+        <section className="space-y-3">
+          <SectionHeader
+            title="Personlig rådgivning"
+            count={advisoryRecords.length}
+            description="Personlige anbefalinger fra platformen — en rådgiver ringer dig op."
+          />
+          <ul className="divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/40">
+            {advisoryRecords.map((r) => (
+              <AdvisoryRequestRow key={r.id} record={r} />
+            ))}
+          </ul>
+        </section>
+      )}
 
       {bookingRecords.length > 0 && (
         <section className="space-y-3">
@@ -261,6 +290,73 @@ function BookingRequestRow({ record }: { record: BookingRequest }) {
         </div>
         <div className="flex items-center gap-3">
           <span className={`shrink-0 text-xs ${statusTone}`}>{status}</span>
+          <ArrowRight className="h-4 w-4 text-muted-foreground" />
+        </div>
+      </Link>
+    </li>
+  );
+}
+
+function AdvisoryRequestRow({ record }: { record: PersonalAdviceRecord }) {
+  const wedding = record.brief.eventType === "wedding" ? record.brief.wedding : null;
+  const eventLabel =
+    record.brief.eventType === "wedding"
+      ? "Bryllup"
+      : record.brief.eventType === "birthday"
+        ? "Fødselsdag"
+        : record.brief.eventType === "corporate"
+          ? "Firmaevent"
+          : "Event";
+  const where = wedding?.city ?? "";
+  const dateLabel = wedding?.weddingDate
+    ? new Date(wedding.weddingDate).toLocaleDateString("da-DK", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : "Dato ikke valgt";
+
+  const status =
+    record.status === "reserved"
+      ? "Reserveret"
+      : record.status === "declined"
+        ? "Afslået"
+        : "Afventer rådgiver-opkald";
+  const tone =
+    record.status === "reserved"
+      ? "text-emerald-700"
+      : record.status === "declined"
+        ? "text-muted-foreground"
+        : "text-amber-700";
+
+  return (
+    <li>
+      <Link
+        to={`/dashboard/personlig-radgivning/${record.id}`}
+        className="flex items-center justify-between gap-4 px-5 py-4 text-sm transition-colors hover:bg-muted/30"
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-rose-100 text-rose-700">
+            <Sparkles className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate font-medium text-foreground">
+              {eventLabel}
+              {where ? (
+                <span className="font-normal text-muted-foreground"> · {where}</span>
+              ) : null}
+              <span className="font-normal text-muted-foreground">
+                {" · "}Anbefalet: {record.recommendation.name}
+              </span>
+            </p>
+            <p className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted-foreground">
+              <Phone className="h-3 w-3 shrink-0" />
+              {dateLabel} · sendt {timeSince(record.createdAtMs)}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className={`shrink-0 text-xs ${tone}`}>{status}</span>
           <ArrowRight className="h-4 w-4 text-muted-foreground" />
         </div>
       </Link>

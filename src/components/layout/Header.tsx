@@ -16,9 +16,16 @@ import { PLATFORM_NAME } from "@/lib/constants";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
+type NavLinkSpec = {
+  to: string;
+  label: string;
+  highlight?: "primary" | "secondary";
+};
+
+const navLinks: NavLinkSpec[] = [
   { to: "/search", label: "Browse DJs" },
-  { to: "/get-offers", label: "Get 3 offers", highlight: true },
+  { to: "/get-offers", label: "Get 3 offers", highlight: "primary" },
+  { to: "/personal-advice", label: "Personlig Rådgivning", highlight: "secondary" },
   { to: "/how-it-works", label: "How it works" },
   { to: "/about", label: "About" },
   { to: "/faq", label: "FAQ" },
@@ -48,14 +55,19 @@ export function Header() {
                 className={({ isActive }) =>
                   cn(
                     "text-sm font-medium transition-colors hover:text-foreground",
-                    link.highlight
+                    link.highlight === "primary"
                       ? cn(
                           "rounded-full bg-gradient-to-r from-rose-500 to-rose-600 px-3.5 py-1.5 text-white shadow-sm hover:from-rose-600 hover:to-rose-700 hover:text-white",
                           isActive && "ring-2 ring-rose-300",
                         )
-                      : isActive
-                        ? "text-foreground"
-                        : "text-muted-foreground",
+                      : link.highlight === "secondary"
+                        ? cn(
+                            "rounded-full border border-foreground/80 bg-background px-3.5 py-1.5 text-foreground shadow-sm hover:bg-foreground hover:text-background",
+                            isActive && "bg-foreground text-background",
+                          )
+                        : isActive
+                          ? "text-foreground"
+                          : "text-muted-foreground",
                   )
                 }
               >
