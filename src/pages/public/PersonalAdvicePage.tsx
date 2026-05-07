@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, mockCustomerIdFor } from "@/hooks/useAuth";
 import {
   recommendWeddingPackage,
   writeAdvisoryRecord,
@@ -68,6 +68,12 @@ export function PersonalAdvicePage() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // A DJ or admin demo session can't auto-create a customer record without
+  // overwriting their session. Surface that as a guard and let them sign
+  // out manually rather than silently destroying their auth state.
+  const blockedRole = profile && profile.role !== "customer" ? profile.role : null;
 
   const valid = useMemo(() => {
     if (eventType !== "wedding") return false;
@@ -97,17 +103,32 @@ export function PersonalAdvicePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!valid || submitting) return;
+
+    // A DJ / admin demo session can't be silently overwritten — that would
+    // destroy their dashboard access on the next reload. Bail out early and
+    // ask them to sign out first. Anonymous and customer sessions proceed.
+    if (profile && profile.role !== "customer") {
+      setSubmitError(
+        `Du er logget ind som ${profile.role === "dj" ? "DJ" : "administrator"}. Log ud først for at sende en personlig rådgivnings-anmodning som kunde.`,
+      );
+      return;
+    }
+
+    setSubmitError(null);
     setSubmitting(true);
 
-    // Auto-create / log in a demo customer account if there's no session yet.
-    if (!profile || profile.role !== "customer") {
+    // Determine the customerId we're about to attach the record to. If the
+    // user is already logged in as a customer, reuse their id. Otherwise
+    // mockLogin will create a private-customer session — derive the id
+    // from the same helper mockLogin uses, so we don't depend on its
+    // internal implementation.
+    let customerId: string;
+    if (profile?.role === "customer") {
+      customerId = profile.id;
+    } else {
       mockLogin("customer", { customerKind: "private" });
+      customerId = mockCustomerIdFor("private");
     }
-    // The mockLogin call above sets the profile in state synchronously, but
-    // the customerId we attach to the record uses the same deterministic id
-    // mockLogin assigns ("user-customer-1" for private).
-    const customerId =
-      profile?.role === "customer" ? profile.id : "user-customer-1";
 
     const brief: WeddingAdvisoryBrief = {
       coupleNames: coupleNames.trim(),
@@ -466,6 +487,20 @@ export function PersonalAdvicePage() {
               betaler ingenting før alt er aftalt på telefon.
             </div>
 
+            {blockedRole && (
+              <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+                Du er logget ind som{" "}
+                <strong>{blockedRole === "dj" ? "DJ" : "administrator"}</strong>.
+                Log ud først for at sende en personlig rådgivnings-anmodning
+                som kunde, så vi ikke overskriver din nuværende session.
+              </div>
+            )}
+            {submitError && !blockedRole && (
+              <div className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900">
+                {submitError}
+              </div>
+            )}
+
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs text-muted-foreground">
                 Ved at sende accepterer du vores{" "}
@@ -478,7 +513,11 @@ export function PersonalAdvicePage() {
                 </a>
                 .
               </p>
-              <Button type="submit" disabled={!valid || submitting} className="gap-1.5">
+              <Button
+                type="submit"
+                disabled={!valid || submitting || Boolean(blockedRole)}
+                className="gap-1.5"
+              >
                 <Phone className="h-4 w-4" />
                 {submitting ? "Sender..." : "Send og få rådgivning"}
               </Button>

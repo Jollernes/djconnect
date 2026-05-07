@@ -29,6 +29,20 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 const MOCK_STORAGE_KEY = "djconnect.mockRole";
 const MOCK_CUSTOMER_KIND_KEY = "djconnect.mockCustomerKind";
 
+/**
+ * Deterministic profile ids assigned to the demo private / corporate
+ * customer accounts. Exported so other parts of the app (e.g. flows that
+ * auto-create a customer session via {@link mockLogin}) can attach
+ * records to the same id `mockLogin` will produce, without depending on
+ * the implicit string literal.
+ */
+export const MOCK_CUSTOMER_PRIVATE_ID = "user-customer-1";
+export const MOCK_CUSTOMER_CORPORATE_ID = "user-customer-2";
+
+export function mockCustomerIdFor(kind: "private" | "corporate"): string {
+  return kind === "corporate" ? MOCK_CUSTOMER_CORPORATE_ID : MOCK_CUSTOMER_PRIVATE_ID;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -62,7 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const isCorporate = mockRole === "customer" && kind === "corporate";
         const demoDJ = mockRole === "dj" ? readDemoDJProfile() : null;
         setProfile({
-          id: isCorporate ? "user-customer-2" : mockRole === "customer" ? "user-customer-1" : `mock-${mockRole}`,
+          id: isCorporate
+            ? MOCK_CUSTOMER_CORPORATE_ID
+            : mockRole === "customer"
+              ? MOCK_CUSTOMER_PRIVATE_ID
+              : `mock-${mockRole}`,
           role: mockRole,
           email: demoDJ?.email
             ? demoDJ.email
@@ -189,7 +207,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         markDJGuideCompleted();
       }
       setProfile({
-        id: isCorporate ? "user-customer-2" : role === "customer" ? "user-customer-1" : `mock-${role}`,
+        id: isCorporate
+          ? MOCK_CUSTOMER_CORPORATE_ID
+          : role === "customer"
+            ? MOCK_CUSTOMER_PRIVATE_ID
+            : `mock-${role}`,
         role,
         email: demoDJ?.email
           ? demoDJ.email
