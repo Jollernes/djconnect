@@ -1,7 +1,16 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Phone, Sparkles, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  CalendarHeart,
+  MapPin,
+  Users,
+  Clock,
+  Music2,
+  Sparkles,
+  Wallet,
+  Phone,
+  Check,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,35 +21,71 @@ import {
   writeAdvisoryRecord,
   type WeddingAdvisoryBrief,
 } from "@/lib/personalAdviceStore";
+import { OfferWizardLayout } from "@/components/offers/OfferWizardLayout";
 
 /**
- * Personal advisory landing page.
+ * Personal advisory wizard.
  *
- * Surfaces the Danish hook copy ("Er du i tvivl…"), then drops the user
- * straight into an extended wedding-brief form. On submit:
+ * Mirrors the 3-offers wizard shape: a full-screen `OfferWizardLayout`
+ * with a top progress bar, one or two questions per step, and a sticky
+ * back / continue bar at the bottom. On submit:
  *   1. Writes a `PersonalAdviceRecord` to localStorage with a deterministic
  *      package recommendation derived from the brief.
- *   2. Auto-creates a demo customer account via `mockLogin` (Supabase later).
- *   3. Navigates to the customer-dashboard advisory waiting page.
+ *   2. Auto-creates a demo customer account via `mockLogin` if the user
+ *      isn't already logged in as a customer (existing DJ / admin demo
+ *      sessions are protected — those users are asked to sign out first
+ *      so we don't overwrite their session).
+ *   3. Navigates to the dashboard recommendation page.
  *
- * Other event types (birthday, corporate, other) currently show a
- * "kommer snart" placeholder and route the user back to the wedding flow,
- * but the underlying store + dashboard pages are scaffolded so adding
- * those later is just a new form template + recommendation rules.
+ * Step layout (URL `?step=0..9`):
+ *   0  Welcome / lede
+ *   1  Couple's names + date
+ *   2  City + venue
+ *   3  Guests + DJ hours
+ *   4  Schedule (ceremony / dinner / party)
+ *   5  Music style + must-play / må-ikke-spilles
+ *   6  Setup needs
+ *   7  Budget + notes
+ *   8  Contact
+ *   9  Review & submit
  */
+
+const TOTAL_STEPS = 8; // questions counted in the progress bar (steps 1..8)
+
+type StepConfig = {
+  stepNumber: number;
+  title: string;
+  subtitle?: string;
+  content: React.ReactNode;
+  hideBack?: boolean;
+  hideNext?: boolean;
+  showProgress?: boolean;
+  nextLabel?: string;
+};
+
 export function PersonalAdvicePage() {
   useDocumentHead({
     title: "Personlig rådgivning · DJConnect",
     description:
       "Få personlig rådgivning til dit event. Vi ringer dig op og hjælper med at finde den rette DJ-løsning.",
+    canonical: "/personal-advice",
   });
 
   const navigate = useNavigate();
   const { profile, mockLogin } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [eventType, setEventType] = useState<
-    "wedding" | "birthday" | "corporate" | "other"
-  >("wedding");
+  const stepParam = parseInt(searchParams.get("step") ?? "0", 10);
+  const step =
+    Number.isFinite(stepParam) && stepParam >= 0 && stepParam <= 9
+      ? stepParam
+      : 0;
+
+  function setStep(next: number) {
+    setSearchParams({ step: String(next) }, { replace: false });
+    if (typeof window !== "undefined")
+      window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   // Wedding form state
   const [coupleNames, setCoupleNames] = useState("");
@@ -70,43 +115,51 @@ export function PersonalAdvicePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  // A DJ or admin demo session can't auto-create a customer record without
-  // overwriting their session. Surface that as a guard and let them sign
-  // out manually rather than silently destroying their auth state.
+  // DJ / admin demo sessions can't be silently overwritten without
+  // destroying that user's dashboard access on the next reload.
   const blockedRole = profile && profile.role !== "customer" ? profile.role : null;
-
-  const valid = useMemo(() => {
-    if (eventType !== "wedding") return false;
-    return (
-      coupleNames.trim().length > 0 &&
-      weddingDate.length > 0 &&
-      city.trim().length > 0 &&
-      typeof guestCount === "number" && guestCount > 0 &&
-      contactName.trim().length > 0 &&
-      contactEmail.trim().length > 0 &&
-      contactPhone.trim().length > 0
-    );
-  }, [eventType, coupleNames, weddingDate, city, guestCount, contactName, contactEmail, contactPhone]);
 
   function togglePart(p: "ceremony" | "dinner" | "party") {
     setParts((prev) =>
       prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p],
     );
   }
-
   function toggleSetup(label: string) {
     setSetupNeeds((prev) =>
       prev.includes(label) ? prev.filter((x) => x !== label) : [...prev, label],
     );
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!valid || submitting) return;
+  const nextDisabled = useMemo(() => {
+    switch (step) {
+      case 1:
+        return coupleNames.trim().length === 0 || weddingDate.length === 0;
+      case 2:
+        return city.trim().length === 0;
+      case 3:
+        return !(typeof guestCount === "number" && guestCount > 0);
+      case 4:
+        return parts.length === 0;
+      case 5:
+        return false; // music details optional
+      case 6:
+        return false; // setup optional (chips)
+      case 7:
+        return false; // budget + notes optional
+      case 8:
+        return (
+          contactName.trim().length === 0 ||
+          !/.+@.+\..+/.test(contactEmail) ||
+          contactPhone.trim().length === 0
+        );
+      default:
+        return false;
+    }
+  }, [step, coupleNames, weddingDate, city, guestCount, parts, contactName, contactEmail, contactPhone]);
 
-    // A DJ / admin demo session can't be silently overwritten — that would
-    // destroy their dashboard access on the next reload. Bail out early and
-    // ask them to sign out first. Anonymous and customer sessions proceed.
+  function handleSubmit() {
+    if (submitting) return;
+
     if (profile && profile.role !== "customer") {
       setSubmitError(
         `Du er logget ind som ${profile.role === "dj" ? "DJ" : "administrator"}. Log ud først for at sende en personlig rådgivnings-anmodning som kunde.`,
@@ -117,11 +170,6 @@ export function PersonalAdvicePage() {
     setSubmitError(null);
     setSubmitting(true);
 
-    // Determine the customerId we're about to attach the record to. If the
-    // user is already logged in as a customer, reuse their id. Otherwise
-    // mockLogin will create a private-customer session — derive the id
-    // from the same helper mockLogin uses, so we don't depend on its
-    // internal implementation.
     let customerId: string;
     if (profile?.role === "customer") {
       customerId = profile.id;
@@ -165,92 +213,28 @@ export function PersonalAdvicePage() {
     navigate(`/dashboard/personlig-radgivning/${id}`);
   }
 
-  return (
-    <div className="container py-10">
-      <div className="mx-auto max-w-2xl space-y-8">
-        <header className="space-y-3">
-          <p className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-rose-700">
-            <Sparkles className="h-3 w-3" />
-            Personlig rådgivning
-          </p>
-          <h1 className="text-3xl font-semibold leading-tight tracking-tight md:text-4xl">
-            Lad os finde den rette løsning til jeres event
-          </h1>
-          <p className="text-base leading-relaxed text-muted-foreground">
-            Er du i tvivl om, hvilken DJ, pakke eller løsning der passer til dit
-            event? Fortæl os lidt mere om festen, så ringer vi dig op og hjælper
-            med at finde den rette løsning!
-          </p>
-          <ul className="space-y-1.5 pt-2 text-sm text-muted-foreground">
-            <li className="flex items-start gap-2">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-              Personlig anbefaling baseret på dit eventbrief — ingen forpligtelser.
-            </li>
-            <li className="flex items-start gap-2">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-              En rådgiver ringer dig op typisk inden for et par timer.
-            </li>
-            <li className="flex items-start gap-2">
-              <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-              Mulighed for at booke direkte gennem platformen — alt samlet ét sted.
-            </li>
-          </ul>
-        </header>
-
-        {/* Event type selector */}
-        <div className="space-y-2">
-          <p className="text-sm font-medium">Hvilken slags event er det?</p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {([
-              { id: "wedding", label: "Bryllup" },
-              { id: "birthday", label: "Fødselsdag" },
-              { id: "corporate", label: "Firmaevent" },
-              { id: "other", label: "Andet" },
-            ] as const).map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setEventType(opt.id)}
-                className={
-                  "rounded-xl border px-3 py-3 text-sm font-medium transition-colors " +
-                  (eventType === opt.id
-                    ? "border-foreground bg-foreground text-background"
-                    : "border-border bg-background hover:border-foreground/40")
-                }
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {eventType !== "wedding" ? (
-          <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-6 text-center">
-            <p className="text-sm font-medium">Kommer snart</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Vi tilbyder lige nu kun personlig rådgivning til bryllupper. Vi
-              udvider snart — i mellemtiden kan du{" "}
-              <button
-                type="button"
-                onClick={() => setEventType("wedding")}
-                className="font-medium text-foreground underline-offset-2 hover:underline"
-              >
-                udfylde bryllupsformularen
-              </button>{" "}
-              hvis det passer, eller{" "}
-              <a href="/get-offers" className="font-medium text-foreground underline-offset-2 hover:underline">
-                få 3 tilbud
-              </a>{" "}
-              fra DJ'er på platformen.
-            </p>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <FormSection
-              title="Om jeres bryllup"
-              description="Lidt baggrund om dagen, så rådgiveren ved hvad det handler om."
-            >
-              <Field label="Brudeparrets navne" htmlFor="adv-couple">
+  // Step configuration
+  const config: StepConfig = (() => {
+    switch (step) {
+      case 0:
+        return {
+          stepNumber: 0,
+          title: "Lad os finde den rette løsning til jeres bryllup.",
+          subtitle:
+            "Er du i tvivl om, hvilken DJ, pakke eller løsning der passer til dit event? Fortæl os lidt mere om festen, så ringer vi dig op og hjælper med at finde den rette løsning.",
+          content: <WelcomeStep />,
+          hideBack: true,
+          showProgress: false,
+          nextLabel: "Start — det tager ~2 min",
+        };
+      case 1:
+        return {
+          stepNumber: 1,
+          title: "Hvem skal giftes — og hvornår?",
+          subtitle: "Vi bruger det til at adressere jer korrekt og holde datoen åben.",
+          content: (
+            <StepCard icon={<CalendarHeart className="h-5 w-5" />}>
+              <Field label="Brudeparrets navne" htmlFor="adv-couple" required>
                 <Input
                   id="adv-couple"
                   required
@@ -259,26 +243,34 @@ export function PersonalAdvicePage() {
                   onChange={(e) => setCoupleNames(e.target.value)}
                 />
               </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Bryllupsdato" htmlFor="adv-date">
-                  <Input
-                    id="adv-date"
-                    type="date"
-                    required
-                    value={weddingDate}
-                    onChange={(e) => setWeddingDate(e.target.value)}
-                  />
-                </Field>
-                <Field label="By / region" htmlFor="adv-city">
-                  <Input
-                    id="adv-city"
-                    required
-                    placeholder="København"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                  />
-                </Field>
-              </div>
+              <Field label="Bryllupsdato" htmlFor="adv-date" required>
+                <Input
+                  id="adv-date"
+                  type="date"
+                  required
+                  value={weddingDate}
+                  onChange={(e) => setWeddingDate(e.target.value)}
+                />
+              </Field>
+            </StepCard>
+          ),
+        };
+      case 2:
+        return {
+          stepNumber: 2,
+          title: "Hvor holder I det?",
+          subtitle: "Bare byen er nok. Festlokalet er valgfrit hvis I endnu ikke har valgt.",
+          content: (
+            <StepCard icon={<MapPin className="h-5 w-5" />}>
+              <Field label="By / region" htmlFor="adv-city" required>
+                <Input
+                  id="adv-city"
+                  required
+                  placeholder="København"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                />
+              </Field>
               <Field label="Festlokale (valgfrit)" htmlFor="adv-venue">
                 <Input
                   id="adv-venue"
@@ -287,41 +279,55 @@ export function PersonalAdvicePage() {
                   onChange={(e) => setVenueName(e.target.value)}
                 />
               </Field>
-            </FormSection>
-
-            <FormSection
-              title="Antal gæster og forløb"
-              description="Hvor stort er det, og hvor meget af dagen skal DJ'en dække?"
-            >
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Antal gæster (ca.)" htmlFor="adv-guests">
-                  <Input
-                    id="adv-guests"
-                    type="number"
-                    min={0}
-                    required
-                    placeholder="80"
-                    value={guestCount}
-                    onChange={(e) =>
-                      setGuestCount(e.target.value === "" ? "" : Number(e.target.value))
-                    }
-                  />
-                </Field>
-                <Field label="Antal timer DJ-tid (ca.)" htmlFor="adv-hours">
-                  <Input
-                    id="adv-hours"
-                    type="number"
-                    min={1}
-                    max={12}
-                    placeholder="5"
-                    value={totalHours}
-                    onChange={(e) =>
-                      setTotalHours(e.target.value === "" ? "" : Number(e.target.value))
-                    }
-                  />
-                </Field>
-              </div>
-              <Field label="DJ skal dække">
+            </StepCard>
+          ),
+        };
+      case 3:
+        return {
+          stepNumber: 3,
+          title: "Hvor stort er det?",
+          subtitle: "Antallet af gæster og DJ-tiden afgør hvilken pakke vi anbefaler.",
+          content: (
+            <StepCard icon={<Users className="h-5 w-5" />}>
+              <Field label="Antal gæster (ca.)" htmlFor="adv-guests" required>
+                <Input
+                  id="adv-guests"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  required
+                  placeholder="80"
+                  value={guestCount}
+                  onChange={(e) =>
+                    setGuestCount(e.target.value === "" ? "" : Number(e.target.value))
+                  }
+                />
+              </Field>
+              <Field label="Antal timer DJ-tid (ca.)" htmlFor="adv-hours">
+                <Input
+                  id="adv-hours"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  max={12}
+                  placeholder="5"
+                  value={totalHours}
+                  onChange={(e) =>
+                    setTotalHours(e.target.value === "" ? "" : Number(e.target.value))
+                  }
+                />
+              </Field>
+            </StepCard>
+          ),
+        };
+      case 4:
+        return {
+          stepNumber: 4,
+          title: "Hvilke dele af dagen skal DJ'en dække?",
+          subtitle: "Vælg alle der passer — det styrer både timeforbrug og udstyr.",
+          content: (
+            <StepCard icon={<Clock className="h-5 w-5" />}>
+              <Field label="DJ skal dække" required>
                 <div className="flex flex-wrap gap-2">
                   {([
                     { id: "ceremony", label: "Ceremoni" },
@@ -347,12 +353,17 @@ export function PersonalAdvicePage() {
                   })}
                 </div>
               </Field>
-            </FormSection>
-
-            <FormSection
-              title="Musik og stemning"
-              description="Det vi bruger til at briefe DJ'en. Du behøver ikke kende alle navne."
-            >
+            </StepCard>
+          ),
+        };
+      case 5:
+        return {
+          stepNumber: 5,
+          title: "Hvilken musik forestiller I jer?",
+          subtitle:
+            "Du behøver ikke have det hele klar — bare nævn det vigtigste, så briefer vi DJ'en.",
+          content: (
+            <StepCard icon={<Music2 className="h-5 w-5" />}>
               <Field label="Musikstil / genrer" htmlFor="adv-music">
                 <Input
                   id="adv-music"
@@ -366,7 +377,7 @@ export function PersonalAdvicePage() {
                   <Textarea
                     id="adv-must"
                     rows={3}
-                    placeholder="Vores første dans, brudens fars yndlingssang, ..."
+                    placeholder="Vores første dans, brudens fars yndlingssang..."
                     value={mustPlay}
                     onChange={(e) => setMustPlay(e.target.value)}
                   />
@@ -381,12 +392,17 @@ export function PersonalAdvicePage() {
                   />
                 </Field>
               </div>
-            </FormSection>
-
-            <FormSection
-              title="Setup og praktisk"
-              description="Hvad har I selv, og hvad skal vi medbringe?"
-            >
+            </StepCard>
+          ),
+        };
+      case 6:
+        return {
+          stepNumber: 6,
+          title: "Hvad skal vi sørge for?",
+          subtitle:
+            "Vælg det udstyr vi skal medbringe. Vi har det hele med som standard.",
+          content: (
+            <StepCard icon={<Sparkles className="h-5 w-5" />}>
               <Field label="Vi skal sørge for">
                 <div className="flex flex-wrap gap-2">
                   {[
@@ -425,6 +441,17 @@ export function PersonalAdvicePage() {
                   onChange={(e) => setVenueNotes(e.target.value)}
                 />
               </Field>
+            </StepCard>
+          ),
+        };
+      case 7:
+        return {
+          stepNumber: 7,
+          title: "Budget og særlige ønsker?",
+          subtitle:
+            "Helt valgfrit. Det hjælper rådgiveren med at finde den rette pakke til jer.",
+          content: (
+            <StepCard icon={<Wallet className="h-5 w-5" />}>
               <Field label="Budget (valgfrit)" htmlFor="adv-budget">
                 <Input
                   id="adv-budget"
@@ -436,19 +463,24 @@ export function PersonalAdvicePage() {
               <Field label="Andet vi skal vide? (valgfrit)" htmlFor="adv-notes">
                 <Textarea
                   id="adv-notes"
-                  rows={3}
-                  placeholder="Alt I tænker er værd at nævne."
+                  rows={4}
+                  placeholder="Alt I tænker er værd at nævne — overraskelser, tradition, sprog..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
               </Field>
-            </FormSection>
-
-            <FormSection
-              title="Hvor kan vi ringe dig?"
-              description="En rådgiver kontakter dig typisk inden for et par timer i dagtimerne."
-            >
-              <Field label="Dit navn" htmlFor="adv-name">
+            </StepCard>
+          ),
+        };
+      case 8:
+        return {
+          stepNumber: 8,
+          title: "Hvor kan rådgiveren ringe dig?",
+          subtitle:
+            "Vi kontakter dig typisk inden for et par timer i dagtimerne — ingen forpligtelser.",
+          content: (
+            <StepCard icon={<Phone className="h-5 w-5" />}>
+              <Field label="Dit navn" htmlFor="adv-name" required>
                 <Input
                   id="adv-name"
                   required
@@ -458,7 +490,7 @@ export function PersonalAdvicePage() {
                 />
               </Field>
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Email" htmlFor="adv-email">
+                <Field label="Email" htmlFor="adv-email" required>
                   <Input
                     id="adv-email"
                     type="email"
@@ -468,7 +500,7 @@ export function PersonalAdvicePage() {
                     onChange={(e) => setContactEmail(e.target.value)}
                   />
                 </Field>
-                <Field label="Telefon" htmlFor="adv-phone">
+                <Field label="Telefon" htmlFor="adv-phone" required>
                   <Input
                     id="adv-phone"
                     type="tel"
@@ -479,89 +511,295 @@ export function PersonalAdvicePage() {
                   />
                 </Field>
               </div>
-            </FormSection>
-
-            <div className="rounded-xl border border-border/60 bg-muted/30 p-4 text-xs text-muted-foreground">
-              Når du sender, opretter vi automatisk en konto til dig så du kan
-              følge med på din anbefaling og kommunikere med rådgiveren. Du
-              betaler ingenting før alt er aftalt på telefon.
-            </div>
-
-            {blockedRole && (
-              <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-                Du er logget ind som{" "}
-                <strong>{blockedRole === "dj" ? "DJ" : "administrator"}</strong>.
-                Log ud først for at sende en personlig rådgivnings-anmodning
-                som kunde, så vi ikke overskriver din nuværende session.
-              </div>
-            )}
-            {submitError && !blockedRole && (
-              <div className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900">
-                {submitError}
-              </div>
-            )}
-
-            <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs text-muted-foreground">
-                Ved at sende accepterer du vores{" "}
-                <a href="/terms" className="underline-offset-2 hover:underline">
-                  vilkår
-                </a>{" "}
-                og{" "}
-                <a href="/privacy" className="underline-offset-2 hover:underline">
-                  privatlivspolitik
-                </a>
-                .
+                Når du sender, opretter vi automatisk en konto til dig så du
+                kan følge med på din anbefaling. Du betaler ingenting før alt
+                er aftalt på telefon.
               </p>
-              <Button
-                type="submit"
-                disabled={!valid || submitting || Boolean(blockedRole)}
-                className="gap-1.5"
-              >
-                <Phone className="h-4 w-4" />
-                {submitting ? "Sender..." : "Send og få rådgivning"}
-              </Button>
-            </div>
-          </form>
-        )}
-      </div>
+            </StepCard>
+          ),
+          nextLabel: "Gå til oversigt",
+        };
+      case 9:
+        return {
+          stepNumber: 9,
+          title: "Klar til at sende dit brief?",
+          subtitle:
+            "Tjek lige at det hele ser rigtigt ud. Du kan altid justere bagefter sammen med rådgiveren.",
+          content: (
+            <ReviewStep
+              data={{
+                coupleNames,
+                weddingDate,
+                city,
+                venueName,
+                guestCount,
+                totalHours,
+                parts,
+                musicStyle,
+                mustPlay,
+                doNotPlay,
+                setupNeeds,
+                budget,
+                notes,
+                contactName,
+                contactEmail,
+                contactPhone,
+              }}
+              blockedRole={blockedRole}
+              submitError={submitError}
+              onEdit={(s) => setStep(s)}
+            />
+          ),
+          nextLabel: submitting ? "Sender..." : "Send og få rådgivning",
+          showProgress: false,
+        };
+      default:
+        return {
+          stepNumber: step,
+          title: "",
+          content: null,
+        };
+    }
+  })();
+
+  function handleNext() {
+    if (step === 9) {
+      handleSubmit();
+      return;
+    }
+    setStep(step + 1);
+  }
+
+  function handleBack() {
+    if (step > 0) setStep(step - 1);
+  }
+
+  return (
+    <OfferWizardLayout
+      step={config.stepNumber}
+      totalSteps={TOTAL_STEPS}
+      title={config.title}
+      subtitle={config.subtitle}
+      onBack={handleBack}
+      onNext={handleNext}
+      nextLabel={config.nextLabel}
+      nextDisabled={nextDisabled || (step === 9 && Boolean(blockedRole))}
+      hideBack={config.hideBack}
+      hideNext={config.hideNext}
+      showProgress={config.showProgress}
+    >
+      {config.content}
+    </OfferWizardLayout>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* Step UI helpers                                                       */
+/* -------------------------------------------------------------------- */
+
+function WelcomeStep() {
+  return (
+    <div className="space-y-6">
+      <ul className="mx-auto max-w-md space-y-2 text-sm">
+        {[
+          "Personlig anbefaling baseret på dit eventbrief — ingen forpligtelser.",
+          "En rådgiver ringer dig op typisk inden for et par timer.",
+          "Mulighed for at booke direkte gennem platformen — alt samlet ét sted.",
+        ].map((point) => (
+          <li key={point} className="flex items-start gap-2">
+            <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+            <span>{point}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
 
-function FormSection({
-  title,
-  description,
+function StepCard({
+  icon,
   children,
 }: {
-  title: string;
-  description: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-4 rounded-2xl border border-border/60 bg-card/40 p-5 sm:p-6">
-      <header>
-        <h2 className="text-lg font-semibold tracking-tight">{title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-      </header>
-      <div className="space-y-4">{children}</div>
-    </section>
+    <div className="mx-auto max-w-xl space-y-5 rounded-2xl border border-border/60 bg-card/40 p-5 shadow-sm sm:p-6">
+      {icon && (
+        <div className="grid h-10 w-10 place-items-center rounded-full bg-rose-100 text-rose-700">
+          {icon}
+        </div>
+      )}
+      <div className="space-y-5">{children}</div>
+    </div>
   );
 }
 
 function Field({
   label,
   htmlFor,
+  required,
   children,
 }: {
   label: string;
   htmlFor?: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={htmlFor}>{label}</Label>
+      <Label htmlFor={htmlFor}>
+        {label}
+        {required && <span className="ml-0.5 text-rose-600">*</span>}
+      </Label>
       {children}
     </div>
   );
+}
+
+type ReviewData = {
+  coupleNames: string;
+  weddingDate: string;
+  city: string;
+  venueName: string;
+  guestCount: number | "";
+  totalHours: number | "";
+  parts: Array<"ceremony" | "dinner" | "party">;
+  musicStyle: string;
+  mustPlay: string;
+  doNotPlay: string;
+  setupNeeds: string[];
+  budget: string;
+  notes: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+};
+
+function ReviewStep({
+  data,
+  blockedRole,
+  submitError,
+  onEdit,
+}: {
+  data: ReviewData;
+  blockedRole: string | null;
+  submitError: string | null;
+  onEdit: (step: number) => void;
+}) {
+  const partsLabel = data.parts
+    .map((p) => (p === "ceremony" ? "ceremoni" : p === "dinner" ? "middag" : "fest"))
+    .join(" + ");
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-4">
+      <SummaryRow
+        label="Brudepar"
+        onEdit={() => onEdit(1)}
+        value={`${data.coupleNames} · ${formatDateDanish(data.weddingDate)}`}
+      />
+      <SummaryRow
+        label="Sted"
+        onEdit={() => onEdit(2)}
+        value={[data.city, data.venueName].filter(Boolean).join(" · ")}
+      />
+      <SummaryRow
+        label="Størrelse"
+        onEdit={() => onEdit(3)}
+        value={`${data.guestCount || "?"} gæster · ${data.totalHours || "?"} timer DJ-tid`}
+      />
+      <SummaryRow label="Forløb" onEdit={() => onEdit(4)} value={partsLabel || "—"} />
+      <SummaryRow
+        label="Musik"
+        onEdit={() => onEdit(5)}
+        value={data.musicStyle || "Ikke specificeret"}
+        secondary={[
+          data.mustPlay && `Skal: ${data.mustPlay}`,
+          data.doNotPlay && `Ikke: ${data.doNotPlay}`,
+        ]
+          .filter(Boolean)
+          .join(" · ")}
+      />
+      <SummaryRow
+        label="Setup"
+        onEdit={() => onEdit(6)}
+        value={data.setupNeeds.join(", ") || "Standard"}
+      />
+      {(data.budget || data.notes) && (
+        <SummaryRow
+          label="Budget & noter"
+          onEdit={() => onEdit(7)}
+          value={data.budget || "Intet specifikt budget"}
+          secondary={data.notes}
+        />
+      )}
+      <SummaryRow
+        label="Kontakt"
+        onEdit={() => onEdit(8)}
+        value={data.contactName}
+        secondary={`${data.contactEmail} · ${data.contactPhone}`}
+      />
+
+      {blockedRole && (
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          Du er logget ind som{" "}
+          <strong>{blockedRole === "dj" ? "DJ" : "administrator"}</strong>. Log
+          ud først for at sende en personlig rådgivnings-anmodning som kunde,
+          så vi ikke overskriver din nuværende session.
+        </div>
+      )}
+      {submitError && !blockedRole && (
+        <div className="rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900">
+          {submitError}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SummaryRow({
+  label,
+  value,
+  secondary,
+  onEdit,
+}: {
+  label: string;
+  value: string;
+  secondary?: string;
+  onEdit: () => void;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3 rounded-xl border border-border/60 bg-card/40 p-4">
+      <div className="min-w-0">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </p>
+        <p className="mt-0.5 text-sm font-medium">{value || "—"}</p>
+        {secondary && (
+          <p className="mt-1 truncate text-xs text-muted-foreground">{secondary}</p>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onEdit}
+        className="shrink-0 text-xs font-medium text-rose-700 underline-offset-2 hover:underline"
+      >
+        Rediger
+      </button>
+    </div>
+  );
+}
+
+function formatDateDanish(iso: string): string {
+  if (!iso) return "Ikke valgt";
+  try {
+    return new Date(iso).toLocaleDateString("da-DK", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  } catch {
+    return iso;
+  }
 }

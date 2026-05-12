@@ -159,11 +159,8 @@ function App() {
           {/* Get-3-offers wizard owns its own full-screen layout (no site header/footer) */}
           <Route path="/get-offers" element={<GetOffersPage />} />
 
-          {/* Personal advisory landing + form. Has the public site header
-              so the active nav tab stays visible while filling the brief. */}
-          <Route element={<PublicLayout />}>
-            <Route path="/personal-advice" element={<PersonalAdvicePage />} />
-          </Route>
+          {/* Personal advisory wizard — same full-screen shell as Get-3-offers */}
+          <Route path="/personal-advice" element={<PersonalAdvicePage />} />
 
           {/* Live progress page for an offer request — public for now;
               eventually gated behind a magic link. */}
