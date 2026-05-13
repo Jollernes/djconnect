@@ -13,9 +13,6 @@ import { GetOffersPage } from "@/pages/public/GetOffersPage";
 import { PersonalAdvicePage } from "@/pages/public/PersonalAdvicePage";
 import { PersonalAdviceWeddingPage } from "@/pages/public/PersonalAdviceWeddingPage";
 import { MyRequestPage } from "@/pages/public/MyRequestPage";
-import { WeddingDJsTestAPage } from "@/pages/public/WeddingDJsTestAPage";
-import { WeddingDJsTestBPage } from "@/pages/public/WeddingDJsTestBPage";
-import { WeddingDJsTestCPage } from "@/pages/public/WeddingDJsTestCPage";
 import { DJProfilePage } from "@/pages/public/DJProfilePage";
 import { BookingRequestPage } from "@/pages/public/BookingRequestPage";
 import { AboutPage } from "@/pages/public/AboutPage";
@@ -71,9 +68,6 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/wedding-djs" element={<WeddingDJsPage />} />
-            <Route path="/wedding-djs-test-a" element={<WeddingDJsTestAPage />} />
-            <Route path="/wedding-djs-test-b" element={<WeddingDJsTestBPage />} />
-            <Route path="/wedding-djs-test-c" element={<WeddingDJsTestCPage />} />
             <Route path="/djs/:username" element={<DJProfilePage />} />
             <Route path="/book/:username" element={<BookingRequestPage />} />
             <Route path="/about" element={<AboutPage />} />
