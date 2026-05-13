@@ -532,11 +532,12 @@ function VariantQuiz() {
             Personlig Rådgivning · trin 1 af 2
           </div>
           <h1 className="mt-6 text-balance text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">
-            Hvilket event handler det om?
+            Få personlig rådgivning til jeres fest!
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
-            Tryk på en kategori for at komme i gang. Vi tilpasser samtalen og
-            anbefalingen til netop dit event.
+            Er du i tvivl om, hvilken DJ, pakke eller løsning der passer til
+            dit event? Fortæl os lidt mere om festen, så ringer vi dig op og
+            hjælper med at finde den rette løsning.
           </p>
         </div>
 
