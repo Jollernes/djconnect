@@ -53,7 +53,7 @@ export function EventDJsListingHero({ config }: { config: EventListingConfig }) 
           if (!id) return;
           if (id !== config.id) navigate(`/${slugForEventType(id)}`);
         }}
-        onBrowseAll={() => navigate("/wedding-djs")}
+        onBrowseAll={() => navigate(`/${config.slug}`)}
         title="Switch event"
         description="Browsing for a different event will change the DJ profiles you see."
       />

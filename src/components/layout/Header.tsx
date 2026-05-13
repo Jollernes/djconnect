@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Search, User, LogOut, LayoutDashboard, Settings, Shield } from "lucide-react";
 import { BrandMark } from "@/components/common/BrandMark";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { PLATFORM_NAME } from "@/lib/constants";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { readPersistedEventType } from "@/hooks/useEventContext";
 import { slugForEventType } from "@/lib/eventDJsContent";
@@ -39,8 +39,7 @@ type NavLinkSpec = {
   resolveHref?: () => string;
 };
 
-const navLinks: NavLinkSpec[] = [
-  { to: browseDJsPath(), label: "Browse DJs", resolveHref: browseDJsPath },
+const STATIC_LINKS: NavLinkSpec[] = [
   { to: "/get-offers", label: "Get 3 offers", highlight: "primary" },
   { to: "/personal-advice", label: "Personlig Rådgivning", highlight: "secondary" },
   { to: "/how-it-works", label: "How it works" },
@@ -51,7 +50,20 @@ const navLinks: NavLinkSpec[] = [
 export function Header() {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Recompute the Browse-DJs link target on every navigation so the
+  // NavLink's `to` (and therefore its isActive matching) stays in sync
+  // with the current event-context, which may have just changed.
+  const navLinks = useMemo<NavLinkSpec[]>(
+    () => [
+      { to: browseDJsPath(), label: "Browse DJs", resolveHref: browseDJsPath },
+      ...STATIC_LINKS,
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname],
+  );
 
   const dashboardPath =
     profile?.role === "admin" ? "/admin" : profile?.role === "dj" ? "/dj/dashboard" : "/dashboard";
