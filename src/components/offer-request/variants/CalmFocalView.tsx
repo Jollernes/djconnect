@@ -86,9 +86,12 @@ export function CalmFocalView({
     }
   }, [tickerLines.length]);
 
-  const stages = useMemo(() => buildStages(agg), [agg]);
+  const allDeclined =
+    agg.quotesReady === 0 && agg.total > 0 && agg.total === agg.declined;
+  const stages = useMemo(() => buildStages(agg, allDeclined), [agg, allDeclined]);
   const allDone = agg.quotesReady >= 3;
   const hasAnyQuote = agg.quotesReady > 0;
+  const focalActive = !allDone && !allDeclined;
 
   return (
     <div className="space-y-12">
@@ -99,21 +102,29 @@ export function CalmFocalView({
             Your offers are on the way
           </p>
           <h1 className="mt-3 text-2xl font-medium tracking-tight md:text-[26px]">
-            {allDone
-              ? "Your 3 personal quotes are ready"
-              : eta
-                ? `Quotes expected by ${eta}`
-                : "Quotes are coming in"}
+            {allDeclined
+              ? "All matched DJs have responded \u2014 none were available this date"
+              : allDone
+                ? "Your 3 personal quotes are ready"
+                : eta
+                  ? `Quotes expected by ${eta}`
+                  : "Quotes are coming in"}
           </h1>
-          {!allDone && (
+          {!allDone && !allDeclined && (
             <p className="mt-2 text-sm text-muted-foreground">
               Up to 3 personal quotes within 24 hours.
+            </p>
+          )}
+          {allDeclined && (
+            <p className="mt-2 text-sm text-muted-foreground">
+              Try a different date, broaden your filters, or browse DJs
+              directly to keep your options open.
             </p>
           )}
 
           {/* Pulsing focal animation */}
           <div className="relative mt-12 flex h-44 w-44 items-center justify-center md:h-52 md:w-52">
-            <PulsingFocal active={!allDone} />
+            <PulsingFocal active={focalActive} />
             <div className="relative z-10 text-center">
               <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
                 Quotes ready
@@ -147,7 +158,7 @@ export function CalmFocalView({
           </div>
 
           {/* Reassurance */}
-          {!allDone && (
+          {!allDone && !allDeclined && (
             <p className="mt-8 inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/60 px-4 py-2 text-xs text-muted-foreground">
               <Mail className="h-3.5 w-3.5" />
               Feel free to close this page — we'll email you when each quote arrives
@@ -406,11 +417,25 @@ function MicroStepper({
   );
 }
 
-function buildStages(agg: ReturnType<typeof aggregateOf>): {
+function buildStages(
+  agg: ReturnType<typeof aggregateOf>,
+  allDeclined: boolean,
+): {
   id: StageId;
   label: string;
   state: StageState;
 }[] {
+  // Terminal: every matched DJ has responded with a decline. The request
+  // is done — no more quotes are coming — so every stage is "done" and
+  // nothing is "current".
+  if (allDeclined) {
+    return STAGE_ORDER.map((id) => ({
+      id,
+      label: STAGE_LABEL[id],
+      state: "done" as StageState,
+    }));
+  }
+
   const reviewing = agg.inProgress > 0 || (agg.awaiting > 0 && agg.quotesReady === 0);
   const quoting = agg.quotesReady > 0 && agg.quotesReady < 3;
   const ready = agg.quotesReady >= 3;
