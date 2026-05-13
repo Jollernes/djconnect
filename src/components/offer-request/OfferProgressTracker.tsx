@@ -247,9 +247,6 @@ function formatExpected(target: Date): string {
   });
   if (sameDay) return `today at ${time}`;
   if (isTomorrow) return `tomorrow at ${time}`;
-  return target.toLocaleDateString("en-GB", {
-    weekday: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const weekday = target.toLocaleDateString("en-GB", { weekday: "long" });
+  return `${weekday} at ${time}`;
 }
