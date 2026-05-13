@@ -130,7 +130,7 @@ export function CalmFocalView({
                 Quotes ready
               </p>
               <p className="mt-1 text-5xl font-light tabular-nums leading-none text-foreground">
-                {agg.quotesReady}
+                {Math.min(agg.quotesReady, 3)}
                 <span className="text-2xl text-muted-foreground/70"> / 3</span>
               </p>
             </div>

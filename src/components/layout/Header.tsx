@@ -15,15 +15,32 @@ import { useAuth } from "@/hooks/useAuth";
 import { PLATFORM_NAME } from "@/lib/constants";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { readPersistedEventType } from "@/hooks/useEventContext";
+import { slugForEventType } from "@/lib/eventDJsContent";
+
+/**
+ * "Browse DJs" routes the customer to the event-specific listing page
+ * matching whatever event context they've already chosen (or to
+ * `/wedding-djs` as the default).
+ */
+function browseDJsPath(): string {
+  return `/${slugForEventType(readPersistedEventType())}`;
+}
 
 type NavLinkSpec = {
   to: string;
   label: string;
   highlight?: "primary" | "secondary";
+  /**
+   * Optional callback resolved at click time — used by "Browse DJs" so the
+   * destination depends on the user's currently-selected event type rather
+   * than being baked in at render time.
+   */
+  resolveHref?: () => string;
 };
 
 const navLinks: NavLinkSpec[] = [
-  { to: "/search", label: "Browse DJs" },
+  { to: browseDJsPath(), label: "Browse DJs", resolveHref: browseDJsPath },
   { to: "/get-offers", label: "Get 3 offers", highlight: "primary" },
   { to: "/personal-advice", label: "Personlig Rådgivning", highlight: "secondary" },
   { to: "/how-it-works", label: "How it works" },
@@ -50,8 +67,16 @@ export function Header() {
           <nav className="hidden md:flex md:items-center md:gap-6">
             {navLinks.map((link) => (
               <NavLink
-                key={link.to}
+                key={link.label}
                 to={link.to}
+                onClick={
+                  link.resolveHref
+                    ? (e) => {
+                        e.preventDefault();
+                        navigate(link.resolveHref!());
+                      }
+                    : undefined
+                }
                 className={({ isActive }) =>
                   cn(
                     "text-sm font-medium transition-colors hover:text-foreground",
@@ -81,10 +106,14 @@ export function Header() {
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu">
             <Menu className="h-5 w-5" />
           </Button>
-          <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex">
-            <Link to="/search" aria-label="Search DJs">
-              <Search className="h-5 w-5" />
-            </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden sm:inline-flex"
+            aria-label="Search DJs"
+            onClick={() => navigate(browseDJsPath())}
+          >
+            <Search className="h-5 w-5" />
           </Button>
 
           {profile ? (
@@ -157,7 +186,18 @@ export function Header() {
         <div className="border-t bg-background md:hidden">
           <div className="container flex flex-col py-3">
             {navLinks.map((l) => (
-              <Link key={l.to} to={l.to} className="py-2 text-sm font-medium" onClick={() => setMobileOpen(false)}>
+              <Link
+                key={l.label}
+                to={l.to}
+                className="py-2 text-sm font-medium"
+                onClick={(e) => {
+                  setMobileOpen(false);
+                  if (l.resolveHref) {
+                    e.preventDefault();
+                    navigate(l.resolveHref());
+                  }
+                }}
+              >
                 {l.label}
               </Link>
             ))}

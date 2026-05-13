@@ -9,6 +9,9 @@ import { ViewportPreview } from "@/components/dev/ViewportPreview";
 import { HomePage } from "@/pages/public/HomePage";
 import { SearchPage } from "@/pages/public/SearchPage";
 import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
+import { BirthdayDJsPage } from "@/pages/public/BirthdayDJsPage";
+import { CorporateDJsPage } from "@/pages/public/CorporateDJsPage";
+import { OtherDJsPage } from "@/pages/public/OtherDJsPage";
 import { GetOffersPage } from "@/pages/public/GetOffersPage";
 import { PersonalAdvicePage } from "@/pages/public/PersonalAdvicePage";
 import { PersonalAdviceWeddingPage } from "@/pages/public/PersonalAdviceWeddingPage";
@@ -68,6 +71,9 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/wedding-djs" element={<WeddingDJsPage />} />
+            <Route path="/birthday-djs" element={<BirthdayDJsPage />} />
+            <Route path="/corporate-djs" element={<CorporateDJsPage />} />
+            <Route path="/other-djs" element={<OtherDJsPage />} />
             <Route path="/djs/:username" element={<DJProfilePage />} />
             <Route path="/book/:username" element={<BookingRequestPage />} />
             <Route path="/about" element={<AboutPage />} />
