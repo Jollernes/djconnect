@@ -12,7 +12,6 @@ import {
   ShieldCheck,
   BadgeCheck,
   Users,
-  Headphones,
   ArrowRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -527,9 +526,8 @@ function VariantQuiz() {
       {/* Question hero */}
       <section className="container py-14 md:py-20">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border bg-card/60 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur">
-            <Headphones className="h-3 w-3" />
-            Personlig Rådgivning · trin 1 af 2
+          <div className="text-sm font-semibold uppercase tracking-[0.22em] text-rose-700">
+            Bliv ringet op
           </div>
           <h1 className="mt-6 text-balance text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">
             Få personlig rådgivning til jeres fest!

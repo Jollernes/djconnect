@@ -22,9 +22,15 @@ const PHONE_W = 390;
 const PHONE_H = 844;
 
 export function ViewportPreview({ children }: { children: React.ReactNode }) {
-  const skip =
-    typeof window !== "undefined" &&
-    new URLSearchParams(window.location.search).get(SKIP_PARAM) === "skip";
+  // Captured once on mount so that client-side navigation inside the
+  // iframe (which strips the ?vp=skip param) doesn't flip this back to
+  // false and (a) leak the toggle button into the iframe view or (b)
+  // wipe the parent window's localStorage preference.
+  const [skip] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get(SKIP_PARAM) === "skip",
+  );
 
   const [mobile, setMobile] = useState<boolean>(() => {
     if (skip || typeof window === "undefined") return false;
