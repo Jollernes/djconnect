@@ -66,6 +66,13 @@ const EVENT_TYPES: EventType[] = [
   },
 ];
 
+/** Variant 3 uses a different tile order (Bryllup, Firmaevent, Fødselsdag, Andet). */
+function quizEventOrder(types: EventType[]): EventType[] {
+  const byId = new Map(types.map((t) => [t.id, t]));
+  const order: EventType["id"][] = ["wedding", "corporate", "birthday", "other"];
+  return order.map((id) => byId.get(id)).filter((t): t is EventType => Boolean(t));
+}
+
 const LEDE_HEADLINE = "Lad os finde den rette løsning til jeres bryllup.";
 const LEDE_BODY =
   "Er du i tvivl om, hvilken DJ, pakke eller løsning der passer til dit event? Fortæl os lidt mere om festen, så ringer vi dig op og hjælper med at finde den rette løsning.";
@@ -547,7 +554,7 @@ function VariantQuiz() {
         </div>
 
         <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-3 md:gap-5">
-          {EVENT_TYPES.map((et, i) => (
+          {quizEventOrder(EVENT_TYPES).map((et, i) => (
             <QuizTile
               key={et.id}
               type={et}
