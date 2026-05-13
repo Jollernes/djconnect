@@ -262,7 +262,13 @@ export function DJSignupPage() {
         setTimeout(() => navigate("/dj/pending-verification"), 2800);
       } else {
         setTimeout(() => {
-          mockLogin("dj");
+          try {
+            mockLogin("dj");
+          } catch {
+            // localStorage may be full or blocked — proceed to the
+            // dashboard anyway so the user isn't stuck on the success
+            // screen.
+          }
           navigate("/dj/dashboard");
         }, 1800);
       }

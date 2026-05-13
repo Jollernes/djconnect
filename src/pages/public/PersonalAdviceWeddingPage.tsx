@@ -170,47 +170,62 @@ export function PersonalAdviceWeddingPage() {
     setSubmitError(null);
     setSubmitting(true);
 
-    let customerId: string;
-    if (profile?.role === "customer") {
-      customerId = profile.id;
-    } else {
-      mockLogin("customer", { customerKind: "private" });
-      customerId = mockCustomerIdFor("private");
+    try {
+      let customerId: string;
+      if (profile?.role === "customer") {
+        customerId = profile.id;
+      } else {
+        try {
+          mockLogin("customer", { customerKind: "private" });
+        } catch {
+          // localStorage may be full or blocked — fall back to the
+          // deterministic id so the rest of the submission can still
+          // succeed and the user reaches the recommendation page.
+        }
+        customerId = mockCustomerIdFor("private");
+      }
+
+      const brief: WeddingAdvisoryBrief = {
+        coupleNames: coupleNames.trim(),
+        weddingDate,
+        venueName: venueName.trim(),
+        city: city.trim(),
+        guestCount: typeof guestCount === "number" ? guestCount : 0,
+        parts,
+        totalHours: typeof totalHours === "number" ? totalHours : 5,
+        musicStyle: musicStyle.trim(),
+        mustPlay: mustPlay.trim(),
+        doNotPlay: doNotPlay.trim(),
+        setupNeeds,
+        venueNotes: venueNotes.trim(),
+        budget: budget.trim(),
+        notes: notes.trim(),
+        contactName: contactName.trim(),
+        contactEmail: contactEmail.trim(),
+        contactPhone: contactPhone.trim(),
+      };
+
+      const recommendation = recommendWeddingPackage(brief);
+      const id = `adv_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+
+      writeAdvisoryRecord({
+        id,
+        createdAtMs: Date.now(),
+        customerId,
+        status: "awaiting_call",
+        brief: { eventType: "wedding", wedding: brief },
+        recommendation,
+      });
+
+      navigate(`/dashboard/personlig-radgivning/${id}`);
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error
+          ? `Noget gik galt: ${err.message}. Prøv venligst igen.`
+          : "Noget gik galt. Prøv venligst igen.",
+      );
+      setSubmitting(false);
     }
-
-    const brief: WeddingAdvisoryBrief = {
-      coupleNames: coupleNames.trim(),
-      weddingDate,
-      venueName: venueName.trim(),
-      city: city.trim(),
-      guestCount: typeof guestCount === "number" ? guestCount : 0,
-      parts,
-      totalHours: typeof totalHours === "number" ? totalHours : 5,
-      musicStyle: musicStyle.trim(),
-      mustPlay: mustPlay.trim(),
-      doNotPlay: doNotPlay.trim(),
-      setupNeeds,
-      venueNotes: venueNotes.trim(),
-      budget: budget.trim(),
-      notes: notes.trim(),
-      contactName: contactName.trim(),
-      contactEmail: contactEmail.trim(),
-      contactPhone: contactPhone.trim(),
-    };
-
-    const recommendation = recommendWeddingPackage(brief);
-    const id = `adv_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-
-    writeAdvisoryRecord({
-      id,
-      createdAtMs: Date.now(),
-      customerId,
-      status: "awaiting_call",
-      brief: { eventType: "wedding", wedding: brief },
-      recommendation,
-    });
-
-    navigate(`/dashboard/personlig-radgivning/${id}`);
   }
 
   // Step configuration
