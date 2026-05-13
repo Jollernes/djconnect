@@ -526,11 +526,12 @@ function VariantQuiz() {
       {/* Question hero */}
       <section className="container py-14 md:py-20">
         <div className="mx-auto max-w-4xl text-center">
-          <div className="text-sm font-semibold uppercase tracking-[0.22em] text-rose-700">
-            Bliv ringet op
+          <div className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-4 py-1.5 text-sm font-semibold text-rose-700">
+            <Phone className="h-4 w-4" />
+            En rådgiver ringer dig op — typisk inden for 2 timer
           </div>
-          <h1 className="mt-6 text-balance text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">
-            Få personlig rådgivning til jeres fest!
+          <h1 className="mt-6 text-balance font-serif text-4xl font-bold leading-tight tracking-tight md:text-6xl">
+            Vi ringer dig op og finder den rette DJ til jeres fest
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
             Er du i tvivl om, hvilken DJ, pakke eller løsning der passer til
