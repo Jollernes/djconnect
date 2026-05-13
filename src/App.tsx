@@ -10,6 +10,7 @@ import { SearchPage } from "@/pages/public/SearchPage";
 import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
 import { GetOffersPage } from "@/pages/public/GetOffersPage";
 import { PersonalAdvicePage } from "@/pages/public/PersonalAdvicePage";
+import { PersonalAdviceWeddingPage } from "@/pages/public/PersonalAdviceWeddingPage";
 import { MyRequestPage } from "@/pages/public/MyRequestPage";
 import { WeddingDJsTestAPage } from "@/pages/public/WeddingDJsTestAPage";
 import { WeddingDJsTestBPage } from "@/pages/public/WeddingDJsTestBPage";
@@ -79,6 +80,7 @@ function App() {
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/personal-advice" element={<PersonalAdvicePage />} />
 
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
@@ -160,7 +162,7 @@ function App() {
           <Route path="/get-offers" element={<GetOffersPage />} />
 
           {/* Personal advisory wizard — same full-screen shell as Get-3-offers */}
-          <Route path="/personal-advice" element={<PersonalAdvicePage />} />
+          <Route path="/personal-advice/wedding" element={<PersonalAdviceWeddingPage />} />
 
           {/* Live progress page for an offer request — public for now;
               eventually gated behind a magic link. */}
