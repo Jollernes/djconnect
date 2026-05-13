@@ -382,11 +382,19 @@ export const EVENT_LISTING_ORDER: string[] = [
   "other",
 ];
 
+/**
+ * DJs that should appear on the listing page for the given event id.
+ * "other" is treated as a catch-all and returns every DJ in the catalog,
+ * since no DJ explicitly tags themselves with the "other" event id.
+ */
+function djsForEvent(eventTypeId: string) {
+  if (eventTypeId === "other") return mockDJs;
+  return mockDJs.filter((d) => d.event_types.some((et) => et.id === eventTypeId));
+}
+
 /** Compute price min/avg/max from real DJs that list this event type. */
 export function pricingForEvent(eventTypeId: string) {
-  const djs = mockDJs.filter((d) =>
-    d.event_types.some((et) => et.id === eventTypeId),
-  );
+  const djs = djsForEvent(eventTypeId);
   const prices = djs.map((d) => d.price_from_minor).filter((p): p is number => Boolean(p));
   if (prices.length === 0) return null;
   const min = Math.min(...prices);
@@ -397,9 +405,7 @@ export function pricingForEvent(eventTypeId: string) {
 
 /** Count of real DJs that list this event type. */
 export function djCountForEvent(eventTypeId: string): number {
-  return mockDJs.filter((d) =>
-    d.event_types.some((et) => et.id === eventTypeId),
-  ).length;
+  return djsForEvent(eventTypeId).length;
 }
 
 /** Lookup helper used by routes and the header. */

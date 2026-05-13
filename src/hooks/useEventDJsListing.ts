@@ -43,8 +43,12 @@ export function useEventDJsListing(eventTypeId: string, eventLabelLower: string)
     const blocking = new Set(["confirmed", "pending"]);
     const available: DJProfileWithRelations[] = [];
     const unavailable: UnavailableEntry[] = [];
+    // "other" is the catch-all listing — show every DJ in the catalog
+    // (no DJ explicitly tags themselves with the "other" event id).
+    const isCatchAll = eventTypeId === "other";
     for (const dj of rawDJs) {
-      const matchesEvent = dj.event_types.some((et) => et.id === eventTypeId);
+      const matchesEvent =
+        isCatchAll || dj.event_types.some((et) => et.id === eventTypeId);
       const hasConflict = selectedDate
         ? mockBookings.some(
             (b) =>
