@@ -530,13 +530,19 @@ function VariantQuiz() {
             <Phone className="h-4 w-4" />
             En rådgiver ringer dig op — typisk inden for 2 timer
           </div>
-          <h1 className="mt-6 text-balance font-serif text-4xl font-bold leading-tight tracking-tight md:text-6xl">
-            Vi ringer dig op og finder den rette DJ til jeres fest
+          <h1 className="mt-6 text-balance text-4xl font-extrabold leading-tight tracking-tight md:text-6xl">
+            Lad os finde den rette løsning til jeres fest
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-balance text-base text-muted-foreground md:text-lg">
             Er du i tvivl om, hvilken DJ, pakke eller løsning der passer til
             dit event? Fortæl os lidt mere om festen, så ringer vi dig op og
             hjælper med at finde den rette løsning.
+          </p>
+          <p className="mt-5 inline-flex items-center gap-2 text-xs font-medium tracking-wide text-muted-foreground">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Helt gratis
+            <span className="text-muted-foreground/40">·</span>
+            Ingen forpligtelser
           </p>
         </div>
 
