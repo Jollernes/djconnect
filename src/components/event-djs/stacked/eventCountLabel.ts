@@ -20,6 +20,25 @@ export function eventCountLabel(eventTypeId?: string): string {
   }
 }
 
+/**
+ * Returns the Danish label for the rating-count parenthetical, matched to
+ * the event type so wedding listings read "bryllupsanmeldelser" etc.
+ */
+export function reviewCountLabel(eventTypeId?: string): string {
+  switch (eventTypeId) {
+    case "wedding":
+      return "bryllupsanmeldelser";
+    case "birthday":
+    case "private_party":
+      return "festanmeldelser";
+    case "corporate_event":
+    case "corporate_party":
+      return "eventanmeldelser";
+    default:
+      return "anmeldelser";
+  }
+}
+
 const EVENTS_BUCKET_TO_COUNT: Record<string, string> = {
   "0-10": "5+",
   "10-50": "30+",

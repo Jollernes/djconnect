@@ -5,7 +5,6 @@ import {
   Star,
   PlayCircle,
   ShieldCheck,
-  Users,
   MapPin,
   PhoneCall,
 } from "lucide-react";
@@ -16,8 +15,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
 import { HostAvatar } from "./HostAvatar";
-import { KpiTile } from "./KpiTile";
-import { eventCountLabel, eventCountValue } from "./eventCountLabel";
+import { StatsRow } from "./StatsRow";
 
 /**
  * Variant C — Concierge / luxury wedding.
@@ -254,27 +252,7 @@ export function StackedDJCardC({
                   {description}
                 </p>
               )}
-              <div className="grid grid-cols-3 gap-3 pt-1">
-                <KpiTile
-                  icon={Star}
-                  iconFill
-                  accent="amber"
-                  value={dj.rating_average.toFixed(1).replace(".", ",")}
-                  label={`(${dj.rating_count} anmeldelser)`}
-                />
-                <KpiTile
-                  icon={Users}
-                  accent="amber"
-                  value={eventCountValue(dj.events_performed)}
-                  label={eventCountLabel(eventTypeId)}
-                />
-                <KpiTile
-                  icon={MapPin}
-                  accent="amber"
-                  value={dj.base_location}
-                  label="og omegn"
-                />
-              </div>
+              <StatsRow dj={dj} eventTypeId={eventTypeId} />
               {isUnavailable && unavailable && (
                 <div className="mt-1 rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs text-muted-foreground">
                   <span className="font-medium text-foreground">{unavailable.reason}</span>
