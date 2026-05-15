@@ -3,7 +3,7 @@ import {
   MapPin,
   CalendarX2,
   Star,
-  Sparkles,
+  Users,
   ShieldCheck,
   CreditCard,
   RotateCcw,
@@ -17,13 +17,8 @@ import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
 import { HostAvatar } from "./HostAvatar";
-
-const EVENTS_TO_COUNT: Record<string, string> = {
-  "0-10": "5+",
-  "10-50": "30+",
-  "51-100": "80+",
-  "100+": "150+",
-};
+import { KpiTile } from "./KpiTile";
+import { eventCountLabel, eventCountValue } from "./eventCountLabel";
 
 /**
  * Variant B — Boutique wedding (premium · trustworthy).
@@ -51,7 +46,6 @@ export function StackedDJCardB({
 
   const href = eventTypeId ? `/djs/${dj.username}?eventType=${eventTypeId}` : `/djs/${dj.username}`;
   const isUnavailable = Boolean(unavailable);
-  const weddingsHosted = dj.events_performed ? EVENTS_TO_COUNT[dj.events_performed] ?? "+" : null;
   const priceLabel = dj.price_on_request
     ? "Pris på forespørgsel"
     : dj.price_from_minor
@@ -61,10 +55,9 @@ export function StackedDJCardB({
   const isCompact = density === "compact";
   const isComfortable = density === "comfortable";
   const showThumbs = density === "spacious";
-  const showCoverage = density === "spacious";
   const showRail = !isCompact;
   const avatarSize = isCompact ? "sm" : isComfortable ? "md" : "lg";
-  const showBio = !isCompact && !isUnavailable && Boolean(dj.bio);
+  const description = dj.bio || dj.tagline;
 
   return (
     <Card
@@ -169,124 +162,111 @@ export function StackedDJCardB({
             isUnavailable && "opacity-70",
           )}
         >
-          <div>
-            <p
-              className={cn(
-                "font-semibold uppercase tracking-[0.22em] text-amber-700",
-                isCompact ? "text-[9px]" : "text-[10px]",
-              )}
-            >
-              Bryllups-DJ · {dj.base_location}
-            </p>
-            <div className="mt-1 flex items-center gap-3">
-              <HostAvatar
-                src={dj.profile.avatar_url}
-                alt={dj.profile.full_name || dj.stage_name}
-                size={avatarSize}
-                tone="boutique"
-                verified
-              />
-              <h3
-                className={cn(
-                  "font-serif font-semibold leading-tight tracking-tight",
-                  isCompact ? "text-base" : isComfortable ? "text-xl" : "text-2xl",
-                )}
-              >
-                <Link to={href} className="hover:underline">
-                  {dj.stage_name}
-                </Link>
-              </h3>
-            </div>
-            {dj.tagline && !isCompact && (
-              <p className="mt-1.5 line-clamp-2 font-serif text-[15px] italic leading-snug text-amber-900">
-                {dj.tagline}
-              </p>
-            )}
-            {showBio && (
-              <p
-                className={cn(
-                  "mt-1.5 font-serif leading-relaxed text-amber-950/80",
-                  isComfortable ? "line-clamp-3 text-sm" : "line-clamp-4 text-[15px]",
-                )}
-              >
-                {dj.bio}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-            <span className="inline-flex items-center gap-1.5">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span className="font-semibold text-foreground">
-                {dj.rating_average.toFixed(1)}
-              </span>
-              <span className="text-muted-foreground">
-                ({dj.rating_count}{!isCompact && " bryllupsanmeldelser"})
-              </span>
-            </span>
-            {weddingsHosted && !isCompact && (
-              <>
-                <span className="text-muted-foreground/50">·</span>
-                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
-                  <Sparkles className="h-3.5 w-3.5 text-amber-600" />
-                  <span className="font-semibold text-foreground">{weddingsHosted}</span> bryllupper
+          {isCompact ? (
+            <>
+              <div className="flex min-w-0 items-center gap-3">
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="boutique"
+                  verified
+                />
+                <div className="min-w-0">
+                  <h3 className="line-clamp-1 font-serif text-base font-semibold leading-tight">
+                    <Link to={href} className="hover:underline">{dj.stage_name}</Link>
+                  </h3>
+                  {dj.tagline && (
+                    <p className="line-clamp-1 text-sm text-amber-900">{dj.tagline}</p>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-x-3 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1">
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  <span className="font-semibold text-foreground">{dj.rating_average.toFixed(1)}</span>
                 </span>
-              </>
-            )}
-            {!isCompact && (
-              <>
-                <span className="text-muted-foreground/50">·</span>
-                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                <span>·</span>
+                <span className="inline-flex items-center gap-1">
                   <MapPin className="h-3.5 w-3.5" /> {dj.base_location}
                 </span>
-              </>
-            )}
-            {isCompact && (
-              <>
-                <span className="text-muted-foreground/50">·</span>
-                <span
-                  className={cn(
-                    "inline-flex items-center gap-1 font-semibold text-amber-800",
-                    isUnavailable && "text-muted-foreground line-through",
-                  )}
-                >
+                <span>·</span>
+                <span className={cn(
+                  "font-semibold text-amber-800",
+                  isUnavailable && "text-muted-foreground line-through",
+                )}>
                   {priceLabel}
                 </span>
-              </>
-            )}
-          </div>
-
-          {showCoverage && (
-            <div className="rounded-lg border border-amber-100 bg-white/70 px-3 py-2 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Dækker hele aftenen:</span> Ceremoni ·
-              Velkomst · Middag · Førsteddansene · After-party
-            </div>
-          )}
-
-          {isUnavailable && unavailable && !isCompact && (
-            <div className="mt-1 rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">{unavailable.reason}</span>
-              {unavailable.subReason && (
-                <span className="ml-1 text-muted-foreground">· {unavailable.subReason}</span>
+              </div>
+              <div className="mt-auto flex items-center justify-between gap-2 pt-1">
+                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700">
+                  <ShieldCheck className="h-3 w-3" /> Forsikret · Refunderbar
+                </span>
+                <Button asChild size="sm" disabled={isUnavailable} className="h-8 rounded-full bg-amber-700 px-3 text-xs hover:bg-amber-800">
+                  <Link to={href}>Se pakker</Link>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-700">
+                {dj.base_location.toUpperCase()}
+              </p>
+              <div className="flex items-center gap-3">
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="boutique"
+                  verified
+                />
+                <h3 className={cn(
+                  "font-serif font-semibold leading-tight tracking-tight text-slate-900",
+                  isComfortable ? "text-2xl" : "text-3xl",
+                )}>
+                  <Link to={href} className="hover:underline">{dj.stage_name}</Link>
+                </h3>
+              </div>
+              {description && (
+                <p className={cn(
+                  "text-sm leading-relaxed text-slate-700",
+                  isComfortable ? "line-clamp-2" : "line-clamp-3",
+                )}>
+                  {description}
+                </p>
               )}
-            </div>
+              <div className="grid grid-cols-3 gap-3 pt-1">
+                <KpiTile
+                  icon={Star}
+                  iconFill
+                  accent="amber"
+                  value={dj.rating_average.toFixed(1).replace(".", ",")}
+                  label={`(${dj.rating_count} anmeldelser)`}
+                />
+                <KpiTile
+                  icon={Users}
+                  accent="amber"
+                  value={eventCountValue(dj.events_performed)}
+                  label={eventCountLabel(eventTypeId)}
+                />
+                <KpiTile
+                  icon={MapPin}
+                  accent="amber"
+                  value={dj.base_location}
+                  label="og omegn"
+                />
+              </div>
+              {isUnavailable && unavailable && (
+                <div className="mt-1 rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">{unavailable.reason}</span>
+                  {unavailable.subReason && (
+                    <span className="ml-1 text-muted-foreground">· {unavailable.subReason}</span>
+                  )}
+                </div>
+              )}
+            </>
           )}
 
-          {isCompact && (
-            <div className="mt-auto flex items-center justify-between gap-2 pt-1">
-              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700">
-                <ShieldCheck className="h-3 w-3" /> Forsikret · Refunderbar
-              </span>
-              <Button
-                asChild
-                size="sm"
-                disabled={isUnavailable}
-                className="h-8 rounded-full bg-amber-700 px-3 text-xs hover:bg-amber-800"
-              >
-                <Link to={href}>Se pakker</Link>
-              </Button>
-            </div>
-          )}
         </div>
 
         {/* RIGHT RAIL */}

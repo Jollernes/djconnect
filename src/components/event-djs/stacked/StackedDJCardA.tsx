@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import {
   MapPin,
-  Shield,
   CalendarX2,
   CheckCircle2,
   Star,
-  Clock,
-  Settings2,
+  Users,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,12 +13,8 @@ import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
 import { HostAvatar } from "./HostAvatar";
-
-const SETUP_LABEL: Record<string, string> = {
-  small: "Intim · op til 60",
-  medium: "Mellem · 60–150",
-  large: "Stor · 150+",
-};
+import { KpiTile } from "./KpiTile";
+import { eventCountLabel, eventCountValue } from "./eventCountLabel";
 
 /**
  * Variant A — Clean comparison row (baseline refresh).
@@ -49,7 +43,6 @@ export function StackedDJCardA({
 
   const href = eventTypeId ? `/djs/${dj.username}?eventType=${eventTypeId}` : `/djs/${dj.username}`;
   const isUnavailable = Boolean(unavailable);
-  const setupLabel = dj.setup_size ? SETUP_LABEL[dj.setup_size] : null;
   const priceLabel = dj.price_on_request
     ? "Pris på forespørgsel"
     : dj.price_from_minor
@@ -58,10 +51,9 @@ export function StackedDJCardA({
 
   const isCompact = density === "compact";
   const showThumbs = density === "spacious";
-  const showBadgesRow = density !== "compact";
   const showRail = density !== "compact";
   const avatarSize = isCompact ? "sm" : density === "spacious" ? "lg" : "md";
-  const showBio = !isCompact && !isUnavailable && Boolean(dj.bio);
+  const description = dj.bio || dj.tagline;
 
   return (
     <Card
@@ -165,123 +157,102 @@ export function StackedDJCardA({
             isUnavailable && "opacity-70",
           )}
         >
-          <div className="flex flex-wrap items-start justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-3">
-              <HostAvatar
-                src={dj.profile.avatar_url}
-                alt={dj.profile.full_name || dj.stage_name}
-                size={avatarSize}
-                tone="neutral"
-              />
-              <div className="min-w-0">
-              <h3 className="line-clamp-1 text-base font-semibold leading-tight sm:text-lg">
-                <Link to={href} className="hover:underline">
-                  {dj.stage_name}
-                </Link>
-              </h3>
-              {dj.tagline && (
-                <p
-                  className={cn(
-                    "font-serif italic leading-snug text-slate-700",
-                    isCompact ? "line-clamp-1 text-sm" : "line-clamp-2 text-[15px]",
+          {isCompact ? (
+            <>
+              <div className="flex min-w-0 items-center gap-3">
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="neutral"
+                />
+                <div className="min-w-0">
+                  <h3 className="line-clamp-1 text-base font-semibold leading-tight">
+                    <Link to={href} className="hover:underline">{dj.stage_name}</Link>
+                  </h3>
+                  {dj.tagline && (
+                    <p className="line-clamp-1 text-sm text-muted-foreground">{dj.tagline}</p>
                   )}
-                >
-                  {dj.tagline}
-                </p>
-              )}
-              {showBio && (
-                <p
-                  className={cn(
-                    "text-sm leading-relaxed text-muted-foreground",
-                    density === "spacious" ? "line-clamp-4" : "line-clamp-3",
-                  )}
-                >
-                  {dj.bio}
-                </p>
-              )}
+                </div>
               </div>
-            </div>
-            {!isCompact && (
-              <Badge variant="success" className="shrink-0 gap-1">
-                <Shield className="h-3 w-3" /> Verified
-              </Badge>
-            )}
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span className="font-medium text-foreground">{dj.rating_average.toFixed(1)}</span>
-              <span>({dj.rating_count})</span>
-            </span>
-            {!isCompact && (
-              <>
+              <div className="flex items-center gap-x-3 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1">
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  <span className="font-medium text-foreground">{dj.rating_average.toFixed(1)}</span>
+                </span>
                 <span>·</span>
                 <span className="inline-flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" /> {dj.years_experience} år
+                  <MapPin className="h-3.5 w-3.5" /> {dj.base_location}
                 </span>
-                {setupLabel && (
-                  <>
-                    <span>·</span>
-                    <span className="inline-flex items-center gap-1">
-                      <Settings2 className="h-3.5 w-3.5" /> {setupLabel}
-                    </span>
-                  </>
-                )}
-              </>
-            )}
-            <span>·</span>
-            <span className="inline-flex items-center gap-1">
-              <MapPin className="h-3.5 w-3.5" /> {dj.base_location}
-            </span>
-            {isCompact && (
-              <>
                 <span>·</span>
-                <span
-                  className={cn(
-                    "font-semibold text-foreground",
-                    isUnavailable && "text-muted-foreground line-through",
-                  )}
-                >
+                <span className={cn(
+                  "font-semibold text-foreground",
+                  isUnavailable && "text-muted-foreground line-through",
+                )}>
                   {priceLabel}
                 </span>
-              </>
-            )}
-          </div>
-
-          {showBadgesRow && (
-            <div className="flex flex-wrap gap-1.5 pt-0.5">
-              {dj.event_types.slice(0, 4).map((et) => (
-                <Badge key={et.id} variant="secondary" className="text-[11px]">
-                  {et.label}
-                </Badge>
-              ))}
-              {dj.event_types.length > 4 && (
-                <Badge variant="outline" className="text-[11px]">
-                  +{dj.event_types.length - 4}
-                </Badge>
+              </div>
+              <div className="mt-auto flex items-center justify-end pt-1">
+                <Button asChild size="sm" disabled={isUnavailable} className="h-8 rounded-full px-3 text-xs">
+                  <Link to={href}>Få tilbud</Link>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-700">
+                {dj.base_location.toUpperCase()}
+              </p>
+              <div className="flex items-center gap-3">
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="neutral"
+                  verified
+                />
+                <h3 className="font-serif text-2xl font-semibold leading-tight tracking-tight text-slate-900">
+                  <Link to={href} className="hover:underline">{dj.stage_name}</Link>
+                </h3>
+              </div>
+              {description && (
+                <p className={cn(
+                  "text-sm leading-relaxed text-slate-700",
+                  density === "spacious" ? "line-clamp-3" : "line-clamp-2",
+                )}>
+                  {description}
+                </p>
               )}
-            </div>
-          )}
-
-          {isUnavailable && unavailable && !isCompact && (
-            <div className="mt-1 rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">{unavailable.reason}</span>
-              {unavailable.subReason && (
-                <span className="ml-1 text-muted-foreground">· {unavailable.subReason}</span>
+              <div className="grid grid-cols-3 gap-3 pt-1">
+                <KpiTile
+                  icon={Star}
+                  iconFill
+                  accent="amber"
+                  value={dj.rating_average.toFixed(1).replace(".", ",")}
+                  label={`(${dj.rating_count} anmeldelser)`}
+                />
+                <KpiTile
+                  icon={Users}
+                  accent="amber"
+                  value={eventCountValue(dj.events_performed)}
+                  label={eventCountLabel(eventTypeId)}
+                />
+                <KpiTile
+                  icon={MapPin}
+                  accent="amber"
+                  value={dj.base_location}
+                  label="og omegn"
+                />
+              </div>
+              {isUnavailable && unavailable && (
+                <div className="mt-1 rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">{unavailable.reason}</span>
+                  {unavailable.subReason && (
+                    <span className="ml-1 text-muted-foreground">· {unavailable.subReason}</span>
+                  )}
+                </div>
               )}
-            </div>
-          )}
-
-          {/* Inline CTA when no right rail (compact) */}
-          {isCompact && (
-            <div className="mt-auto flex items-center justify-end pt-1">
-              <Button asChild size="sm" disabled={isUnavailable} className="h-8 rounded-full px-3 text-xs">
-                <Link to={href}>
-                  Få tilbud
-                </Link>
-              </Button>
-            </div>
+            </>
           )}
         </div>
 

@@ -5,9 +5,9 @@ import {
   Star,
   PlayCircle,
   ShieldCheck,
-  PhoneCall,
-  Quote,
+  Users,
   MapPin,
+  PhoneCall,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,19 +16,8 @@ import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
 import { HostAvatar } from "./HostAvatar";
-
-const COUPLE_QUOTES: { quote: string; couple: string }[] = [
-  { quote: "Han læste rummet og holdt dansegulvet fyldt hele aftenen.", couple: "Mette & Frederik" },
-  { quote: "Den bedste investering i hele brylluppet.", couple: "Sara & Anders" },
-  { quote: "Alle vores gæster spurgte hvor vi havde fundet ham.", couple: "Camilla & Jonas" },
-  { quote: "Smooth fra førsteddansene til de sidste 30 minutter.", couple: "Line & Mathias" },
-  { quote: "Personlig samtale før dagen — det betød alt.", couple: "Ida & Magnus" },
-];
-
-function pickQuote(djId: string): { quote: string; couple: string } {
-  const seed = Array.from(djId).reduce((a, c) => a + c.charCodeAt(0), 0);
-  return COUPLE_QUOTES[seed % COUPLE_QUOTES.length];
-}
+import { KpiTile } from "./KpiTile";
+import { eventCountLabel, eventCountValue } from "./eventCountLabel";
 
 /**
  * Variant C — Concierge / luxury wedding.
@@ -56,7 +45,6 @@ export function StackedDJCardC({
 
   const href = eventTypeId ? `/djs/${dj.username}?eventType=${eventTypeId}` : `/djs/${dj.username}`;
   const isUnavailable = Boolean(unavailable);
-  const testimonial = useMemo(() => pickQuote(dj.id), [dj.id]);
 
   const packages = useMemo(() => {
     if (dj.price_on_request || !dj.price_from_minor) return null;
@@ -72,10 +60,9 @@ export function StackedDJCardC({
   const isComfortable = density === "comfortable";
   const isSpacious = density === "spacious";
   const showThumbs = isSpacious;
-  const showTestimonial = isSpacious;
   const showRail = !isCompact;
   const avatarSize = isCompact ? "sm" : isComfortable ? "md" : "lg";
-  const showBio = !isCompact && !isUnavailable && Boolean(dj.bio);
+  const description = dj.bio || dj.tagline;
 
   return (
     <Card
@@ -190,121 +177,113 @@ export function StackedDJCardC({
             isUnavailable && "opacity-75",
           )}
         >
-          <div>
-            <p
-              className={cn(
-                "font-semibold uppercase tracking-[0.22em] text-slate-700",
-                isCompact ? "text-[9px]" : "text-[10px]",
-              )}
-            >
-              Bryllups-DJ · Personlig service · {dj.base_location}
-            </p>
-            <div
-              className={cn(
-                "flex items-center gap-3",
-                isCompact ? "" : isComfortable ? "mt-1" : "mt-1.5",
-              )}
-            >
-              <HostAvatar
-                src={dj.profile.avatar_url}
-                alt={dj.profile.full_name || dj.stage_name}
-                size={avatarSize}
-                tone="concierge"
-                verified
-              />
-              <h3
-                className={cn(
+          {isCompact ? (
+            <>
+              <div className="flex min-w-0 items-center gap-3">
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="concierge"
+                  verified
+                />
+                <div className="min-w-0">
+                  <h3 className="line-clamp-1 font-serif text-base font-semibold leading-tight text-slate-900">
+                    <Link to={href} className="hover:underline">{dj.stage_name}</Link>
+                  </h3>
+                  {dj.tagline && (
+                    <p className="line-clamp-1 text-sm text-slate-700">{dj.tagline}</p>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-x-3 text-xs text-muted-foreground">
+                <span className="inline-flex items-center gap-1">
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                  <span className="font-semibold text-foreground">{dj.rating_average.toFixed(1)}</span>
+                </span>
+                <span>·</span>
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="h-3.5 w-3.5" /> {dj.base_location}
+                </span>
+                {packages && (
+                  <>
+                    <span>·</span>
+                    <span className={cn(
+                      "font-semibold text-slate-900",
+                      isUnavailable && "text-muted-foreground line-through",
+                    )}>
+                      {packages.essentials}
+                    </span>
+                  </>
+                )}
+              </div>
+              <div className="mt-auto flex items-center justify-between gap-2 pt-1">
+                <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700">
+                  <ShieldCheck className="h-3 w-3" /> Forsikret
+                </span>
+                <Button asChild size="sm" disabled={isUnavailable} className="h-8 rounded-full bg-amber-400 px-3 text-xs text-slate-900 hover:bg-amber-300">
+                  <Link to={href}>Reservér dato</Link>
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-amber-700">
+                {dj.base_location.toUpperCase()}
+              </p>
+              <div className="flex items-center gap-3">
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="concierge"
+                  verified
+                />
+                <h3 className={cn(
                   "font-serif font-semibold leading-tight tracking-tight text-slate-900",
-                  isCompact ? "text-base" : isComfortable ? "text-xl" : "text-2xl sm:text-3xl",
-                )}
-              >
-                <Link to={href} className="hover:underline">
-                  {dj.stage_name}
-                </Link>
-              </h3>
-            </div>
-            {dj.tagline && !isCompact && (
-              <p className="mt-1.5 line-clamp-2 font-serif text-[15px] italic leading-snug text-slate-800">
-                {dj.tagline}
-              </p>
-            )}
-            {showBio && (
-              <p
-                className={cn(
-                  "mt-1.5 leading-relaxed text-slate-600",
-                  isComfortable ? "line-clamp-3 text-sm" : "line-clamp-4 text-[15px]",
-                )}
-              >
-                {dj.bio}
-              </p>
-            )}
-          </div>
-
-          {showTestimonial && !isUnavailable && (
-            <figure className="rounded-lg border border-slate-200 bg-white/70 px-4 py-3">
-              <Quote className="h-3.5 w-3.5 text-slate-400" />
-              <blockquote className="mt-1 text-sm italic text-slate-700">
-                "{testimonial.quote}"
-              </blockquote>
-              <figcaption className="mt-1 text-[11px] font-medium uppercase tracking-[0.14em] text-slate-500">
-                — {testimonial.couple}, bryllup i {dj.base_location}
-              </figcaption>
-            </figure>
-          )}
-
-          {!isCompact && (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-                Forsikret & verificeret
-              </span>
-              <span className="text-muted-foreground/50">·</span>
-              <span className="inline-flex items-center gap-1.5">
-                <PhoneCall className="h-3.5 w-3.5 text-slate-600" />
-                Gratis forsamtale
-              </span>
-              {!isComfortable && (
-                <>
-                  <span className="text-muted-foreground/50">·</span>
-                  <span className="inline-flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5" />
-                    Op til {dj.travel_radius_km} km
-                  </span>
-                </>
+                  isComfortable ? "text-2xl" : "text-3xl",
+                )}>
+                  <Link to={href} className="hover:underline">{dj.stage_name}</Link>
+                </h3>
+              </div>
+              {description && (
+                <p className={cn(
+                  "text-sm leading-relaxed text-slate-700",
+                  isComfortable ? "line-clamp-2" : "line-clamp-3",
+                )}>
+                  {description}
+                </p>
               )}
-            </div>
-          )}
-
-          {isCompact && packages && (
-            <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-slate-900">{packages.essentials}</span>
-              <span className="ml-1">· 5t reception</span>
-              <span className="mx-1.5 text-muted-foreground/50">·</span>
-              <ShieldCheck className="mr-1 inline h-3 w-3 align-middle text-emerald-600" />
-              Forsikret
-            </p>
-          )}
-
-          {isUnavailable && unavailable && !isCompact && (
-            <div className="mt-1 rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">{unavailable.reason}</span>
-              {unavailable.subReason && (
-                <span className="ml-1 text-muted-foreground">· {unavailable.subReason}</span>
+              <div className="grid grid-cols-3 gap-3 pt-1">
+                <KpiTile
+                  icon={Star}
+                  iconFill
+                  accent="amber"
+                  value={dj.rating_average.toFixed(1).replace(".", ",")}
+                  label={`(${dj.rating_count} anmeldelser)`}
+                />
+                <KpiTile
+                  icon={Users}
+                  accent="amber"
+                  value={eventCountValue(dj.events_performed)}
+                  label={eventCountLabel(eventTypeId)}
+                />
+                <KpiTile
+                  icon={MapPin}
+                  accent="amber"
+                  value={dj.base_location}
+                  label="og omegn"
+                />
+              </div>
+              {isUnavailable && unavailable && (
+                <div className="mt-1 rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">{unavailable.reason}</span>
+                  {unavailable.subReason && (
+                    <span className="ml-1 text-muted-foreground">· {unavailable.subReason}</span>
+                  )}
+                </div>
               )}
-            </div>
-          )}
-
-          {isCompact && (
-            <div className="mt-auto flex items-center justify-end pt-1">
-              <Button
-                asChild
-                size="sm"
-                disabled={isUnavailable}
-                className="h-8 rounded-full bg-amber-400 px-3 text-xs text-slate-900 hover:bg-amber-300"
-              >
-                <Link to={href}>Reservér dato</Link>
-              </Button>
-            </div>
+            </>
           )}
         </div>
 
