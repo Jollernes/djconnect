@@ -285,20 +285,21 @@ export function StackedDJCardA({
               isUnavailable && "opacity-70",
             )}
           >
-            <div className="flex items-center gap-2.5 border-b border-border/60 pb-3">
+            <div className="flex items-center gap-3 border-b border-border/60 pb-3">
               <HostAvatar
                 src={dj.profile.avatar_url}
                 alt={dj.profile.full_name || dj.stage_name}
-                size="md"
+                size="lg"
                 tone="neutral"
-                verified
               />
               <div className="min-w-0 flex-1">
-                <p className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
-                  <BadgeCheck className="h-3 w-3 fill-emerald-500 text-white" strokeWidth={3} />
+                <p className="inline-flex items-center gap-1 text-xs text-slate-500">
                   Verificeret profil
+                  <BadgeCheck className="h-3.5 w-3.5 fill-emerald-500 text-white" strokeWidth={2.5} />
                 </p>
-                <p className="truncate text-sm font-semibold leading-tight">{dj.stage_name}</p>
+                <p className="truncate text-base font-semibold leading-tight text-slate-900">
+                  {dj.stage_name}
+                </p>
               </div>
             </div>
             <div>

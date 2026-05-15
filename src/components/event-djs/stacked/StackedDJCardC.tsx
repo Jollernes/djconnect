@@ -306,20 +306,19 @@ export function StackedDJCardC({
               isUnavailable && "opacity-70",
             )}
           >
-            <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
+            <div className="flex items-center gap-3 border-b border-white/10 pb-3">
               <HostAvatar
                 src={dj.profile.avatar_url}
                 alt={dj.profile.full_name || dj.stage_name}
-                size="md"
+                size="lg"
                 tone="concierge"
-                verified
               />
               <div className="min-w-0 flex-1">
-                <p className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-300">
-                  <BadgeCheck className="h-3 w-3 fill-emerald-400 text-slate-900" strokeWidth={3} />
+                <p className="inline-flex items-center gap-1 text-xs text-slate-300">
                   Verificeret profil
+                  <BadgeCheck className="h-3.5 w-3.5 fill-emerald-400 text-slate-900" strokeWidth={2.5} />
                 </p>
-                <p className="truncate font-serif text-sm font-semibold leading-tight text-white">
+                <p className="truncate font-serif text-base font-semibold leading-tight text-white">
                   {dj.stage_name}
                 </p>
               </div>
