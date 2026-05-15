@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import {
   djHref,
@@ -27,13 +28,16 @@ import {
 export function GridCardV19Wave({
   dj,
   eventTypeId,
+  density = "3",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
+  density?: "3" | "4";
 }) {
   const hero = dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
   const href = djHref(dj, eventTypeId);
   const photoCount = photoCountFor(dj);
+  const compact = density === "4";
   // Unique clip-path ID per card so multiple instances don't collide
   const clipId = `wave-${dj.id}`;
 
@@ -74,9 +78,9 @@ export function GridCardV19Wave({
         <button
           type="button"
           aria-label="Afspil introvideo"
-          className="absolute right-5 block h-14 w-14 overflow-hidden rounded-full"
+          className={cn("absolute right-5 block overflow-hidden rounded-full", compact ? "h-12 w-12" : "h-14 w-14")}
           style={{
-            top: "calc(100% - 36px)",
+            top: compact ? "calc(100% - 30px)" : "calc(100% - 36px)",
             boxShadow:
               "0 4px 10px rgba(0,0,0,0.2), inset 0 0 0 2px #ff6b46",
           }}
@@ -95,7 +99,7 @@ export function GridCardV19Wave({
           )}
           <span className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/30">
             <span
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full text-white shadow-sm"
+              className={cn("inline-flex items-center justify-center rounded-full text-white shadow-sm", compact ? "h-5 w-5" : "h-6 w-6")}
               style={{ backgroundColor: "#ff6b46" }}
             >
               <Play className="h-3 w-3 fill-white text-white translate-x-px" />
@@ -105,7 +109,7 @@ export function GridCardV19Wave({
       </div>
 
       {/* Media tabs */}
-      <div className="mx-4 mt-7 flex divide-x divide-amber-100 overflow-hidden rounded-md border border-amber-100 bg-white/60 text-[11px]">
+      <div className={cn("flex divide-x divide-amber-100 overflow-hidden rounded-md border border-amber-100 bg-white/60", compact ? "mx-3 mt-6 text-[10px]" : "mx-4 mt-7 text-[11px]")}>
         <span className="flex flex-1 items-center justify-center gap-1 px-2 py-1.5 font-medium text-slate-700">
           Foto <span className="text-slate-400">{photoCount}</span>
         </span>
@@ -118,9 +122,9 @@ export function GridCardV19Wave({
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col gap-2 px-5 pb-5 pt-3">
+      <div className={cn("flex flex-1 flex-col gap-2", compact ? "px-3 pb-4 pt-3" : "px-5 pb-5 pt-3")}>
         <div className="flex items-center gap-1.5">
-          <h3 className="truncate font-serif text-[20px] font-semibold leading-tight tracking-tight text-slate-900">
+          <h3 className={cn("truncate font-serif font-semibold leading-tight tracking-tight text-slate-900", compact ? "text-[17px]" : "text-[20px]")}>
             <Link to={href} className="hover:underline">{dj.stage_name}</Link>
           </h3>
           <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-500" strokeWidth={2.5} />

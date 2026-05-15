@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import {
   djHref,
@@ -28,17 +29,20 @@ import {
 export function GridCardV17Arch({
   dj,
   eventTypeId,
+  density = "3",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
+  density?: "3" | "4";
 }) {
   const hero = dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
   const href = djHref(dj, eventTypeId);
   const photoCount = photoCountFor(dj);
   const thumbs = thumbnailsFor(dj);
+  const compact = density === "4";
 
   return (
-    <Card className="group flex flex-col rounded-2xl border-amber-100/60 bg-[#fbf8f3] px-4 pb-4 pt-4 shadow-sm transition-shadow hover:shadow-md">
+    <Card className={cn("group flex flex-col rounded-2xl border-amber-100/60 bg-[#fbf8f3] shadow-sm transition-shadow hover:shadow-md", compact ? "px-3 pb-3 pt-3" : "px-4 pb-4 pt-4")}>
       {/* Arched image */}
       <div className="relative w-full">
         <Link
@@ -69,7 +73,7 @@ export function GridCardV17Arch({
         </Link>
         {/* B&W avatar — bottom-left over image edge */}
         <span
-          className="absolute -bottom-4 left-3 block h-12 w-12 overflow-hidden rounded-full ring-2 ring-[#fbf8f3]"
+          className={cn("absolute -bottom-4 left-3 block overflow-hidden rounded-full ring-2 ring-[#fbf8f3]", compact ? "h-10 w-10" : "h-12 w-12")}
           style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.18)" }}
         >
           {dj.profile.avatar_url ? (
@@ -88,11 +92,11 @@ export function GridCardV17Arch({
       </div>
 
       {/* Thumbnail strip */}
-      <div className="mt-5 flex justify-end gap-1.5">
+      <div className={cn("flex justify-end gap-1.5", compact ? "mt-4" : "mt-5")}>
         {thumbs.map((t, i) => (
           <span
             key={i}
-            className="block h-9 w-9 overflow-hidden rounded-md border border-amber-100"
+            className={cn("block overflow-hidden rounded-md border border-amber-100", compact ? "h-7 w-7" : "h-9 w-9")}
           >
             <img src={t} alt="" className="h-full w-full object-cover" loading="lazy" />
           </span>
@@ -100,9 +104,9 @@ export function GridCardV17Arch({
       </div>
 
       {/* Content */}
-      <div className="mt-3 flex flex-1 flex-col gap-2">
+      <div className={cn("flex flex-1 flex-col", compact ? "mt-2 gap-1.5" : "mt-3 gap-2")}>
         <div className="flex items-center gap-1.5">
-          <h3 className="truncate font-serif text-[22px] font-semibold leading-tight tracking-tight text-slate-900">
+          <h3 className={cn("truncate font-serif font-semibold leading-tight tracking-tight text-slate-900", compact ? "text-[18px]" : "text-[22px]")}>
             <Link to={href} className="hover:underline">{dj.stage_name}</Link>
           </h3>
           <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-500" strokeWidth={2.5} />

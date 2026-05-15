@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import {
   djHref,
@@ -29,20 +30,23 @@ import {
 export function GridCardV21Triptych({
   dj,
   eventTypeId,
+  density = "3",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
+  density?: "3" | "4";
 }) {
   const hero = dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
   const href = djHref(dj, eventTypeId);
   const photoCount = photoCountFor(dj);
   const thumbs = thumbnailsFor(dj);
+  const compact = density === "4";
 
   return (
     <Card className="group flex flex-col overflow-hidden rounded-2xl border-amber-100/60 bg-[#fbf8f3] shadow-sm transition-shadow hover:shadow-md">
       {/* Triptych mosaic */}
-      <div className="relative w-full p-3 pb-0">
-        <div className="grid grid-cols-[1.55fr_1fr] gap-1.5">
+      <div className={cn("relative w-full pb-0", compact ? "p-2" : "p-3")}>
+        <div className={cn("grid grid-cols-[1.55fr_1fr]", compact ? "gap-1" : "gap-1.5")}>
           {/* Hero */}
           <Link
             to={href}
@@ -64,7 +68,7 @@ export function GridCardV21Triptych({
             </span>
           </Link>
           {/* Two stacked thumbnails */}
-          <div className="flex flex-col gap-1.5">
+          <div className={cn("flex flex-col", compact ? "gap-1" : "gap-1.5")}>
             <Link
               to={href}
               className="relative block aspect-[3/2] w-full overflow-hidden rounded-lg bg-slate-100"
@@ -106,7 +110,7 @@ export function GridCardV21Triptych({
         </button>
         {/* B&W avatar overlapping seam */}
         <span
-          className="absolute bottom-[-18px] left-1/2 block h-11 w-11 -translate-x-1/2 overflow-hidden rounded-full ring-2 ring-[#fbf8f3]"
+          className={cn("absolute left-1/2 block -translate-x-1/2 overflow-hidden rounded-full ring-2 ring-[#fbf8f3]", compact ? "bottom-[-16px] h-10 w-10" : "bottom-[-18px] h-11 w-11")}
           style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
         >
           {dj.profile.avatar_url ? (
@@ -125,9 +129,9 @@ export function GridCardV21Triptych({
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col gap-2 px-5 pb-5 pt-7">
+      <div className={cn("flex flex-1 flex-col gap-2", compact ? "px-3 pb-4 pt-6" : "px-5 pb-5 pt-7")}>
         <div className="flex items-center justify-center gap-1.5">
-          <h3 className="truncate font-serif text-[21px] font-semibold leading-tight tracking-tight text-slate-900">
+          <h3 className={cn("truncate font-serif font-semibold leading-tight tracking-tight text-slate-900", compact ? "text-[18px]" : "text-[21px]")}>
             <Link to={href} className="hover:underline">{dj.stage_name}</Link>
           </h3>
           <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-500" strokeWidth={2.5} />

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import {
   djHref,
@@ -29,13 +30,16 @@ import {
 export function GridCardV18Diagonal({
   dj,
   eventTypeId,
+  density = "3",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
+  density?: "3" | "4";
 }) {
   const hero = dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
   const href = djHref(dj, eventTypeId);
   const thumbs = thumbnailsFor(dj);
+  const compact = density === "4";
 
   return (
     <Card className="group flex flex-col overflow-hidden rounded-2xl border-amber-100/60 bg-[#fbf8f3] shadow-sm transition-shadow hover:shadow-md">
@@ -57,11 +61,11 @@ export function GridCardV18Diagonal({
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
           {/* Intro video pill */}
           <span
-            className="absolute bottom-6 right-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-white shadow-sm"
+            className={cn("absolute right-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-semibold uppercase tracking-[0.08em] text-white shadow-sm", compact ? "bottom-4 text-[9.5px]" : "bottom-6 text-[10.5px]")}
             style={{ backgroundColor: "#ff6b46" }}
           >
             <Play className="h-3 w-3 fill-white text-white" />
-            1:00 introvideo
+            {compact ? "Introvideo" : "1:00 introvideo"}
           </span>
           {/* Favorite */}
           <button
@@ -77,7 +81,7 @@ export function GridCardV18Diagonal({
           {thumbs.slice(0, 3).map((t, i) => (
             <span
               key={i}
-              className="block h-10 w-10 overflow-hidden rounded-md border-2 border-[#fbf8f3] bg-slate-100"
+              className={cn("block overflow-hidden rounded-md border-2 border-[#fbf8f3] bg-slate-100", compact ? "h-8 w-8" : "h-10 w-10")}
               style={{
                 marginLeft: i === 0 ? 0 : "-12px",
                 transform: `rotate(${(i - 1) * 4}deg)`,
@@ -92,11 +96,11 @@ export function GridCardV18Diagonal({
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col gap-2 px-5 pb-5 pt-5">
-        <div className="flex items-center gap-2.5">
+      <div className={cn("flex flex-1 flex-col gap-2", compact ? "px-3 pb-4 pt-4" : "px-5 pb-5 pt-5")}>
+        <div className={cn("flex items-center", compact ? "gap-2" : "gap-2.5")}>
           {/* B&W avatar inline */}
           <span
-            className="block h-9 w-9 shrink-0 overflow-hidden rounded-full ring-1 ring-amber-200"
+            className={cn("block shrink-0 overflow-hidden rounded-full ring-1 ring-amber-200", compact ? "h-8 w-8" : "h-9 w-9")}
             style={{ boxShadow: "0 1px 4px rgba(0,0,0,0.12)" }}
           >
             {dj.profile.avatar_url ? (
@@ -113,7 +117,7 @@ export function GridCardV18Diagonal({
             )}
           </span>
           <div className="flex min-w-0 items-center gap-1.5">
-            <h3 className="truncate font-serif text-[20px] font-semibold leading-tight tracking-tight text-slate-900">
+            <h3 className={cn("truncate font-serif font-semibold leading-tight tracking-tight text-slate-900", compact ? "text-[17px]" : "text-[20px]")}>
               <Link to={href} className="hover:underline">{dj.stage_name}</Link>
             </h3>
             <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-500" strokeWidth={2.5} />

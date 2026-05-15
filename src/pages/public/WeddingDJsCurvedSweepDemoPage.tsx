@@ -15,15 +15,19 @@ import { cn } from "@/lib/utils";
 const config = EVENT_LISTING_CONFIG.wedding;
 
 type VariantId = "arch" | "diagonal" | "wave" | "corner" | "triptych";
+type Density = "3" | "4";
 
 type Variant = {
   id: VariantId;
   label: string;
   blurb: string;
-  cols: string;
-  count: number;
-  render: (dj: DJProfileWithRelations) => ReactElement;
+  count3: number;
+  count4: number;
+  render: (dj: DJProfileWithRelations, density: Density) => ReactElement;
 };
+
+const COLS_3 = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
+const COLS_4 = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
 const VARIANTS: Variant[] = [
   {
@@ -31,63 +35,76 @@ const VARIANTS: Variant[] = [
     label: "Arch",
     blurb:
       "Chapel-arch image mask · image counter pill · B&W avatar bottom-left of image · compact thumbnail strip beneath.",
-    cols: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    count: 6,
-    render: (dj) => <GridCardV17Arch dj={dj} eventTypeId={config.id} />,
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV17Arch dj={dj} eventTypeId={config.id} density={density} />
+    ),
   },
   {
     id: "diagonal",
     label: "Diagonal",
     blurb:
       "Diagonal slash image mask · coral 'Introvideo 1:00' pill · stacked mini-gallery cascading in the open diagonal corner.",
-    cols: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    count: 6,
-    render: (dj) => <GridCardV18Diagonal dj={dj} eventTypeId={config.id} />,
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV18Diagonal dj={dj} eventTypeId={config.id} density={density} />
+    ),
   },
   {
     id: "wave",
     label: "Wave",
     blurb:
       "Wave-cut bottom edge (SVG clipPath) · B&W avatar itself functions as the intro video with a coral play overlay · compact Foto/Video/Setlist media tabs.",
-    cols: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    count: 6,
-    render: (dj) => <GridCardV19Wave dj={dj} eventTypeId={config.id} />,
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV19Wave dj={dj} eventTypeId={config.id} density={density} />
+    ),
   },
   {
     id: "corner",
     label: "Corner",
     blurb:
-      "Asymmetric top-right corner cut creating a pentagon image · '+N fotos' counter pill · 3-square thumbnail column sits next to the lockup to save vertical space.",
-    cols: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    count: 6,
-    render: (dj) => <GridCardV20Corner dj={dj} eventTypeId={config.id} />,
+      "Asymmetric top-right corner cut creating a pentagon image · '+N fotos' counter pill · 3-square thumbnail column sits next to the lockup at 3-per-row (hidden at 4-per-row to keep cards uncluttered).",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV20Corner dj={dj} eventTypeId={config.id} density={density} />
+    ),
   },
   {
     id: "triptych",
     label: "Triptych",
     blurb:
       "1 hero + 2 stacked thumbnails as a mosaic · intro-video play badge on the hero · '+N' image counter on the bottom thumbnail · B&W avatar overlapping the seam.",
-    cols: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-    count: 6,
-    render: (dj) => <GridCardV21Triptych dj={dj} eventTypeId={config.id} />,
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV21Triptych dj={dj} eventTypeId={config.id} density={density} />
+    ),
   },
 ];
 
 /**
  * Five card-only variations for the wedding-DJ marketplace, toggled
- * one-at-a-time via the top tab strip. Variant choice persists in the
- * URL search param so each view is shareable.
+ * one-at-a-time via the top tab strip. Each variant also has a density
+ * sub-toggle to switch between 3 and 4 cards per row. Both choices
+ * persist in the URL search params so the views are shareable.
  */
 export function WeddingDJsCurvedSweepDemoPage() {
   const [params, setParams] = useSearchParams();
   const variantParam = params.get("variant");
+  const colsParam = params.get("cols");
   const activeVariant: Variant = useMemo(() => {
     const found = VARIANTS.find((v) => v.id === variantParam);
     return found || VARIANTS[0]!;
   }, [variantParam]);
+  const density: Density = colsParam === "4" ? "4" : "3";
 
   useDocumentHead({
-    title: `[${activeVariant.label}] ${config.metaTitle}`,
+    title: `[${activeVariant.label} · ${density}-col] ${config.metaTitle}`,
     description: "Five card-only DJ marketplace explorations with toggle.",
   });
 
@@ -96,13 +113,24 @@ export function WeddingDJsCurvedSweepDemoPage() {
     config.label.toLowerCase(),
   );
 
-  const examples = availableDJs.slice(0, activeVariant.count);
+  const count = density === "4" ? activeVariant.count4 : activeVariant.count3;
+  const cols = density === "4" ? COLS_4 : COLS_3;
+  const examples = availableDJs.slice(0, count);
 
   const setVariant = (id: VariantId) => {
     if (id === VARIANTS[0]!.id) {
       params.delete("variant");
     } else {
       params.set("variant", id);
+    }
+    setParams(params, { replace: true });
+  };
+
+  const setDensity = (d: Density) => {
+    if (d === "3") {
+      params.delete("cols");
+    } else {
+      params.set("cols", d);
     }
     setParams(params, { replace: true });
   };
@@ -122,32 +150,68 @@ export function WeddingDJsCurvedSweepDemoPage() {
             and integrated into the card (arch, diagonal, wave, corner,
             triptych). All share the same brand foundation: warm off-white,
             deep navy text, coral accents, soft shadows. Switch between
-            variations using the tabs below — the choice persists in the URL.
+            variations using the tabs below, and toggle the row density to
+            preview 3 or 4 cards per row — both choices persist in the URL.
           </p>
 
-          {/* Toggle */}
-          <div role="tablist" aria-label="Card variant" className="mt-6 inline-flex flex-wrap items-center gap-1 rounded-full border border-amber-200 bg-white p-1 shadow-sm">
-            {VARIANTS.map((v) => {
-              const active = v.id === activeVariant.id;
-              return (
-                <button
-                  key={v.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setVariant(v.id)}
-                  className={cn(
-                    "rounded-full px-4 py-1.5 text-[12.5px] font-semibold tracking-tight transition-colors",
-                    active
-                      ? "bg-slate-900 text-white shadow-sm"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-                  )}
-                >
-                  {v.label}
-                </button>
-              );
-            })}
+          {/* Toggles */}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div
+              role="tablist"
+              aria-label="Card variant"
+              className="inline-flex flex-wrap items-center gap-1 rounded-full border border-amber-200 bg-white p-1 shadow-sm"
+            >
+              {VARIANTS.map((v) => {
+                const active = v.id === activeVariant.id;
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setVariant(v.id)}
+                    className={cn(
+                      "rounded-full px-4 py-1.5 text-[12.5px] font-semibold tracking-tight transition-colors",
+                      active
+                        ? "bg-slate-900 text-white shadow-sm"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                    )}
+                  >
+                    {v.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div
+              role="tablist"
+              aria-label="Cards per row"
+              className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white p-1 shadow-sm"
+            >
+              {(["3", "4"] as const).map((d) => {
+                const active = d === density;
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setDensity(d)}
+                    className={cn(
+                      "rounded-full px-3.5 py-1.5 text-[12.5px] font-semibold tracking-tight transition-colors",
+                      active
+                        ? "text-white shadow-sm"
+                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
+                    )}
+                    style={active ? { backgroundColor: "#ff6b46" } : undefined}
+                  >
+                    {d} per række
+                  </button>
+                );
+              })}
+            </div>
           </div>
+
           <p className="mt-3 max-w-3xl text-xs leading-relaxed text-slate-500">
             {activeVariant.blurb}
           </p>
@@ -158,10 +222,10 @@ export function WeddingDJsCurvedSweepDemoPage() {
         {loading ? (
           <div className="h-[460px] animate-pulse rounded-lg bg-muted" />
         ) : (
-          <div className={`grid gap-6 ${activeVariant.cols}`}>
+          <div className={cn("grid gap-6", cols)}>
             {examples.map((dj) => (
-              <div key={`${activeVariant.id}-${dj.id}`}>
-                {activeVariant.render(dj)}
+              <div key={`${activeVariant.id}-${density}-${dj.id}`}>
+                {activeVariant.render(dj, density)}
               </div>
             ))}
           </div>
