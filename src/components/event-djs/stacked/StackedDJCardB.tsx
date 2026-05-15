@@ -9,7 +9,6 @@ import {
   RotateCcw,
   Clock3,
   Award,
-  Settings2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +17,6 @@ import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
 import { HostAvatar } from "./HostAvatar";
-import { deriveHighlights } from "./highlights";
 
 const EVENTS_TO_COUNT: Record<string, string> = {
   "0-10": "5+",
@@ -66,8 +64,7 @@ export function StackedDJCardB({
   const showCoverage = density === "spacious";
   const showRail = !isCompact;
   const avatarSize = isCompact ? "sm" : isComfortable ? "md" : "lg";
-  const highlights = !isCompact && !isUnavailable ? deriveHighlights(dj) : [];
-  const HIGHLIGHT_ICONS = [Sparkles, Award, Settings2] as const;
+  const showBio = !isCompact && !isUnavailable && Boolean(dj.bio);
 
   return (
     <Card
@@ -247,18 +244,10 @@ export function StackedDJCardB({
             )}
           </div>
 
-          {highlights.length > 0 && (
-            <ul className="space-y-1 text-xs text-muted-foreground">
-              {highlights.map((line, i) => {
-                const Icon = HIGHLIGHT_ICONS[i] ?? Sparkles;
-                return (
-                  <li key={i} className="flex items-start gap-2">
-                    <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-700" />
-                    <span className="line-clamp-1">{line}</span>
-                  </li>
-                );
-              })}
-            </ul>
+          {showBio && (
+            <blockquote className="line-clamp-3 border-l-2 border-amber-200 pl-3 font-serif text-sm italic leading-relaxed text-amber-950/80">
+              “{dj.bio}”
+            </blockquote>
           )}
 
           {showCoverage && (
