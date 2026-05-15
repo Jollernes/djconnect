@@ -59,15 +59,14 @@ export function djHref(dj: DJProfileWithRelations, eventTypeId?: string): string
     : `/djs/${dj.username}`;
 }
 
-/** Three deterministic thumbnail URLs sourced from `dj.equipment_photos`,
- * falling back to the hero photo if fewer than 3 photos exist. */
-export function thumbnailsFor(dj: DJProfileWithRelations): string[] {
+/** N deterministic thumbnail URLs sourced from `dj.equipment_photos`,
+ * falling back to the hero photo if fewer than N photos exist. Defaults
+ * to 3 thumbs to match the existing card layouts. */
+export function thumbnailsFor(dj: DJProfileWithRelations, count = 3): string[] {
   const photos = dj.equipment_photos.map((p) => p.url).filter(Boolean);
-  if (photos.length >= 3) return photos.slice(0, 3);
-  if (photos.length === 0 && dj.profile.avatar_url) {
-    return [dj.profile.avatar_url, dj.profile.avatar_url, dj.profile.avatar_url];
-  }
+  if (photos.length >= count) return photos.slice(0, count);
+  const fallback = photos[0] || dj.profile.avatar_url || "";
   const out = [...photos];
-  while (out.length < 3 && photos.length > 0) out.push(photos[0]!);
+  while (out.length < count) out.push(fallback);
   return out;
 }

@@ -39,7 +39,7 @@ export function GridCardV21Triptych({
   const hero = dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
   const href = djHref(dj, eventTypeId);
   const photoCount = photoCountFor(dj);
-  const thumbs = thumbnailsFor(dj);
+  const thumbs = thumbnailsFor(dj, 4);
   const compact = density === "4";
 
   return (
@@ -67,11 +67,12 @@ export function GridCardV21Triptych({
               1:00
             </span>
           </Link>
-          {/* Two stacked thumbnails */}
+          {/* Three stacked thumbnails — flex-1 each so they align with the
+              hero's full height regardless of natural aspect ratio. */}
           <div className={cn("flex flex-col", compact ? "gap-1" : "gap-1.5")}>
             <Link
               to={href}
-              className="relative block aspect-[3/2] w-full overflow-hidden rounded-lg bg-slate-100"
+              className="relative block w-full flex-1 overflow-hidden rounded-lg bg-slate-100"
             >
               {thumbs[1] && (
                 <img
@@ -84,7 +85,7 @@ export function GridCardV21Triptych({
             </Link>
             <Link
               to={href}
-              className="relative block aspect-[3/2] w-full overflow-hidden rounded-lg bg-slate-100"
+              className="relative block w-full flex-1 overflow-hidden rounded-lg bg-slate-100"
             >
               {thumbs[2] && (
                 <img
@@ -94,8 +95,21 @@ export function GridCardV21Triptych({
                   loading="lazy"
                 />
               )}
+            </Link>
+            <Link
+              to={href}
+              className="relative block w-full flex-1 overflow-hidden rounded-lg bg-slate-100"
+            >
+              {thumbs[3] && (
+                <img
+                  src={thumbs[3]}
+                  alt=""
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+              )}
               <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-[12px] font-semibold text-white">
-                +{Math.max(photoCount - 3, 1)}
+                +{Math.max(photoCount - 4, 1)}
               </span>
             </Link>
           </div>

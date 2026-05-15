@@ -9,12 +9,19 @@ import { GridCardV18Diagonal } from "@/components/event-djs/grid/V18Diagonal";
 import { GridCardV19Wave } from "@/components/event-djs/grid/V19Wave";
 import { GridCardV20Corner } from "@/components/event-djs/grid/V20Corner";
 import { GridCardV21Triptych } from "@/components/event-djs/grid/V21Triptych";
+import { GridCardV22DiagonalRight } from "@/components/event-djs/grid/V22DiagonalRight";
 import type { DJProfileWithRelations } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
 const config = EVENT_LISTING_CONFIG.wedding;
 
-type VariantId = "arch" | "diagonal" | "wave" | "corner" | "triptych";
+type VariantId =
+  | "arch"
+  | "diagonal"
+  | "wave"
+  | "corner"
+  | "triptych"
+  | "diagonal-right";
 type Density = "3" | "4";
 
 type Variant = {
@@ -78,11 +85,26 @@ const VARIANTS: Variant[] = [
     id: "triptych",
     label: "Triptych",
     blurb:
-      "1 hero + 2 stacked thumbnails as a mosaic · intro-video play badge on the hero · '+N' image counter on the bottom thumbnail · B&W avatar overlapping the seam.",
+      "1 hero + 3 stacked thumbnails as a mosaic · intro-video play badge on the hero · '+N' image counter on the bottom thumbnail · B&W avatar overlapping the seam.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
       <GridCardV21Triptych dj={dj} eventTypeId={config.id} density={density} />
+    ),
+  },
+  {
+    id: "diagonal-right",
+    label: "Diagonal · Right",
+    blurb:
+      "Variant 6 — same diagonal slash mask as Diagonal, but the coral intro-video pill is removed and the stacked mini-gallery sits in the open diagonal corner on the bottom-right (cascading right-to-left into the cut).",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV22DiagonalRight
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+      />
     ),
   },
 ];
