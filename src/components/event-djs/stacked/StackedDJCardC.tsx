@@ -8,6 +8,7 @@ import {
   PhoneCall,
   Quote,
   MapPin,
+  BadgeCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -74,7 +75,6 @@ export function StackedDJCardC({
   const showThumbs = isSpacious;
   const showTestimonial = isSpacious;
   const showRail = !isCompact;
-  const avatarSize = isCompact ? "sm" : isSpacious ? "lg" : "md";
 
   return (
     <Card
@@ -204,13 +204,15 @@ export function StackedDJCardC({
                 isCompact ? "" : isComfortable ? "mt-1" : "mt-1.5",
               )}
             >
-              <HostAvatar
-                src={dj.profile.avatar_url}
-                alt={dj.profile.full_name || dj.stage_name}
-                size={avatarSize}
-                tone="concierge"
-                verified
-              />
+              {isCompact && (
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size="sm"
+                  tone="concierge"
+                  verified
+                />
+              )}
               <h3
                 className={cn(
                   "font-serif font-semibold leading-tight tracking-tight text-slate-900",
@@ -304,6 +306,24 @@ export function StackedDJCardC({
               isUnavailable && "opacity-70",
             )}
           >
+            <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
+              <HostAvatar
+                src={dj.profile.avatar_url}
+                alt={dj.profile.full_name || dj.stage_name}
+                size="md"
+                tone="concierge"
+                verified
+              />
+              <div className="min-w-0 flex-1">
+                <p className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-300">
+                  <BadgeCheck className="h-3 w-3 fill-emerald-400 text-slate-900" strokeWidth={3} />
+                  Verificeret profil
+                </p>
+                <p className="truncate font-serif text-sm font-semibold leading-tight text-white">
+                  {dj.stage_name}
+                </p>
+              </div>
+            </div>
             <div className="space-y-3">
               <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-300">
                 Bryllupspakker

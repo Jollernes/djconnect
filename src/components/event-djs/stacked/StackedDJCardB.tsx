@@ -9,6 +9,7 @@ import {
   RotateCcw,
   Clock3,
   Award,
+  BadgeCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -63,8 +64,6 @@ export function StackedDJCardB({
   const showThumbs = density === "spacious";
   const showCoverage = density === "spacious";
   const showRail = !isCompact;
-  const isSpacious = density === "spacious";
-  const avatarSize = isCompact ? "sm" : isSpacious ? "lg" : "md";
 
   return (
     <Card
@@ -179,13 +178,15 @@ export function StackedDJCardB({
               Bryllups-DJ · {dj.base_location}
             </p>
             <div className="mt-1 flex items-center gap-3">
-              <HostAvatar
-                src={dj.profile.avatar_url}
-                alt={dj.profile.full_name || dj.stage_name}
-                size={avatarSize}
-                tone="boutique"
-                verified
-              />
+              {isCompact && (
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size="sm"
+                  tone="boutique"
+                  verified
+                />
+              )}
               <h3
                 className={cn(
                   "font-serif font-semibold leading-tight tracking-tight",
@@ -282,10 +283,28 @@ export function StackedDJCardB({
           <div
             className={cn(
               "flex shrink-0 flex-col items-stretch justify-between gap-3 border-t bg-white/80 md:border-l md:border-t-0",
-              isComfortable ? "p-4 md:w-52" : "p-5 md:w-64",
+              isComfortable ? "p-4 md:w-56" : "p-5 md:w-64",
               isUnavailable && "opacity-70",
             )}
           >
+            <div className="flex items-center gap-2.5 border-b border-amber-100 pb-3">
+              <HostAvatar
+                src={dj.profile.avatar_url}
+                alt={dj.profile.full_name || dj.stage_name}
+                size="md"
+                tone="boutique"
+                verified
+              />
+              <div className="min-w-0 flex-1">
+                <p className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700">
+                  <BadgeCheck className="h-3 w-3 fill-emerald-500 text-white" strokeWidth={3} />
+                  Verificeret profil
+                </p>
+                <p className="truncate font-serif text-sm font-semibold leading-tight">
+                  {dj.stage_name}
+                </p>
+              </div>
+            </div>
             <div className="space-y-2 text-[11px]">
               <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Trygt at booke
