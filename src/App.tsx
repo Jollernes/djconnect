@@ -12,6 +12,7 @@ import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
 import { StackedWeddingDJsPage } from "@/pages/public/StackedWeddingDJsPage";
 import { WeddingDJsStackedBExplorePage } from "@/pages/public/WeddingDJsStackedBExplorePage";
 import { WeddingDJsCurvedCardsDemoPage } from "@/pages/public/WeddingDJsCurvedCardsDemoPage";
+import { WeddingDJsCurvedSweepDemoPage } from "@/pages/public/WeddingDJsCurvedSweepDemoPage";
 import { BirthdayDJsPage } from "@/pages/public/BirthdayDJsPage";
 import { CorporateDJsPage } from "@/pages/public/CorporateDJsPage";
 import { OtherDJsPage } from "@/pages/public/OtherDJsPage";
@@ -79,6 +80,7 @@ function App() {
             <Route path="/wedding-djs-stacked-c" element={<StackedWeddingDJsPage variant="c" />} />
             <Route path="/wedding-djs-stacked-b-explore" element={<WeddingDJsStackedBExplorePage />} />
             <Route path="/wedding-djs-curved-cards" element={<WeddingDJsCurvedCardsDemoPage />} />
+            <Route path="/wedding-djs-curved-sweep" element={<WeddingDJsCurvedSweepDemoPage />} />
             <Route path="/birthday-djs" element={<BirthdayDJsPage />} />
             <Route path="/corporate-djs" element={<CorporateDJsPage />} />
             <Route path="/other-djs" element={<OtherDJsPage />} />
