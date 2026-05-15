@@ -21,12 +21,15 @@ import { openBrowseDJsGate } from "@/components/event-djs/BrowseDJsGate";
 import { StackedDJCardA } from "@/components/event-djs/stacked/StackedDJCardA";
 import { StackedDJCardB } from "@/components/event-djs/stacked/StackedDJCardB";
 import { StackedDJCardC } from "@/components/event-djs/stacked/StackedDJCardC";
+import { DensityToggle } from "@/components/event-djs/stacked/DensityToggle";
+import { useStackedDensity, type Density } from "@/components/event-djs/stacked/density";
 import type { DJProfileWithRelations } from "@/types/domain";
 
 type CardComponent = ComponentType<{
   dj: DJProfileWithRelations;
   eventTypeId?: string;
   unavailable?: { reason: string; subReason?: string } | null;
+  density?: Density;
 }>;
 
 type Variant = {
@@ -83,12 +86,15 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
   } = useEventDJsListing(config.id, config.label.toLowerCase());
 
   const city = filters.city;
+  const [density, setDensity] = useStackedDensity();
 
   useEffect(() => {
     if (!city) openBrowseDJsGate({ eventTypeId: config.id });
   }, [city]);
 
   const Card = v.Card;
+  const skeletonHeight =
+    density === "compact" ? "h-[120px]" : density === "comfortable" ? "h-[200px]" : "h-[300px]";
 
   return (
     <div className="bg-gradient-to-b from-white via-white to-slate-50">
@@ -174,6 +180,7 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
             />
 
             <div className="ml-auto flex items-center gap-2">
+              <DensityToggle value={density} onChange={setDensity} />
               <Select
                 value={filters.sortBy ?? "relevance"}
                 onValueChange={(val) => update({ sort: val === "relevance" ? undefined : val })}
@@ -200,9 +207,9 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
         {/* Listings — stacked, one per row, matching filter-bar width */}
         <div>
           {loading ? (
-            <div className="space-y-4">
+            <div className={density === "compact" ? "space-y-2" : "space-y-4"}>
               {Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-44 w-full" />
+                <Skeleton key={i} className={`${skeletonHeight} w-full`} />
               ))}
             </div>
           ) : availableDJs.length === 0 && unavailableDJs.length === 0 ? (
@@ -214,9 +221,9 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
           ) : (
             <div className="space-y-10">
               {availableDJs.length > 0 ? (
-                <div className="space-y-4">
+                <div className={density === "compact" ? "space-y-2" : "space-y-4"}>
                   {availableDJs.map((dj) => (
-                    <Card key={dj.id} dj={dj} eventTypeId={config.id} />
+                    <Card key={dj.id} dj={dj} eventTypeId={config.id} density={density} />
                   ))}
                 </div>
               ) : (
@@ -236,12 +243,13 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
                       {unavailableDJs.length} {unavailableDJs.length === 1 ? "DJ" : "DJs"}
                     </span>
                   </div>
-                  <div className="space-y-4">
+                  <div className={density === "compact" ? "space-y-2" : "space-y-4"}>
                     {unavailableDJs.map((u) => (
                       <Card
                         key={u.dj.id}
                         dj={u.dj}
                         eventTypeId={config.id}
+                        density={density}
                         unavailable={{ reason: u.reason, subReason: u.subReason }}
                       />
                     ))}
