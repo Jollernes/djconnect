@@ -132,6 +132,17 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
             <a href="/wedding-djs" className="hover:underline">
               Current grid
             </a>
+            {variant === "b" && (
+              <>
+                <span>·</span>
+                <a
+                  href="/wedding-djs-stacked-b-explore"
+                  className="font-medium text-amber-700 hover:underline"
+                >
+                  Explore B variants →
+                </a>
+              </>
+            )}
           </span>
         </div>
       </div>

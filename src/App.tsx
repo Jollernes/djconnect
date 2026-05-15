@@ -10,6 +10,7 @@ import { HomePage } from "@/pages/public/HomePage";
 import { SearchPage } from "@/pages/public/SearchPage";
 import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
 import { StackedWeddingDJsPage } from "@/pages/public/StackedWeddingDJsPage";
+import { WeddingDJsStackedBExplorePage } from "@/pages/public/WeddingDJsStackedBExplorePage";
 import { BirthdayDJsPage } from "@/pages/public/BirthdayDJsPage";
 import { CorporateDJsPage } from "@/pages/public/CorporateDJsPage";
 import { OtherDJsPage } from "@/pages/public/OtherDJsPage";
@@ -75,6 +76,7 @@ function App() {
             <Route path="/wedding-djs-stacked-a" element={<StackedWeddingDJsPage variant="a" />} />
             <Route path="/wedding-djs-stacked-b" element={<StackedWeddingDJsPage variant="b" />} />
             <Route path="/wedding-djs-stacked-c" element={<StackedWeddingDJsPage variant="c" />} />
+            <Route path="/wedding-djs-stacked-b-explore" element={<WeddingDJsStackedBExplorePage />} />
             <Route path="/birthday-djs" element={<BirthdayDJsPage />} />
             <Route path="/corporate-djs" element={<CorporateDJsPage />} />
             <Route path="/other-djs" element={<OtherDJsPage />} />
