@@ -7,7 +7,6 @@ import {
   Star,
   Clock,
   Settings2,
-  BadgeCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -61,6 +60,7 @@ export function StackedDJCardA({
   const showThumbs = density === "spacious";
   const showBadgesRow = density !== "compact";
   const showRail = density !== "compact";
+  const avatarSize = isCompact ? "sm" : density === "spacious" ? "lg" : "md";
 
   return (
     <Card
@@ -166,14 +166,12 @@ export function StackedDJCardA({
         >
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="flex min-w-0 items-center gap-3">
-              {isCompact && (
-                <HostAvatar
-                  src={dj.profile.avatar_url}
-                  alt={dj.profile.full_name || dj.stage_name}
-                  size="sm"
-                  tone="neutral"
-                />
-              )}
+              <HostAvatar
+                src={dj.profile.avatar_url}
+                alt={dj.profile.full_name || dj.stage_name}
+                size={avatarSize}
+                tone="neutral"
+              />
               <div className="min-w-0">
               <h3 className="line-clamp-1 text-base font-semibold leading-tight sm:text-lg">
                 <Link to={href} className="hover:underline">
@@ -285,23 +283,6 @@ export function StackedDJCardA({
               isUnavailable && "opacity-70",
             )}
           >
-            <div className="flex items-center gap-3 border-b border-border/60 pb-3">
-              <HostAvatar
-                src={dj.profile.avatar_url}
-                alt={dj.profile.full_name || dj.stage_name}
-                size="lg"
-                tone="neutral"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="inline-flex items-center gap-1 text-xs text-slate-500">
-                  Verificeret profil
-                  <BadgeCheck className="h-3.5 w-3.5 fill-emerald-500 text-white" strokeWidth={2.5} />
-                </p>
-                <p className="truncate text-base font-semibold leading-tight text-slate-900">
-                  {dj.stage_name}
-                </p>
-              </div>
-            </div>
             <div>
               {!isUnavailable && (
                 <p className="inline-flex items-center gap-1.5 text-[11px] font-medium text-emerald-700">

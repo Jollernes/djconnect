@@ -9,7 +9,6 @@ import {
   RotateCcw,
   Clock3,
   Award,
-  BadgeCheck,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +63,7 @@ export function StackedDJCardB({
   const showThumbs = density === "spacious";
   const showCoverage = density === "spacious";
   const showRail = !isCompact;
+  const avatarSize = isCompact ? "sm" : isComfortable ? "md" : "lg";
 
   return (
     <Card
@@ -178,15 +178,13 @@ export function StackedDJCardB({
               Bryllups-DJ · {dj.base_location}
             </p>
             <div className="mt-1 flex items-center gap-3">
-              {isCompact && (
-                <HostAvatar
-                  src={dj.profile.avatar_url}
-                  alt={dj.profile.full_name || dj.stage_name}
-                  size="sm"
-                  tone="boutique"
-                  verified
-                />
-              )}
+              <HostAvatar
+                src={dj.profile.avatar_url}
+                alt={dj.profile.full_name || dj.stage_name}
+                size={avatarSize}
+                tone="boutique"
+                verified
+              />
               <h3
                 className={cn(
                   "font-serif font-semibold leading-tight tracking-tight",
@@ -287,23 +285,6 @@ export function StackedDJCardB({
               isUnavailable && "opacity-70",
             )}
           >
-            <div className="flex items-center gap-3 border-b border-amber-100 pb-3">
-              <HostAvatar
-                src={dj.profile.avatar_url}
-                alt={dj.profile.full_name || dj.stage_name}
-                size="lg"
-                tone="boutique"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="inline-flex items-center gap-1 text-xs text-slate-500">
-                  Verificeret profil
-                  <BadgeCheck className="h-3.5 w-3.5 fill-emerald-500 text-white" strokeWidth={2.5} />
-                </p>
-                <p className="truncate font-serif text-base font-semibold leading-tight text-slate-900">
-                  {dj.stage_name}
-                </p>
-              </div>
-            </div>
             <div className="space-y-2 text-[11px]">
               <p className="text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                 Trygt at booke
