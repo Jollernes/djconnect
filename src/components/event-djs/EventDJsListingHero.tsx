@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { EventContextModal } from "@/components/common/EventContextModal";
 import { useEventContext } from "@/hooks/useEventContext";
 import type { EventListingConfig } from "@/lib/eventDJsContent";
@@ -9,6 +9,19 @@ export function EventDJsListingHero({ config }: { config: EventListingConfig }) 
   const { set: setEventType } = useEventContext();
   const [switchOpen, setSwitchOpen] = useState(false);
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+
+  // Preserve city + date across event switches so the customer doesn't have
+  // to re-enter them when jumping between event listings.
+  function carriedParams(): string {
+    const next = new URLSearchParams();
+    const city = params.get("city");
+    const date = params.get("date");
+    if (city) next.set("city", city);
+    if (date) next.set("date", date);
+    const s = next.toString();
+    return s ? `?${s}` : "";
+  }
 
   return (
     <>
@@ -51,9 +64,9 @@ export function EventDJsListingHero({ config }: { config: EventListingConfig }) 
         onSelect={(id) => {
           setEventType(id);
           if (!id) return;
-          if (id !== config.id) navigate(`/${slugForEventType(id)}`);
+          if (id !== config.id) navigate(`/${slugForEventType(id)}${carriedParams()}`);
         }}
-        onBrowseAll={() => navigate(`/${config.slug}`)}
+        onBrowseAll={() => navigate(`/${config.slug}${carriedParams()}`)}
         title="Switch event"
         description="Browsing for a different event will change the DJ profiles you see."
       />

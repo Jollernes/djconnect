@@ -86,16 +86,17 @@ export function useEventDJsListing(eventTypeId: string, eventLabelLower: string)
   }
 
   function clearAllFilters() {
-    setParams(new URLSearchParams());
+    // City is set via the gate and treated as the page's anchor — keep it.
+    // Everything else (date, setup size, rating, price, query, sort) clears.
+    const next = new URLSearchParams();
+    if (filters.city) next.set("city", filters.city);
+    setParams(next);
   }
 
+  // Count only the filters the customer can edit on the page: date + setup
+  // size. (City is locked, query/sort/rating/price are hidden.)
   const activeCount =
-    (filters.city ? 1 : 0) +
-    (filters.setupSize ? 1 : 0) +
-    (filters.minRating ? 1 : 0) +
-    (filters.maxPriceMinor ? 1 : 0) +
-    (selectedDate ? 1 : 0) +
-    (filters.query ? 1 : 0);
+    (filters.setupSize ? 1 : 0) + (selectedDate ? 1 : 0);
 
   return {
     filters,

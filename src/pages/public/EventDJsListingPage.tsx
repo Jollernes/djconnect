@@ -1,14 +1,8 @@
-import { Filter, X } from "lucide-react";
+import { useEffect } from "react";
+import { Filter, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { DJCard } from "@/components/common/DJCard";
 import { EmptyState } from "@/components/common/EmptyState";
 import { EventDJsListingHero } from "@/components/event-djs/EventDJsListingHero";
@@ -17,6 +11,7 @@ import { SetupSizePicker } from "@/components/wedding/SetupSizePicker";
 import { useEventDJsListing } from "@/hooks/useEventDJsListing";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import type { EventListingConfig } from "@/lib/eventDJsContent";
+import { openBrowseDJsGate } from "@/components/event-djs/BrowseDJsGate";
 
 /**
  * Shared listing page for an event-specific DJ search. The same layout
@@ -44,6 +39,17 @@ export function EventDJsListingPage({ config }: { config: EventListingConfig }) 
     selectedDate,
   } = useEventDJsListing(config.id, config.label.toLowerCase());
 
+  const city = filters.city;
+
+  // If someone lands here without going through the Browse-DJs gate (no
+  // city set), open the gate pre-filled with the event so they're funnelled
+  // through it.
+  useEffect(() => {
+    if (!city) {
+      openBrowseDJsGate({ eventTypeId: config.id });
+    }
+  }, [city, config.id]);
+
   return (
     <div className="bg-gradient-to-b from-white via-white to-slate-50">
       <EventDJsListingHero config={config} />
@@ -56,12 +62,33 @@ export function EventDJsListingPage({ config }: { config: EventListingConfig }) 
               <Filter className="h-3.5 w-3.5" /> Refine
             </span>
 
-            <Input
-              placeholder="City"
-              value={filters.city ?? ""}
-              onChange={(e) => update({ city: e.target.value || undefined })}
-              className="h-9 w-32 rounded-full text-xs"
-            />
+            {city ? (
+              <span className="inline-flex items-center gap-1.5 rounded-full border bg-muted/40 pl-2.5 pr-1.5 py-1 text-xs">
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="font-medium">{city}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    openBrowseDJsGate({
+                      eventTypeId: config.id,
+                      city,
+                      date: selectedDate,
+                    })
+                  }
+                  className="ml-1 rounded-full px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                >
+                  Change
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => openBrowseDJsGate({ eventTypeId: config.id })}
+                className="inline-flex items-center gap-1.5 rounded-full border border-dashed bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+              >
+                <MapPin className="h-3.5 w-3.5" /> Pick a city
+              </button>
+            )}
 
             <Input
               type="date"
@@ -76,20 +103,6 @@ export function EventDJsListingPage({ config }: { config: EventListingConfig }) 
             />
 
             <div className="ml-auto flex items-center gap-2">
-              <Select
-                value={filters.sortBy ?? "relevance"}
-                onValueChange={(v) => update({ sort: v === "relevance" ? undefined : v })}
-              >
-                <SelectTrigger className="h-9 w-44 rounded-full text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="relevance">Sort: Relevance</SelectItem>
-                  <SelectItem value="price_asc">Price (low–high)</SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
-                  <SelectItem value="most_reviewed">Most reviewed</SelectItem>
-                </SelectContent>
-              </Select>
               {activeCount > 0 && (
                 <Button variant="ghost" size="sm" onClick={clearAllFilters}>
                   <X className="h-3.5 w-3.5" /> Clear
