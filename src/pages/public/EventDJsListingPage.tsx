@@ -3,6 +3,13 @@ import { Filter, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { DJCard } from "@/components/common/DJCard";
 import { EmptyState } from "@/components/common/EmptyState";
 import { EventDJsListingHero } from "@/components/event-djs/EventDJsListingHero";
@@ -103,6 +110,20 @@ export function EventDJsListingPage({ config }: { config: EventListingConfig }) 
             />
 
             <div className="ml-auto flex items-center gap-2">
+              <Select
+                value={filters.sortBy ?? "relevance"}
+                onValueChange={(v) => update({ sort: v === "relevance" ? undefined : v })}
+              >
+                <SelectTrigger className="h-9 w-44 rounded-full text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="relevance">Sort: Relevance</SelectItem>
+                  <SelectItem value="price_asc">Price (low–high)</SelectItem>
+                  <SelectItem value="rating">Rating</SelectItem>
+                  <SelectItem value="most_reviewed">Most reviewed</SelectItem>
+                </SelectContent>
+              </Select>
               {activeCount > 0 && (
                 <Button variant="ghost" size="sm" onClick={clearAllFilters}>
                   <X className="h-3.5 w-3.5" /> Clear
