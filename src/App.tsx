@@ -9,6 +9,7 @@ import { ViewportPreview } from "@/components/dev/ViewportPreview";
 import { HomePage } from "@/pages/public/HomePage";
 import { SearchPage } from "@/pages/public/SearchPage";
 import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
+import { StackedWeddingDJsPage } from "@/pages/public/StackedWeddingDJsPage";
 import { BirthdayDJsPage } from "@/pages/public/BirthdayDJsPage";
 import { CorporateDJsPage } from "@/pages/public/CorporateDJsPage";
 import { OtherDJsPage } from "@/pages/public/OtherDJsPage";
@@ -71,6 +72,9 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/wedding-djs" element={<WeddingDJsPage />} />
+            <Route path="/wedding-djs-stacked-a" element={<StackedWeddingDJsPage variant="a" />} />
+            <Route path="/wedding-djs-stacked-b" element={<StackedWeddingDJsPage variant="b" />} />
+            <Route path="/wedding-djs-stacked-c" element={<StackedWeddingDJsPage variant="c" />} />
             <Route path="/birthday-djs" element={<BirthdayDJsPage />} />
             <Route path="/corporate-djs" element={<CorporateDJsPage />} />
             <Route path="/other-djs" element={<OtherDJsPage />} />
