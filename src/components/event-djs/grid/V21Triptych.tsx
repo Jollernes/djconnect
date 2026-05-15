@@ -67,12 +67,15 @@ export function GridCardV21Triptych({
               1:00
             </span>
           </Link>
-          {/* Three stacked thumbnails — flex-1 each so they align with the
-              hero's full height regardless of natural aspect ratio. */}
-          <div className={cn("flex flex-col", compact ? "gap-1" : "gap-1.5")}>
+          {/* Three stacked thumbnails — grid grid-rows-3 + min-h-0 so the
+              column is locked to the hero's aspect-[3/4] height (which
+              the outer grid row stretches us to) and each thumb gets
+              exactly 1/3 of that height. Prevents the stack from
+              spilling below the hero on any card position. */}
+          <div className={cn("grid h-full grid-rows-3", compact ? "gap-1" : "gap-1.5")}>
             <Link
               to={href}
-              className="relative block w-full flex-1 overflow-hidden rounded-lg bg-slate-100"
+              className="relative block w-full min-h-0 overflow-hidden rounded-lg bg-slate-100"
             >
               {thumbs[1] && (
                 <img
@@ -85,7 +88,7 @@ export function GridCardV21Triptych({
             </Link>
             <Link
               to={href}
-              className="relative block w-full flex-1 overflow-hidden rounded-lg bg-slate-100"
+              className="relative block w-full min-h-0 overflow-hidden rounded-lg bg-slate-100"
             >
               {thumbs[2] && (
                 <img
@@ -98,7 +101,7 @@ export function GridCardV21Triptych({
             </Link>
             <Link
               to={href}
-              className="relative block w-full flex-1 overflow-hidden rounded-lg bg-slate-100"
+              className="relative block w-full min-h-0 overflow-hidden rounded-lg bg-slate-100"
             >
               {thumbs[3] && (
                 <img
