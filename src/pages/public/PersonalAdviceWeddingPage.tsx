@@ -172,15 +172,19 @@ export function PersonalAdviceWeddingPage() {
 
     try {
       let customerId: string;
-      if (profile?.role === "customer") {
+      let sessionEstablished = profile?.role === "customer";
+      if (sessionEstablished && profile) {
         customerId = profile.id;
       } else {
         try {
           mockLogin("customer", { customerKind: "private" });
+          sessionEstablished = true;
         } catch {
-          // localStorage may be full or blocked — fall back to the
-          // deterministic id so the rest of the submission can still
-          // succeed and the user reaches the recommendation page.
+          // localStorage may be full or blocked. We still try to persist
+          // the advisory record (writeAdvisoryRecord has its own error
+          // handling) and surface a recoverable message below instead of
+          // navigating into an auth-gated dashboard route the user can't
+          // actually reach.
         }
         customerId = mockCustomerIdFor("private");
       }
@@ -216,6 +220,14 @@ export function PersonalAdviceWeddingPage() {
         brief: { eventType: "wedding", wedding: brief },
         recommendation,
       });
+
+      if (!sessionEstablished) {
+        setSubmitError(
+          "Din anmodning er gemt, men vi kunne ikke automatisk logge dig ind i denne browser (privat-tilstand eller fuld lagring?). Log venligst manuelt ind for at se anbefalingen.",
+        );
+        setSubmitting(false);
+        return;
+      }
 
       navigate(`/dashboard/personlig-radgivning/${id}`);
     } catch (err) {

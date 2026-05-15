@@ -262,14 +262,24 @@ export function DJSignupPage() {
         setTimeout(() => navigate("/dj/pending-verification"), 2800);
       } else {
         setTimeout(() => {
+          let loggedIn = false;
           try {
             mockLogin("dj");
+            loggedIn = true;
           } catch {
-            // localStorage may be full or blocked — proceed to the
-            // dashboard anyway so the user isn't stuck on the success
-            // screen.
+            // localStorage may be full or blocked — fall through and send
+            // the user to /login so they're not stranded on /dj/dashboard,
+            // which is auth-gated and would just bounce them to /login
+            // anyway, losing the toast context.
           }
-          navigate("/dj/dashboard");
+          if (loggedIn) {
+            navigate("/dj/dashboard");
+          } else {
+            toast.error(
+              "Din profil er oprettet, men vi kunne ikke automatisk logge dig ind i denne browser. Log venligst manuelt ind.",
+            );
+            navigate("/login");
+          }
         }, 1800);
       }
     } catch (err) {
