@@ -8,6 +8,9 @@ import {
   PhoneCall,
   Quote,
   MapPin,
+  Sparkles,
+  Award,
+  Settings2,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +19,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
 import { HostAvatar } from "./HostAvatar";
+import { deriveHighlights } from "./highlights";
 
 const COUPLE_QUOTES: { quote: string; couple: string }[] = [
   { quote: "Han læste rummet og holdt dansegulvet fyldt hele aftenen.", couple: "Mette & Frederik" },
@@ -75,6 +79,8 @@ export function StackedDJCardC({
   const showTestimonial = isSpacious;
   const showRail = !isCompact;
   const avatarSize = isCompact ? "sm" : isComfortable ? "md" : "lg";
+  const highlights = !isCompact && !isUnavailable ? deriveHighlights(dj) : [];
+  const HIGHLIGHT_ICONS = [Sparkles, Award, Settings2] as const;
 
   return (
     <Card
@@ -237,6 +243,20 @@ export function StackedDJCardC({
                 — {testimonial.couple}, bryllup i {dj.base_location}
               </figcaption>
             </figure>
+          )}
+
+          {highlights.length > 0 && (
+            <ul className="space-y-1 text-xs text-slate-600">
+              {highlights.map((line, i) => {
+                const Icon = HIGHLIGHT_ICONS[i] ?? Sparkles;
+                return (
+                  <li key={i} className="flex items-start gap-2">
+                    <Icon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-700" />
+                    <span className="line-clamp-1">{line}</span>
+                  </li>
+                );
+              })}
+            </ul>
           )}
 
           {!isCompact && (
