@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
+import { HostAvatar } from "./HostAvatar";
 
 const EVENTS_TO_COUNT: Record<string, string> = {
   "0-10": "5+",
@@ -62,6 +63,9 @@ export function StackedDJCardB({
   const showThumbs = density === "spacious";
   const showCoverage = density === "spacious";
   const showRail = !isCompact;
+  const isSpacious = density === "spacious";
+  const avatarSize = isSpacious ? "lg" : "md";
+  const firstName = (dj.profile.full_name || dj.stage_name).split(/\s+/)[0];
 
   return (
     <Card
@@ -126,6 +130,27 @@ export function StackedDJCardB({
                 </span>
               )
             )}
+            {!isUnavailable && !isCompact && (
+              <span
+                className={cn(
+                  "pointer-events-none absolute flex items-center gap-2",
+                  isSpacious ? "bottom-3 left-3" : "bottom-2 left-2",
+                )}
+              >
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="boutique"
+                  verified
+                />
+                {isSpacious && (
+                  <span className="hidden rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700 shadow-sm backdrop-blur md:inline-flex">
+                    Hosted by {firstName}
+                  </span>
+                )}
+              </span>
+            )}
           </Link>
           {showThumbs && (
             <div className="mt-1 grid grid-cols-2 gap-1">
@@ -175,16 +200,27 @@ export function StackedDJCardB({
             >
               Bryllups-DJ · {dj.base_location}
             </p>
-            <h3
-              className={cn(
-                "font-serif font-semibold leading-tight tracking-tight",
-                isCompact ? "text-base" : isComfortable ? "text-xl mt-1" : "text-2xl mt-1",
+            <div className="mt-1 flex items-center gap-2">
+              {isCompact && (
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size="sm"
+                  tone="boutique"
+                  verified
+                />
               )}
-            >
-              <Link to={href} className="hover:underline">
-                {dj.stage_name}
-              </Link>
-            </h3>
+              <h3
+                className={cn(
+                  "font-serif font-semibold leading-tight tracking-tight",
+                  isCompact ? "text-base" : isComfortable ? "text-xl" : "text-2xl",
+                )}
+              >
+                <Link to={href} className="hover:underline">
+                  {dj.stage_name}
+                </Link>
+              </h3>
+            </div>
             {dj.tagline && !isCompact && (
               <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{dj.tagline}</p>
             )}

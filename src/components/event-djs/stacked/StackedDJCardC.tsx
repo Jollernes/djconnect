@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
+import { HostAvatar } from "./HostAvatar";
 
 const COUPLE_QUOTES: { quote: string; couple: string }[] = [
   { quote: "Han læste rummet og holdt dansegulvet fyldt hele aftenen.", couple: "Mette & Frederik" },
@@ -73,6 +74,8 @@ export function StackedDJCardC({
   const showThumbs = isSpacious;
   const showTestimonial = isSpacious;
   const showRail = !isCompact;
+  const avatarSize = isSpacious ? "lg" : "md";
+  const firstName = (dj.profile.full_name || dj.stage_name).split(/\s+/)[0];
 
   return (
     <Card
@@ -136,7 +139,7 @@ export function StackedDJCardC({
                   </span>
                 )}
                 {!isCompact && (
-                  <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur transition-transform duration-300 group-hover:scale-105">
+                  <span className="pointer-events-none absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur transition-transform duration-300 group-hover:scale-105">
                     <PlayCircle className="h-3.5 w-3.5 fill-slate-900 text-white" />
                     Introvideo
                   </span>
@@ -146,6 +149,27 @@ export function StackedDJCardC({
                   {dj.rating_average.toFixed(1)}
                 </span>
               </>
+            )}
+            {!isUnavailable && !isCompact && (
+              <span
+                className={cn(
+                  "pointer-events-none absolute flex items-center gap-2",
+                  isSpacious ? "bottom-3 left-3" : "bottom-2 left-2",
+                )}
+              >
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="concierge"
+                  verified
+                />
+                {isSpacious && (
+                  <span className="hidden rounded-full bg-slate-900/85 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-white shadow-sm backdrop-blur md:inline-flex">
+                    Din DJ · {firstName}
+                  </span>
+                )}
+              </span>
             )}
           </Link>
           {showThumbs && (
@@ -196,16 +220,32 @@ export function StackedDJCardC({
             >
               Bryllups-DJ · Personlig service · {dj.base_location}
             </p>
-            <h3
+            <div
               className={cn(
-                "font-serif font-semibold leading-tight tracking-tight text-slate-900",
-                isCompact ? "text-base" : isComfortable ? "mt-1 text-xl" : "mt-1.5 text-2xl sm:text-3xl",
+                "flex items-center gap-2",
+                isCompact ? "" : isComfortable ? "mt-1" : "mt-1.5",
               )}
             >
-              <Link to={href} className="hover:underline">
-                {dj.stage_name}
-              </Link>
-            </h3>
+              {isCompact && (
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size="sm"
+                  tone="concierge"
+                  verified
+                />
+              )}
+              <h3
+                className={cn(
+                  "font-serif font-semibold leading-tight tracking-tight text-slate-900",
+                  isCompact ? "text-base" : isComfortable ? "text-xl" : "text-2xl sm:text-3xl",
+                )}
+              >
+                <Link to={href} className="hover:underline">
+                  {dj.stage_name}
+                </Link>
+              </h3>
+            </div>
             {dj.tagline && !isCompact && (
               <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{dj.tagline}</p>
             )}

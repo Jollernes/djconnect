@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
+import { HostAvatar } from "./HostAvatar";
 
 const SETUP_LABEL: Record<string, string> = {
   small: "Intim · op til 60",
@@ -59,6 +60,7 @@ export function StackedDJCardA({
   const showThumbs = density === "spacious";
   const showBadgesRow = density !== "compact";
   const showRail = density !== "compact";
+  const avatarSize = density === "spacious" ? "lg" : "md";
 
   return (
     <Card
@@ -122,6 +124,21 @@ export function StackedDJCardA({
                 Featured
               </Badge>
             )}
+            {!isUnavailable && !isCompact && (
+              <span
+                className={cn(
+                  "pointer-events-none absolute",
+                  density === "spacious" ? "bottom-3 left-3" : "bottom-2 left-2",
+                )}
+              >
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size={avatarSize}
+                  tone="neutral"
+                />
+              </span>
+            )}
           </Link>
           {showThumbs && (
             <div className="mt-1 grid grid-cols-2 gap-1">
@@ -163,7 +180,16 @@ export function StackedDJCardA({
           )}
         >
           <div className="flex flex-wrap items-start justify-between gap-2">
-            <div className="min-w-0">
+            <div className="min-w-0 flex items-center gap-2">
+              {isCompact && (
+                <HostAvatar
+                  src={dj.profile.avatar_url}
+                  alt={dj.profile.full_name || dj.stage_name}
+                  size="sm"
+                  tone="neutral"
+                />
+              )}
+              <div className="min-w-0">
               <h3 className="line-clamp-1 text-base font-semibold leading-tight sm:text-lg">
                 <Link to={href} className="hover:underline">
                   {dj.stage_name}
@@ -179,6 +205,7 @@ export function StackedDJCardA({
                   {dj.tagline}
                 </p>
               )}
+              </div>
             </div>
             {!isCompact && (
               <Badge variant="success" className="shrink-0 gap-1">
