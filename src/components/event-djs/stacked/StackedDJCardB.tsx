@@ -64,8 +64,7 @@ export function StackedDJCardB({
   const showCoverage = density === "spacious";
   const showRail = !isCompact;
   const isSpacious = density === "spacious";
-  const avatarSize = isSpacious ? "lg" : "md";
-  const firstName = (dj.profile.full_name || dj.stage_name).split(/\s+/)[0];
+  const avatarSize = isCompact ? "sm" : isSpacious ? "lg" : "md";
 
   return (
     <Card
@@ -90,7 +89,7 @@ export function StackedDJCardB({
               isCompact
                 ? "aspect-square"
                 : isComfortable
-                  ? "aspect-[4/3]"
+                  ? "aspect-[4/3] md:aspect-auto md:h-full md:min-h-full"
                   : "aspect-[16/10]",
               isUnavailable && "pointer-events-none",
             )}
@@ -129,27 +128,6 @@ export function StackedDJCardB({
                   <Award className="h-3 w-3" /> Wedding specialist
                 </span>
               )
-            )}
-            {!isUnavailable && !isCompact && (
-              <span
-                className={cn(
-                  "pointer-events-none absolute flex items-center gap-2",
-                  isSpacious ? "bottom-3 left-3" : "bottom-2 left-2",
-                )}
-              >
-                <HostAvatar
-                  src={dj.profile.avatar_url}
-                  alt={dj.profile.full_name || dj.stage_name}
-                  size={avatarSize}
-                  tone="boutique"
-                  verified
-                />
-                {isSpacious && (
-                  <span className="hidden rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700 shadow-sm backdrop-blur md:inline-flex">
-                    Hosted by {firstName}
-                  </span>
-                )}
-              </span>
             )}
           </Link>
           {showThumbs && (
@@ -200,16 +178,14 @@ export function StackedDJCardB({
             >
               Bryllups-DJ · {dj.base_location}
             </p>
-            <div className="mt-1 flex items-center gap-2">
-              {isCompact && (
-                <HostAvatar
-                  src={dj.profile.avatar_url}
-                  alt={dj.profile.full_name || dj.stage_name}
-                  size="sm"
-                  tone="boutique"
-                  verified
-                />
-              )}
+            <div className="mt-1 flex items-center gap-3">
+              <HostAvatar
+                src={dj.profile.avatar_url}
+                alt={dj.profile.full_name || dj.stage_name}
+                size={avatarSize}
+                tone="boutique"
+                verified
+              />
               <h3
                 className={cn(
                   "font-serif font-semibold leading-tight tracking-tight",

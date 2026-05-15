@@ -60,7 +60,7 @@ export function StackedDJCardA({
   const showThumbs = density === "spacious";
   const showBadgesRow = density !== "compact";
   const showRail = density !== "compact";
-  const avatarSize = density === "spacious" ? "lg" : "md";
+  const avatarSize = isCompact ? "sm" : density === "spacious" ? "lg" : "md";
 
   return (
     <Card
@@ -83,9 +83,9 @@ export function StackedDJCardA({
             className={cn(
               "relative block w-full overflow-hidden bg-muted",
               isCompact
-                ? "aspect-square md:aspect-square"
+                ? "aspect-square"
                 : density === "comfortable"
-                  ? "aspect-[4/3] md:aspect-[4/3]"
+                  ? "aspect-[4/3] md:aspect-auto md:h-full md:min-h-full"
                   : "aspect-[16/10]",
               isUnavailable && "pointer-events-none",
             )}
@@ -123,21 +123,6 @@ export function StackedDJCardA({
               <Badge variant="accent" className="absolute left-2 top-2">
                 Featured
               </Badge>
-            )}
-            {!isUnavailable && !isCompact && (
-              <span
-                className={cn(
-                  "pointer-events-none absolute",
-                  density === "spacious" ? "bottom-3 left-3" : "bottom-2 left-2",
-                )}
-              >
-                <HostAvatar
-                  src={dj.profile.avatar_url}
-                  alt={dj.profile.full_name || dj.stage_name}
-                  size={avatarSize}
-                  tone="neutral"
-                />
-              </span>
             )}
           </Link>
           {showThumbs && (
@@ -180,15 +165,13 @@ export function StackedDJCardA({
           )}
         >
           <div className="flex flex-wrap items-start justify-between gap-2">
-            <div className="min-w-0 flex items-center gap-2">
-              {isCompact && (
-                <HostAvatar
-                  src={dj.profile.avatar_url}
-                  alt={dj.profile.full_name || dj.stage_name}
-                  size="sm"
-                  tone="neutral"
-                />
-              )}
+            <div className="flex min-w-0 items-center gap-3">
+              <HostAvatar
+                src={dj.profile.avatar_url}
+                alt={dj.profile.full_name || dj.stage_name}
+                size={avatarSize}
+                tone="neutral"
+              />
               <div className="min-w-0">
               <h3 className="line-clamp-1 text-base font-semibold leading-tight sm:text-lg">
                 <Link to={href} className="hover:underline">
