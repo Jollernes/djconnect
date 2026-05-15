@@ -21,12 +21,11 @@ const SETUP_LABEL: Record<string, string> = {
 };
 
 /**
- * Variant A — Booking.com / Thumbtack-style comparison row.
+ * Variant A — Clean comparison row (baseline refresh).
  *
- * Optimised for shortlist-building: small photo, dense middle column with
- * the facts that matter for filtering (rating, experience, setup size,
- * event-type badges, base city), right rail with a hard-locked price-from
- * block + availability dot + dual CTAs.
+ * Tripartite layout (photo column · facts middle · price rail right) with
+ * a hero photo + two thumbnails on the left. Optimised for shortlist-
+ * building — dense, scannable, neutral palette.
  */
 export function StackedDJCardA({
   dj,
@@ -37,7 +36,13 @@ export function StackedDJCardA({
   eventTypeId?: string;
   unavailable?: { reason: string; subReason?: string } | null;
 }) {
-  const heroImage = dj.equipment_photos[0]?.url ?? dj.profile.avatar_url;
+  const photos = dj.equipment_photos
+    .map((p) => p.url)
+    .filter(Boolean);
+  while (photos.length < 3 && dj.profile.avatar_url) photos.push(dj.profile.avatar_url);
+  const hero = photos[0];
+  const thumbs = [photos[1], photos[2]];
+
   const href = eventTypeId ? `/djs/${dj.username}?eventType=${eventTypeId}` : `/djs/${dj.username}`;
   const isUnavailable = Boolean(unavailable);
   const setupLabel = dj.setup_size ? SETUP_LABEL[dj.setup_size] : null;
@@ -56,47 +61,78 @@ export function StackedDJCardA({
       )}
     >
       <div className="flex flex-col gap-0 md:flex-row">
-        {/* PHOTO */}
-        <Link
-          to={isUnavailable ? "#" : href}
-          className={cn(
-            "relative block aspect-[4/3] w-full overflow-hidden bg-muted md:aspect-auto md:h-auto md:w-72 md:shrink-0",
-            isUnavailable && "pointer-events-none",
-          )}
-        >
-          {heroImage ? (
-            <img
-              src={heroImage}
-              alt={dj.stage_name}
-              className={cn(
-                "h-full w-full object-cover transition-transform duration-500",
-                !isUnavailable && "hover:scale-105",
-                isUnavailable && "grayscale",
-              )}
-              loading="lazy"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-muted-foreground">No photo</div>
-          )}
-          {isUnavailable && (
-            <>
-              <div className="absolute inset-0 bg-white/55" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Badge
-                  variant="destructive"
-                  className="gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wide shadow-md"
-                >
-                  <CalendarX2 className="h-3.5 w-3.5" /> Not available
-                </Badge>
+        {/* PHOTO COLUMN — hero + 2 thumbs */}
+        <div className="relative w-full shrink-0 md:w-80">
+          <Link
+            to={isUnavailable ? "#" : href}
+            className={cn(
+              "relative block aspect-[16/10] w-full overflow-hidden bg-muted",
+              isUnavailable && "pointer-events-none",
+            )}
+          >
+            {hero ? (
+              <img
+                src={hero}
+                alt={dj.stage_name}
+                className={cn(
+                  "h-full w-full object-cover transition-transform duration-500",
+                  !isUnavailable && "hover:scale-105",
+                  isUnavailable && "grayscale",
+                )}
+                loading="lazy"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-muted-foreground">
+                No photo
               </div>
-            </>
-          )}
-          {!isUnavailable && dj.is_featured && (
-            <Badge variant="accent" className="absolute left-3 top-3">
-              Featured
-            </Badge>
-          )}
-        </Link>
+            )}
+            {isUnavailable && (
+              <>
+                <div className="absolute inset-0 bg-white/55" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Badge
+                    variant="destructive"
+                    className="gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wide shadow-md"
+                  >
+                    <CalendarX2 className="h-3.5 w-3.5" /> Not available
+                  </Badge>
+                </div>
+              </>
+            )}
+            {!isUnavailable && dj.is_featured && (
+              <Badge variant="accent" className="absolute left-3 top-3">
+                Featured
+              </Badge>
+            )}
+          </Link>
+          <div className="mt-1 grid grid-cols-2 gap-1">
+            {thumbs.map((url, i) => (
+              <Link
+                key={i}
+                to={isUnavailable ? "#" : href}
+                className={cn(
+                  "relative block aspect-[4/3] overflow-hidden bg-muted",
+                  isUnavailable && "pointer-events-none",
+                )}
+              >
+                {url ? (
+                  <img
+                    src={url}
+                    alt=""
+                    className={cn(
+                      "h-full w-full object-cover transition-transform duration-500",
+                      !isUnavailable && "hover:scale-105",
+                      isUnavailable && "grayscale",
+                    )}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="h-full w-full bg-muted" />
+                )}
+              </Link>
+            ))}
+          </div>
+        </div>
 
         {/* MIDDLE — facts */}
         <div className={cn("flex flex-1 flex-col gap-2 p-4 md:p-5", isUnavailable && "opacity-70")}>
@@ -108,10 +144,10 @@ export function StackedDJCardA({
                 </Link>
               </h3>
               {dj.tagline && (
-                <p className="line-clamp-1 text-sm text-muted-foreground">{dj.tagline}</p>
+                <p className="line-clamp-2 text-sm text-muted-foreground">{dj.tagline}</p>
               )}
             </div>
-            <Badge variant="success" className="gap-1 shrink-0">
+            <Badge variant="success" className="shrink-0 gap-1">
               <Shield className="h-3 w-3" /> Verified
             </Badge>
           </div>

@@ -197,8 +197,8 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
           </div>
         </div>
 
-        {/* Listings — stacked, one per row */}
-        <div className="mx-auto max-w-4xl">
+        {/* Listings — stacked, one per row, matching filter-bar width */}
+        <div>
           {loading ? (
             <div className="space-y-4">
               {Array.from({ length: 4 }).map((_, i) => (
