@@ -67,54 +67,57 @@ export function GridCardV21Triptych({
               1:00
             </span>
           </Link>
-          {/* Three stacked thumbnails — grid grid-rows-3 + min-h-0 so the
-              column is locked to the hero's aspect-[3/4] height (which
-              the outer grid row stretches us to) and each thumb gets
-              exactly 1/3 of that height. Prevents the stack from
-              spilling below the hero on any card position. */}
-          <div className={cn("grid h-full grid-rows-3", compact ? "gap-1" : "gap-1.5")}>
-            <Link
-              to={href}
-              className="relative block w-full min-h-0 overflow-hidden rounded-lg bg-slate-100"
-            >
-              {thumbs[1] && (
-                <img
-                  src={thumbs[1]}
-                  alt=""
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              )}
-            </Link>
-            <Link
-              to={href}
-              className="relative block w-full min-h-0 overflow-hidden rounded-lg bg-slate-100"
-            >
-              {thumbs[2] && (
-                <img
-                  src={thumbs[2]}
-                  alt=""
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              )}
-            </Link>
-            <Link
-              to={href}
-              className="relative block w-full min-h-0 overflow-hidden rounded-lg bg-slate-100"
-            >
-              {thumbs[3] && (
-                <img
-                  src={thumbs[3]}
-                  alt=""
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
-              )}
-              <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-[12px] font-semibold text-white">
-                +{Math.max(photoCount - 4, 1)}
-              </span>
-            </Link>
+          {/* Three stacked thumbnails. The wrapper is a relative grid item
+              that stretches to the row's height (which the hero's
+              aspect-[3/4] locks); the inner absolute-positioned grid
+              divides that height into three equal rows. Taking the
+              thumbs out of intrinsic flow stops them from inflating the
+              row taller than the hero. */}
+          <div className="relative">
+            <div className={cn("absolute inset-0 grid grid-rows-3", compact ? "gap-1" : "gap-1.5")}>
+              <Link
+                to={href}
+                className="relative block w-full overflow-hidden rounded-lg bg-slate-100"
+              >
+                {thumbs[1] && (
+                  <img
+                    src={thumbs[1]}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                )}
+              </Link>
+              <Link
+                to={href}
+                className="relative block w-full overflow-hidden rounded-lg bg-slate-100"
+              >
+                {thumbs[2] && (
+                  <img
+                    src={thumbs[2]}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                )}
+              </Link>
+              <Link
+                to={href}
+                className="relative block w-full overflow-hidden rounded-lg bg-slate-100"
+              >
+                {thumbs[3] && (
+                  <img
+                    src={thumbs[3]}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                )}
+                <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-[12px] font-semibold text-white">
+                  +{Math.max(photoCount - 4, 1)}
+                </span>
+              </Link>
+            </div>
           </div>
         </div>
         {/* Favorite */}
