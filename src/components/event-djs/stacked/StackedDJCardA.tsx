@@ -182,11 +182,21 @@ export function StackedDJCardA({
               {dj.tagline && (
                 <p
                   className={cn(
-                    "text-sm text-muted-foreground",
-                    isCompact ? "line-clamp-1" : "line-clamp-2",
+                    "font-serif italic leading-snug text-slate-700",
+                    isCompact ? "line-clamp-1 text-sm" : "line-clamp-2 text-[15px]",
                   )}
                 >
                   {dj.tagline}
+                </p>
+              )}
+              {showBio && (
+                <p
+                  className={cn(
+                    "text-sm leading-relaxed text-muted-foreground",
+                    density === "spacious" ? "line-clamp-4" : "line-clamp-3",
+                  )}
+                >
+                  {dj.bio}
                 </p>
               )}
               </div>
@@ -238,12 +248,6 @@ export function StackedDJCardA({
               </>
             )}
           </div>
-
-          {showBio && (
-            <p className="line-clamp-3 text-sm leading-relaxed text-muted-foreground">
-              {dj.bio}
-            </p>
-          )}
 
           {showBadgesRow && (
             <div className="flex flex-wrap gap-1.5 pt-0.5">

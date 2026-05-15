@@ -224,7 +224,19 @@ export function StackedDJCardC({
               </h3>
             </div>
             {dj.tagline && !isCompact && (
-              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{dj.tagline}</p>
+              <p className="mt-1.5 line-clamp-2 font-serif text-[15px] italic leading-snug text-slate-800">
+                {dj.tagline}
+              </p>
+            )}
+            {showBio && (
+              <p
+                className={cn(
+                  "mt-1.5 leading-relaxed text-slate-600",
+                  isComfortable ? "line-clamp-3 text-sm" : "line-clamp-4 text-[15px]",
+                )}
+              >
+                {dj.bio}
+              </p>
             )}
           </div>
 
@@ -238,12 +250,6 @@ export function StackedDJCardC({
                 — {testimonial.couple}, bryllup i {dj.base_location}
               </figcaption>
             </figure>
-          )}
-
-          {showBio && (
-            <p className="line-clamp-3 border-l-2 border-slate-300 pl-3 text-sm leading-relaxed text-slate-700">
-              {dj.bio}
-            </p>
           )}
 
           {!isCompact && (

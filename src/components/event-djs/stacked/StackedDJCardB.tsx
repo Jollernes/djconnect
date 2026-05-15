@@ -198,7 +198,19 @@ export function StackedDJCardB({
               </h3>
             </div>
             {dj.tagline && !isCompact && (
-              <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{dj.tagline}</p>
+              <p className="mt-1.5 line-clamp-2 font-serif text-[15px] italic leading-snug text-amber-900">
+                {dj.tagline}
+              </p>
+            )}
+            {showBio && (
+              <p
+                className={cn(
+                  "mt-1.5 font-serif leading-relaxed text-amber-950/80",
+                  isComfortable ? "line-clamp-3 text-sm" : "line-clamp-4 text-[15px]",
+                )}
+              >
+                {dj.bio}
+              </p>
             )}
           </div>
 
@@ -243,12 +255,6 @@ export function StackedDJCardB({
               </>
             )}
           </div>
-
-          {showBio && (
-            <blockquote className="line-clamp-3 border-l-2 border-amber-200 pl-3 font-serif text-sm italic leading-relaxed text-amber-950/80">
-              “{dj.bio}”
-            </blockquote>
-          )}
 
           {showCoverage && (
             <div className="rounded-lg border border-amber-100 bg-white/70 px-3 py-2 text-xs text-muted-foreground">
