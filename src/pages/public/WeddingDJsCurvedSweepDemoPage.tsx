@@ -129,7 +129,7 @@ const VARIANTS: Variant[] = [
         eventTypeId={config.id}
         density={density}
         tint="none"
-        heroGrayscale={60}
+        heroGrayscale={40}
         avatarGrayscale={100}
       />
     ),
