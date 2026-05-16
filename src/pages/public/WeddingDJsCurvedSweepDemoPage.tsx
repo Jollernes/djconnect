@@ -25,7 +25,9 @@ type VariantId =
   | "diagonal-right"
   | "soft-wedding-clean"
   | "soft-wedding-light"
-  | "soft-wedding-champagne";
+  | "soft-wedding-airy"
+  | "soft-wedding-warm"
+  | "soft-wedding-fineart";
 type Density = "3" | "4";
 
 type Variant = {
@@ -144,10 +146,10 @@ const VARIANTS: Variant[] = [
     ),
   },
   {
-    id: "soft-wedding-champagne",
-    label: "Soft Wedding · Champagne",
+    id: "soft-wedding-airy",
+    label: "Soft Wedding · Light & Airy",
     blurb:
-      "Variant 8 — same premium card as Soft Wedding · Clean, with a colour-only wedding tint on the hero (no fade). Saturation drops ~20%, contrast softens ~5%, and three soft-light gradients shift the tonal bands toward warm ivory highlights, muted peach midtones, and warmed taupe-beige shadows. A subtle radial glow at the upper-centre adds an airy, luminous haze. Skin tones stay natural; overall mood is romantic, elegant, calm.",
+      "Variant 8a — Light & Airy wedding grade. High-key brightness lift, low contrast, lightly desaturated. A cream haze in the highlights and a very gentle blush midtone keep the photo bright and Pinterest-wedding-friendly; shadows are lifted with cream rather than warmed with taupe so the overall image stays luminous. Reference: Mastin Labs Fuji 400H / Sage & Ivory.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -155,7 +157,39 @@ const VARIANTS: Variant[] = [
         dj={dj}
         eventTypeId={config.id}
         density={density}
-        tint="wedding"
+        tint="wedding-airy"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-warm",
+    label: "Soft Wedding · Warm Romantic",
+    blurb:
+      "Variant 8b — Warm Romantic / Golden Hour grade. Slight sepia tilt + saturated peach midtones and warm amber shadows; an amber radial glow biased toward the upper-right suggests late-afternoon sun. Feels intimate, celebratory, golden. Reference: Tribe Archipelago Forester / Greg Finck golden-hour ceremonies.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="wedding-warm"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-fineart",
+    label: "Soft Wedding · Fine-Art Film",
+    blurb:
+      "Variant 8c — Editorial fine-art split-tone grade. Warm cream highlights AND cool taupe-blue shadows (the signature of magazine wedding photography). Skin tones stay rich because the cool shift is concentrated in the lowest tonal band, not across the whole frame. Reference: Mastin Labs Kodak Portra 400 / KT Merry / Brides editorial.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="wedding-fineart"
       />
     ),
   },
