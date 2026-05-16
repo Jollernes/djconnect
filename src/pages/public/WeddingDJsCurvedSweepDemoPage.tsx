@@ -141,7 +141,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-clean",
     label: "Soft Wedding · Clean",
     blurb:
-      "Variant 7a — same premium marketplace card with the elegant BryllupsDJ badge and the circular avatar carved into the lower-middle of the hero. In this variant the hero photo is rendered in black-and-white and the avatar keeps its original colours — an editorial contrast that highlights the DJ as a person against a calmer monochrome stage backdrop.",
+      "Variant 7a — same premium marketplace card with the elegant BryllupsDJ badge and the circular avatar carved into the lower-middle of the hero. The hero photo is rendered with a 60 % grayscale wash for a calmer monochrome backdrop, the avatar keeps its original colours, the bio expands to a 3-line summary, the event-type pills are hidden, and a small rose-gold \"X+ brylluper spillet\" row sits under the rating to emphasise wedding expertise.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -153,6 +153,8 @@ const VARIANTS: Variant[] = [
         heroGrayscale={60}
         avatarGrayscale={false}
         bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
       />
     ),
   },

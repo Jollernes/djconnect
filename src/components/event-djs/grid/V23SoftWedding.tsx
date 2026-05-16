@@ -375,6 +375,24 @@ function grayscaleFilter(g: boolean | number): string | null {
   return pct > 0 ? `grayscale(${pct}%)` : null;
 }
 
+/** Heuristic "weddings played" count keyed off years of experience
+ * and modulated by review count so adjacent DJs in the same
+ * experience bracket still show different numbers. Result is
+ * rounded down to the nearest 10 for a marketing-friendly "X+"
+ * read. Returns `null` when we don't have enough signal. */
+function weddingsPlayedFor(dj: DJProfileWithRelations): number | null {
+  const base: Record<string, number> = {
+    "10+": 200,
+    "5-10": 95,
+    "3-5": 45,
+    "1-3": 18,
+  };
+  const seed = base[dj.years_experience];
+  if (seed === undefined) return null;
+  const bumped = seed + Math.floor((dj.rating_count ?? 0) * 1.4);
+  return Math.max(20, Math.round(bumped / 10) * 10);
+}
+
 const WEDDING_TINTS: SoftWeddingTint[] = [
   "wedding",
   "wedding-airy",
@@ -395,6 +413,8 @@ export function GridCardV23SoftWedding({
   avatarGrayscale = true,
   bioLines = 1,
   fontStyle = "serif",
+  showWeddingsPlayed = false,
+  hideEventTypes = false,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -425,6 +445,13 @@ export function GridCardV23SoftWedding({
    * wedding variants. `sans` swaps to Inter to match the standard
    * marketplace card used on `/wedding-djs`. */
   fontStyle?: "serif" | "sans";
+  /** When true, render a small "X+ brylluper spillet" expertise row
+   * below the rating, derived from the DJ's years of experience and
+   * review count. */
+  showWeddingsPlayed?: boolean;
+  /** When true, the event-type pill row (Bryllup · Fest · …) is
+   * omitted entirely. */
+  hideEventTypes?: boolean;
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -631,8 +658,32 @@ export function GridCardV23SoftWedding({
           </span>
         </div>
 
+        {/* Weddings-played expertise row. Heuristic count rendered as
+         * "X+ brylluper spillet" with the rose-gold wedding-rings
+         * glyph used by the BryllupsDJ badge for visual continuity. */}
+        {showWeddingsPlayed &&
+          (() => {
+            const weddings = weddingsPlayedFor(dj);
+            if (weddings === null) return null;
+            return (
+              <div
+                className={cn(
+                  "mt-2 flex items-center justify-center gap-1.5 text-slate-600",
+                  compact ? "text-[11.5px]" : "text-[12.5px]",
+                )}
+              >
+                <WeddingRings
+                  className={compact ? "h-3 w-3" : "h-3.5 w-3.5"}
+                />
+                <span className="font-medium text-slate-700">
+                  {weddings}+ brylluper spillet
+                </span>
+              </div>
+            );
+          })()}
+
         {/* Event-type pill tags */}
-        {tagList.length > 0 && (
+        {!hideEventTypes && tagList.length > 0 && (
           <div
             className={cn(
               "flex flex-wrap items-center justify-center gap-1.5",
