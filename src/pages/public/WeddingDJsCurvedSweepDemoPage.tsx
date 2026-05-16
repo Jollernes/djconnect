@@ -120,7 +120,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-clean",
     label: "Soft Wedding · Clean",
     blurb:
-      "Variant 7a — same premium marketplace card with the elegant Bryllupsspecialist badge and the circular avatar carved into the lower-middle of the hero. In this variant the hero photo is rendered in black-and-white and the avatar keeps its original colours — an editorial contrast that highlights the DJ as a person against a calmer monochrome stage backdrop.",
+      "Variant 7a — same premium marketplace card with the elegant BryllupsDJ badge and the circular avatar carved into the lower-middle of the hero. In this variant the hero photo is rendered in black-and-white and the avatar keeps its original colours — an editorial contrast that highlights the DJ as a person against a calmer monochrome stage backdrop.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (

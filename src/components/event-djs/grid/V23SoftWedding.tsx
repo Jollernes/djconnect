@@ -9,7 +9,7 @@ import {
   priceFromLabel,
 } from "./shared";
 
-/** Wedding-rings glyph for the Bryllupsspecialist badge — two slightly-
+/** Wedding-rings glyph for the BryllupsDJ badge — two slightly-
  * overlapping outline rings in warm champagne / rose-gold. Drawn as
  * inline SVG because lucide-react does not include this symbol. */
 function WeddingRings({ className }: { className?: string }) {
@@ -484,7 +484,7 @@ export function GridCardV23SoftWedding({
           )}
         </Link>
 
-        {/* Bryllupsspecialist badge. Single editorial trust mark, top-
+        {/* BryllupsDJ badge. Single editorial trust mark, top-
             left. Cream backdrop + thin amber ring + serif italic deep-
             navy text keeps it premium / wedding-magazine rather than
             marketplace-tag-y. */}
@@ -499,7 +499,7 @@ export function GridCardV23SoftWedding({
           <WeddingRings
             className={compact ? "h-3 w-[20px]" : "h-3.5 w-[22px]"}
           />
-          Bryllupsspecialist
+          BryllupsDJ
         </span>
 
         {/* Carved-in avatar. Positioned so its centre sits exactly on
