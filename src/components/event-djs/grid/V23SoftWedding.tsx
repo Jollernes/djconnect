@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BadgeCheck, MapPin, Star, Sparkles } from "lucide-react";
+import { Heart, MapPin, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -319,31 +319,24 @@ export function GridCardV23SoftWedding({
           )}
         </Link>
 
-        {/* Trust badges */}
+        {/* Bryllupsspecialist badge. Single editorial trust mark, top-
+            left. Cream backdrop + thin amber ring + serif italic deep-
+            navy text keeps it premium / wedding-magazine rather than
+            marketplace-tag-y. */}
         <span
           className={cn(
-            "absolute left-3 top-3 inline-flex items-center gap-1 rounded-full font-semibold text-white shadow-sm",
-            compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-[11px]",
-          )}
-          style={{ backgroundColor: "#ff6b46" }}
-        >
-          <Sparkles
-            className={compact ? "h-2.5 w-2.5" : "h-3 w-3"}
-            strokeWidth={2.5}
-          />
-          Featured
-        </span>
-        <span
-          className={cn(
-            "absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald-500 font-semibold text-white shadow-sm",
-            compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-1 text-[11px]",
+            "absolute left-3 top-3 inline-flex items-center rounded-full bg-white/95 font-serif italic tracking-tight text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
+            compact ? "gap-1 px-2.5 py-0.5 text-[10.5px]" : "gap-1.5 px-3 py-1 text-[11.5px]",
           )}
         >
-          <BadgeCheck
-            className={compact ? "h-2.5 w-2.5" : "h-3 w-3"}
-            strokeWidth={2.5}
+          <Heart
+            className={cn(
+              compact ? "h-2.5 w-2.5" : "h-3 w-3",
+              "fill-[#ff6b46] text-[#ff6b46]",
+            )}
+            strokeWidth={0}
           />
-          Verified
+          Bryllupsspecialist
         </span>
 
         {/* Carved-in avatar. Positioned so its centre sits exactly on
