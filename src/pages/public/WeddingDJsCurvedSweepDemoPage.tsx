@@ -27,7 +27,10 @@ type VariantId =
   | "soft-wedding-light"
   | "soft-wedding-airy"
   | "soft-wedding-warm"
-  | "soft-wedding-fineart";
+  | "soft-wedding-fineart"
+  | "soft-wedding-grade-film"
+  | "soft-wedding-grade-warmbias"
+  | "soft-wedding-grade-matte";
 type Density = "3" | "4";
 
 type Variant = {
@@ -193,7 +196,73 @@ const VARIANTS: Variant[] = [
       />
     ),
   },
+  // Three unifying colour-grade demos. Each variant uses the same two
+  // very different source photos for DJ Alex Holm (dark blue stage
+  // light) and DJ Flashback (bright neutral daylight) and applies a
+  // different unifying grade so we can compare how each grade pulls
+  // visually inconsistent photos into the same wedding palette.
+  {
+    id: "soft-wedding-grade-film",
+    label: "Soft Wedding · Grade A (Film Wash)",
+    blurb:
+      "Variant 9a — Unifying grade A. Heavy desaturation (sat 0.55) strips out source colour casts hard, then a champagne base + ivory highlights / peach midtones / warmed-taupe shadows + a luminous upper-centre haze rebuild a single wedding palette from scratch. Strongest unification — the dark-blue venue photo loses its blue cast almost entirely.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="wedding-grade-film"
+        heroOverrides={WEDDING_GRADE_HERO_OVERRIDES}
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-grade-warmbias",
+    label: "Soft Wedding · Grade B (Warm Bias)",
+    blurb:
+      "Variant 9b — Unifying grade B. A hue-rotation of −8° plus sepia 15% bias every photo toward warm before a single 165° champagne → peach → taupe gradient is applied. Less aggressive than Grade A — keeps more of each photo's individual character while still reading as the same shoot. The blue venue stays slightly cool but reads as warm-toned overall.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="wedding-grade-warmbias"
+        heroOverrides={WEDDING_GRADE_HERO_OVERRIDES}
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-grade-matte",
+    label: "Soft Wedding · Grade C (Matte Film)",
+    blurb:
+      "Variant 9c — Unifying grade C. A heavy contrast drop (0.85) flattens both photos into a matte film look, then a lifted-black champagne base + standard ivory/peach/taupe soft-light bands add warmth. Less colour-twist than Grade A, more unifying than Grade B — middle ground that preserves natural skin tones while equalising the lighting feel.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="wedding-grade-matte"
+        heroOverrides={WEDDING_GRADE_HERO_OVERRIDES}
+      />
+    ),
+  },
 ];
+
+/** Per-DJ hero overrides used only by the wedding-grade demo
+ * variants. Two source photos with intentionally inconsistent
+ * lighting (bright daylight neutral vs dark venue with strong blue
+ * stage light) so we can compare how each unifying grade handles
+ * very different starting points. */
+const WEDDING_GRADE_HERO_OVERRIDES: Record<string, string> = {
+  "dj-1": "/dj-photos/warm-alex.png",
+  "dj-5": "/dj-photos/warm-flashback.png",
+};
 
 /**
  * Five card-only variations for the wedding-DJ marketplace, toggled

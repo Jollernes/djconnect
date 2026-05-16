@@ -45,7 +45,10 @@ export type SoftWeddingTint =
   | "wedding"
   | "wedding-airy"
   | "wedding-warm"
-  | "wedding-fineart";
+  | "wedding-fineart"
+  | "wedding-grade-film"
+  | "wedding-grade-warmbias"
+  | "wedding-grade-matte";
 
 /** CSS filter applied directly to the photo for each tint mode. */
 function tintFilter(tint: SoftWeddingTint): string | undefined {
@@ -66,6 +69,18 @@ function tintFilter(tint: SoftWeddingTint): string | undefined {
       // Fine-Art Film — muted, low contrast, no sepia (warmth in shadows
       // comes from overlays so highlights stay clean).
       return "saturate(0.78) brightness(1.02) contrast(0.92)";
+    case "wedding-grade-film":
+      // Heavy desaturation strips colour casts hard, then warm overlays
+      // rebuild a unified wedding palette on top.
+      return "saturate(0.55) brightness(1.05) contrast(0.90)";
+    case "wedding-grade-warmbias":
+      // Hue-rotate -8deg pulls blues toward warm, sepia + moderate desat
+      // bias the whole frame toward gold-champagne.
+      return "saturate(0.70) brightness(1.06) contrast(0.92) hue-rotate(-8deg) sepia(0.15)";
+    case "wedding-grade-matte":
+      // Heavy contrast drop creates a matte film look that flattens
+      // colour-cast variance between very different source photos.
+      return "saturate(0.65) brightness(1.04) contrast(0.85)";
     default:
       return undefined;
   }
@@ -226,6 +241,129 @@ function TintOverlay({ tint }: { tint: SoftWeddingTint }) {
       />
     );
   }
+  if (tint === "wedding-grade-film") {
+    // Grade A. Heavy desaturation in the filter strips the source
+    // colour casts; here we rebuild a unified warm wedding palette:
+    // full-frame champagne base + 3 soft-light tonal bands + luminous
+    // upper-centre haze.
+    return (
+      <>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: "rgba(255,235,215,0.18)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,245,230,0.50) 0%, rgba(255,245,230,0.00) 42%)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(230,180,155,0.00) 28%, rgba(230,180,155,0.40) 55%, rgba(230,180,155,0.00) 82%)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(150,125,105,0.00) 60%, rgba(150,125,105,0.45) 100%)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 80% at 50% 22%, rgba(255,250,240,0.16) 0%, rgba(255,250,240,0.00) 60%)",
+          }}
+        />
+      </>
+    );
+  }
+  if (tint === "wedding-grade-warmbias") {
+    // Grade B. Hue-rotate + sepia in the filter pre-warm every photo;
+    // here a single unified diagonal gradient (champagne → peach →
+    // taupe) plus a soft luminous haze finishes the look.
+    return (
+      <>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: "rgba(252,230,210,0.18)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(165deg, rgba(255,238,220,0.40) 0%, rgba(235,195,180,0.30) 50%, rgba(170,140,120,0.35) 100%)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(110% 70% at 50% 18%, rgba(255,247,235,0.20) 0%, rgba(255,247,235,0.00) 65%)",
+          }}
+        />
+      </>
+    );
+  }
+  if (tint === "wedding-grade-matte") {
+    // Grade C. Filter already flattened the photo's contrast; here a
+    // soft champagne base raises black levels further, then the
+    // standard 3-band ivory/peach/taupe soft-light stack adds warmth.
+    return (
+      <>
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background: "rgba(255,240,225,0.14)",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,240,220,0.45) 0%, rgba(255,240,220,0.00) 42%)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(225,185,170,0.00) 28%, rgba(225,185,170,0.42) 55%, rgba(225,185,170,0.00) 82%)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(155,130,110,0.00) 60%, rgba(155,130,110,0.42) 100%)",
+            mixBlendMode: "soft-light",
+          }}
+        />
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(130% 85% at 50% 22%, rgba(255,247,232,0.18) 0%, rgba(255,247,232,0.00) 62%)",
+          }}
+        />
+      </>
+    );
+  }
   return null;
 }
 
@@ -234,6 +372,9 @@ const WEDDING_TINTS: SoftWeddingTint[] = [
   "wedding-airy",
   "wedding-warm",
   "wedding-fineart",
+  "wedding-grade-film",
+  "wedding-grade-warmbias",
+  "wedding-grade-matte",
 ];
 
 export function GridCardV23SoftWedding({
@@ -241,6 +382,7 @@ export function GridCardV23SoftWedding({
   eventTypeId,
   density = "3",
   tint = "soft",
+  heroOverrides,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -249,8 +391,16 @@ export function GridCardV23SoftWedding({
    * shows the raw photo, `light` is a very subtle blush, `soft` is
    * the original champagne/blush wedding wash. */
   tint?: SoftWeddingTint;
+  /** Optional per-DJ hero photo override. Used by the unifying-grade
+   * variants to swap in specific source photos for chosen DJs so we
+   * can demo a colour grade against known-different lighting. */
+  heroOverrides?: Record<string, string>;
 }) {
-  const hero = dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
+  const hero =
+    heroOverrides?.[dj.id] ||
+    dj.equipment_photos[0]?.url ||
+    dj.profile.avatar_url ||
+    "";
   const href = djHref(dj, eventTypeId);
   const compact = density === "4";
 
