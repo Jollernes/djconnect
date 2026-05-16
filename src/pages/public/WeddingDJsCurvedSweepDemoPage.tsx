@@ -130,7 +130,8 @@ const VARIANTS: Variant[] = [
         density={density}
         tint="none"
         heroGrayscale={60}
-        avatarGrayscale={20}
+        avatarGrayscale={false}
+        bioLines={3}
       />
     ),
   },

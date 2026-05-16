@@ -393,6 +393,7 @@ export function GridCardV23SoftWedding({
   heroOverrides,
   heroGrayscale = false,
   avatarGrayscale = true,
+  bioLines = 1,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -413,6 +414,11 @@ export function GridCardV23SoftWedding({
    * percentage, `false` leaves it in colour. Defaults to true so
    * existing variants keep their B&W carved-in portrait. */
   avatarGrayscale?: boolean | number;
+  /** How many lines of muted bio text to show under the DJ name. `1`
+   * keeps the single truncated tagline used historically. Higher
+   * values (2 or 3) switch to the full `dj.bio` clamped via
+   * `line-clamp-N` for a denser editorial subtitle. */
+  bioLines?: 1 | 2 | 3;
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -560,16 +566,29 @@ export function GridCardV23SoftWedding({
             {dj.stage_name}
           </Link>
         </h3>
-        {dj.tagline && (
-          <p
-            className={cn(
-              "mt-1 truncate text-center leading-snug text-slate-500",
-              compact ? "text-[11.5px]" : "text-[12.5px]",
-            )}
-          >
-            {dj.tagline}
-          </p>
-        )}
+        {(() => {
+          // Show 1 line of `tagline` (historical default) or N lines
+          // of the longer `bio` field when bioLines >= 2.
+          const text = bioLines > 1 ? dj.bio || dj.tagline : dj.tagline;
+          if (!text) return null;
+          const clamp =
+            bioLines === 1
+              ? "truncate"
+              : bioLines === 2
+                ? "line-clamp-2"
+                : "line-clamp-3";
+          return (
+            <p
+              className={cn(
+                "mt-1 text-center leading-snug text-slate-500",
+                clamp,
+                compact ? "text-[11.5px]" : "text-[12.5px]",
+              )}
+            >
+              {text}
+            </p>
+          );
+        })()}
 
         {/* Rating */}
         <div className="mt-2 flex items-center justify-center gap-1.5">
