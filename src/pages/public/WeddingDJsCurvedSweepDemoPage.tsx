@@ -24,7 +24,8 @@ type VariantId =
   | "triptych"
   | "diagonal-right"
   | "soft-wedding-clean"
-  | "soft-wedding-light";
+  | "soft-wedding-light"
+  | "soft-wedding-champagne";
 type Density = "3" | "4";
 
 type Variant = {
@@ -139,6 +140,22 @@ const VARIANTS: Variant[] = [
         eventTypeId={config.id}
         density={density}
         tint="light"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-champagne",
+    label: "Soft Wedding · Champagne",
+    blurb:
+      "Variant 8 — same premium card as Soft Wedding · Clean, but the hero photo gets a layered wedding colour grade. CSS filter pulls back saturation and contrast and adds a touch of sepia warmth; four soft-light gradient overlays then add ivory/peach highlights, a dusty-rose midtone band, warmed-taupe shadows, and a low-opacity luminous cream haze. Skin tones stay natural while the surrounding lighting leans toward champagne, blush, and soft beige — romantic, calm, refined.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="wedding"
       />
     ),
   },

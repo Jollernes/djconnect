@@ -19,7 +19,7 @@ import {
  * star rating, light-gray event-type pill tags, and a utility row
  * with location on the left and starting price on the right.
  */
-export type SoftWeddingTint = "none" | "light" | "soft";
+export type SoftWeddingTint = "none" | "light" | "soft" | "wedding";
 
 export function GridCardV23SoftWedding({
   dj,
@@ -90,15 +90,17 @@ export function GridCardV23SoftWedding({
                     ? "saturate(0.78) brightness(1.04) contrast(0.96) sepia(0.06)"
                     : tint === "light"
                       ? "saturate(0.92) brightness(1.02)"
-                      : undefined,
+                      : tint === "wedding"
+                        ? "saturate(0.82) brightness(1.04) contrast(0.94) sepia(0.10)"
+                        : undefined,
               }}
               loading="lazy"
             />
           )}
-          {/* Warm wedding-tone wash. A blush/champagne gradient on top
-              softens nightclub saturation and gives every hero a
-              consistent, romantic colour temperature. Suppressed when
-              tint === "none"; toned down when tint === "light". */}
+          {/* Warm wedding-tone washes. Different tint modes layer
+              different overlays on top of the photo so we can vary
+              the romantic colour temperature without ever editing the
+              underlying images. `none` leaves the photo alone. */}
           {tint === "soft" && (
             <div
               className="pointer-events-none absolute inset-0"
@@ -116,6 +118,52 @@ export function GridCardV23SoftWedding({
                   "linear-gradient(180deg, rgba(255,231,214,0.07) 0%, rgba(245,224,210,0.08) 100%)",
               }}
             />
+          )}
+          {/* Wedding tint — layered grade. Each layer targets a tonal
+              band of the image:
+                · ivory/peach wash on highlights (top)
+                · dusty-rose midtone band (centre)
+                · warmed-taupe shadow band (bottom)
+                · creamy luminous haze across the full frame
+              We use mix-blend-mode: soft-light on the colour bands so
+              skin tones stay natural and only the surrounding lighting
+              warms; the haze is a normal-blend low-opacity cream so
+              the image picks up the polished, slightly-misted feel
+              characteristic of wedding photography. */}
+          {tint === "wedding" && (
+            <>
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(255,238,220,0.55) 0%, rgba(255,238,220,0.00) 38%)",
+                  mixBlendMode: "soft-light",
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(225,185,180,0.00) 30%, rgba(225,185,180,0.45) 55%, rgba(225,185,180,0.00) 80%)",
+                  mixBlendMode: "soft-light",
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(160,140,120,0.00) 60%, rgba(160,140,120,0.55) 100%)",
+                  mixBlendMode: "soft-light",
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(255,247,232,0.10) 0%, rgba(252,238,224,0.06) 100%)",
+                }}
+              />
+            </>
           )}
           {tint !== "none" && (
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-transparent" />
