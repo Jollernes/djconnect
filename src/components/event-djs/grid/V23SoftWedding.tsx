@@ -459,7 +459,7 @@ export function GridCardV23SoftWedding({
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               style={{
                 filter:
-                  [tintFilter(tint), heroGrayscale ? "grayscale(100%)" : null]
+                  [tintFilter(tint), heroGrayscale ? "grayscale(80%)" : null]
                     .filter(Boolean)
                     .join(" ") || undefined,
               }}
