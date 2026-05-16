@@ -213,44 +213,17 @@ function TintOverlay({ tint }: { tint: SoftWeddingTint }) {
     );
   }
   if (tint === "wedding-fineart") {
-    // Editorial split-tone. Warm cream highlights and COOL taupe-blue
-    // shadows — the signature look of magazine wedding photography.
-    // Skin tones stay rich because the cool shift is concentrated in
-    // the lowest tonal band, not across the whole frame.
+    // Diagonal peach → blush → lavender wash. Single normal-blend
+    // overlay with calibrated alphas — sits visibly on top of the
+    // photo and gives every hero a soft, dreamy, colour-graded feel.
     return (
-      <>
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(255,232,210,0.55) 0%, rgba(255,232,210,0.00) 42%)",
-            mixBlendMode: "soft-light",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(225,200,185,0.00) 30%, rgba(225,200,185,0.28) 55%, rgba(225,200,185,0.00) 82%)",
-            mixBlendMode: "soft-light",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(95,110,115,0.00) 60%, rgba(95,110,115,0.40) 100%)",
-            mixBlendMode: "soft-light",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(140% 90% at 30% 20%, rgba(225,228,230,0.10) 0%, rgba(225,228,230,0.00) 65%)",
-          }}
-        />
-      </>
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,220,200,0.55) 0%, rgba(240,210,225,0.35) 50%, rgba(220,210,240,0.45) 100%)",
+        }}
+      />
     );
   }
   return null;
@@ -384,7 +357,7 @@ export function GridCardV23SoftWedding({
               className="block h-full w-full object-cover"
               style={{
                 imageRendering: "auto",
-                filter: WEDDING_TINTS.includes(tint) ? tintFilter(tint) : undefined,
+                filter: "grayscale(100%)",
               }}
             />
           ) : (
@@ -392,9 +365,6 @@ export function GridCardV23SoftWedding({
               {(dj.profile.full_name || dj.stage_name).slice(0, 2).toUpperCase()}
             </span>
           )}
-          {/* Same wedding colour grade as the hero, clipped by the
-              avatar wrapper's `overflow-hidden rounded-full`. */}
-          {WEDDING_TINTS.includes(tint) && <TintOverlay tint={tint} />}
         </span>
       </div>
 

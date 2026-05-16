@@ -181,7 +181,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-fineart",
     label: "Soft Wedding · Fine-Art Film",
     blurb:
-      "Variant 8c — Editorial fine-art split-tone grade. Warm cream highlights AND cool taupe-blue shadows (the signature of magazine wedding photography). Skin tones stay rich because the cool shift is concentrated in the lowest tonal band, not across the whole frame. Reference: Mastin Labs Kodak Portra 400 / KT Merry / Brides editorial.",
+      "Variant 8c — Diagonal peach → blush → lavender wash on the hero. A single 135° linear gradient (warm peach → soft blush pink → pale lavender) sits on top of the photo with calibrated alphas, giving the image a dreamy, romantic colour-graded feel.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
