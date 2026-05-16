@@ -91,7 +91,7 @@ export function GridCardV23SoftWedding({
                     : tint === "light"
                       ? "saturate(0.92) brightness(1.02)"
                       : tint === "wedding"
-                        ? "saturate(0.82) brightness(1.04) contrast(0.94) sepia(0.10)"
+                        ? "saturate(0.80) brightness(1.03) contrast(0.95)"
                         : undefined,
               }}
               loading="lazy"
@@ -119,24 +119,21 @@ export function GridCardV23SoftWedding({
               }}
             />
           )}
-          {/* Wedding tint — layered grade. Each layer targets a tonal
-              band of the image:
-                · ivory/peach wash on highlights (top)
-                · dusty-rose midtone band (centre)
-                · warmed-taupe shadow band (bottom)
-                · creamy luminous haze across the full frame
-              We use mix-blend-mode: soft-light on the colour bands so
-              skin tones stay natural and only the surrounding lighting
-              warms; the haze is a normal-blend low-opacity cream so
-              the image picks up the polished, slightly-misted feel
-              characteristic of wedding photography. */}
+          {/* Wedding tint — colour-only grade, no fade. Three soft-light
+              colour bands shift the image's tonal regions toward a
+              warm wedding palette without darkening or washing it out:
+                · warm ivory / soft champagne on highlights (top)
+                · muted peach / dusty blush on midtones (centre)
+                · soft warmed taupe-beige on shadows (bottom)
+              A subtle radial glow at the upper-centre adds the airy
+              luminous haze. No black gradient fade is applied. */}
           {tint === "wedding" && (
             <>
               <div
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(180deg, rgba(255,238,220,0.55) 0%, rgba(255,238,220,0.00) 38%)",
+                    "linear-gradient(180deg, rgba(255,238,220,0.55) 0%, rgba(255,238,220,0.00) 42%)",
                   mixBlendMode: "soft-light",
                 }}
               />
@@ -144,7 +141,7 @@ export function GridCardV23SoftWedding({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(180deg, rgba(225,185,180,0.00) 30%, rgba(225,185,180,0.45) 55%, rgba(225,185,180,0.00) 80%)",
+                    "linear-gradient(180deg, rgba(228,188,178,0.00) 28%, rgba(228,188,178,0.45) 55%, rgba(228,188,178,0.00) 82%)",
                   mixBlendMode: "soft-light",
                 }}
               />
@@ -152,7 +149,7 @@ export function GridCardV23SoftWedding({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(180deg, rgba(160,140,120,0.00) 60%, rgba(160,140,120,0.55) 100%)",
+                    "linear-gradient(180deg, rgba(168,148,128,0.00) 60%, rgba(168,148,128,0.45) 100%)",
                   mixBlendMode: "soft-light",
                 }}
               />
@@ -160,12 +157,12 @@ export function GridCardV23SoftWedding({
                 className="pointer-events-none absolute inset-0"
                 style={{
                   background:
-                    "linear-gradient(180deg, rgba(255,247,232,0.10) 0%, rgba(252,238,224,0.06) 100%)",
+                    "radial-gradient(120% 80% at 50% 25%, rgba(255,247,232,0.16) 0%, rgba(255,247,232,0.00) 60%)",
                 }}
               />
             </>
           )}
-          {tint !== "none" && (
+          {tint !== "none" && tint !== "wedding" && (
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-transparent" />
           )}
         </Link>

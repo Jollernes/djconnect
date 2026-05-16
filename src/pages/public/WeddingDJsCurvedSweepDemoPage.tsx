@@ -147,7 +147,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-champagne",
     label: "Soft Wedding · Champagne",
     blurb:
-      "Variant 8 — same premium card as Soft Wedding · Clean, but the hero photo gets a layered wedding colour grade. CSS filter pulls back saturation and contrast and adds a touch of sepia warmth; four soft-light gradient overlays then add ivory/peach highlights, a dusty-rose midtone band, warmed-taupe shadows, and a low-opacity luminous cream haze. Skin tones stay natural while the surrounding lighting leans toward champagne, blush, and soft beige — romantic, calm, refined.",
+      "Variant 8 — same premium card as Soft Wedding · Clean, with a colour-only wedding tint on the hero (no fade). Saturation drops ~20%, contrast softens ~5%, and three soft-light gradients shift the tonal bands toward warm ivory highlights, muted peach midtones, and warmed taupe-beige shadows. A subtle radial glow at the upper-centre adds an airy, luminous haze. Skin tones stay natural; overall mood is romantic, elegant, calm.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
