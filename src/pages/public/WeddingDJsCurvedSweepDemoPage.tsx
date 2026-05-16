@@ -155,6 +155,10 @@ const VARIANTS: Variant[] = [
         bioLines={3}
         showWeddingsPlayed
         hideEventTypes
+        priceIncludes={[
+          "inkl. 5 timers spilletid",
+          "inkl. mobil disco",
+        ]}
       />
     ),
   },

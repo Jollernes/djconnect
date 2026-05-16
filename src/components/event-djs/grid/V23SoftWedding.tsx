@@ -415,6 +415,7 @@ export function GridCardV23SoftWedding({
   fontStyle = "serif",
   showWeddingsPlayed = false,
   hideEventTypes = false,
+  priceIncludes,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -452,6 +453,10 @@ export function GridCardV23SoftWedding({
   /** When true, the event-type pill row (Bryllup · Fest · …) is
    * omitted entirely. */
   hideEventTypes?: boolean;
+  /** Optional small inclusion lines rendered under the price (e.g.
+   * "inkl. 5 timers spilletid", "inkl. mobil disco") to clarify what
+   * the starting price covers. */
+  priceIncludes?: string[];
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -717,7 +722,10 @@ export function GridCardV23SoftWedding({
         {/* Utility row */}
         <div
           className={cn(
-            "flex items-center justify-between border-t border-slate-100",
+            "flex justify-between gap-3 border-t border-slate-100",
+            priceIncludes && priceIncludes.length > 0
+              ? "items-start"
+              : "items-center",
             compact ? "mt-4 pt-3" : "mt-5 pt-4",
           )}
         >
@@ -730,14 +738,27 @@ export function GridCardV23SoftWedding({
             <MapPin className="h-3.5 w-3.5 text-slate-400" />
             <span className="truncate">{dj.base_location}</span>
           </span>
-          <span
-            className={cn(
-              "font-semibold text-slate-900",
-              compact ? "text-[13px]" : "text-[14px]",
-            )}
-          >
-            {priceFromLabel(dj)}
-          </span>
+          <div className="flex flex-col items-end gap-0.5">
+            <span
+              className={cn(
+                "font-semibold text-slate-900",
+                compact ? "text-[13px]" : "text-[14px]",
+              )}
+            >
+              {priceFromLabel(dj)}
+            </span>
+            {priceIncludes?.map((line) => (
+              <span
+                key={line}
+                className={cn(
+                  "leading-tight text-slate-500",
+                  compact ? "text-[10px]" : "text-[10.5px]",
+                )}
+              >
+                {line}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </Card>
