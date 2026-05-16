@@ -10,6 +10,7 @@ import { GridCardV19Wave } from "@/components/event-djs/grid/V19Wave";
 import { GridCardV20Corner } from "@/components/event-djs/grid/V20Corner";
 import { GridCardV21Triptych } from "@/components/event-djs/grid/V21Triptych";
 import { GridCardV22DiagonalRight } from "@/components/event-djs/grid/V22DiagonalRight";
+import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
 import type { DJProfileWithRelations } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
@@ -21,7 +22,8 @@ type VariantId =
   | "wave"
   | "corner"
   | "triptych"
-  | "diagonal-right";
+  | "diagonal-right"
+  | "soft-wedding";
 type Density = "3" | "4";
 
 type Variant = {
@@ -107,6 +109,21 @@ const VARIANTS: Variant[] = [
       />
     ),
   },
+  {
+    id: "soft-wedding",
+    label: "Soft Wedding",
+    blurb:
+      "Variant 7 — premium marketplace card with a softly tinted hero (champagne/blush wash), orange Featured + green Verified trust badges, and a grayscale circular avatar carved into the lower-middle of the hero via a radial mask so the bottom edge of the photo curves around it. Centred name + muted subtitle, orange star rating, light-gray event-type pill tags, and a location/price utility row.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+      />
+    ),
+  },
 ];
 
 /**
@@ -165,15 +182,16 @@ export function WeddingDJsCurvedSweepDemoPage() {
             Mock-up · Card-only explorations · Toggle
           </p>
           <h1 className="mt-2 font-serif text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
-            Five card variations for the wedding-DJ marketplace.
+            Card variations for the wedding-DJ marketplace.
           </h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">
-            Five card designs, each differing in how the hero image is cut
-            and integrated into the card (arch, diagonal, wave, corner,
-            triptych). All share the same brand foundation: warm off-white,
-            deep navy text, coral accents, soft shadows. Switch between
-            variations using the tabs below, and toggle the row density to
-            preview 3 or 4 cards per row — both choices persist in the URL.
+            Card designs that differ in how the hero image is cut and
+            integrated (arch, diagonal, wave, corner, triptych,
+            diagonal · right, soft wedding). All share the same brand
+            foundation: warm off-white, deep navy text, coral accents,
+            soft shadows. Switch between variations using the tabs below,
+            and toggle the row density to preview 3 or 4 cards per row —
+            both choices persist in the URL.
           </p>
 
           {/* Toggles */}
