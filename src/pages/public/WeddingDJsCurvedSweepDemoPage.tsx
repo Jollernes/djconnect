@@ -30,7 +30,8 @@ type VariantId =
   | "soft-wedding-fineart"
   | "soft-wedding-grade-film"
   | "soft-wedding-grade-warmbias"
-  | "soft-wedding-grade-matte";
+  | "soft-wedding-grade-matte"
+  | "soft-wedding-clean-inter";
 type Density = "3" | "4";
 
 type Variant = {
@@ -113,6 +114,26 @@ const VARIANTS: Variant[] = [
         dj={dj}
         eventTypeId={config.id}
         density={density}
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-clean-inter",
+    label: "Soft Wedding · Clean · Inter",
+    blurb:
+      "Variant 7a-Inter — identical to Soft Wedding · Clean (hero grayscale 60 %, colour avatar, 3-line bio, BryllupsDJ badge) but the DJ name swaps from font-serif tracking-tight to font-sans tracking-normal — i.e. Inter, the same font used by the standard marketplace DJ card on /wedding-djs.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        fontStyle="sans"
       />
     ),
   },

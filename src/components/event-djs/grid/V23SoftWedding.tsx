@@ -394,6 +394,7 @@ export function GridCardV23SoftWedding({
   heroGrayscale = false,
   avatarGrayscale = true,
   bioLines = 1,
+  fontStyle = "serif",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -419,6 +420,11 @@ export function GridCardV23SoftWedding({
    * values (2 or 3) switch to the full `dj.bio` clamped via
    * `line-clamp-N` for a denser editorial subtitle. */
   bioLines?: 1 | 2 | 3;
+  /** Typography for the DJ name. `serif` (default) keeps the
+   * editorial wedding-magazine treatment used by the existing soft
+   * wedding variants. `sans` swaps to Inter to match the standard
+   * marketplace card used on `/wedding-djs`. */
+  fontStyle?: "serif" | "sans";
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -558,7 +564,10 @@ export function GridCardV23SoftWedding({
         {/* Name + subtitle */}
         <h3
           className={cn(
-            "truncate text-center font-serif font-semibold leading-tight tracking-tight text-slate-900",
+            "truncate text-center font-semibold leading-tight text-slate-900",
+            fontStyle === "serif"
+              ? "font-serif tracking-tight"
+              : "font-sans tracking-normal",
             compact ? "text-[19px]" : "text-[22px]",
           )}
         >
