@@ -120,7 +120,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-clean",
     label: "Soft Wedding · Clean",
     blurb:
-      "Variant 7a — same premium marketplace card (orange Featured + green Verified pills, circular avatar carved into the lower-middle of the hero), but the hero photo is rendered with NO fade at all: no desaturation filter and no warm overlay. Pure original photography.",
+      "Variant 7a — same premium marketplace card with the elegant Bryllupsspecialist badge and the circular avatar carved into the lower-middle of the hero. In this variant the hero photo is rendered in black-and-white and the avatar keeps its original colours — an editorial contrast that highlights the DJ as a person against a calmer monochrome stage backdrop.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -129,6 +129,8 @@ const VARIANTS: Variant[] = [
         eventTypeId={config.id}
         density={density}
         tint="none"
+        heroGrayscale
+        avatarGrayscale={false}
       />
     ),
   },

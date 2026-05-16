@@ -383,6 +383,8 @@ export function GridCardV23SoftWedding({
   density = "3",
   tint = "soft",
   heroOverrides,
+  heroGrayscale = false,
+  avatarGrayscale = true,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -395,6 +397,12 @@ export function GridCardV23SoftWedding({
    * variants to swap in specific source photos for chosen DJs so we
    * can demo a colour grade against known-different lighting. */
   heroOverrides?: Record<string, string>;
+  /** Apply `grayscale(100%)` to the hero image. Stacks with any tint
+   * filter. Defaults to false so existing variants keep colour heroes. */
+  heroGrayscale?: boolean;
+  /** Apply `grayscale(100%)` to the avatar image. Defaults to true so
+   * existing variants keep their B&W carved-in portrait. */
+  avatarGrayscale?: boolean;
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -449,7 +457,12 @@ export function GridCardV23SoftWedding({
               src={hero}
               alt={dj.stage_name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              style={{ filter: tintFilter(tint) }}
+              style={{
+                filter:
+                  [tintFilter(tint), heroGrayscale ? "grayscale(100%)" : null]
+                    .filter(Boolean)
+                    .join(" ") || undefined,
+              }}
               loading="lazy"
             />
           )}
@@ -507,7 +520,7 @@ export function GridCardV23SoftWedding({
               className="block h-full w-full object-cover"
               style={{
                 imageRendering: "auto",
-                filter: "grayscale(100%)",
+                filter: avatarGrayscale ? "grayscale(100%)" : undefined,
               }}
             />
           ) : (
