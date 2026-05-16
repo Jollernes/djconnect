@@ -114,7 +114,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-clean",
     label: "Soft Wedding · Clean",
     blurb:
-      "Variant 7a — same premium marketplace card (orange Featured + green Verified pills, grayscale avatar carved into the lower-middle of the hero), but the hero photo is rendered with NO fade at all: no desaturation filter and no warm overlay. Pure original photography.",
+      "Variant 7a — same premium marketplace card (orange Featured + green Verified pills, circular avatar carved into the lower-middle of the hero), but the hero photo is rendered with NO fade at all: no desaturation filter and no warm overlay. Pure original photography.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (

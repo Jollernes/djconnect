@@ -12,8 +12,8 @@ import {
 /**
  * V23 — Soft Wedding. Premium marketplace listing card with a soft,
  * warm-tinted hero photo (champagne / blush wash), an orange "Featured"
- * pill top-left and a green "Verified" pill top-right, and a circular
- * grayscale avatar carved into the lower-middle of the hero via a
+ * pill top-left and a green "Verified" pill top-right, and a
+ * circular avatar carved into the lower-middle of the hero via a
  * radial mask so the hero's bottom edge appears to curve around the
  * avatar. Content below: name, single-line muted subtitle, orange
  * star rating, light-gray event-type pill tags, and a utility row
@@ -155,8 +155,8 @@ export function GridCardV23SoftWedding({
             area below. We position with `left: 50%` + negative
             `marginLeft` rather than `transform: translateX(-50%)` so
             the avatar isn't promoted to a separate GPU layer, which
-            was softening the image when combined with the grayscale
-            CSS filter. Ring trimmed to 2 px for a sharper edge. */}
+            was softening the image when combined with the avatar's
+            CSS filters. Ring trimmed to 2 px for a sharper edge. */}
         <span
           className="absolute left-1/2 block overflow-hidden rounded-full bg-white ring-2 ring-white"
           style={{
@@ -175,10 +175,7 @@ export function GridCardV23SoftWedding({
               height={avatarSize}
               decoding="async"
               className="block h-full w-full object-cover"
-              style={{
-                filter: "grayscale(100%)",
-                imageRendering: "auto",
-              }}
+              style={{ imageRendering: "auto" }}
             />
           ) : (
             <span className="flex h-full w-full items-center justify-center bg-slate-700 text-base font-bold text-white">

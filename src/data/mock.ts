@@ -333,7 +333,7 @@ export const mockDJs: DJProfileWithRelations[] = [
       id: "user-dj-5",
       email: "booking@flashback.example",
       full_name: "DJ Flashback",
-      avatar_url: "/dj-photos/dj-pioneer.png",
+      avatar_url: "/dj-photos/dj-flashback.png",
       city: "Copenhagen",
       company_name: "Flashback Mobildiskotek",
     },
