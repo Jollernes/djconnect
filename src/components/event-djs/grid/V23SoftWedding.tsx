@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, MapPin, Star } from "lucide-react";
+import { MapPin, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -8,6 +8,25 @@ import {
   eventTypesLine,
   priceFromLabel,
 } from "./shared";
+
+/** Wedding-rings glyph for the Bryllupsspecialist badge — two slightly-
+ * overlapping outline rings in warm champagne / rose-gold. Drawn as
+ * inline SVG because lucide-react does not include this symbol. */
+function WeddingRings({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 26 16"
+      fill="none"
+      stroke="#b8884a"
+      strokeWidth={1.5}
+      aria-hidden="true"
+      className={className}
+    >
+      <circle cx="9" cy="9" r="5.25" />
+      <circle cx="17" cy="9" r="5.25" />
+    </svg>
+  );
+}
 
 /**
  * V23 — Soft Wedding. Premium marketplace listing card with a soft,
@@ -329,12 +348,8 @@ export function GridCardV23SoftWedding({
             compact ? "gap-1 px-2.5 py-0.5 text-[10.5px]" : "gap-1.5 px-3 py-1 text-[11.5px]",
           )}
         >
-          <Heart
-            className={cn(
-              compact ? "h-2.5 w-2.5" : "h-3 w-3",
-              "fill-[#ff6b46] text-[#ff6b46]",
-            )}
-            strokeWidth={0}
+          <WeddingRings
+            className={compact ? "h-3 w-[20px]" : "h-3.5 w-[22px]"}
           />
           Bryllupsspecialist
         </span>
