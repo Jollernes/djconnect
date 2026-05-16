@@ -41,11 +41,11 @@ export function GridCardV23SoftWedding({
 
   // Avatar / notch geometry. The radial-gradient mask carves a half-
   // circle out of the bottom-center of the hero so the avatar drops
-  // into a real cutout (not just a circle pasted on top). Notch radius
-  // is slightly larger than the avatar so a clean ivory gap surrounds
-  // it.
-  const avatarSize = compact ? 60 : 72;
-  const notchRadius = avatarSize / 2 + 8;
+  // into a real cutout (not just a circle pasted on top). The notch
+  // hugs the avatar with only a hairline ivory gap so the integration
+  // feels tight and elegant rather than a halo of empty space.
+  const avatarSize = compact ? 90 : 108;
+  const notchRadius = avatarSize / 2 + 2;
 
   const heroMask = `radial-gradient(circle ${notchRadius}px at 50% 100%, transparent ${notchRadius}px, black ${
     notchRadius + 1
@@ -151,15 +151,19 @@ export function GridCardV23SoftWedding({
 
         {/* Carved-in avatar. Positioned so its centre sits exactly on
             the hero's bottom edge — the upper half drops into the
-            notched cutout and the lower half spills into the content
-            area below. */}
+            notched cutout, the lower half spills into the content
+            area below. We position with `left: 50%` + negative
+            `marginLeft` rather than `transform: translateX(-50%)` so
+            the avatar isn't promoted to a separate GPU layer, which
+            was softening the image when combined with the grayscale
+            CSS filter. Ring trimmed to 2 px for a sharper edge. */}
         <span
-          className="absolute left-1/2 block overflow-hidden rounded-full bg-white ring-[3px] ring-white"
+          className="absolute left-1/2 block overflow-hidden rounded-full bg-white ring-2 ring-white"
           style={{
             width: avatarSize,
             height: avatarSize,
             bottom: -avatarSize / 2,
-            transform: "translateX(-50%)",
+            marginLeft: -avatarSize / 2,
             boxShadow: "0 4px 14px rgba(17,24,39,0.18)",
           }}
         >
@@ -167,11 +171,17 @@ export function GridCardV23SoftWedding({
             <img
               src={dj.profile.avatar_url}
               alt=""
-              className="h-full w-full object-cover"
-              style={{ filter: "grayscale(100%) contrast(1.05)" }}
+              width={avatarSize}
+              height={avatarSize}
+              decoding="async"
+              className="block h-full w-full object-cover"
+              style={{
+                filter: "grayscale(100%)",
+                imageRendering: "auto",
+              }}
             />
           ) : (
-            <span className="flex h-full w-full items-center justify-center bg-slate-700 text-sm font-bold text-white">
+            <span className="flex h-full w-full items-center justify-center bg-slate-700 text-base font-bold text-white">
               {(dj.profile.full_name || dj.stage_name).slice(0, 2).toUpperCase()}
             </span>
           )}
