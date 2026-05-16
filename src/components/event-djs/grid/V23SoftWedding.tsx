@@ -220,12 +220,58 @@ export function GridCardV23SoftWedding({
               height={avatarSize}
               decoding="async"
               className="block h-full w-full object-cover"
-              style={{ imageRendering: "auto" }}
+              style={{
+                imageRendering: "auto",
+                filter:
+                  tint === "wedding"
+                    ? "saturate(0.80) brightness(1.03) contrast(0.95)"
+                    : undefined,
+              }}
             />
           ) : (
             <span className="flex h-full w-full items-center justify-center bg-slate-700 text-base font-bold text-white">
               {(dj.profile.full_name || dj.stage_name).slice(0, 2).toUpperCase()}
             </span>
+          )}
+          {/* Same wedding colour grade as the hero — three soft-light
+              colour bands (ivory highlights / peach midtones / taupe
+              shadows) + an upper-centre cream glow. The avatar
+              wrapper's `overflow-hidden rounded-full` clips them to
+              the circle. */}
+          {tint === "wedding" && (
+            <>
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(255,238,220,0.55) 0%, rgba(255,238,220,0.00) 42%)",
+                  mixBlendMode: "soft-light",
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(228,188,178,0.00) 28%, rgba(228,188,178,0.45) 55%, rgba(228,188,178,0.00) 82%)",
+                  mixBlendMode: "soft-light",
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(168,148,128,0.00) 60%, rgba(168,148,128,0.45) 100%)",
+                  mixBlendMode: "soft-light",
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    "radial-gradient(120% 80% at 50% 25%, rgba(255,247,232,0.16) 0%, rgba(255,247,232,0.00) 60%)",
+                }}
+              />
+            </>
           )}
         </span>
       </div>
