@@ -367,6 +367,14 @@ function TintOverlay({ tint }: { tint: SoftWeddingTint }) {
   return null;
 }
 
+/** Resolve a `boolean | number` grayscale prop into a CSS filter
+ * fragment (e.g. `grayscale(60%)`) or `null` if the photo should be
+ * left in colour. */
+function grayscaleFilter(g: boolean | number): string | null {
+  const pct = typeof g === "number" ? g : g ? 100 : 0;
+  return pct > 0 ? `grayscale(${pct}%)` : null;
+}
+
 const WEDDING_TINTS: SoftWeddingTint[] = [
   "wedding",
   "wedding-airy",
@@ -397,12 +405,14 @@ export function GridCardV23SoftWedding({
    * variants to swap in specific source photos for chosen DJs so we
    * can demo a colour grade against known-different lighting. */
   heroOverrides?: Record<string, string>;
-  /** Apply `grayscale(100%)` to the hero image. Stacks with any tint
-   * filter. Defaults to false so existing variants keep colour heroes. */
-  heroGrayscale?: boolean;
-  /** Apply `grayscale(100%)` to the avatar image. Defaults to true so
+  /** Grayscale applied to the hero image. `true` = 100 %, a number is
+   * the percentage, `false`/undefined leaves the photo in colour.
+   * Stacks with any tint filter. */
+  heroGrayscale?: boolean | number;
+  /** Grayscale applied to the avatar. `true` = 100 %, a number is the
+   * percentage, `false` leaves it in colour. Defaults to true so
    * existing variants keep their B&W carved-in portrait. */
-  avatarGrayscale?: boolean;
+  avatarGrayscale?: boolean | number;
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -459,7 +469,7 @@ export function GridCardV23SoftWedding({
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               style={{
                 filter:
-                  [tintFilter(tint), heroGrayscale ? "grayscale(60%)" : null]
+                  [tintFilter(tint), grayscaleFilter(heroGrayscale)]
                     .filter(Boolean)
                     .join(" ") || undefined,
               }}
@@ -520,7 +530,7 @@ export function GridCardV23SoftWedding({
               className="block h-full w-full object-cover"
               style={{
                 imageRendering: "auto",
-                filter: avatarGrayscale ? "grayscale(100%)" : undefined,
+                filter: grayscaleFilter(avatarGrayscale) || undefined,
               }}
             />
           ) : (
