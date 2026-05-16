@@ -344,8 +344,10 @@ export function GridCardV23SoftWedding({
             marketplace-tag-y. */}
         <span
           className={cn(
-            "absolute left-3 top-3 inline-flex items-center rounded-full bg-white/95 font-serif italic tracking-tight text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
-            compact ? "gap-1 px-2.5 py-0.5 text-[10.5px]" : "gap-1.5 px-3 py-1 text-[11.5px]",
+            "absolute left-3 top-3 inline-flex items-center rounded-full bg-white/95 font-sans font-medium uppercase text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
+            compact
+              ? "gap-1 px-2.5 py-1 text-[9.5px] tracking-[0.12em]"
+              : "gap-1.5 px-3 py-1 text-[10.5px] tracking-[0.14em]",
           )}
         >
           <WeddingRings
