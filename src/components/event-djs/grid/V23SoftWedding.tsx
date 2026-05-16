@@ -19,14 +19,21 @@ import {
  * star rating, light-gray event-type pill tags, and a utility row
  * with location on the left and starting price on the right.
  */
+export type SoftWeddingTint = "none" | "light" | "soft";
+
 export function GridCardV23SoftWedding({
   dj,
   eventTypeId,
   density = "3",
+  tint = "soft",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
   density?: "3" | "4";
+  /** How much warm-wedding wash to apply on top of the hero. `none`
+   * shows the raw photo, `light` is a very subtle blush, `soft` is
+   * the original champagne/blush wedding wash. */
+  tint?: SoftWeddingTint;
 }) {
   const hero = dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
   const href = djHref(dj, eventTypeId);
@@ -79,22 +86,40 @@ export function GridCardV23SoftWedding({
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               style={{
                 filter:
-                  "saturate(0.78) brightness(1.04) contrast(0.96) sepia(0.06)",
+                  tint === "soft"
+                    ? "saturate(0.78) brightness(1.04) contrast(0.96) sepia(0.06)"
+                    : tint === "light"
+                      ? "saturate(0.92) brightness(1.02)"
+                      : undefined,
               }}
               loading="lazy"
             />
           )}
           {/* Warm wedding-tone wash. A blush/champagne gradient on top
               softens nightclub saturation and gives every hero a
-              consistent, romantic colour temperature. */}
-          <div
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(255,231,214,0.18) 0%, rgba(255,209,200,0.10) 45%, rgba(245,224,210,0.22) 100%)",
-            }}
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-transparent" />
+              consistent, romantic colour temperature. Suppressed when
+              tint === "none"; toned down when tint === "light". */}
+          {tint === "soft" && (
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(255,231,214,0.18) 0%, rgba(255,209,200,0.10) 45%, rgba(245,224,210,0.22) 100%)",
+              }}
+            />
+          )}
+          {tint === "light" && (
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(255,231,214,0.07) 0%, rgba(245,224,210,0.08) 100%)",
+              }}
+            />
+          )}
+          {tint !== "none" && (
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-transparent" />
+          )}
         </Link>
 
         {/* Trust badges */}

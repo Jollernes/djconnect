@@ -23,7 +23,8 @@ type VariantId =
   | "corner"
   | "triptych"
   | "diagonal-right"
-  | "soft-wedding";
+  | "soft-wedding-clean"
+  | "soft-wedding-light";
 type Density = "3" | "4";
 
 type Variant = {
@@ -110,10 +111,10 @@ const VARIANTS: Variant[] = [
     ),
   },
   {
-    id: "soft-wedding",
-    label: "Soft Wedding",
+    id: "soft-wedding-clean",
+    label: "Soft Wedding · Clean",
     blurb:
-      "Variant 7 — premium marketplace card with a softly tinted hero (champagne/blush wash), orange Featured + green Verified trust badges, and a grayscale circular avatar carved into the lower-middle of the hero via a radial mask so the bottom edge of the photo curves around it. Centred name + muted subtitle, orange star rating, light-gray event-type pill tags, and a location/price utility row.",
+      "Variant 7a — same premium marketplace card (orange Featured + green Verified pills, grayscale avatar carved into the lower-middle of the hero), but the hero photo is rendered with NO fade at all: no desaturation filter and no warm overlay. Pure original photography.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -121,6 +122,23 @@ const VARIANTS: Variant[] = [
         dj={dj}
         eventTypeId={config.id}
         density={density}
+        tint="none"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-light",
+    label: "Soft Wedding · Light",
+    blurb:
+      "Variant 7b — same premium marketplace card, but with only a SLIGHT fade on the hero: a small saturation drop and a very light blush overlay (~⅓ the intensity of the original Soft Wedding wash). Photo still reads close to its true colour while picking up a touch of wedding warmth.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="light"
       />
     ),
   },
@@ -187,7 +205,8 @@ export function WeddingDJsCurvedSweepDemoPage() {
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">
             Card designs that differ in how the hero image is cut and
             integrated (arch, diagonal, wave, corner, triptych,
-            diagonal · right, soft wedding). All share the same brand
+            diagonal · right, soft wedding · clean, soft wedding · light).
+            All share the same brand
             foundation: warm off-white, deep navy text, coral accents,
             soft shadows. Switch between variations using the tabs below,
             and toggle the row density to preview 3 or 4 cards per row —
