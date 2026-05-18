@@ -791,29 +791,56 @@ export function GridCardV23SoftWedding({
             );
           })()}
 
-        {/* Typical response-time stat. Heuristic, derived from
-         * review count. Compact line with a soft MessageCircle glyph
-         * in rose-gold so it sits inside the existing palette. */}
-        {showResponseTime && (
+        {/* Availability chips. Two compact pill chips sit on one row
+         * (with wrap fallback) — response time on the left and the
+         * travel-radius region on the right. Cream backdrop + amber
+         * border keeps them inside the wedding palette without
+         * competing with the BryllupsDJ badge on the hero. */}
+        {(showResponseTime || showRegion) && (
           <div
             className={cn(
-              "mt-2 flex items-center justify-center gap-1.5 text-slate-600",
-              compact ? "text-[11.5px]" : "text-[12.5px]",
+              "flex flex-wrap items-center justify-center gap-1.5",
+              compact ? "mt-2.5" : "mt-3",
             )}
           >
-            <MessageCircle
-              className={cn(
-                "text-[#b8884a]",
-                compact ? "h-3 w-3" : "h-3.5 w-3.5",
-              )}
-              strokeWidth={1.75}
-            />
-            <span>
-              Svarer typisk inden for{" "}
-              <span className="font-medium text-slate-700">
-                {responseHoursFor(dj)} timer
+            {showResponseTime && (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-[#fdfaf3] text-slate-700",
+                  compact
+                    ? "px-2.5 py-1 text-[10.5px]"
+                    : "px-3 py-1 text-[11.5px]",
+                )}
+              >
+                <MessageCircle
+                  className={cn(
+                    "text-[#b8884a]",
+                    compact ? "h-3 w-3" : "h-3.5 w-3.5",
+                  )}
+                  strokeWidth={1.75}
+                />
+                Svarer typisk inden for {responseHoursFor(dj)} timer
               </span>
-            </span>
+            )}
+            {showRegion && (
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-[#fdfaf3] text-slate-700",
+                  compact
+                    ? "px-2.5 py-1 text-[10.5px]"
+                    : "px-3 py-1 text-[11.5px]",
+                )}
+              >
+                <MapPin
+                  className={cn(
+                    "text-[#b8884a]",
+                    compact ? "h-3 w-3" : "h-3.5 w-3.5",
+                  )}
+                  strokeWidth={1.75}
+                />
+                Kører i hele {regionFor(dj)}
+              </span>
+            )}
           </div>
         )}
 
@@ -866,11 +893,7 @@ export function GridCardV23SoftWedding({
             )}
           >
             <MapPin className="h-3.5 w-3.5 text-slate-400" />
-            <span className="truncate">
-              {showRegion
-                ? `Tilgængelig i ${regionFor(dj)}`
-                : dj.base_location}
-            </span>
+            <span className="truncate">{dj.base_location}</span>
           </span>
           <div className="flex flex-col items-end gap-0.5">
             <span
