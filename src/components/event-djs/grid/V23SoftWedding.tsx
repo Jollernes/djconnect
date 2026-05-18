@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MapPin, Star } from "lucide-react";
+import { BadgeCheck, MapPin, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -649,11 +649,23 @@ export function GridCardV23SoftWedding({
           {hideStarRating ? (
             <span
               className={cn(
-                "text-slate-600",
-                compact ? "text-[12px]" : "text-[13px]",
+                "inline-flex items-center gap-1.5 text-slate-600",
+                compact ? "text-[12.5px]" : "text-[13.5px]",
               )}
             >
-              {ratingCount === 1 ? "1 anmeldelse" : `${ratingCount} anmeldelser`}
+              <BadgeCheck
+                className={cn(
+                  "fill-[#b8884a] text-white",
+                  compact ? "h-4 w-4" : "h-[18px] w-[18px]",
+                )}
+                strokeWidth={2}
+              />
+              <span>
+                <span className="font-medium text-slate-900">{ratingCount}</span>{" "}
+                {ratingCount === 1
+                  ? "verificeret anmeldelse"
+                  : "verificerede anmeldelser"}
+              </span>
             </span>
           ) : (
             <>
