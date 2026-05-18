@@ -156,6 +156,9 @@ const VARIANTS: Variant[] = [
         showWeddingsPlayed
         hideEventTypes
         hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
         priceIncludes={["5 timer inkl. mobildiskotek"]}
       />
     ),

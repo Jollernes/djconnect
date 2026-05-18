@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BadgeCheck, Clock, MapPin, Star } from "lucide-react";
+import { BadgeCheck, Clock, MapPin, MessageCircle, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -375,6 +375,37 @@ function grayscaleFilter(g: boolean | number): string | null {
   return pct > 0 ? `grayscale(${pct}%)` : null;
 }
 
+/** Coarse city → Danish region map for the "Tilgængelig i …"
+ * line on the Clean variant. Falls back to the raw city string when
+ * unmapped so we never render an empty location. */
+const REGION_BY_CITY: Record<string, string> = {
+  Copenhagen: "Sjælland",
+  København: "Sjælland",
+  Roskilde: "Sjælland",
+  Helsingør: "Sjælland",
+  Aarhus: "Midtjylland",
+  Århus: "Midtjylland",
+  Aalborg: "Nordjylland",
+  Ålborg: "Nordjylland",
+  Esbjerg: "Sydjylland",
+  Odense: "Fyn",
+};
+
+function regionFor(dj: DJProfileWithRelations): string {
+  return REGION_BY_CITY[dj.base_location] ?? dj.base_location;
+}
+
+/** Heuristic typical-response-time in whole hours. Driven by review
+ * count as a proxy for how active the DJ is on the platform. Used
+ * by the Clean variant's "Svarer typisk inden for X timer" stat. */
+function responseHoursFor(dj: DJProfileWithRelations): number {
+  const rc = dj.rating_count ?? 0;
+  if (rc >= 100) return 2;
+  if (rc >= 50) return 4;
+  if (rc >= 20) return 12;
+  return 24;
+}
+
 /** Heuristic "weddings played" count keyed off years of experience
  * and modulated by review count so adjacent DJs in the same
  * experience bracket still show different numbers. Result is
@@ -416,6 +447,9 @@ export function GridCardV23SoftWedding({
   showWeddingsPlayed = false,
   hideEventTypes = false,
   hideStarRating = false,
+  showResponseTime = false,
+  showRegion = false,
+  showSeeProfileCta = false,
   priceIncludes,
 }: {
   dj: DJProfileWithRelations;
@@ -459,6 +493,16 @@ export function GridCardV23SoftWedding({
    * vertical space the stars would occupy, so a future re-enable does
    * not cause layout shift. */
   hideStarRating?: boolean;
+  /** When true, render a small "Svarer typisk inden for X timer"
+   * stat under the expertise row. Driven by the DJ's review count
+   * via `responseHoursFor`. */
+  showResponseTime?: boolean;
+  /** When true, the utility-row location shows the DJ's region
+   * (e.g. "Tilgængelig i Sjælland") rather than the raw city. */
+  showRegion?: boolean;
+  /** When true, render a full-width "Se profil →" CTA button at the
+   * bottom of the card body, linking to the DJ's profile. */
+  showSeeProfileCta?: boolean;
   /** Optional small inclusion lines rendered under the price (e.g.
    * "inkl. 5 timers spilletid", "inkl. mobil disco") to clarify what
    * the starting price covers. */
@@ -747,6 +791,32 @@ export function GridCardV23SoftWedding({
             );
           })()}
 
+        {/* Typical response-time stat. Heuristic, derived from
+         * review count. Compact line with a soft MessageCircle glyph
+         * in rose-gold so it sits inside the existing palette. */}
+        {showResponseTime && (
+          <div
+            className={cn(
+              "mt-2 flex items-center justify-center gap-1.5 text-slate-600",
+              compact ? "text-[11.5px]" : "text-[12.5px]",
+            )}
+          >
+            <MessageCircle
+              className={cn(
+                "text-[#b8884a]",
+                compact ? "h-3 w-3" : "h-3.5 w-3.5",
+              )}
+              strokeWidth={1.75}
+            />
+            <span>
+              Svarer typisk inden for{" "}
+              <span className="font-medium text-slate-700">
+                {responseHoursFor(dj)} timer
+              </span>
+            </span>
+          </div>
+        )}
+
         {/* Event-type pill tags */}
         {!hideEventTypes && tagList.length > 0 && (
           <div
@@ -796,7 +866,11 @@ export function GridCardV23SoftWedding({
             )}
           >
             <MapPin className="h-3.5 w-3.5 text-slate-400" />
-            <span className="truncate">{dj.base_location}</span>
+            <span className="truncate">
+              {showRegion
+                ? `Tilgængelig i ${regionFor(dj)}`
+                : dj.base_location}
+            </span>
           </span>
           <div className="flex flex-col items-end gap-0.5">
             <span
@@ -820,6 +894,21 @@ export function GridCardV23SoftWedding({
             ))}
           </div>
         </div>
+
+        {/* "Se profil →" CTA. Full-width pill button with the same
+         * warm amber palette as the BryllupsDJ badge so it reads as
+         * part of the wedding identity rather than a generic action. */}
+        {showSeeProfileCta && (
+          <Link
+            to={href}
+            className={cn(
+              "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-amber-200 bg-white font-medium text-slate-900 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50",
+              compact ? "py-2 text-[12.5px]" : "py-2.5 text-[13px]",
+            )}
+          >
+            Se profil <span aria-hidden="true">→</span>
+          </Link>
+        )}
       </div>
     </Card>
   );
