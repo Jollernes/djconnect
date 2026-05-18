@@ -75,9 +75,9 @@ const VARIANTS: Variant[] = [
         showWeddingsPlayed
         hideEventTypes
         hideStarRating
-        showResponseTime
         showRegion
         showSeeProfileCta
+        ctaLabel="Se profil & bryllupspakker"
         priceIncludes={["5 timer inkl. lyd & lys"]}
       />
     ),

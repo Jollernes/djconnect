@@ -460,6 +460,7 @@ export function GridCardV23SoftWedding({
   priceIncludes,
   statStyle = "default",
   footerStyle = "default",
+  ctaLabel = "Se profil",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -554,6 +555,11 @@ export function GridCardV23SoftWedding({
    *   full-width button with the price embedded inside it).
    *   Region + inclusion sit as a small caption above the CTA. */
   footerStyle?: "default" | "inline-row" | "price-lead" | "cta-bar";
+  /** Label rendered inside the "Se profil →" CTA. Defaults to
+   * `"Se profil"`. Override to surface a richer affordance such as
+   * `"Se profil & bryllupspakker"`. The trailing arrow is added
+   * automatically by the renderer. */
+  ctaLabel?: string;
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -1279,7 +1285,7 @@ export function GridCardV23SoftWedding({
                         : "px-3 py-1.5 text-[12px]",
                     )}
                   >
-                    Se profil
+                    {ctaLabel}
                     <span aria-hidden="true">→</span>
                   </Link>
                 )}
@@ -1344,7 +1350,7 @@ export function GridCardV23SoftWedding({
                           : "px-3.5 py-1.5 text-[12.5px]",
                       )}
                     >
-                      Se profil
+                      {ctaLabel}
                       <span aria-hidden="true">→</span>
                     </Link>
                   )}
@@ -1397,7 +1403,7 @@ export function GridCardV23SoftWedding({
                     )}
                   >
                     <span className="inline-flex items-center gap-1.5">
-                      Se profil
+                      {ctaLabel}
                       <span
                         aria-hidden="true"
                         className="text-slate-400"
@@ -1476,7 +1482,7 @@ export function GridCardV23SoftWedding({
                     compact ? "py-2 text-[12.5px]" : "py-2.5 text-[13px]",
                   )}
                 >
-                  Se profil <span aria-hidden="true">→</span>
+                  {ctaLabel} <span aria-hidden="true">→</span>
                 </Link>
               )}
             </>
