@@ -7,6 +7,9 @@ import { EVENT_LISTING_CONFIG } from "@/lib/eventDJsContent";
 import { GridCardV21Triptych } from "@/components/event-djs/grid/V21Triptych";
 import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
 import { GridCardV24SoftWeddingSide } from "@/components/event-djs/grid/V24SoftWeddingSide";
+import { GridCardV25SoftWeddingLeft } from "@/components/event-djs/grid/V25SoftWeddingLeft";
+import { GridCardV26SoftWeddingCompact } from "@/components/event-djs/grid/V26SoftWeddingCompact";
+import { GridCardV27SoftWeddingOverlay } from "@/components/event-djs/grid/V27SoftWeddingOverlay";
 import type { DJProfileWithRelations } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +20,10 @@ type VariantId =
   | "soft-wedding-clean"
   | "soft-wedding-banner"
   | "soft-wedding-side"
-  | "soft-wedding-pills";
+  | "soft-wedding-pills"
+  | "soft-wedding-left"
+  | "soft-wedding-compact"
+  | "soft-wedding-overlay";
 type Density = "3" | "4";
 
 type Variant = {
@@ -136,6 +142,51 @@ const VARIANTS: Variant[] = [
         showSeeProfileCta
         priceIncludes={["5 timer inkl. mobildiskotek"]}
         statStyle="pills"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-left",
+    label: "Soft Wedding · Left",
+    blurb:
+      "Alt D — left-aligned content. Hero plain rectangle (no avatar notch). Below the hero a horizontal mini-header: a small 56-px avatar on the left + name + 3-line bio stacked beside it. Stats inline-left, region/price utility, CTA and response-time line all left-aligned.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV25SoftWeddingLeft
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-compact",
+    label: "Soft Wedding · Compact",
+    blurb:
+      "Alt E — same centered vertical layout as Clean but everything tightened: 16:9 hero, 76-px avatar in the carved notch, smaller paddings (px-3.5), smaller serif name (17 / 15.5 px), stats as one inline pills row, smaller CTA, response-time line dropped. 3-line bio preserved.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV26SoftWeddingCompact
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-overlay",
+    label: "Soft Wedding · Overlay",
+    blurb:
+      "Alt F — image-heavy. Taller 4:3 hero with a subtle bottom gradient. Content sits as a frosted-glass \"ticket\" overlapping the bottom of the hero via a negative top margin, with the avatar floating in the top-right of the panel just above its edge. 3-line bio preserved.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV27SoftWeddingOverlay
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
       />
     ),
   },
