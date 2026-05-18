@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BadgeCheck, MapPin, Star } from "lucide-react";
+import { BadgeCheck, Clock, MapPin, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -701,26 +701,48 @@ export function GridCardV23SoftWedding({
           )}
         </div>
 
-        {/* Weddings-played expertise row. Heuristic count rendered as
-         * "X+ brylluper spillet" with the rose-gold wedding-rings
-         * glyph used by the BryllupsDJ badge for visual continuity. */}
+        {/* Expertise row. Two compact stats — heuristic weddings count
+         * and the DJ's years-of-experience bracket — separated by a
+         * thin bullet. Each stat has its own small glyph (rose-gold
+         * rings for weddings; outline clock for years) so the
+         * categories read at a glance. */}
         {showWeddingsPlayed &&
           (() => {
             const weddings = weddingsPlayedFor(dj);
-            if (weddings === null) return null;
+            const years = dj.years_experience;
+            if (weddings === null && !years) return null;
+            const iconSize = compact ? "h-3 w-3" : "h-3.5 w-3.5";
             return (
               <div
                 className={cn(
-                  "mt-2 flex items-center justify-center gap-1.5 text-slate-600",
+                  "mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-slate-600",
                   compact ? "text-[11.5px]" : "text-[12.5px]",
                 )}
               >
-                <WeddingRings
-                  className={compact ? "h-3 w-3" : "h-3.5 w-3.5"}
-                />
-                <span className="font-medium text-slate-700">
-                  {weddings}+ brylluper spillet
-                </span>
+                {weddings !== null && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <WeddingRings className={iconSize} />
+                    <span className="font-medium text-slate-700">
+                      {weddings}+ brylluper
+                    </span>
+                  </span>
+                )}
+                {weddings !== null && years && (
+                  <span aria-hidden="true" className="text-slate-300">
+                    ·
+                  </span>
+                )}
+                {years && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Clock
+                      className={cn(iconSize, "text-[#b8884a]")}
+                      strokeWidth={1.75}
+                    />
+                    <span className="font-medium text-slate-700">
+                      {years} års erfaring
+                    </span>
+                  </span>
+                )}
               </div>
             );
           })()}
