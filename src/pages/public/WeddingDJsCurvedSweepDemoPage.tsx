@@ -4,34 +4,14 @@ import type { ReactElement } from "react";
 import { useEventDJsListing } from "@/hooks/useEventDJsListing";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { EVENT_LISTING_CONFIG } from "@/lib/eventDJsContent";
-import { GridCardV17Arch } from "@/components/event-djs/grid/V17Arch";
-import { GridCardV18Diagonal } from "@/components/event-djs/grid/V18Diagonal";
-import { GridCardV19Wave } from "@/components/event-djs/grid/V19Wave";
-import { GridCardV20Corner } from "@/components/event-djs/grid/V20Corner";
 import { GridCardV21Triptych } from "@/components/event-djs/grid/V21Triptych";
-import { GridCardV22DiagonalRight } from "@/components/event-djs/grid/V22DiagonalRight";
 import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
 import type { DJProfileWithRelations } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
 const config = EVENT_LISTING_CONFIG.wedding;
 
-type VariantId =
-  | "arch"
-  | "diagonal"
-  | "wave"
-  | "corner"
-  | "triptych"
-  | "diagonal-right"
-  | "soft-wedding-clean"
-  | "soft-wedding-light"
-  | "soft-wedding-airy"
-  | "soft-wedding-warm"
-  | "soft-wedding-fineart"
-  | "soft-wedding-grade-film"
-  | "soft-wedding-grade-warmbias"
-  | "soft-wedding-grade-matte"
-  | "soft-wedding-clean-inter";
+type VariantId = "triptych" | "soft-wedding-clean";
 type Density = "3" | "4";
 
 type Variant = {
@@ -48,50 +28,6 @@ const COLS_4 = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
 const VARIANTS: Variant[] = [
   {
-    id: "arch",
-    label: "Arch",
-    blurb:
-      "Chapel-arch image mask · image counter pill · B&W avatar bottom-left of image · compact thumbnail strip beneath.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV17Arch dj={dj} eventTypeId={config.id} density={density} />
-    ),
-  },
-  {
-    id: "diagonal",
-    label: "Diagonal",
-    blurb:
-      "Diagonal slash image mask · coral 'Introvideo 1:00' pill · stacked mini-gallery cascading in the open diagonal corner.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV18Diagonal dj={dj} eventTypeId={config.id} density={density} />
-    ),
-  },
-  {
-    id: "wave",
-    label: "Wave",
-    blurb:
-      "Wave-cut bottom edge (SVG clipPath) · B&W avatar itself functions as the intro video with a coral play overlay · compact Foto/Video/Setlist media tabs.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV19Wave dj={dj} eventTypeId={config.id} density={density} />
-    ),
-  },
-  {
-    id: "corner",
-    label: "Corner",
-    blurb:
-      "Asymmetric top-right corner cut creating a pentagon image · '+N fotos' counter pill · 3-square thumbnail column sits next to the lockup at 3-per-row (hidden at 4-per-row to keep cards uncluttered).",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV20Corner dj={dj} eventTypeId={config.id} density={density} />
-    ),
-  },
-  {
     id: "triptych",
     label: "Triptych",
     blurb:
@@ -100,41 +36,6 @@ const VARIANTS: Variant[] = [
     count4: 8,
     render: (dj, density) => (
       <GridCardV21Triptych dj={dj} eventTypeId={config.id} density={density} />
-    ),
-  },
-  {
-    id: "diagonal-right",
-    label: "Diagonal · Right",
-    blurb:
-      "Variant 6 — same diagonal slash mask as Diagonal, but the coral intro-video pill is removed and the stacked mini-gallery sits in the open diagonal corner on the bottom-right (cascading right-to-left into the cut).",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV22DiagonalRight
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-clean-inter",
-    label: "Soft Wedding · Clean · Inter",
-    blurb:
-      "Variant 7a-Inter — identical to Soft Wedding · Clean (hero grayscale 60 %, colour avatar, 3-line bio, BryllupsDJ badge) but the DJ name swaps from font-serif tracking-tight to font-sans tracking-normal — i.e. Inter, the same font used by the standard marketplace DJ card on /wedding-djs.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="none"
-        heroGrayscale={60}
-        avatarGrayscale={false}
-        bioLines={3}
-        fontStyle="sans"
-      />
     ),
   },
   {
@@ -163,143 +64,14 @@ const VARIANTS: Variant[] = [
       />
     ),
   },
-  {
-    id: "soft-wedding-light",
-    label: "Soft Wedding · Light",
-    blurb:
-      "Variant 7b — same premium marketplace card, but with only a SLIGHT fade on the hero: a small saturation drop and a very light blush overlay (~⅓ the intensity of the original Soft Wedding wash). Photo still reads close to its true colour while picking up a touch of wedding warmth.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="light"
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-airy",
-    label: "Soft Wedding · Light & Airy",
-    blurb:
-      "Variant 8a — Light & Airy wedding grade. High-key brightness lift, low contrast, lightly desaturated. A cream haze in the highlights and a very gentle blush midtone keep the photo bright and Pinterest-wedding-friendly; shadows are lifted with cream rather than warmed with taupe so the overall image stays luminous. Reference: Mastin Labs Fuji 400H / Sage & Ivory.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="wedding-airy"
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-warm",
-    label: "Soft Wedding · Warm Romantic",
-    blurb:
-      "Variant 8b — Warm Romantic / Golden Hour grade. Slight sepia tilt + saturated peach midtones and warm amber shadows; an amber radial glow biased toward the upper-right suggests late-afternoon sun. Feels intimate, celebratory, golden. Reference: Tribe Archipelago Forester / Greg Finck golden-hour ceremonies.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="wedding-warm"
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-fineart",
-    label: "Soft Wedding · Fine-Art Film",
-    blurb:
-      "Variant 8c — Diagonal peach → blush → lavender wash on the hero. A single 135° linear gradient (warm peach → soft blush pink → pale lavender) sits on top of the photo with calibrated alphas, giving the image a dreamy, romantic colour-graded feel.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="wedding-fineart"
-      />
-    ),
-  },
-  // Three unifying colour-grade demos. Each variant uses the same two
-  // very different source photos for DJ Alex Holm (dark blue stage
-  // light) and DJ Flashback (bright neutral daylight) and applies a
-  // different unifying grade so we can compare how each grade pulls
-  // visually inconsistent photos into the same wedding palette.
-  {
-    id: "soft-wedding-grade-film",
-    label: "Soft Wedding · Grade A (Film Wash)",
-    blurb:
-      "Variant 9a — Unifying grade A. Heavy desaturation (sat 0.55) strips out source colour casts hard, then a champagne base + ivory highlights / peach midtones / warmed-taupe shadows + a luminous upper-centre haze rebuild a single wedding palette from scratch. Strongest unification — the dark-blue venue photo loses its blue cast almost entirely.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="wedding-grade-film"
-        heroOverrides={WEDDING_GRADE_HERO_OVERRIDES}
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-grade-warmbias",
-    label: "Soft Wedding · Grade B (Warm Bias)",
-    blurb:
-      "Variant 9b — Unifying grade B. A hue-rotation of −8° plus sepia 15% bias every photo toward warm before a single 165° champagne → peach → taupe gradient is applied. Less aggressive than Grade A — keeps more of each photo's individual character while still reading as the same shoot. The blue venue stays slightly cool but reads as warm-toned overall.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="wedding-grade-warmbias"
-        heroOverrides={WEDDING_GRADE_HERO_OVERRIDES}
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-grade-matte",
-    label: "Soft Wedding · Grade C (Matte Film)",
-    blurb:
-      "Variant 9c — Unifying grade C. A heavy contrast drop (0.85) flattens both photos into a matte film look, then a lifted-black champagne base + standard ivory/peach/taupe soft-light bands add warmth. Less colour-twist than Grade A, more unifying than Grade B — middle ground that preserves natural skin tones while equalising the lighting feel.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="wedding-grade-matte"
-        heroOverrides={WEDDING_GRADE_HERO_OVERRIDES}
-      />
-    ),
-  },
 ];
 
-/** Per-DJ hero overrides used only by the wedding-grade demo
- * variants. Two source photos with intentionally inconsistent
- * lighting (bright daylight neutral vs dark venue with strong blue
- * stage light) so we can compare how each unifying grade handles
- * very different starting points. */
-const WEDDING_GRADE_HERO_OVERRIDES: Record<string, string> = {
-  "dj-1": "/dj-photos/warm-alex.png",
-  "dj-5": "/dj-photos/warm-flashback.png",
-};
-
 /**
- * Five card-only variations for the wedding-DJ marketplace, toggled
- * one-at-a-time via the top tab strip. Each variant also has a density
- * sub-toggle to switch between 3 and 4 cards per row. Both choices
- * persist in the URL search params so the views are shareable.
+ * Two card-only variations for the wedding-DJ marketplace — Triptych
+ * and Soft Wedding · Clean — toggled one-at-a-time via the top tab
+ * strip. Each variant also has a density sub-toggle to switch between
+ * 3 and 4 cards per row. Both choices persist in the URL search
+ * params so the views are shareable.
  */
 export function WeddingDJsCurvedSweepDemoPage() {
   const [params, setParams] = useSearchParams();
@@ -354,14 +126,14 @@ export function WeddingDJsCurvedSweepDemoPage() {
             Card variations for the wedding-DJ marketplace.
           </h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">
-            Card designs that differ in how the hero image is cut and
-            integrated (arch, diagonal, wave, corner, triptych,
-            diagonal · right, soft wedding · clean, soft wedding · light).
-            All share the same brand
-            foundation: warm off-white, deep navy text, coral accents,
-            soft shadows. Switch between variations using the tabs below,
-            and toggle the row density to preview 3 or 4 cards per row —
-            both choices persist in the URL.
+            Two card designs for the wedding-DJ marketplace: Triptych
+            (1 hero + 3 stacked thumbnails mosaic) and Soft Wedding ·
+            Clean (premium single-photo card with the BryllupsDJ
+            badge, 3-stat row, and Se profil CTA). Both share the same
+            brand foundation: warm off-white, deep navy text, coral
+            accents, soft shadows. Switch between variations using the
+            tabs below, and toggle the row density to preview 3 or 4
+            cards per row — both choices persist in the URL.
           </p>
 
           {/* Toggles */}
