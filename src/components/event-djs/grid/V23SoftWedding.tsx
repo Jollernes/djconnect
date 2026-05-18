@@ -514,8 +514,23 @@ export function GridCardV23SoftWedding({
    * - `"banner"`: full-bleed cream-amber band with larger numbers
    *   and an editorial italic label — stats become the visual lead.
    * - `"pills"`: three compact horizontal chips in a single row,
-   *   reducing card height and giving a lighter trust signal. */
-  statStyle?: "default" | "banner" | "pills";
+   *   reducing card height and giving a lighter trust signal.
+   * - `"inline"`: a single line of plain text with tiny icons —
+   *   no chips, no badges. Includes the star rating as a 4th
+   *   item so the row stays balanced.
+   * - `"grid4"`: 4-column divided grid (rating added as col 1).
+   *   Micro icons inline next to values, no badge circles,
+   *   smaller everything than the default 3-col grid.
+   * - `"rating-lead"`: rating displayed as a small cream-amber
+   *   trust chip on the left, followed by 3 compact text stats.
+   *   Rating becomes the visual anchor. */
+  statStyle?:
+    | "default"
+    | "banner"
+    | "pills"
+    | "inline"
+    | "grid4"
+    | "rating-lead";
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -865,6 +880,177 @@ export function GridCardV23SoftWedding({
                       <span className="text-slate-500">{s.label}</span>
                     </span>
                   ))}
+                </div>
+              );
+            }
+
+            // Build a 4-stat list (rating + the 3 existing) for the
+            // newer treatments below. Rating is shown as "4,9" with a
+            // filled rose-gold star inline.
+            const ratingStat = {
+              icon: (
+                <Star
+                  className={cn(
+                    "fill-[#b8884a] text-[#b8884a]",
+                    compact ? "h-2.5 w-2.5" : "h-3 w-3",
+                  )}
+                  strokeWidth={1.5}
+                />
+              ),
+              value: ratingValue,
+              label: "stjerner",
+            };
+            const stats4 = [ratingStat, ...stats];
+
+            if (statStyle === "inline") {
+              // Single text line: tiny icons + bold values + grey
+              // labels separated by thin slate-300 bullets. No chips,
+              // no badges, no padding boxes. Wraps to two lines only
+              // when the row really cannot fit.
+              return (
+                <div
+                  className={cn(
+                    "flex flex-wrap items-center justify-center gap-x-2 gap-y-1",
+                    compact ? "mt-2.5" : "mt-3",
+                    compact ? "text-[10.5px]" : "text-[11.5px]",
+                  )}
+                >
+                  {stats4.map((s, i) => (
+                    <span
+                      key={s.label}
+                      className="inline-flex items-center gap-1 text-slate-600"
+                    >
+                      {i > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="text-slate-300"
+                        >
+                          ·
+                        </span>
+                      )}
+                      <span className="inline-flex items-center">
+                        {s.icon}
+                      </span>
+                      <span className="font-semibold text-slate-900">
+                        {s.value}
+                      </span>
+                      <span className="text-slate-500">{s.label}</span>
+                    </span>
+                  ))}
+                </div>
+              );
+            }
+
+            if (statStyle === "grid4") {
+              // 4-column divided grid. Each column shows a micro icon
+              // inline with the bold value, with a small caption below.
+              // No icon badge circles. Smaller everything than the
+              // default 3-col grid so the row reads tight.
+              return (
+                <div
+                  className={cn(
+                    "grid grid-cols-4 divide-x divide-amber-100",
+                    compact ? "mt-2" : "mt-2.5",
+                  )}
+                >
+                  {stats4.map((s) => (
+                    <div
+                      key={s.label}
+                      className={cn(
+                        "flex flex-col items-center gap-0.5 text-center",
+                        compact ? "px-0.5" : "px-1",
+                      )}
+                    >
+                      <span className="inline-flex items-center gap-0.5">
+                        <span className="inline-flex items-center">
+                          {s.icon}
+                        </span>
+                        <span
+                          className={cn(
+                            "font-semibold leading-none text-slate-900",
+                            compact ? "text-[12px]" : "text-[13.5px]",
+                          )}
+                        >
+                          {s.value}
+                        </span>
+                      </span>
+                      <span
+                        className={cn(
+                          "leading-tight text-slate-500",
+                          compact ? "text-[9px]" : "text-[10px]",
+                        )}
+                      >
+                        {s.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+
+            if (statStyle === "rating-lead") {
+              // Asymmetric: rating as a small cream-amber "trust
+              // chip" on the left (slightly taller, with the count
+              // beneath the score), followed by the 3 supporting
+              // stats as compact text on the right.
+              return (
+                <div
+                  className={cn(
+                    "flex items-center gap-2",
+                    compact ? "mt-2.5" : "mt-3",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-1 rounded-md border border-amber-200 bg-[#fdf8ec]",
+                      compact ? "px-2 py-1" : "px-2.5 py-1.5",
+                    )}
+                  >
+                    <Star
+                      className={cn(
+                        "fill-[#b8884a] text-[#b8884a]",
+                        compact ? "h-3 w-3" : "h-3.5 w-3.5",
+                      )}
+                      strokeWidth={1.5}
+                    />
+                    <span
+                      className={cn(
+                        "font-semibold leading-none text-slate-900",
+                        compact ? "text-[13px]" : "text-[14.5px]",
+                      )}
+                    >
+                      {ratingValue}
+                    </span>
+                  </span>
+                  <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
+                    {stats.map((s, i) => (
+                      <span
+                        key={s.label}
+                        className={cn(
+                          "inline-flex items-center gap-1 text-slate-600",
+                          compact ? "text-[10.5px]" : "text-[11.5px]",
+                        )}
+                      >
+                        {i > 0 && (
+                          <span
+                            aria-hidden="true"
+                            className="text-slate-300"
+                          >
+                            ·
+                          </span>
+                        )}
+                        <span className="inline-flex items-center">
+                          {s.icon}
+                        </span>
+                        <span className="font-semibold text-slate-900">
+                          {s.value}
+                        </span>
+                        <span className="text-slate-500">
+                          {s.label}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
               );
             }

@@ -23,7 +23,10 @@ type VariantId =
   | "soft-wedding-pills"
   | "soft-wedding-left"
   | "soft-wedding-compact"
-  | "soft-wedding-overlay";
+  | "soft-wedding-overlay"
+  | "soft-wedding-stats-inline"
+  | "soft-wedding-stats-grid4"
+  | "soft-wedding-stats-rating-lead";
 type Density = "3" | "4";
 
 type Variant = {
@@ -187,6 +190,87 @@ const VARIANTS: Variant[] = [
         dj={dj}
         eventTypeId={config.id}
         density={density}
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-stats-inline",
+    label: "Soft Wedding · Stats · Inline",
+    blurb:
+      "Alt G — central stat row collapsed to a single line of plain text with tiny rose-gold icons and thin slate-300 bullet separators. Star rating added as a 4th item to keep proportions balanced: \"★ 4,9 · 87 anmeldelser · 320+ brylluper · 10+ års erfaring\". Tightest possible footprint — barely taller than one text line.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        statStyle="inline"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-stats-grid4",
+    label: "Soft Wedding · Stats · Grid-4",
+    blurb:
+      "Alt H — 4-column divided grid. Rating added as a fourth column on the left. Micro icons inline with the bold values (no icon badge circles), single-line captions, thin amber dividers, smaller numbers and labels than the current 3-col default. Same visual language but compressed and balanced 4-up.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        statStyle="grid4"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-stats-rating-lead",
+    label: "Soft Wedding · Stats · Rating-Lead",
+    blurb:
+      "Alt I — asymmetric. Star rating rendered as a small cream-amber \"trust chip\" on the left (slightly taller than the other stats), then the three supporting stats flow as compact bullet-separated text on the right. Rating becomes the visual anchor; the other facts read as support.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        statStyle="rating-lead"
       />
     ),
   },
