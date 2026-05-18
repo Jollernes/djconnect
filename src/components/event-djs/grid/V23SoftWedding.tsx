@@ -558,6 +558,7 @@ export function GridCardV23SoftWedding({
   ctaLabel = "Se profil",
   colourway = "default",
   ctaProminence = "ghost",
+  availabilityDate,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -670,6 +671,13 @@ export function GridCardV23SoftWedding({
    * with a slightly darker border, semibold text, and a softer lift
    * shadow — turns the CTA into the visual end-anchor of the card. */
   ctaProminence?: "ghost" | "filled";
+  /** Human-formatted availability hint shown next to a compact CTA
+   * (e.g. `"d. 14. juni 2025"`). When provided, the default footer
+   * collapses its full-width "Se profil" CTA into a flex row: a
+   * small green-dot availability line on the left + an auto-width
+   * pill button on the right. Intended to reflect a customer-
+   * selected event date from the listings page. */
+  availabilityDate?: string;
 }) {
   const palette = SOFT_WEDDING_COLOURWAYS[colourway];
   const hero =
@@ -1582,7 +1590,54 @@ export function GridCardV23SoftWedding({
                 </div>
               )}
 
-              {showSeeProfileCta && (
+              {showSeeProfileCta && availabilityDate && (
+                // Compact row: availability hint on the left + auto-
+                // width pill button on the right. CTA shrinks so the
+                // two affordances can share one line without crowding.
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <span
+                    className={cn(
+                      "inline-flex min-w-0 items-center gap-1.5 text-slate-600",
+                      compact ? "text-[11.5px]" : "text-[12px]",
+                    )}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-500"
+                    />
+                    <span className="truncate">
+                      Sandsynligvis ledig {availabilityDate}
+                    </span>
+                  </span>
+                  <Link
+                    to={href}
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-1 rounded-full border text-slate-900 transition-colors",
+                      ctaProminence === "filled"
+                        ? cn(
+                            "font-semibold shadow-sm",
+                            palette.ctaFilledBg,
+                            palette.ctaFilledBorder,
+                            palette.ctaFilledHover,
+                            compact
+                              ? "px-3 py-1.5 text-[11.5px]"
+                              : "px-3.5 py-1.5 text-[12px]",
+                          )
+                        : cn(
+                            "bg-white font-medium shadow-sm",
+                            palette.ctaBorder,
+                            palette.ctaHover,
+                            compact
+                              ? "px-3 py-1.5 text-[11.5px]"
+                              : "px-3.5 py-1.5 text-[12px]",
+                          ),
+                    )}
+                  >
+                    {ctaLabel} <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              )}
+              {showSeeProfileCta && !availabilityDate && (
                 <Link
                   to={href}
                   className={cn(

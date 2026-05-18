@@ -91,10 +91,10 @@ const VARIANTS: Variant[] = [
         hideStarRating
         showRegion
         showSeeProfileCta
-        ctaLabel="Se profil & bryllupspakker"
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         ctaProminence="filled"
+        availabilityDate="d. 14. juni 2025"
       />
     ),
   },
@@ -119,11 +119,11 @@ const VARIANTS: Variant[] = [
         hideStarRating
         showRegion
         showSeeProfileCta
-        ctaLabel="Se profil & bryllupspakker"
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         colourway="blush"
         ctaProminence="filled"
+        availabilityDate="d. 14. juni 2025"
       />
     ),
   },
@@ -148,11 +148,11 @@ const VARIANTS: Variant[] = [
         hideStarRating
         showRegion
         showSeeProfileCta
-        ctaLabel="Se profil & bryllupspakker"
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         colourway="sage"
         ctaProminence="filled"
+        availabilityDate="d. 14. juni 2025"
       />
     ),
   },
@@ -177,11 +177,11 @@ const VARIANTS: Variant[] = [
         hideStarRating
         showRegion
         showSeeProfileCta
-        ctaLabel="Se profil & bryllupspakker"
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         colourway="champagne"
         ctaProminence="filled"
+        availabilityDate="d. 14. juni 2025"
       />
     ),
   },
