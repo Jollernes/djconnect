@@ -1,5 +1,12 @@
 import { Link } from "react-router-dom";
-import { BadgeCheck, Clock, MapPin, MessageCircle, Star } from "lucide-react";
+import {
+  BadgeCheck,
+  Clock,
+  Disc3,
+  MapPin,
+  MessageCircle,
+  Star,
+} from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -905,8 +912,31 @@ export function GridCardV23SoftWedding({
             if (statStyle === "inline") {
               // Single text line: tiny icons + bold values + grey
               // labels separated by thin slate-300 bullets. No chips,
-              // no badges, no padding boxes. Wraps to two lines only
-              // when the row really cannot fit.
+              // no badges, no padding boxes. The 4th item is a
+              // value-less equipment claim ("Professionelt DJ
+              // Udstyr") rather than the star rating — it reads as a
+              // trust signal of its own without needing a number.
+              const equipmentItem: {
+                icon: React.ReactNode;
+                value?: string;
+                label: string;
+              } = {
+                icon: (
+                  <Disc3
+                    className={cn(
+                      compact ? "h-2.5 w-2.5" : "h-3 w-3",
+                      "text-[#b8884a]",
+                    )}
+                    strokeWidth={1.75}
+                  />
+                ),
+                label: "Professionelt DJ Udstyr",
+              };
+              const inlineItems: Array<{
+                icon: React.ReactNode;
+                value?: string;
+                label: string;
+              }> = [...stats, equipmentItem];
               return (
                 <div
                   className={cn(
@@ -915,7 +945,7 @@ export function GridCardV23SoftWedding({
                     compact ? "text-[10.5px]" : "text-[11.5px]",
                   )}
                 >
-                  {stats4.map((s, i) => (
+                  {inlineItems.map((s, i) => (
                     <span
                       key={s.label}
                       className="inline-flex items-center gap-1 text-slate-600"
@@ -931,10 +961,18 @@ export function GridCardV23SoftWedding({
                       <span className="inline-flex items-center">
                         {s.icon}
                       </span>
-                      <span className="font-semibold text-slate-900">
-                        {s.value}
+                      {s.value && (
+                        <span className="font-semibold text-slate-900">
+                          {s.value}
+                        </span>
+                      )}
+                      <span
+                        className={cn(
+                          s.value ? "text-slate-500" : "text-slate-700",
+                        )}
+                      >
+                        {s.label}
                       </span>
-                      <span className="text-slate-500">{s.label}</span>
                     </span>
                   ))}
                 </div>
