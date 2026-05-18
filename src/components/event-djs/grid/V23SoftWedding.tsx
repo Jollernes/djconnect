@@ -18,13 +18,22 @@ import {
 
 /** Wedding-rings glyph for the BryllupsDJ badge — two slightly-
  * overlapping outline rings in warm champagne / rose-gold. Drawn as
- * inline SVG because lucide-react does not include this symbol. */
-export function WeddingRings({ className }: { className?: string }) {
+ * inline SVG because lucide-react does not include this symbol.
+ * `stroke` defaults to the rose-gold hallmark but can be overridden
+ * so the glyph picks up alternate colourways (blush, sage,
+ * champagne) when used inside the stat row. */
+export function WeddingRings({
+  className,
+  stroke = "#b8884a",
+}: {
+  className?: string;
+  stroke?: string;
+}) {
   return (
     <svg
       viewBox="0 0 26 16"
       fill="none"
-      stroke="#b8884a"
+      stroke={stroke}
       strokeWidth={1.5}
       aria-hidden="true"
       className={className}
@@ -34,6 +43,70 @@ export function WeddingRings({ className }: { className?: string }) {
     </svg>
   );
 }
+
+/** A subtle colour wash applied on top of the (otherwise neutral)
+ * Soft Wedding card. Used to retint the stat-row icons and the CTA
+ * button — and, for `champagne`, the card body itself — without
+ * touching the BryllupsDJ hallmark or the editorial grayscale hero.
+ * Each entry maps to a complete set of tokens so colourway selection
+ * stays a single prop on the parent component. */
+export type SoftWeddingColourway =
+  | "default"
+  | "blush"
+  | "sage"
+  | "champagne";
+
+interface SoftWeddingColourwayTokens {
+  /** Hex used on icon strokes/fills inside the stat row. */
+  accent: string;
+  /** Tailwind class for the card and inner content background. */
+  cardBg: string;
+  /** Border class for the resting state of the "Se profil" CTA. */
+  ctaBorder: string;
+  /** Combined Tailwind hover class for the CTA (border + bg). */
+  ctaHover: string;
+}
+
+export const SOFT_WEDDING_COLOURWAYS: Record<
+  SoftWeddingColourway,
+  SoftWeddingColourwayTokens
+> = {
+  // Existing rose-gold / amber accent. Identity colourway — nothing
+  // shifts when this is selected, so the prop is fully opt-in.
+  default: {
+    accent: "#b8884a",
+    cardBg: "bg-white",
+    ctaBorder: "border-amber-200",
+    ctaHover: "hover:border-amber-300 hover:bg-amber-50",
+  },
+  // Dusty rose. Reads romantic / floral — peony bouquets, blush
+  // tablescapes. Keeps the card bg neutral so the hero photo still
+  // anchors the composition.
+  blush: {
+    accent: "#c08487",
+    cardBg: "bg-white",
+    ctaBorder: "border-[#f0d6d6]",
+    ctaHover: "hover:border-[#e6c2c2] hover:bg-[#fbf2f2]",
+  },
+  // Botanical sage / greenery. A widely-coded modern-wedding
+  // palette (eucalyptus runners, olive). Cool, calm, slightly more
+  // editorial than the warm default.
+  sage: {
+    accent: "#7d8b6e",
+    cardBg: "bg-white",
+    ctaBorder: "border-[#d6dccc]",
+    ctaHover: "hover:border-[#c5ceb6] hover:bg-[#f3f5ee]",
+  },
+  // Warmer luxe champagne. Same family as the default rose-gold but
+  // more saturated and lifted, with the card body itself tinted to
+  // a pale champagne so the whole card reads "warm".
+  champagne: {
+    accent: "#c9a16b",
+    cardBg: "bg-[#fcfaf6]",
+    ctaBorder: "border-[#e8d09e]",
+    ctaHover: "hover:border-[#dfc185] hover:bg-[#f9f1de]",
+  },
+};
 
 /**
  * V23 — Soft Wedding. Premium marketplace listing card with a soft,
@@ -461,6 +534,7 @@ export function GridCardV23SoftWedding({
   statStyle = "default",
   footerStyle = "default",
   ctaLabel = "Se profil",
+  colourway = "default",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -560,7 +634,15 @@ export function GridCardV23SoftWedding({
    * `"Se profil & bryllupspakker"`. The trailing arrow is added
    * automatically by the renderer. */
   ctaLabel?: string;
+  /** Subtle accent retint applied to the stat-row icons and the
+   * "Se profil" CTA — and, for `"champagne"`, the card body itself.
+   * Defaults to `"default"` (existing rose-gold / amber palette).
+   * Other options: `"blush"` (dusty rose), `"sage"` (botanical
+   * green), `"champagne"` (warmer luxe). The BryllupsDJ hallmark
+   * and editorial grayscale hero stay constant across colourways. */
+  colourway?: SoftWeddingColourway;
 }) {
+  const palette = SOFT_WEDDING_COLOURWAYS[colourway];
   const hero =
     heroOverrides?.[dj.id] ||
     dj.equipment_photos[0]?.url ||
@@ -593,7 +675,8 @@ export function GridCardV23SoftWedding({
   return (
     <Card
       className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border border-amber-100/70 bg-white shadow-sm transition-shadow hover:shadow-md",
+        "group flex flex-col overflow-hidden rounded-2xl border border-amber-100/70 shadow-sm transition-shadow hover:shadow-md",
+        palette.cardBg,
       )}
     >
       {/* Hero with soft tint + carved notch for the avatar */}
@@ -691,7 +774,8 @@ export function GridCardV23SoftWedding({
       {/* Content */}
       <div
         className={cn(
-          "flex flex-1 flex-col bg-white",
+          "flex flex-1 flex-col",
+          palette.cardBg,
           compact ? "px-4 pb-4" : "px-5 pb-5",
         )}
         style={{ paddingTop: avatarSize / 2 + (compact ? 10 : 14) }}
@@ -792,10 +876,8 @@ export function GridCardV23SoftWedding({
               {
                 icon: (
                   <BadgeCheck
-                    className={cn(
-                      "fill-[#b8884a] text-white",
-                      compact ? "h-2.5 w-2.5" : "h-3 w-3",
-                    )}
+                    className={compact ? "h-2.5 w-2.5" : "h-3 w-3"}
+                    style={{ fill: palette.accent, color: "#fff" }}
                     strokeWidth={2}
                   />
                 ),
@@ -806,6 +888,7 @@ export function GridCardV23SoftWedding({
                 icon: (
                   <WeddingRings
                     className={compact ? "h-2.5 w-2.5" : "h-3 w-3"}
+                    stroke={palette.accent}
                   />
                 ),
                 value: weddings !== null ? `${weddings}+` : "—",
@@ -814,10 +897,8 @@ export function GridCardV23SoftWedding({
               {
                 icon: (
                   <Clock
-                    className={cn(
-                      compact ? "h-2.5 w-2.5" : "h-3 w-3",
-                      "text-[#b8884a]",
-                    )}
+                    className={compact ? "h-2.5 w-2.5" : "h-3 w-3"}
+                    style={{ color: palette.accent }}
                     strokeWidth={1.75}
                   />
                 ),
@@ -927,10 +1008,8 @@ export function GridCardV23SoftWedding({
               } = {
                 icon: (
                   <Disc3
-                    className={cn(
-                      compact ? "h-2.5 w-2.5" : "h-3 w-3",
-                      "text-[#b8884a]",
-                    )}
+                    className={compact ? "h-2.5 w-2.5" : "h-3 w-3"}
+                    style={{ color: palette.accent }}
                     strokeWidth={1.75}
                     aria-label="Professionelt DJ Udstyr"
                   />
@@ -1478,7 +1557,9 @@ export function GridCardV23SoftWedding({
                 <Link
                   to={href}
                   className={cn(
-                    "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-amber-200 bg-white font-medium text-slate-900 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50",
+                    "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border bg-white font-medium text-slate-900 shadow-sm transition-colors",
+                    palette.ctaBorder,
+                    palette.ctaHover,
                     compact ? "py-2 text-[12.5px]" : "py-2.5 text-[13px]",
                   )}
                 >

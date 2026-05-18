@@ -14,7 +14,10 @@ const config = EVENT_LISTING_CONFIG.wedding;
 type VariantId =
   | "triptych"
   | "soft-wedding-clean"
-  | "soft-wedding-stats-inline";
+  | "soft-wedding-stats-inline"
+  | "soft-wedding-stats-inline-blush"
+  | "soft-wedding-stats-inline-sage"
+  | "soft-wedding-stats-inline-champagne";
 type Density = "3" | "4";
 
 type Variant = {
@@ -91,6 +94,90 @@ const VARIANTS: Variant[] = [
         ctaLabel="Se profil & bryllupspakker"
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-stats-inline-blush",
+    label: "Soft Wedding · Stats · Inline · Blush",
+    blurb:
+      "Colour alt 1 — dusty rose (`#c08487`) replaces the rose-gold accent on the stat-row icons, with a soft pink CTA border (`#f0d6d6`) and a pale blush hover (`#fbf2f2`). Romantic / floral wedding palette (peony, blush tablescapes). Card body and BryllupsDJ hallmark unchanged.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showRegion
+        showSeeProfileCta
+        ctaLabel="Se profil & bryllupspakker"
+        priceIncludes={["5 timer inkl. lyd & lys"]}
+        statStyle="inline"
+        colourway="blush"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-stats-inline-sage",
+    label: "Soft Wedding · Stats · Inline · Sage",
+    blurb:
+      "Colour alt 2 — muted sage (`#7d8b6e`) on the stat-row icons, sage-pale CTA border (`#d6dccc`) and hover (`#f3f5ee`). Botanical / greenery wedding palette (eucalyptus, olive). Cool, calm, modern. Card body and BryllupsDJ hallmark unchanged.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showRegion
+        showSeeProfileCta
+        ctaLabel="Se profil & bryllupspakker"
+        priceIncludes={["5 timer inkl. lyd & lys"]}
+        statStyle="inline"
+        colourway="sage"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-stats-inline-champagne",
+    label: "Soft Wedding · Stats · Inline · Champagne",
+    blurb:
+      "Colour alt 3 — warmer champagne gold (`#c9a16b`) on the stat-row icons, champagne CTA border (`#e8d09e`) + hover (`#f9f1de`), and the card body itself subtly tinted to a pale champagne (`#fcfaf6`) so the whole card reads warm rather than muted brown. Closest to the default palette but lifted in temperature.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showRegion
+        showSeeProfileCta
+        ctaLabel="Se profil & bryllupspakker"
+        priceIncludes={["5 timer inkl. lyd & lys"]}
+        statStyle="inline"
+        colourway="champagne"
       />
     ),
   },
