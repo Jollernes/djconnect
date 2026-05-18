@@ -745,102 +745,141 @@ export function GridCardV23SoftWedding({
           )}
         </div>
 
-        {/* Expertise row. Two compact stats — heuristic weddings count
-         * and the DJ's years-of-experience bracket — separated by a
-         * thin bullet. Each stat has its own small glyph (rose-gold
-         * rings for weddings; outline clock for years) so the
-         * categories read at a glance. */}
+        {/* Three-stat block. One row, three equal columns, thin amber
+         * dividers between. Two stats use a big-number + caption
+         * treatment (weddings, years); the third (response time) is a
+         * two-line description without a big number so the sentence
+         * reads naturally. The whole block replaces the older inline
+         * "X+ brylluper · Y års erfaring" expertise row and the
+         * standalone response-time pill. */}
         {showWeddingsPlayed &&
+          showResponseTime &&
           (() => {
             const weddings = weddingsPlayedFor(dj);
             const years = dj.years_experience;
-            if (weddings === null && !years) return null;
+            const hours = responseHoursFor(dj);
+            const badgeSize = compact ? "h-6 w-6" : "h-7 w-7";
             const iconSize = compact ? "h-3 w-3" : "h-3.5 w-3.5";
+            const valueSize = compact ? "text-[15px]" : "text-[17px]";
+            const labelSize = compact ? "text-[10.5px]" : "text-[11.5px]";
+            const Cell = ({
+              icon,
+              children,
+            }: {
+              icon: React.ReactNode;
+              children: React.ReactNode;
+            }) => (
+              <div
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1.5 text-center",
+                  compact ? "px-1" : "px-2",
+                )}
+              >
+                <span
+                  className={cn(
+                    "inline-flex items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-100",
+                    badgeSize,
+                  )}
+                >
+                  {icon}
+                </span>
+                {children}
+              </div>
+            );
             return (
               <div
                 className={cn(
-                  "mt-2 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-slate-600",
-                  compact ? "text-[11.5px]" : "text-[12.5px]",
+                  "grid grid-cols-3 divide-x divide-amber-100",
+                  compact ? "mt-3" : "mt-4",
                 )}
               >
-                {weddings !== null && (
-                  <span className="inline-flex items-center gap-1.5">
-                    <WeddingRings className={iconSize} />
-                    <span className="font-medium text-slate-700">
-                      {weddings}+ brylluper
-                    </span>
+                {/* Weddings */}
+                <Cell icon={<WeddingRings className={iconSize} />}>
+                  <span
+                    className={cn(
+                      "font-semibold text-slate-900 leading-none",
+                      valueSize,
+                    )}
+                  >
+                    {weddings !== null ? `${weddings}+` : "—"}
                   </span>
-                )}
-                {weddings !== null && years && (
-                  <span aria-hidden="true" className="text-slate-300">
-                    ·
+                  <span className={cn("text-slate-500", labelSize)}>
+                    brylluper
                   </span>
-                )}
-                {years && (
-                  <span className="inline-flex items-center gap-1.5">
+                </Cell>
+                {/* Years experience */}
+                <Cell
+                  icon={
                     <Clock
                       className={cn(iconSize, "text-[#b8884a]")}
                       strokeWidth={1.75}
                     />
-                    <span className="font-medium text-slate-700">
-                      {years} års erfaring
-                    </span>
+                  }
+                >
+                  <span
+                    className={cn(
+                      "font-semibold text-slate-900 leading-none",
+                      valueSize,
+                    )}
+                  >
+                    {years || "—"}
                   </span>
-                )}
+                  <span className={cn("text-slate-500", labelSize)}>
+                    års erfaring
+                  </span>
+                </Cell>
+                {/* Response time — two lines of small text instead of a
+                    big-number treatment, matching the inspiration. */}
+                <Cell
+                  icon={
+                    <MessageCircle
+                      className={cn(iconSize, "text-[#b8884a]")}
+                      strokeWidth={1.75}
+                    />
+                  }
+                >
+                  <span
+                    className={cn(
+                      "leading-snug text-slate-700",
+                      labelSize,
+                    )}
+                  >
+                    Svarer typisk
+                    <br />
+                    inden for {hours} timer
+                  </span>
+                </Cell>
               </div>
             );
           })()}
 
-        {/* Availability chips. Two compact pill chips sit on one row
-         * (with wrap fallback) — response time on the left and the
-         * travel-radius region on the right. Cream backdrop + amber
-         * border keeps them inside the wedding palette without
-         * competing with the BryllupsDJ badge on the hero. */}
-        {(showResponseTime || showRegion) && (
+        {/* Region chip. Single pill row showing the DJ's travel
+         * region ("Kører i hele Sjælland" etc.). Response-time has
+         * moved into the 3-stat block above. */}
+        {showRegion && (
           <div
             className={cn(
-              "flex flex-wrap items-center justify-center gap-1.5",
-              compact ? "mt-2.5" : "mt-3",
+              "flex items-center justify-center",
+              compact ? "mt-3" : "mt-4",
             )}
           >
-            {showResponseTime && (
-              <span
+            <span
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-[#fdfaf3] text-slate-700",
+                compact
+                  ? "px-2.5 py-1 text-[10.5px]"
+                  : "px-3 py-1 text-[11.5px]",
+              )}
+            >
+              <MapPin
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-[#fdfaf3] text-slate-700",
-                  compact
-                    ? "px-2.5 py-1 text-[10.5px]"
-                    : "px-3 py-1 text-[11.5px]",
+                  "text-[#b8884a]",
+                  compact ? "h-3 w-3" : "h-3.5 w-3.5",
                 )}
-              >
-                <MessageCircle
-                  className={cn(
-                    "text-[#b8884a]",
-                    compact ? "h-3 w-3" : "h-3.5 w-3.5",
-                  )}
-                  strokeWidth={1.75}
-                />
-                Svarer typisk inden for {responseHoursFor(dj)} timer
-              </span>
-            )}
-            {showRegion && (
-              <span
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-[#fdfaf3] text-slate-700",
-                  compact
-                    ? "px-2.5 py-1 text-[10.5px]"
-                    : "px-3 py-1 text-[11.5px]",
-                )}
-              >
-                <MapPin
-                  className={cn(
-                    "text-[#b8884a]",
-                    compact ? "h-3 w-3" : "h-3.5 w-3.5",
-                  )}
-                  strokeWidth={1.75}
-                />
-                Kører i hele {regionFor(dj)}
-              </span>
-            )}
+                strokeWidth={1.75}
+              />
+              Kører i hele {regionFor(dj)}
+            </span>
           </div>
         )}
 
