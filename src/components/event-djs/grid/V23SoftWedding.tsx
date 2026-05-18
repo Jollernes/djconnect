@@ -727,10 +727,10 @@ export function GridCardV23SoftWedding({
           (() => {
             const weddings = weddingsPlayedFor(dj);
             const years = dj.years_experience;
-            const badgeSize = compact ? "h-6 w-6" : "h-7 w-7";
-            const iconSize = compact ? "h-3 w-3" : "h-3.5 w-3.5";
-            const valueSize = compact ? "text-[15px]" : "text-[17px]";
-            const labelSize = compact ? "text-[10.5px]" : "text-[11.5px]";
+            const badgeSize = compact ? "h-5 w-5" : "h-6 w-6";
+            const iconSize = compact ? "h-2.5 w-2.5" : "h-3 w-3";
+            const valueSize = compact ? "text-[13.5px]" : "text-[15.5px]";
+            const labelSize = compact ? "text-[10px]" : "text-[11px]";
             const Cell = ({
               icon,
               children,
@@ -740,8 +740,8 @@ export function GridCardV23SoftWedding({
             }) => (
               <div
                 className={cn(
-                  "flex flex-col items-center justify-center gap-1.5 text-center",
-                  compact ? "px-1" : "px-2",
+                  "flex flex-col items-center justify-start gap-1 text-center",
+                  compact ? "px-0.5" : "px-1.5",
                 )}
               >
                 <span
@@ -759,17 +759,19 @@ export function GridCardV23SoftWedding({
               <div
                 className={cn(
                   "grid grid-cols-3 divide-x divide-amber-100",
-                  compact ? "mt-3" : "mt-4",
+                  compact ? "mt-2.5" : "mt-3",
                 )}
               >
-                {/* Verified reviews — takes column 1 so the social
-                    proof reads first. */}
+                {/* Verified reviews — BadgeCheck icon already signals
+                    "verified", so the label can read just "anmeldelser"
+                    on one line, matching the single-line labels of the
+                    other two cells. */}
                 <Cell
                   icon={
                     <BadgeCheck
                       className={cn(
                         "fill-[#b8884a] text-white",
-                        compact ? "h-3.5 w-3.5" : "h-4 w-4",
+                        compact ? "h-3 w-3" : "h-3.5 w-3.5",
                       )}
                       strokeWidth={2}
                     />
@@ -783,14 +785,7 @@ export function GridCardV23SoftWedding({
                   >
                     {ratingCount}
                   </span>
-                  <span
-                    className={cn(
-                      "leading-snug text-slate-500",
-                      labelSize,
-                    )}
-                  >
-                    verificerede
-                    <br />
+                  <span className={cn("text-slate-500", labelSize)}>
                     anmeldelser
                   </span>
                 </Cell>
