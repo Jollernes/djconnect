@@ -78,7 +78,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
       />
     ),
   },
@@ -104,7 +104,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="banner"
       />
     ),
@@ -146,7 +146,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="pills"
       />
     ),
@@ -218,7 +218,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
       />
     ),
@@ -245,7 +245,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="grid4"
       />
     ),
@@ -272,7 +272,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="rating-lead"
       />
     ),
@@ -281,7 +281,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-footer-inline-row",
     label: "Soft Wedding · Footer · Inline-Row",
     blurb:
-      "Alt J — based on the Inline stats variant. Footer collapsed into a single horizontal line: `📍 Sjælland · Fra X kr. · 5 t inkl. mobildiskotek` on the left, compact auto-width pill `[Se profil →]` button on the right. Tightest possible footer.",
+      "Alt J — based on the Inline stats variant. Footer collapsed into a single horizontal line: `📍 Sjælland · Fra X kr. · 5 t inkl. lyd & lys` on the left, compact auto-width pill `[Se profil →]` button on the right. Tightest possible footer.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -299,7 +299,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         footerStyle="inline-row"
       />
@@ -309,7 +309,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-footer-price-lead",
     label: "Soft Wedding · Footer · Price-Lead",
     blurb:
-      "Alt K — based on the Inline stats variant. Price becomes the visual hero: large centred serif `Fra X kr.` under the divider with `5 timer inkl. mobildiskotek` as a small caption beneath. Below that: a single row with the region on the left and a slimmer outline `Se profil →` button on the right.",
+      "Alt K — based on the Inline stats variant. Price becomes the visual hero: large centred serif `Fra X kr.` under the divider with `5 timer inkl. lyd & lys` as a small caption beneath. Below that: a single row with the region on the left and a slimmer outline `Se profil →` button on the right.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -327,7 +327,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         footerStyle="price-lead"
       />
@@ -337,7 +337,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-footer-cta-bar",
     label: "Soft Wedding · Footer · CTA-Bar",
     blurb:
-      "Alt L — based on the Inline stats variant. CTA becomes the visual hero: an amber-filled full-width button reading `Se profil · Fra X kr. →` with the price embedded inside it. Above the button: a single muted caption `📍 Kører i hele Sjælland · 5 timer inkl. mobildiskotek`.",
+      "Alt L — based on the Inline stats variant. CTA becomes the visual hero: an amber-filled full-width button reading `Se profil · Fra X kr. →` with the price embedded inside it. Above the button: a single muted caption `📍 Kører i hele Sjælland · 5 timer inkl. lyd & lys`.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -355,7 +355,7 @@ const VARIANTS: Variant[] = [
         showResponseTime
         showRegion
         showSeeProfileCta
-        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         footerStyle="cta-bar"
       />

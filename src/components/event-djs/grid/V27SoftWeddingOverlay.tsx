@@ -253,7 +253,7 @@ export function GridCardV27SoftWeddingOverlay({
               compact ? "text-[9.5px]" : "text-[10px]",
             )}
           >
-            5 timer inkl. mobildiskotek
+            5 timer inkl. lyd & lys
           </span>
         </div>
 

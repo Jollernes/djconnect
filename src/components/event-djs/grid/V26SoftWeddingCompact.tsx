@@ -244,7 +244,7 @@ export function GridCardV26SoftWeddingCompact({
               compact ? "text-[9px]" : "text-[10px]",
             )}
           >
-            5 timer inkl. mobildiskotek
+            5 timer inkl. lyd & lys
           </span>
         </div>
 

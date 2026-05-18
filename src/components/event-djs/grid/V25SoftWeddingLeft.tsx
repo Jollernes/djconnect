@@ -240,7 +240,7 @@ export function GridCardV25SoftWeddingLeft({
               compact ? "text-[10px]" : "text-[10.5px]",
             )}
           >
-            5 timer inkl. mobildiskotek
+            5 timer inkl. lyd & lys
           </span>
         </div>
 
