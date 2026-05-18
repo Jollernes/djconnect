@@ -26,7 +26,10 @@ type VariantId =
   | "soft-wedding-overlay"
   | "soft-wedding-stats-inline"
   | "soft-wedding-stats-grid4"
-  | "soft-wedding-stats-rating-lead";
+  | "soft-wedding-stats-rating-lead"
+  | "soft-wedding-footer-inline-row"
+  | "soft-wedding-footer-price-lead"
+  | "soft-wedding-footer-cta-bar";
 type Density = "3" | "4";
 
 type Variant = {
@@ -251,7 +254,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-stats-rating-lead",
     label: "Soft Wedding · Stats · Rating-Lead",
     blurb:
-      "Alt I — asymmetric. Star rating rendered as a small cream-amber \"trust chip\" on the left (slightly taller than the other stats), then the three supporting stats flow as compact bullet-separated text on the right. Rating becomes the visual anchor; the other facts read as support.",
+      "Alt I — asymmetric. A small cream-amber \"trust chip\" on the left (now carrying the Pro DJ-udstyr claim), then the three numeric stats flow as compact bullet-separated text on the right. The chip becomes the visual anchor; the other facts read as support.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -271,6 +274,90 @@ const VARIANTS: Variant[] = [
         showSeeProfileCta
         priceIncludes={["5 timer inkl. mobildiskotek"]}
         statStyle="rating-lead"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-footer-inline-row",
+    label: "Soft Wedding · Footer · Inline-Row",
+    blurb:
+      "Alt J — based on the Inline stats variant. Footer collapsed into a single horizontal line: `📍 Sjælland · Fra X kr. · 5 t inkl. mobildiskotek` on the left, compact auto-width pill `[Se profil →]` button on the right. Tightest possible footer.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        statStyle="inline"
+        footerStyle="inline-row"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-footer-price-lead",
+    label: "Soft Wedding · Footer · Price-Lead",
+    blurb:
+      "Alt K — based on the Inline stats variant. Price becomes the visual hero: large centred serif `Fra X kr.` under the divider with `5 timer inkl. mobildiskotek` as a small caption beneath. Below that: a single row with the region on the left and a slimmer outline `Se profil →` button on the right.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        statStyle="inline"
+        footerStyle="price-lead"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-footer-cta-bar",
+    label: "Soft Wedding · Footer · CTA-Bar",
+    blurb:
+      "Alt L — based on the Inline stats variant. CTA becomes the visual hero: an amber-filled full-width button reading `Se profil · Fra X kr. →` with the price embedded inside it. Above the button: a single muted caption `📍 Kører i hele Sjælland · 5 timer inkl. mobildiskotek`.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        statStyle="inline"
+        footerStyle="cta-bar"
       />
     ),
   },

@@ -459,6 +459,7 @@ export function GridCardV23SoftWedding({
   showSeeProfileCta = false,
   priceIncludes,
   statStyle = "default",
+  footerStyle = "default",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -538,6 +539,21 @@ export function GridCardV23SoftWedding({
     | "inline"
     | "grid4"
     | "rating-lead";
+  /** Visual treatment for the location + price + inclusion +
+   * "Se profil" CTA bracket at the bottom of the card.
+   * - `"default"`: utility row (location left / price right),
+   *   inclusion fine print right-aligned underneath, full-width
+   *   pill CTA below.
+   * - `"inline-row"`: single horizontal line with location · price ·
+   *   inclusion as a bullet-separated mini-line on the left, and a
+   *   compact auto-width pill CTA on the right.
+   * - `"price-lead"`: price becomes the visual hero (large serif
+   *   centred under the divider). Region + outline CTA on a row
+   *   below.
+   * - `"cta-bar"`: CTA becomes the visual hero (amber-filled
+   *   full-width button with the price embedded inside it).
+   *   Region + inclusion sit as a small caption above the CTA. */
+  footerStyle?: "default" | "inline-row" | "price-lead" | "cta-bar";
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -1195,75 +1211,266 @@ export function GridCardV23SoftWedding({
           </div>
         )}
 
-        {/* Utility row. Always vertically centered — `priceIncludes`
-            text was previously stacked under the price (forcing
-            `items-start` and desynchronising the location pin from the
-            price baseline in 4-col). Inclusion lines now live in
-            their own dedicated row below this one. */}
-        <div
-          className={cn(
-            "flex items-center justify-between gap-3 border-t border-slate-100",
-            compact ? "mt-4 pt-3" : "mt-5 pt-4",
-          )}
-        >
-          <span
-            className={cn(
-              "inline-flex min-w-0 items-center gap-1.5 text-slate-600",
-              compact ? "text-[12px]" : "text-[12.5px]",
-            )}
-          >
-            <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-            <span className="truncate">
-              {showRegion
-                ? `Kører i hele ${regionFor(dj)}`
-                : dj.base_location}
-            </span>
-          </span>
-          <span
-            className={cn(
-              "shrink-0 whitespace-nowrap font-semibold text-slate-900",
-              compact ? "text-[13px]" : "text-[14px]",
-            )}
-          >
-            {priceFromLabel(dj)}
-          </span>
-        </div>
+        {/* Footer bracket — location + price + inclusion + CTA.
+            Visual treatment selected by `footerStyle`. */}
+        {(() => {
+          const locationText = showRegion
+            ? `Kører i hele ${regionFor(dj)}`
+            : dj.base_location;
+          const priceText = priceFromLabel(dj);
+          const inclusion =
+            priceIncludes && priceIncludes.length > 0
+              ? priceIncludes.join(" · ")
+              : null;
 
-        {/* Price-includes fine print. Subtle right-aligned line(s)
-            beneath the utility row. Kept as its own row so the
-            location/price baseline above stays clean. */}
-        {priceIncludes && priceIncludes.length > 0 && (
-          <div
-            className={cn("text-right", compact ? "mt-1" : "mt-1.5")}
-          >
-            {priceIncludes.map((line) => (
-              <span
-                key={line}
+          if (footerStyle === "inline-row") {
+            // Single horizontal line: location · price · inclusion
+            // on the left, compact auto-width pill CTA on the right.
+            return (
+              <div
                 className={cn(
-                  "block leading-tight text-slate-500",
-                  compact ? "text-[10px]" : "text-[10.5px]",
+                  "flex items-center justify-between gap-3 border-t border-slate-100",
+                  compact ? "mt-4 pt-3" : "mt-5 pt-4",
                 )}
               >
-                {line}
-              </span>
-            ))}
-          </div>
-        )}
+                <div
+                  className={cn(
+                    "inline-flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5 text-slate-600",
+                    compact ? "text-[11px]" : "text-[11.5px]",
+                  )}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
+                    <span className="truncate">{locationText}</span>
+                  </span>
+                  <span aria-hidden="true" className="text-slate-300">
+                    ·
+                  </span>
+                  <span className="whitespace-nowrap font-semibold text-slate-900">
+                    {priceText}
+                  </span>
+                  {inclusion && (
+                    <>
+                      <span
+                        aria-hidden="true"
+                        className="text-slate-300"
+                      >
+                        ·
+                      </span>
+                      <span className="text-slate-500">{inclusion}</span>
+                    </>
+                  )}
+                </div>
+                {showSeeProfileCta && (
+                  <Link
+                    to={href}
+                    className={cn(
+                      "inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-white font-medium text-slate-900 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50",
+                      compact
+                        ? "px-2.5 py-1 text-[11px]"
+                        : "px-3 py-1.5 text-[12px]",
+                    )}
+                  >
+                    Se profil
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                )}
+              </div>
+            );
+          }
 
-        {/* "Se profil →" CTA. Full-width pill button with the same
-         * warm amber palette as the BryllupsDJ badge so it reads as
-         * part of the wedding identity rather than a generic action. */}
-        {showSeeProfileCta && (
-          <Link
-            to={href}
-            className={cn(
-              "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-amber-200 bg-white font-medium text-slate-900 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50",
-              compact ? "py-2 text-[12.5px]" : "py-2.5 text-[13px]",
-            )}
-          >
-            Se profil <span aria-hidden="true">→</span>
-          </Link>
-        )}
+          if (footerStyle === "price-lead") {
+            // Price is the visual hero — large centred serif under
+            // the divider, with the inclusion as a small caption
+            // beneath. Below it: a row with the region on the left
+            // and a slimmer outline CTA on the right.
+            return (
+              <div
+                className={cn(
+                  "border-t border-slate-100",
+                  compact ? "mt-4 pt-3" : "mt-5 pt-4",
+                )}
+              >
+                <div className="text-center">
+                  <div
+                    className={cn(
+                      "font-serif font-semibold leading-none text-slate-900",
+                      compact ? "text-[22px]" : "text-[26px]",
+                    )}
+                  >
+                    {priceText}
+                  </div>
+                  {inclusion && (
+                    <div
+                      className={cn(
+                        "leading-tight text-slate-500",
+                        compact ? "mt-1 text-[10.5px]" : "mt-1.5 text-[11.5px]",
+                      )}
+                    >
+                      {inclusion}
+                    </div>
+                  )}
+                </div>
+                <div
+                  className={cn(
+                    "flex items-center justify-between gap-3",
+                    compact ? "mt-3" : "mt-4",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "inline-flex min-w-0 items-center gap-1.5 text-slate-600",
+                      compact ? "text-[11.5px]" : "text-[12px]",
+                    )}
+                  >
+                    <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                    <span className="truncate">{locationText}</span>
+                  </span>
+                  {showSeeProfileCta && (
+                    <Link
+                      to={href}
+                      className={cn(
+                        "inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-white font-medium text-slate-900 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50",
+                        compact
+                          ? "px-3 py-1 text-[11.5px]"
+                          : "px-3.5 py-1.5 text-[12.5px]",
+                      )}
+                    >
+                      Se profil
+                      <span aria-hidden="true">→</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            );
+          }
+
+          if (footerStyle === "cta-bar") {
+            // CTA is the visual hero — amber-filled full-width
+            // button with the price embedded inside it. The region
+            // + inclusion sit above the button as a small caption.
+            return (
+              <div
+                className={cn(
+                  "border-t border-slate-100",
+                  compact ? "mt-4 pt-3" : "mt-5 pt-4",
+                )}
+              >
+                <div
+                  className={cn(
+                    "flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-center text-slate-500",
+                    compact ? "text-[10.5px]" : "text-[11px]",
+                  )}
+                >
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
+                    <span className="truncate">{locationText}</span>
+                  </span>
+                  {inclusion && (
+                    <>
+                      <span
+                        aria-hidden="true"
+                        className="text-slate-300"
+                      >
+                        ·
+                      </span>
+                      <span>{inclusion}</span>
+                    </>
+                  )}
+                </div>
+                {showSeeProfileCta && (
+                  <Link
+                    to={href}
+                    className={cn(
+                      "mt-2 inline-flex w-full items-center justify-between gap-2 rounded-full border border-amber-300 bg-[#f7e6c2] font-semibold text-slate-900 shadow-sm transition-colors hover:bg-[#f3dca6]",
+                      compact
+                        ? "px-3.5 py-2 text-[12.5px]"
+                        : "px-4 py-2.5 text-[13.5px]",
+                    )}
+                  >
+                    <span className="inline-flex items-center gap-1.5">
+                      Se profil
+                      <span
+                        aria-hidden="true"
+                        className="text-slate-400"
+                      >
+                        ·
+                      </span>
+                      <span className="font-semibold text-slate-900">
+                        {priceText}
+                      </span>
+                    </span>
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                )}
+              </div>
+            );
+          }
+
+          // Default — existing Clean footer (location/price row,
+          // inclusion fine print, full-width pill CTA).
+          return (
+            <>
+              <div
+                className={cn(
+                  "flex items-center justify-between gap-3 border-t border-slate-100",
+                  compact ? "mt-4 pt-3" : "mt-5 pt-4",
+                )}
+              >
+                <span
+                  className={cn(
+                    "inline-flex min-w-0 items-center gap-1.5 text-slate-600",
+                    compact ? "text-[12px]" : "text-[12.5px]",
+                  )}
+                >
+                  <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                  <span className="truncate">{locationText}</span>
+                </span>
+                <span
+                  className={cn(
+                    "shrink-0 whitespace-nowrap font-semibold text-slate-900",
+                    compact ? "text-[13px]" : "text-[14px]",
+                  )}
+                >
+                  {priceText}
+                </span>
+              </div>
+
+              {priceIncludes && priceIncludes.length > 0 && (
+                <div
+                  className={cn(
+                    "text-right",
+                    compact ? "mt-1" : "mt-1.5",
+                  )}
+                >
+                  {priceIncludes.map((line) => (
+                    <span
+                      key={line}
+                      className={cn(
+                        "block leading-tight text-slate-500",
+                        compact ? "text-[10px]" : "text-[10.5px]",
+                      )}
+                    >
+                      {line}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {showSeeProfileCta && (
+                <Link
+                  to={href}
+                  className={cn(
+                    "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-amber-200 bg-white font-medium text-slate-900 shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50",
+                    compact ? "py-2 text-[12.5px]" : "py-2.5 text-[13px]",
+                  )}
+                >
+                  Se profil <span aria-hidden="true">→</span>
+                </Link>
+              )}
+            </>
+          );
+        })()}
 
         {/* Typical response-time — small reassurance line beneath the
          * CTA so it sits last, after the user has seen the price and
