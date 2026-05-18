@@ -1407,8 +1407,11 @@ export function GridCardV23SoftWedding({
             );
           }
 
-          // Default — existing Clean footer (location/price row,
-          // inclusion fine print, full-width pill CTA).
+          // Default — Clean footer (location/price row, inclusion
+          // fine print, full-width pill CTA). Location text is
+          // intentionally smaller than the price so the price
+          // anchors the row, and the inclusion line is pulled flush
+          // under the price so it reads as the price's subtitle.
           return (
             <>
               <div
@@ -1419,11 +1422,11 @@ export function GridCardV23SoftWedding({
               >
                 <span
                   className={cn(
-                    "inline-flex min-w-0 items-center gap-1.5 text-slate-600",
-                    compact ? "text-[12px]" : "text-[12.5px]",
+                    "inline-flex min-w-0 items-center gap-1 text-slate-600",
+                    compact ? "text-[11px]" : "text-[11.5px]",
                   )}
                 >
-                  <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                  <MapPin className="h-3 w-3 shrink-0 text-slate-400" />
                   <span className="truncate">{locationText}</span>
                 </span>
                 <span
@@ -1440,14 +1443,14 @@ export function GridCardV23SoftWedding({
                 <div
                   className={cn(
                     "text-right",
-                    compact ? "mt-1" : "mt-1.5",
+                    compact ? "mt-0" : "mt-0.5",
                   )}
                 >
                   {priceIncludes.map((line) => (
                     <span
                       key={line}
                       className={cn(
-                        "block leading-tight text-slate-500",
+                        "block leading-none text-slate-500",
                         compact ? "text-[10px]" : "text-[10.5px]",
                       )}
                     >
