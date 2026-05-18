@@ -788,7 +788,7 @@ export function GridCardV23SoftWedding({
                   <BadgeCheck
                     className={cn(
                       "fill-[#b8884a] text-white",
-                      compact ? "h-3 w-3" : "h-3.5 w-3.5",
+                      compact ? "h-2.5 w-2.5" : "h-3 w-3",
                     )}
                     strokeWidth={2}
                   />
@@ -1136,21 +1136,24 @@ export function GridCardV23SoftWedding({
             }
 
             // Default — icon-badge grid with thin amber dividers.
-            const badgeSize = compact ? "h-5 w-5" : "h-6 w-6";
-            const valueSize = compact ? "text-[13.5px]" : "text-[15.5px]";
-            const labelSize = compact ? "text-[10px]" : "text-[11px]";
+            // Tightened one notch from the previous rhythm so the
+            // row reads as a compact stat strip rather than a
+            // standalone block.
+            const badgeSize = compact ? "h-4 w-4" : "h-5 w-5";
+            const valueSize = compact ? "text-[12px]" : "text-[14px]";
+            const labelSize = compact ? "text-[9.5px]" : "text-[10.5px]";
             return (
               <div
                 className={cn(
                   "grid grid-cols-3 divide-x divide-amber-100",
-                  compact ? "mt-2.5" : "mt-3",
+                  compact ? "mt-2" : "mt-2.5",
                 )}
               >
                 {stats.map((s) => (
                   <div
                     key={s.label}
                     className={cn(
-                      "flex flex-col items-center justify-start gap-1 text-center",
+                      "flex flex-col items-center justify-start gap-0.5 text-center",
                       compact ? "px-0.5" : "px-1.5",
                     )}
                   >
@@ -1170,7 +1173,12 @@ export function GridCardV23SoftWedding({
                     >
                       {s.value}
                     </span>
-                    <span className={cn("text-slate-500", labelSize)}>
+                    <span
+                      className={cn(
+                        "leading-none text-slate-500",
+                        labelSize,
+                      )}
+                    >
                       {s.label}
                     </span>
                   </div>
