@@ -20,6 +20,7 @@ import {
   priceFromLabel,
   thumbnailsFor,
 } from "./shared";
+import { BryllupsDJBadge } from "./BryllupsDJBadge";
 
 /**
  * V21 — Triptych mosaic. 1 large hero on the left + 2 stacked smaller
@@ -61,6 +62,14 @@ export function GridCardV21Triptych({
               />
             )}
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            {/* Discrete BryllupsDJ trust mark. Smaller, lower-opacity
+                pill — kept subtle so it doesn't compete with the busy
+                triptych mosaic, but still signals the wedding focus. */}
+            <BryllupsDJBadge
+              variant="discrete"
+              compact={compact}
+              className="absolute left-2 top-2"
+            />
             {/* Intro video play badge */}
             <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur">
               <Play className="h-2.5 w-2.5 fill-white text-white" />
