@@ -12,7 +12,7 @@ import {
 /** Wedding-rings glyph for the BryllupsDJ badge — two slightly-
  * overlapping outline rings in warm champagne / rose-gold. Drawn as
  * inline SVG because lucide-react does not include this symbol. */
-function WeddingRings({ className }: { className?: string }) {
+export function WeddingRings({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 26 16"
@@ -370,7 +370,7 @@ function TintOverlay({ tint }: { tint: SoftWeddingTint }) {
 /** Resolve a `boolean | number` grayscale prop into a CSS filter
  * fragment (e.g. `grayscale(60%)`) or `null` if the photo should be
  * left in colour. */
-function grayscaleFilter(g: boolean | number): string | null {
+export function grayscaleFilter(g: boolean | number): string | null {
   const pct = typeof g === "number" ? g : g ? 100 : 0;
   return pct > 0 ? `grayscale(${pct}%)` : null;
 }
@@ -391,14 +391,14 @@ const REGION_BY_CITY: Record<string, string> = {
   Odense: "Fyn",
 };
 
-function regionFor(dj: DJProfileWithRelations): string {
+export function regionFor(dj: DJProfileWithRelations): string {
   return REGION_BY_CITY[dj.base_location] ?? dj.base_location;
 }
 
 /** Heuristic typical-response-time in whole hours. Driven by review
  * count as a proxy for how active the DJ is on the platform. Used
  * by the Clean variant's "Svarer typisk inden for X timer" stat. */
-function responseHoursFor(dj: DJProfileWithRelations): number {
+export function responseHoursFor(dj: DJProfileWithRelations): number {
   const rc = dj.rating_count ?? 0;
   if (rc >= 100) return 2;
   if (rc >= 50) return 4;
@@ -411,7 +411,7 @@ function responseHoursFor(dj: DJProfileWithRelations): number {
  * experience bracket still show different numbers. Result is
  * rounded down to the nearest 10 for a marketing-friendly "X+"
  * read. Returns `null` when we don't have enough signal. */
-function weddingsPlayedFor(dj: DJProfileWithRelations): number | null {
+export function weddingsPlayedFor(dj: DJProfileWithRelations): number | null {
   const base: Record<string, number> = {
     "10+": 200,
     "5-10": 95,
@@ -451,6 +451,7 @@ export function GridCardV23SoftWedding({
   showRegion = false,
   showSeeProfileCta = false,
   priceIncludes,
+  statStyle = "default",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -507,6 +508,14 @@ export function GridCardV23SoftWedding({
    * "inkl. 5 timers spilletid", "inkl. mobil disco") to clarify what
    * the starting price covers. */
   priceIncludes?: string[];
+  /** Visual treatment for the 3-stat block.
+   * - `"default"` (current Clean): icon-badge column grid with thin
+   *   amber dividers.
+   * - `"banner"`: full-bleed cream-amber band with larger numbers
+   *   and an editorial italic label — stats become the visual lead.
+   * - `"pills"`: three compact horizontal chips in a single row,
+   *   reducing card height and giving a lighter trust signal. */
+  statStyle?: "default" | "banner" | "pills";
 }) {
   const hero =
     heroOverrides?.[dj.id] ||
@@ -718,43 +727,152 @@ export function GridCardV23SoftWedding({
           </div>
         )}
 
-        {/* Three-stat block. Three equal columns with thin amber
-         * dividers. Each column: a small amber-ringed icon badge,
-         * a big bold value, and a small caption beneath. Replaces
-         * the older inline expertise row and the standalone reviews
-         * row. */}
+        {/* Three-stat block. Three visual treatments selected by
+         * `statStyle`:
+         *   - "default": icon-badge column grid with thin amber
+         *     dividers (the original Clean look).
+         *   - "banner":  full-bleed cream-amber band with larger
+         *     numbers and italic editorial labels — stats become the
+         *     visual lead under the bio.
+         *   - "pills":   three compact horizontal chips in a single
+         *     row — same data, lighter footprint. */}
         {showWeddingsPlayed &&
           (() => {
             const weddings = weddingsPlayedFor(dj);
             const years = dj.years_experience;
-            const badgeSize = compact ? "h-5 w-5" : "h-6 w-6";
-            const iconSize = compact ? "h-2.5 w-2.5" : "h-3 w-3";
-            const valueSize = compact ? "text-[13.5px]" : "text-[15.5px]";
-            const labelSize = compact ? "text-[10px]" : "text-[11px]";
-            const Cell = ({
-              icon,
-              children,
-            }: {
+            const stats: Array<{
               icon: React.ReactNode;
-              children: React.ReactNode;
-            }) => (
-              <div
-                className={cn(
-                  "flex flex-col items-center justify-start gap-1 text-center",
-                  compact ? "px-0.5" : "px-1.5",
-                )}
-              >
-                <span
+              value: string;
+              label: string;
+            }> = [
+              {
+                icon: (
+                  <BadgeCheck
+                    className={cn(
+                      "fill-[#b8884a] text-white",
+                      compact ? "h-3 w-3" : "h-3.5 w-3.5",
+                    )}
+                    strokeWidth={2}
+                  />
+                ),
+                value: `${ratingCount}`,
+                label: "anmeldelser",
+              },
+              {
+                icon: (
+                  <WeddingRings
+                    className={compact ? "h-2.5 w-2.5" : "h-3 w-3"}
+                  />
+                ),
+                value: weddings !== null ? `${weddings}+` : "—",
+                label: "brylluper",
+              },
+              {
+                icon: (
+                  <Clock
+                    className={cn(
+                      compact ? "h-2.5 w-2.5" : "h-3 w-3",
+                      "text-[#b8884a]",
+                    )}
+                    strokeWidth={1.75}
+                  />
+                ),
+                value: years || "—",
+                label: "års erfaring",
+              },
+            ];
+
+            if (statStyle === "banner") {
+              // Full-bleed cream-amber banner. Negative horizontal
+              // margins cancel the card's content padding so the
+              // banner runs edge-to-edge. Larger numbers + italic
+              // labels make stats the dominant visual under the bio.
+              return (
+                <div
                   className={cn(
-                    "inline-flex items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-100",
-                    badgeSize,
+                    "grid grid-cols-3 items-center bg-gradient-to-b from-[#fdf8ec] to-[#f9efd9]",
+                    compact
+                      ? "-mx-4 mt-4 px-3 py-3"
+                      : "-mx-5 mt-5 px-4 py-4",
                   )}
                 >
-                  {icon}
-                </span>
-                {children}
-              </div>
-            );
+                  {stats.map((s, i) => (
+                    <div
+                      key={s.label}
+                      className={cn(
+                        "flex flex-col items-center gap-0.5 text-center",
+                        i > 0 && "border-l border-amber-200/70",
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "inline-flex items-center justify-center text-[#b8884a]",
+                          compact ? "mb-0.5 h-3" : "mb-1 h-3.5",
+                        )}
+                      >
+                        {s.icon}
+                      </span>
+                      <span
+                        className={cn(
+                          "font-serif font-semibold leading-none text-slate-900",
+                          compact ? "text-[18px]" : "text-[20px]",
+                        )}
+                      >
+                        {s.value}
+                      </span>
+                      <span
+                        className={cn(
+                          "font-serif italic text-slate-500",
+                          compact ? "text-[10.5px]" : "text-[11.5px]",
+                        )}
+                      >
+                        {s.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              );
+            }
+
+            if (statStyle === "pills") {
+              // Three compact horizontal chips on a single row.
+              // Lighter trust signal, less vertical space than the
+              // grid block. Wraps to two rows in 4-col where space
+              // is tighter rather than overflowing.
+              return (
+                <div
+                  className={cn(
+                    "flex flex-wrap items-center justify-center gap-1.5",
+                    compact ? "mt-2.5" : "mt-3",
+                  )}
+                >
+                  {stats.map((s) => (
+                    <span
+                      key={s.label}
+                      className={cn(
+                        "inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-[#fdfaf3] text-slate-700",
+                        compact
+                          ? "px-2 py-1 text-[10.5px]"
+                          : "px-2.5 py-1 text-[11.5px]",
+                      )}
+                    >
+                      <span className="inline-flex items-center text-[#b8884a]">
+                        {s.icon}
+                      </span>
+                      <span className="font-semibold text-slate-900">
+                        {s.value}
+                      </span>
+                      <span className="text-slate-500">{s.label}</span>
+                    </span>
+                  ))}
+                </div>
+              );
+            }
+
+            // Default — icon-badge grid with thin amber dividers.
+            const badgeSize = compact ? "h-5 w-5" : "h-6 w-6";
+            const valueSize = compact ? "text-[13.5px]" : "text-[15.5px]";
+            const labelSize = compact ? "text-[10px]" : "text-[11px]";
             return (
               <div
                 className={cn(
@@ -762,68 +880,35 @@ export function GridCardV23SoftWedding({
                   compact ? "mt-2.5" : "mt-3",
                 )}
               >
-                {/* Verified reviews — BadgeCheck icon already signals
-                    "verified", so the label can read just "anmeldelser"
-                    on one line, matching the single-line labels of the
-                    other two cells. */}
-                <Cell
-                  icon={
-                    <BadgeCheck
+                {stats.map((s) => (
+                  <div
+                    key={s.label}
+                    className={cn(
+                      "flex flex-col items-center justify-start gap-1 text-center",
+                      compact ? "px-0.5" : "px-1.5",
+                    )}
+                  >
+                    <span
                       className={cn(
-                        "fill-[#b8884a] text-white",
-                        compact ? "h-3 w-3" : "h-3.5 w-3.5",
+                        "inline-flex items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-100",
+                        badgeSize,
                       )}
-                      strokeWidth={2}
-                    />
-                  }
-                >
-                  <span
-                    className={cn(
-                      "font-semibold text-slate-900 leading-none",
-                      valueSize,
-                    )}
-                  >
-                    {ratingCount}
-                  </span>
-                  <span className={cn("text-slate-500", labelSize)}>
-                    anmeldelser
-                  </span>
-                </Cell>
-                {/* Weddings count */}
-                <Cell icon={<WeddingRings className={iconSize} />}>
-                  <span
-                    className={cn(
-                      "font-semibold text-slate-900 leading-none",
-                      valueSize,
-                    )}
-                  >
-                    {weddings !== null ? `${weddings}+` : "—"}
-                  </span>
-                  <span className={cn("text-slate-500", labelSize)}>
-                    brylluper
-                  </span>
-                </Cell>
-                {/* Years experience */}
-                <Cell
-                  icon={
-                    <Clock
-                      className={cn(iconSize, "text-[#b8884a]")}
-                      strokeWidth={1.75}
-                    />
-                  }
-                >
-                  <span
-                    className={cn(
-                      "font-semibold text-slate-900 leading-none",
-                      valueSize,
-                    )}
-                  >
-                    {years || "—"}
-                  </span>
-                  <span className={cn("text-slate-500", labelSize)}>
-                    års erfaring
-                  </span>
-                </Cell>
+                    >
+                      {s.icon}
+                    </span>
+                    <span
+                      className={cn(
+                        "font-semibold leading-none text-slate-900",
+                        valueSize,
+                      )}
+                    >
+                      {s.value}
+                    </span>
+                    <span className={cn("text-slate-500", labelSize)}>
+                      {s.label}
+                    </span>
+                  </div>
+                ))}
               </div>
             );
           })()}

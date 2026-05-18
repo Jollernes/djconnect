@@ -6,12 +6,18 @@ import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { EVENT_LISTING_CONFIG } from "@/lib/eventDJsContent";
 import { GridCardV21Triptych } from "@/components/event-djs/grid/V21Triptych";
 import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
+import { GridCardV24SoftWeddingSide } from "@/components/event-djs/grid/V24SoftWeddingSide";
 import type { DJProfileWithRelations } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
 const config = EVENT_LISTING_CONFIG.wedding;
 
-type VariantId = "triptych" | "soft-wedding-clean";
+type VariantId =
+  | "triptych"
+  | "soft-wedding-clean"
+  | "soft-wedding-banner"
+  | "soft-wedding-side"
+  | "soft-wedding-pills";
 type Density = "3" | "4";
 
 type Variant = {
@@ -61,6 +67,75 @@ const VARIANTS: Variant[] = [
         showRegion
         showSeeProfileCta
         priceIncludes={["5 timer inkl. mobildiskotek"]}
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-banner",
+    label: "Soft Wedding · Banner",
+    blurb:
+      "Alt A — same Clean recipe, but the 3-stat row is restyled as a full-bleed cream-amber banner with larger serif numbers and italic editorial labels. Stats become the visual lead under the bio. Bio length preserved at 3 lines.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        statStyle="banner"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-side",
+    label: "Soft Wedding · Side",
+    blurb:
+      "Alt B — horizontal layout. Hero (with the avatar carved into its right edge) sits on the left ~45%, all text content (name → full 3-line bio → 3-stat row → region/price → Se profil CTA → response time) flows on the right. Stacks back to vertical on mobile. Bio length preserved.",
+    count3: 4,
+    count4: 6,
+    render: (dj, density) => (
+      <GridCardV24SoftWeddingSide
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-pills",
+    label: "Soft Wedding · Pills",
+    blurb:
+      "Alt C — same Clean recipe, but the 3-stat row is restyled as three compact horizontal chips on a single row (icon · value · label). Lighter trust signal, less vertical real-estate than the icon-badge grid. Bio length preserved at 3 lines.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showResponseTime
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. mobildiskotek"]}
+        statStyle="pills"
       />
     ),
   },
