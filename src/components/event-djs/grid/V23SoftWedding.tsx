@@ -681,83 +681,52 @@ export function GridCardV23SoftWedding({
           );
         })()}
 
-        {/* Rating row. When stars are hidden we still reserve the same
-            vertical box (matched to the star glyph height) so that
-            re-enabling stars in the future does not cause layout shift. */}
-        <div
-          className={cn(
-            "mt-2 flex items-center justify-center gap-1.5",
-            compact ? "min-h-[14px]" : "min-h-[16px]",
-          )}
-        >
-          {hideStarRating ? (
+        {/* Rating row. Only rendered when stars are shown; when
+            `hideStarRating` is true the row is omitted entirely
+            because the verified-reviews count lives inside the 3-stat
+            block below instead. */}
+        {!hideStarRating && (
+          <div className="mt-2 flex items-center justify-center gap-1.5">
+            <span className="inline-flex items-center gap-0.5">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Star
+                  key={i}
+                  className={cn(
+                    compact ? "h-3.5 w-3.5" : "h-4 w-4",
+                    "fill-[#ff8a3d] text-[#ff8a3d]",
+                  )}
+                  strokeWidth={1.5}
+                />
+              ))}
+            </span>
             <span
               className={cn(
-                "inline-flex items-center gap-1.5 text-slate-600",
-                compact ? "text-[12.5px]" : "text-[13.5px]",
+                "font-semibold text-slate-900",
+                compact ? "text-[12px]" : "text-[13px]",
               )}
             >
-              <BadgeCheck
-                className={cn(
-                  "fill-[#b8884a] text-white",
-                  compact ? "h-4 w-4" : "h-[18px] w-[18px]",
-                )}
-                strokeWidth={2}
-              />
-              <span>
-                <span className="font-medium text-slate-900">{ratingCount}</span>{" "}
-                {ratingCount === 1
-                  ? "verificeret anmeldelse"
-                  : "verificerede anmeldelser"}
-              </span>
+              {ratingValue}
             </span>
-          ) : (
-            <>
-              <span className="inline-flex items-center gap-0.5">
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      compact ? "h-3.5 w-3.5" : "h-4 w-4",
-                      "fill-[#ff8a3d] text-[#ff8a3d]",
-                    )}
-                    strokeWidth={1.5}
-                  />
-                ))}
-              </span>
-              <span
-                className={cn(
-                  "font-semibold text-slate-900",
-                  compact ? "text-[12px]" : "text-[13px]",
-                )}
-              >
-                {ratingValue}
-              </span>
-              <span
-                className={cn(
-                  "text-slate-500",
-                  compact ? "text-[11.5px]" : "text-[12.5px]",
-                )}
-              >
-                ({ratingCount})
-              </span>
-            </>
-          )}
-        </div>
+            <span
+              className={cn(
+                "text-slate-500",
+                compact ? "text-[11.5px]" : "text-[12.5px]",
+              )}
+            >
+              ({ratingCount})
+            </span>
+          </div>
+        )}
 
-        {/* Three-stat block. One row, three equal columns, thin amber
-         * dividers between. Two stats use a big-number + caption
-         * treatment (weddings, years); the third (response time) is a
-         * two-line description without a big number so the sentence
-         * reads naturally. The whole block replaces the older inline
-         * "X+ brylluper · Y års erfaring" expertise row and the
-         * standalone response-time pill. */}
+        {/* Three-stat block. Three equal columns with thin amber
+         * dividers. Each column: a small amber-ringed icon badge,
+         * a big bold value, and a small caption beneath. Replaces
+         * the older inline expertise row and the standalone reviews
+         * row. */}
         {showWeddingsPlayed &&
-          showResponseTime &&
           (() => {
             const weddings = weddingsPlayedFor(dj);
             const years = dj.years_experience;
-            const hours = responseHoursFor(dj);
             const badgeSize = compact ? "h-6 w-6" : "h-7 w-7";
             const iconSize = compact ? "h-3 w-3" : "h-3.5 w-3.5";
             const valueSize = compact ? "text-[15px]" : "text-[17px]";
@@ -793,7 +762,39 @@ export function GridCardV23SoftWedding({
                   compact ? "mt-3" : "mt-4",
                 )}
               >
-                {/* Weddings */}
+                {/* Verified reviews — takes column 1 so the social
+                    proof reads first. */}
+                <Cell
+                  icon={
+                    <BadgeCheck
+                      className={cn(
+                        "fill-[#b8884a] text-white",
+                        compact ? "h-3.5 w-3.5" : "h-4 w-4",
+                      )}
+                      strokeWidth={2}
+                    />
+                  }
+                >
+                  <span
+                    className={cn(
+                      "font-semibold text-slate-900 leading-none",
+                      valueSize,
+                    )}
+                  >
+                    {ratingCount}
+                  </span>
+                  <span
+                    className={cn(
+                      "leading-snug text-slate-500",
+                      labelSize,
+                    )}
+                  >
+                    verificerede
+                    <br />
+                    anmeldelser
+                  </span>
+                </Cell>
+                {/* Weddings count */}
                 <Cell icon={<WeddingRings className={iconSize} />}>
                   <span
                     className={cn(
@@ -828,60 +829,9 @@ export function GridCardV23SoftWedding({
                     års erfaring
                   </span>
                 </Cell>
-                {/* Response time — two lines of small text instead of a
-                    big-number treatment, matching the inspiration. */}
-                <Cell
-                  icon={
-                    <MessageCircle
-                      className={cn(iconSize, "text-[#b8884a]")}
-                      strokeWidth={1.75}
-                    />
-                  }
-                >
-                  <span
-                    className={cn(
-                      "leading-snug text-slate-700",
-                      labelSize,
-                    )}
-                  >
-                    Svarer typisk
-                    <br />
-                    inden for {hours} timer
-                  </span>
-                </Cell>
               </div>
             );
           })()}
-
-        {/* Region chip. Single pill row showing the DJ's travel
-         * region ("Kører i hele Sjælland" etc.). Response-time has
-         * moved into the 3-stat block above. */}
-        {showRegion && (
-          <div
-            className={cn(
-              "flex items-center justify-center",
-              compact ? "mt-3" : "mt-4",
-            )}
-          >
-            <span
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-[#fdfaf3] text-slate-700",
-                compact
-                  ? "px-2.5 py-1 text-[10.5px]"
-                  : "px-3 py-1 text-[11.5px]",
-              )}
-            >
-              <MapPin
-                className={cn(
-                  "text-[#b8884a]",
-                  compact ? "h-3 w-3" : "h-3.5 w-3.5",
-                )}
-                strokeWidth={1.75}
-              />
-              Kører i hele {regionFor(dj)}
-            </span>
-          </div>
-        )}
 
         {/* Event-type pill tags */}
         {!hideEventTypes && tagList.length > 0 && (
@@ -932,7 +882,11 @@ export function GridCardV23SoftWedding({
             )}
           >
             <MapPin className="h-3.5 w-3.5 text-slate-400" />
-            <span className="truncate">{dj.base_location}</span>
+            <span className="truncate">
+              {showRegion
+                ? `Kører i hele ${regionFor(dj)}`
+                : dj.base_location}
+            </span>
           </span>
           <div className="flex flex-col items-end gap-0.5">
             <span
@@ -970,6 +924,27 @@ export function GridCardV23SoftWedding({
           >
             Se profil <span aria-hidden="true">→</span>
           </Link>
+        )}
+
+        {/* Typical response-time — small reassurance line beneath the
+         * CTA so it sits last, after the user has seen the price and
+         * the action. */}
+        {showResponseTime && (
+          <div
+            className={cn(
+              "flex items-center justify-center gap-1.5 text-slate-500",
+              compact ? "mt-2 text-[11px]" : "mt-2.5 text-[11.5px]",
+            )}
+          >
+            <MessageCircle
+              className={cn(
+                "text-[#b8884a]",
+                compact ? "h-3 w-3" : "h-3.5 w-3.5",
+              )}
+              strokeWidth={1.75}
+            />
+            <span>Svarer typisk inden for {responseHoursFor(dj)} timer</span>
+          </div>
         )}
       </div>
     </Card>
