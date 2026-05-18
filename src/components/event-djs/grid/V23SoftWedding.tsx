@@ -61,10 +61,20 @@ interface SoftWeddingColourwayTokens {
   accent: string;
   /** Tailwind class for the card and inner content background. */
   cardBg: string;
-  /** Border class for the resting state of the "Se profil" CTA. */
+  /** Border class for the resting state of the ghost "Se profil"
+   * CTA (white bg, faint border). */
   ctaBorder: string;
-  /** Combined Tailwind hover class for the CTA (border + bg). */
+  /** Combined Tailwind hover class for the ghost CTA
+   * (border + bg). */
   ctaHover: string;
+  /** Background class for the resting state of the filled
+   * "Se profil" CTA (visible warm colour fill). */
+  ctaFilledBg: string;
+  /** Border class for the filled CTA's resting state. Slightly
+   * darker than `ctaBorder` so the fill has a defined edge. */
+  ctaFilledBorder: string;
+  /** Hover bg class for the filled CTA (border stays put). */
+  ctaFilledHover: string;
 }
 
 export const SOFT_WEDDING_COLOURWAYS: Record<
@@ -78,6 +88,9 @@ export const SOFT_WEDDING_COLOURWAYS: Record<
     cardBg: "bg-white",
     ctaBorder: "border-amber-200",
     ctaHover: "hover:border-amber-300 hover:bg-amber-50",
+    ctaFilledBg: "bg-[#f7e6c2]",
+    ctaFilledBorder: "border-amber-300",
+    ctaFilledHover: "hover:bg-[#f3dca6]",
   },
   // Dusty rose. Reads romantic / floral — peony bouquets, blush
   // tablescapes. Keeps the card bg neutral so the hero photo still
@@ -87,6 +100,9 @@ export const SOFT_WEDDING_COLOURWAYS: Record<
     cardBg: "bg-white",
     ctaBorder: "border-[#f0d6d6]",
     ctaHover: "hover:border-[#e6c2c2] hover:bg-[#fbf2f2]",
+    ctaFilledBg: "bg-[#e6c2c2]",
+    ctaFilledBorder: "border-[#d9a8a8]",
+    ctaFilledHover: "hover:bg-[#dbb3b3]",
   },
   // Botanical sage / greenery. A widely-coded modern-wedding
   // palette (eucalyptus runners, olive). Cool, calm, slightly more
@@ -96,6 +112,9 @@ export const SOFT_WEDDING_COLOURWAYS: Record<
     cardBg: "bg-white",
     ctaBorder: "border-[#d6dccc]",
     ctaHover: "hover:border-[#c5ceb6] hover:bg-[#f3f5ee]",
+    ctaFilledBg: "bg-[#c5ceb6]",
+    ctaFilledBorder: "border-[#a8b596]",
+    ctaFilledHover: "hover:bg-[#b9c4a8]",
   },
   // Warmer luxe champagne. Same family as the default rose-gold but
   // more saturated and lifted, with the card body itself tinted to
@@ -105,6 +124,9 @@ export const SOFT_WEDDING_COLOURWAYS: Record<
     cardBg: "bg-[#fcfaf6]",
     ctaBorder: "border-[#e8d09e]",
     ctaHover: "hover:border-[#dfc185] hover:bg-[#f9f1de]",
+    ctaFilledBg: "bg-[#e8d09e]",
+    ctaFilledBorder: "border-[#dfc185]",
+    ctaFilledHover: "hover:bg-[#dfc185]",
   },
 };
 
@@ -535,6 +557,7 @@ export function GridCardV23SoftWedding({
   footerStyle = "default",
   ctaLabel = "Se profil",
   colourway = "default",
+  ctaProminence = "ghost",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -641,6 +664,12 @@ export function GridCardV23SoftWedding({
    * green), `"champagne"` (warmer luxe). The BryllupsDJ hallmark
    * and editorial grayscale hero stay constant across colourways. */
   colourway?: SoftWeddingColourway;
+  /** Visual weight of the "Se profil" CTA. Defaults to `"ghost"`
+   * (white bg + faint outline pill — quiet secondary affordance).
+   * `"filled"` switches to a warm colour-filled pill (palette-driven)
+   * with a slightly darker border, semibold text, and a softer lift
+   * shadow — turns the CTA into the visual end-anchor of the card. */
+  ctaProminence?: "ghost" | "filled";
 }) {
   const palette = SOFT_WEDDING_COLOURWAYS[colourway];
   const hero =
@@ -1557,10 +1586,27 @@ export function GridCardV23SoftWedding({
                 <Link
                   to={href}
                   className={cn(
-                    "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border bg-white font-medium text-slate-900 shadow-sm transition-colors",
-                    palette.ctaBorder,
-                    palette.ctaHover,
-                    compact ? "py-2 text-[12.5px]" : "py-2.5 text-[13px]",
+                    "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border text-slate-900 transition-colors",
+                    ctaProminence === "filled"
+                      ? cn(
+                          // Filled treatment: warm palette-driven fill,
+                          // slightly darker border, semibold text + a
+                          // touch more padding + softer lift shadow so
+                          // it reads as the visual end-anchor of the
+                          // card rather than a ghost secondary action.
+                          "font-semibold shadow-md",
+                          palette.ctaFilledBg,
+                          palette.ctaFilledBorder,
+                          palette.ctaFilledHover,
+                          compact ? "py-2.5 text-[13px]" : "py-3 text-[13.5px]",
+                        )
+                      : cn(
+                          // Ghost treatment: white bg + faint outline.
+                          "bg-white font-medium shadow-sm",
+                          palette.ctaBorder,
+                          palette.ctaHover,
+                          compact ? "py-2 text-[12.5px]" : "py-2.5 text-[13px]",
+                        ),
                   )}
                 >
                   {ctaLabel} <span aria-hidden="true">→</span>

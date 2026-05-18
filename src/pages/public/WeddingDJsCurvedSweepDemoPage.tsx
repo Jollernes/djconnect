@@ -94,6 +94,7 @@ const VARIANTS: Variant[] = [
         ctaLabel="Se profil & bryllupspakker"
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
+        ctaProminence="filled"
       />
     ),
   },
@@ -122,6 +123,7 @@ const VARIANTS: Variant[] = [
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         colourway="blush"
+        ctaProminence="filled"
       />
     ),
   },
@@ -150,6 +152,7 @@ const VARIANTS: Variant[] = [
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         colourway="sage"
+        ctaProminence="filled"
       />
     ),
   },
@@ -178,6 +181,7 @@ const VARIANTS: Variant[] = [
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
         colourway="champagne"
+        ctaProminence="filled"
       />
     ),
   },
