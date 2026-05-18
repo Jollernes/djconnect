@@ -860,43 +860,52 @@ export function GridCardV23SoftWedding({
           </div>
         )}
 
-        {/* Utility row */}
+        {/* Utility row. Always vertically centered — `priceIncludes`
+            text was previously stacked under the price (forcing
+            `items-start` and desynchronising the location pin from the
+            price baseline in 4-col). Inclusion lines now live in
+            their own dedicated row below this one. */}
         <div
           className={cn(
-            "flex justify-between gap-3 border-t border-slate-100",
-            priceIncludes && priceIncludes.length > 0
-              ? "items-start"
-              : "items-center",
+            "flex items-center justify-between gap-3 border-t border-slate-100",
             compact ? "mt-4 pt-3" : "mt-5 pt-4",
           )}
         >
           <span
             className={cn(
-              "inline-flex items-center gap-1.5 text-slate-600",
+              "inline-flex min-w-0 items-center gap-1.5 text-slate-600",
               compact ? "text-[12px]" : "text-[12.5px]",
             )}
           >
-            <MapPin className="h-3.5 w-3.5 text-slate-400" />
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
             <span className="truncate">
               {showRegion
                 ? `Kører i hele ${regionFor(dj)}`
                 : dj.base_location}
             </span>
           </span>
-          <div className="flex flex-col items-end gap-0.5">
-            <span
-              className={cn(
-                "font-semibold text-slate-900",
-                compact ? "text-[13px]" : "text-[14px]",
-              )}
-            >
-              {priceFromLabel(dj)}
-            </span>
-            {priceIncludes?.map((line) => (
+          <span
+            className={cn(
+              "shrink-0 whitespace-nowrap font-semibold text-slate-900",
+              compact ? "text-[13px]" : "text-[14px]",
+            )}
+          >
+            {priceFromLabel(dj)}
+          </span>
+        </div>
+
+        {/* Price-includes fine print. Subtle right-aligned line(s)
+            beneath the utility row. Kept as its own row so the
+            location/price baseline above stays clean. */}
+        {priceIncludes && priceIncludes.length > 0 && (
+          <div
+            className={cn("text-right", compact ? "mt-1" : "mt-1.5")}
+          >
+            {priceIncludes.map((line) => (
               <span
                 key={line}
                 className={cn(
-                  "leading-tight text-slate-500",
+                  "block leading-tight text-slate-500",
                   compact ? "text-[10px]" : "text-[10.5px]",
                 )}
               >
@@ -904,7 +913,7 @@ export function GridCardV23SoftWedding({
               </span>
             ))}
           </div>
-        </div>
+        )}
 
         {/* "Se profil →" CTA. Full-width pill button with the same
          * warm amber palette as the BryllupsDJ badge so it reads as
