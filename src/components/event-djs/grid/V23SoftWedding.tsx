@@ -3,8 +3,10 @@ import {
   BadgeCheck,
   Clock,
   Disc3,
+  Heart,
   MapPin,
   MessageCircle,
+  Play,
   Star,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -13,7 +15,9 @@ import type { DJProfileWithRelations } from "@/types/domain";
 import {
   djHref,
   eventTypesLine,
+  photoCountFor,
   priceFromLabel,
+  thumbnailsFor,
 } from "./shared";
 
 /** Wedding-rings glyph for the BryllupsDJ badge — two slightly-
@@ -559,6 +563,7 @@ export function GridCardV23SoftWedding({
   colourway = "default",
   ctaProminence = "ghost",
   availabilityDate,
+  photoLayout = "carved",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -678,6 +683,15 @@ export function GridCardV23SoftWedding({
    * pill button on the right. Intended to reflect a customer-
    * selected event date from the listings page. */
   availabilityDate?: string;
+  /** Photo treatment above the content body. Defaults to `"carved"`
+   * (single hero photo with the circular avatar carved into the
+   * lower-middle via a radial mask — the Soft Wedding hallmark).
+   * `"triptych"` swaps in the Triptych mosaic: 1 large hero on the
+   * left + 3 stacked thumbnails on the right with intro-video play
+   * badge + image-count overlay + a small B&W avatar overlapping the
+   * seam between the panes. The content body below is identical
+   * across both layouts. */
+  photoLayout?: "carved" | "triptych";
 }) {
   const palette = SOFT_WEDDING_COLOURWAYS[colourway];
   const hero =
@@ -716,7 +730,154 @@ export function GridCardV23SoftWedding({
         palette.cardBg,
       )}
     >
+      {/* Hero. Two layouts: the default `"carved"` is a single hero
+          photo with the circular avatar carved into its lower edge
+          via a radial mask. The `"triptych"` layout swaps in the V21
+          mosaic — 1 hero + 3 stacked thumbnails + intro-video play
+          badge + image-count overlay + a small B&W avatar overlapping
+          the seam between panes. The BryllupsDJ hallmark sits in the
+          same top-left position in both. */}
+      {photoLayout === "triptych" && (
+        <div className={cn("relative w-full pb-0", compact ? "p-2" : "p-3")}>
+          <div
+            className={cn(
+              "grid grid-cols-[1.55fr_1fr]",
+              compact ? "gap-1" : "gap-1.5",
+            )}
+          >
+            {/* Hero (left, 3:4) */}
+            <Link
+              to={href}
+              className="relative block aspect-[3/4] w-full overflow-hidden rounded-lg bg-amber-50"
+            >
+              {hero && (
+                <img
+                  src={hero}
+                  alt={dj.stage_name}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  style={{
+                    filter:
+                      [
+                        tintFilter(tint),
+                        grayscaleFilter(heroGrayscale),
+                      ]
+                        .filter(Boolean)
+                        .join(" ") || undefined,
+                  }}
+                  loading="lazy"
+                />
+              )}
+              <TintOverlay tint={tint} />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+              {/* BryllupsDJ hallmark — same cream/amber pill as the
+                  carved layout, just sized down a touch to suit the
+                  narrower triptych hero. */}
+              <span
+                className={cn(
+                  "absolute left-2 top-2 inline-flex items-center rounded-full bg-white/95 font-sans font-medium uppercase text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
+                  compact
+                    ? "gap-1 px-2 py-0.5 text-[9px] tracking-[0.12em]"
+                    : "gap-1 px-2.5 py-1 text-[10px] tracking-[0.14em]",
+                )}
+              >
+                <WeddingRings
+                  className={compact ? "h-2.5 w-[18px]" : "h-3 w-[20px]"}
+                />
+                BryllupsDJ
+              </span>
+              {/* Intro video play badge — bottom-left of the hero. */}
+              <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur">
+                <Play className="h-2.5 w-2.5 fill-white text-white" />
+                1:00
+              </span>
+            </Link>
+            {/* Three stacked thumbnails on the right. The wrapper is a
+                relative grid item that stretches to the row's height
+                (locked by the hero's 3:4 aspect); the inner absolute
+                grid divides that height into three equal rows so the
+                thumbs never inflate the row taller than the hero. */}
+            <div className="relative">
+              <div
+                className={cn(
+                  "absolute inset-0 grid grid-rows-3",
+                  compact ? "gap-1" : "gap-1.5",
+                )}
+              >
+                {[1, 2, 3].map((idx) => {
+                  const thumbs = thumbnailsFor(dj, 4);
+                  const photoCount = photoCountFor(dj);
+                  const src = thumbs[idx];
+                  const isLast = idx === 3;
+                  return (
+                    <Link
+                      key={idx}
+                      to={href}
+                      className="relative block w-full overflow-hidden rounded-lg bg-amber-50"
+                    >
+                      {src && (
+                        <img
+                          src={src}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          style={{
+                            filter:
+                              grayscaleFilter(heroGrayscale) || undefined,
+                          }}
+                          loading="lazy"
+                        />
+                      )}
+                      {isLast && (
+                        <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-[12px] font-semibold text-white">
+                          +{Math.max(photoCount - 4, 1)}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          {/* Favourite heart, top-right of the mosaic frame. */}
+          <button
+            type="button"
+            aria-label="Tilf\u00f8j til favoritter"
+            className="absolute right-5 top-5 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-slate-500 shadow-sm backdrop-blur transition-colors hover:text-rose-500"
+          >
+            <Heart className="h-3.5 w-3.5" />
+          </button>
+          {/* Small B&W avatar overlapping the seam between hero and
+              thumbnails. Card body bg is read into the ring so the
+              avatar feels carved into the frame regardless of
+              colourway. */}
+          <span
+            className={cn(
+              "absolute left-1/2 block -translate-x-1/2 overflow-hidden rounded-full ring-2",
+              colourway === "champagne" ? "ring-[#fcfaf6]" : "ring-white",
+              compact ? "bottom-[-16px] h-10 w-10" : "bottom-[-18px] h-11 w-11",
+            )}
+            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}
+          >
+            {dj.profile.avatar_url ? (
+              <img
+                src={dj.profile.avatar_url}
+                alt=""
+                className="h-full w-full object-cover"
+                style={{
+                  filter: "grayscale(100%) contrast(1.1)",
+                }}
+              />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center bg-slate-700 text-[11px] font-bold text-white">
+                {(dj.profile.full_name || dj.stage_name)
+                  .slice(0, 2)
+                  .toUpperCase()}
+              </span>
+            )}
+          </span>
+        </div>
+      )}
       {/* Hero with soft tint + carved notch for the avatar */}
+      {photoLayout === "carved" && (
       <div className="relative">
         <Link
           to={href}
@@ -807,6 +968,7 @@ export function GridCardV23SoftWedding({
           )}
         </span>
       </div>
+      )}
 
       {/* Content */}
       <div
@@ -815,7 +977,16 @@ export function GridCardV23SoftWedding({
           palette.cardBg,
           compact ? "px-4 pb-4" : "px-5 pb-5",
         )}
-        style={{ paddingTop: avatarSize / 2 + (compact ? 10 : 14) }}
+        style={{
+          // Carved layout: clear the half of the avatar that spills
+          // into the content area. Triptych layout: the small B&W
+          // avatar overlaps the seam (a few px into the content), so
+          // we just need a small clearance — no avatarSize math.
+          paddingTop:
+            photoLayout === "triptych"
+              ? compact ? 24 : 28
+              : avatarSize / 2 + (compact ? 10 : 14),
+        }}
       >
         {/* Name + subtitle */}
         <h3

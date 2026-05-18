@@ -17,7 +17,8 @@ type VariantId =
   | "soft-wedding-stats-inline"
   | "soft-wedding-stats-inline-blush"
   | "soft-wedding-stats-inline-sage"
-  | "soft-wedding-stats-inline-champagne";
+  | "soft-wedding-stats-inline-champagne"
+  | "soft-wedding-triptych";
 type Density = "3" | "4";
 
 type Variant = {
@@ -182,6 +183,35 @@ const VARIANTS: Variant[] = [
         colourway="champagne"
         ctaProminence="filled"
         availabilityDate="d. 14. juni 2025"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-triptych",
+    label: "Soft Wedding · Triptych",
+    blurb:
+      "Hybrid — Triptych's photo mosaic (1 large hero + 3 stacked thumbnails with intro-video play badge + image-count overlay + small B&W avatar overlapping the seam) wears the Soft Wedding · Stats · Inline content body: BryllupsDJ hallmark, serif name + 3-line bio, inline stat row (anmeldelser · brylluper · års erfaring · Pro DJ-udstyr), and the compact CTA row with the availability hint.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. lyd & lys"]}
+        statStyle="inline"
+        ctaProminence="filled"
+        availabilityDate="d. 14. juni 2025"
+        photoLayout="triptych"
       />
     ),
   },
