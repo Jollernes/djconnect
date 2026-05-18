@@ -415,6 +415,7 @@ export function GridCardV23SoftWedding({
   fontStyle = "serif",
   showWeddingsPlayed = false,
   hideEventTypes = false,
+  hideStarRating = false,
   priceIncludes,
 }: {
   dj: DJProfileWithRelations;
@@ -453,6 +454,11 @@ export function GridCardV23SoftWedding({
   /** When true, the event-type pill row (Bryllup · Fest · …) is
    * omitted entirely. */
   hideEventTypes?: boolean;
+  /** When true, hide the orange star glyphs and numeric rating and
+   * show only "X anmeldelser" instead. The row still reserves the
+   * vertical space the stars would occupy, so a future re-enable does
+   * not cause layout shift. */
+  hideStarRating?: boolean;
   /** Optional small inclusion lines rendered under the price (e.g.
    * "inkl. 5 timers spilletid", "inkl. mobil disco") to clarify what
    * the starting price covers. */
@@ -631,36 +637,56 @@ export function GridCardV23SoftWedding({
           );
         })()}
 
-        {/* Rating */}
-        <div className="mt-2 flex items-center justify-center gap-1.5">
-          <span className="inline-flex items-center gap-0.5">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <Star
-                key={i}
+        {/* Rating row. When stars are hidden we still reserve the same
+            vertical box (matched to the star glyph height) so that
+            re-enabling stars in the future does not cause layout shift. */}
+        <div
+          className={cn(
+            "mt-2 flex items-center justify-center gap-1.5",
+            compact ? "min-h-[14px]" : "min-h-[16px]",
+          )}
+        >
+          {hideStarRating ? (
+            <span
+              className={cn(
+                "text-slate-600",
+                compact ? "text-[12px]" : "text-[13px]",
+              )}
+            >
+              {ratingCount === 1 ? "1 anmeldelse" : `${ratingCount} anmeldelser`}
+            </span>
+          ) : (
+            <>
+              <span className="inline-flex items-center gap-0.5">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <Star
+                    key={i}
+                    className={cn(
+                      compact ? "h-3.5 w-3.5" : "h-4 w-4",
+                      "fill-[#ff8a3d] text-[#ff8a3d]",
+                    )}
+                    strokeWidth={1.5}
+                  />
+                ))}
+              </span>
+              <span
                 className={cn(
-                  compact ? "h-3.5 w-3.5" : "h-4 w-4",
-                  "fill-[#ff8a3d] text-[#ff8a3d]",
+                  "font-semibold text-slate-900",
+                  compact ? "text-[12px]" : "text-[13px]",
                 )}
-                strokeWidth={1.5}
-              />
-            ))}
-          </span>
-          <span
-            className={cn(
-              "font-semibold text-slate-900",
-              compact ? "text-[12px]" : "text-[13px]",
-            )}
-          >
-            {ratingValue}
-          </span>
-          <span
-            className={cn(
-              "text-slate-500",
-              compact ? "text-[11.5px]" : "text-[12.5px]",
-            )}
-          >
-            ({ratingCount})
-          </span>
+              >
+                {ratingValue}
+              </span>
+              <span
+                className={cn(
+                  "text-slate-500",
+                  compact ? "text-[11.5px]" : "text-[12.5px]",
+                )}
+              >
+                ({ratingCount})
+              </span>
+            </>
+          )}
         </div>
 
         {/* Weddings-played expertise row. Heuristic count rendered as
