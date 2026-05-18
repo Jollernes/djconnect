@@ -891,24 +891,6 @@ export function GridCardV23SoftWedding({
               );
             }
 
-            // Build a 4-stat list (rating + the 3 existing) for the
-            // newer treatments below. Rating is shown as "4,9" with a
-            // filled rose-gold star inline.
-            const ratingStat = {
-              icon: (
-                <Star
-                  className={cn(
-                    "fill-[#b8884a] text-[#b8884a]",
-                    compact ? "h-2.5 w-2.5" : "h-3 w-3",
-                  )}
-                  strokeWidth={1.5}
-                />
-              ),
-              value: ratingValue,
-              label: "stjerner",
-            };
-            const stats4 = [ratingStat, ...stats];
-
             if (statStyle === "inline") {
               // Single text line: tiny icons + bold values + grey
               // labels separated by thin slate-300 bullets. No chips,
@@ -928,9 +910,13 @@ export function GridCardV23SoftWedding({
                       "text-[#b8884a]",
                     )}
                     strokeWidth={1.75}
+                    aria-label="Professionelt DJ Udstyr"
                   />
                 ),
-                label: "Professionelt DJ Udstyr",
+                // Shortened label so it sits in the same weight
+                // class as the numeric stats. Full string lives in
+                // the icon's aria-label / title for accessibility.
+                label: "Pro DJ-udstyr",
               };
               const inlineItems: Array<{
                 icon: React.ReactNode;
@@ -980,10 +966,33 @@ export function GridCardV23SoftWedding({
             }
 
             if (statStyle === "grid4") {
-              // 4-column divided grid. Each column shows a micro icon
-              // inline with the bold value, with a small caption below.
-              // No icon badge circles. Smaller everything than the
-              // default 3-col grid so the row reads tight.
+              // 4-column divided grid. Column 1 is a value-less
+              // equipment claim (Disc3 + "Pro DJ-udstyr"); the
+              // other 3 columns show micro icon + bold value +
+              // caption. To keep the row vertically aligned, the
+              // equipment cell renders a small rose-gold dot in
+              // place of the missing numeric value so all four
+              // cells take the same height.
+              const grid4Items: Array<{
+                icon: React.ReactNode;
+                value?: string;
+                label: string;
+              }> = [
+                {
+                  icon: (
+                    <Disc3
+                      className={cn(
+                        compact ? "h-2.5 w-2.5" : "h-3 w-3",
+                        "text-[#b8884a]",
+                      )}
+                      strokeWidth={1.75}
+                      aria-label="Professionelt DJ Udstyr"
+                    />
+                  ),
+                  label: "Pro DJ-udstyr",
+                },
+                ...stats,
+              ];
               return (
                 <div
                   className={cn(
@@ -991,7 +1000,7 @@ export function GridCardV23SoftWedding({
                     compact ? "mt-2" : "mt-2.5",
                   )}
                 >
-                  {stats4.map((s) => (
+                  {grid4Items.map((s) => (
                     <div
                       key={s.label}
                       className={cn(
@@ -1003,14 +1012,27 @@ export function GridCardV23SoftWedding({
                         <span className="inline-flex items-center">
                           {s.icon}
                         </span>
-                        <span
-                          className={cn(
-                            "font-semibold leading-none text-slate-900",
-                            compact ? "text-[12px]" : "text-[13.5px]",
-                          )}
-                        >
-                          {s.value}
-                        </span>
+                        {s.value ? (
+                          <span
+                            className={cn(
+                              "font-semibold leading-none text-slate-900",
+                              compact ? "text-[12px]" : "text-[13.5px]",
+                            )}
+                          >
+                            {s.value}
+                          </span>
+                        ) : (
+                          // Visual placeholder for the missing
+                          // numeric value so the cell height
+                          // matches the other three columns.
+                          <span
+                            aria-hidden="true"
+                            className={cn(
+                              "inline-block rounded-full bg-[#b8884a]",
+                              compact ? "h-1 w-1" : "h-1.5 w-1.5",
+                            )}
+                          />
+                        )}
                       </span>
                       <span
                         className={cn(
@@ -1027,10 +1049,13 @@ export function GridCardV23SoftWedding({
             }
 
             if (statStyle === "rating-lead") {
-              // Asymmetric: rating as a small cream-amber "trust
-              // chip" on the left (slightly taller, with the count
-              // beneath the score), followed by the 3 supporting
-              // stats as compact text on the right.
+              // Asymmetric: a cream-amber "trust chip" on the left,
+              // followed by 3 supporting stats as compact text on
+              // the right. The lead chip now carries the equipment
+              // claim (Disc3 + "Pro DJ-udstyr") rather than the
+              // star rating — a categorical claim is a stronger
+              // anchor than a numeric score when the 3 supporting
+              // stats are themselves numeric.
               return (
                 <div
                   className={cn(
@@ -1043,21 +1068,22 @@ export function GridCardV23SoftWedding({
                       "inline-flex shrink-0 items-center gap-1 rounded-md border border-amber-200 bg-[#fdf8ec]",
                       compact ? "px-2 py-1" : "px-2.5 py-1.5",
                     )}
+                    title="Professionelt DJ Udstyr"
                   >
-                    <Star
+                    <Disc3
                       className={cn(
-                        "fill-[#b8884a] text-[#b8884a]",
+                        "text-[#b8884a]",
                         compact ? "h-3 w-3" : "h-3.5 w-3.5",
                       )}
-                      strokeWidth={1.5}
+                      strokeWidth={1.75}
                     />
                     <span
                       className={cn(
                         "font-semibold leading-none text-slate-900",
-                        compact ? "text-[13px]" : "text-[14.5px]",
+                        compact ? "text-[11.5px]" : "text-[12.5px]",
                       )}
                     >
-                      {ratingValue}
+                      Pro DJ-udstyr
                     </span>
                   </span>
                   <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
