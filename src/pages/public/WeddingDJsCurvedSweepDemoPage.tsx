@@ -15,6 +15,7 @@ type VariantId =
   | "triptych"
   | "soft-wedding-clean"
   | "soft-wedding-stats-inline"
+  | "soft-wedding-stats-inline-colour"
   | "soft-wedding-stats-inline-blush"
   | "soft-wedding-stats-inline-sage"
   | "soft-wedding-stats-inline-champagne"
@@ -85,6 +86,34 @@ const VARIANTS: Variant[] = [
         density={density}
         tint="none"
         heroGrayscale={60}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showRegion
+        showSeeProfileCta
+        priceIncludes={["5 timer inkl. lyd & lys"]}
+        statStyle="inline"
+        ctaProminence="filled"
+        availabilityDate="d. 14. juni 2025"
+      />
+    ),
+  },
+  {
+    id: "soft-wedding-stats-inline-colour",
+    label: "Soft Wedding · Stats · Inline · Colour",
+    blurb:
+      "Identical to Soft Wedding · Stats · Inline but with the hero photo rendered in full colour (no grayscale wash). Direct A/B against the base variant — same stat row, same compact CTA + availability hint, same cream-amber palette.",
+    count3: 6,
+    count4: 8,
+    render: (dj, density) => (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={config.id}
+        density={density}
+        tint="none"
+        heroGrayscale={0}
         avatarGrayscale={false}
         bioLines={3}
         showWeddingsPlayed
@@ -190,7 +219,7 @@ const VARIANTS: Variant[] = [
     id: "soft-wedding-triptych",
     label: "Soft Wedding · Triptych",
     blurb:
-      "Hybrid — Triptych's photo mosaic (1 large hero + 3 stacked thumbnails with intro-video play badge + image-count overlay + small B&W avatar overlapping the seam) wears the Soft Wedding · Stats · Inline content body: BryllupsDJ hallmark, serif name + 3-line bio, inline stat row (anmeldelser · brylluper · års erfaring · Pro DJ-udstyr), and the compact CTA row with the availability hint.",
+      "Hybrid — Triptych's photo mosaic (1 large hero + 3 stacked thumbnails with intro-video play badge + image-count overlay + small B&W avatar overlapping the seam) wears the Soft Wedding · Stats · Inline content body: BryllupsDJ hallmark, serif name + 3-line bio, inline stat row (anmeldelser · brylluper · års erfaring · Pro DJ-udstyr), and the compact CTA row with the availability hint. Photos render in full colour.",
     count3: 6,
     count4: 8,
     render: (dj, density) => (
@@ -199,7 +228,7 @@ const VARIANTS: Variant[] = [
         eventTypeId={config.id}
         density={density}
         tint="none"
-        heroGrayscale={60}
+        heroGrayscale={0}
         avatarGrayscale={false}
         bioLines={3}
         showWeddingsPlayed
