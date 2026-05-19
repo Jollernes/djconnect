@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   CalendarX2,
   Star,
+  Play,
   PlayCircle,
   ShieldCheck,
   MapPin,
@@ -17,6 +18,7 @@ import type { Density } from "./density";
 import { storSizeTokens, type StorSize } from "./StorScale";
 import { HostAvatar } from "./HostAvatar";
 import { StatsRow } from "./StatsRow";
+import { genresFor } from "@/components/event-djs/grid/shared";
 
 /**
  * Variant C — Concierge / luxury wedding.
@@ -90,10 +92,108 @@ export function StackedDJCardC({
         <div
           className={cn(
             "relative w-full shrink-0",
-            isCompact ? "md:w-28" : isComfortable ? "md:w-64" : tokens.photoColWidth,
+            isCompact ? "md:w-44" : isComfortable ? "md:w-64" : tokens.photoColWidth,
           )}
         >
-          {isSpacious ? (
+          {isCompact ? (
+            // Mini-triptych at row height: hero (square) + 3 stacked thumbs.
+            // Echoes the Stor variant's mosaic so Kompakt still reads as the
+            // media-reel / creator variant at a glance.
+            <div className="h-full p-2">
+              <div className="grid h-full grid-cols-[1.55fr_1fr] gap-1">
+                {/* Hero */}
+                <Link
+                  to={isUnavailable ? "#" : href}
+                  className={cn(
+                    "group relative block aspect-square w-full overflow-hidden rounded-md bg-muted",
+                    isUnavailable && "pointer-events-none",
+                  )}
+                >
+                  {hero ? (
+                    <img
+                      src={hero}
+                      alt={dj.stage_name}
+                      className={cn(
+                        "h-full w-full object-cover transition-transform duration-500",
+                        !isUnavailable && "group-hover:scale-105",
+                        isUnavailable && "grayscale",
+                      )}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-[10px] text-muted-foreground">
+                      Intet foto
+                    </div>
+                  )}
+                  {isUnavailable ? (
+                    <>
+                      <div className="absolute inset-0 bg-white/55" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Badge
+                          variant="destructive"
+                          className="gap-1 rounded-full px-1.5 py-0.5 text-[9px] shadow-md"
+                        >
+                          <CalendarX2 className="h-2.5 w-2.5" /> Optaget
+                        </Badge>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-black/0" />
+                      <span
+                        className="pointer-events-none absolute bottom-1 left-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/90 text-slate-900 shadow-sm backdrop-blur"
+                        title="Introvideo"
+                      >
+                        <Play className="h-2.5 w-2.5 fill-slate-900 text-slate-900" />
+                      </span>
+                      <span className="pointer-events-none absolute bottom-1 right-1 inline-flex items-center gap-0.5 rounded-full bg-white/90 px-1 py-0.5 text-[9px] font-semibold text-amber-700 shadow-sm backdrop-blur">
+                        <Star className="h-2.5 w-2.5 fill-amber-500 text-amber-500" />
+                        {dj.rating_average.toFixed(1)}
+                      </span>
+                    </>
+                  )}
+                </Link>
+                {/* 3 stacked thumbs to the right of the hero */}
+                <div className="relative">
+                  <div className="absolute inset-0 grid grid-rows-3 gap-1">
+                    {thumbs.map((url, i) => {
+                      const isLast = i === thumbs.length - 1;
+                      return (
+                        <Link
+                          key={i}
+                          to={isUnavailable ? "#" : href}
+                          className={cn(
+                            "relative block w-full overflow-hidden rounded-md bg-muted",
+                            isUnavailable && "pointer-events-none",
+                          )}
+                        >
+                          {url ? (
+                            <img
+                              src={url}
+                              alt=""
+                              className={cn(
+                                "h-full w-full object-cover transition-transform duration-300",
+                                !isUnavailable && "hover:scale-105",
+                                isUnavailable && "grayscale",
+                              )}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-muted" />
+                          )}
+                          {isLast && !isUnavailable && photoCount > 4 && (
+                            <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-[10px] font-semibold text-white">
+                              +{photoCount - 4}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : isSpacious ? (
             // Triptych mosaic: 1 large hero (left) + 3 stacked thumbs (right).
             // The right column uses an absolute-positioned grid so the thumbs
             // don't inflate the row taller than the hero's aspect lock.
@@ -194,14 +294,12 @@ export function StackedDJCardC({
               </div>
             </div>
           ) : (
-            // Compact + comfortable: keep the existing single-hero column.
+            // Comfortable: single hero column with the original badges.
             <Link
               to={isUnavailable ? "#" : href}
               className={cn(
                 "group relative block w-full overflow-hidden bg-muted",
-                isCompact
-                  ? "aspect-square"
-                  : "aspect-[4/3] md:aspect-auto md:h-full md:min-h-full",
+                "aspect-[4/3] md:aspect-auto md:h-full md:min-h-full",
                 isUnavailable && "pointer-events-none",
               )}
             >
@@ -233,17 +331,13 @@ export function StackedDJCardC({
               ) : (
                 <>
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0" />
-                  {!isCompact && (
-                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-900/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">
-                      Concierge
-                    </span>
-                  )}
-                  {!isCompact && (
-                    <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur transition-transform duration-300 group-hover:scale-105">
-                      <PlayCircle className="h-3.5 w-3.5 fill-slate-900 text-white" />
-                      Introvideo
-                    </span>
-                  )}
+                  <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-900/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">
+                    Concierge
+                  </span>
+                  <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur transition-transform duration-300 group-hover:scale-105">
+                    <PlayCircle className="h-3.5 w-3.5 fill-slate-900 text-white" />
+                    Introvideo
+                  </span>
                   <span className="pointer-events-none absolute bottom-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 shadow-sm backdrop-blur">
                     <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
                     {dj.rating_average.toFixed(1)}
@@ -273,13 +367,36 @@ export function StackedDJCardC({
                   tone="concierge"
                   verified
                 />
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <h3 className="line-clamp-1 font-serif text-base font-semibold leading-tight text-slate-900">
                     <Link to={href} className="hover:underline">{dj.stage_name}</Link>
                   </h3>
                   {dj.tagline && (
                     <p className="line-clamp-1 text-sm text-slate-700">{dj.tagline}</p>
                   )}
+                  {/* Genre pills — micro-row that says "what they spin" in
+                      one glance. Reinforces the media-reel / creator framing
+                      that's the point of Variant C. */}
+                  {(() => {
+                    const genres = genresFor(dj)
+                      .split(",")
+                      .map((g) => g.trim())
+                      .filter(Boolean)
+                      .slice(0, 3);
+                    if (genres.length === 0) return null;
+                    return (
+                      <div className="mt-1 flex flex-wrap items-center gap-1">
+                        {genres.map((g) => (
+                          <span
+                            key={g}
+                            className="inline-flex items-center rounded-full border border-amber-200 bg-[#fbf3df] px-1.5 py-px text-[10px] font-medium text-amber-800"
+                          >
+                            {g}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
               <div className="flex items-center gap-x-3 text-xs text-muted-foreground">
