@@ -48,10 +48,10 @@ export type StorSizeTokens = {
 };
 
 const TOKENS: Record<StorSize, StorSizeTokens> = {
-  // Baseline — matches the current Spacious branch values verbatim.
+  // Baseline — Triptych mosaic with the tallest hero (3:4 portrait).
   stor: {
-    heroAspect: "aspect-[16/10]",
-    photoColWidth: "md:w-96",
+    heroAspect: "aspect-[3/4]",
+    photoColWidth: "md:w-[28rem]",
     contentPad: "p-5 md:p-6",
     railPad: "p-5 md:p-6",
     railWidth: "md:w-72",
@@ -62,10 +62,10 @@ const TOKENS: Record<StorSize, StorSizeTokens> = {
     cardWrapper: "",
     packageGap: "space-y-2",
   },
-  // ~80 % height — wider hero frame, slightly tighter paddings, 2-line bio.
+  // ~80 % height — square hero, slightly tighter paddings, 2-line bio.
   h80: {
-    heroAspect: "aspect-[16/8]",
-    photoColWidth: "md:w-96",
+    heroAspect: "aspect-[1/1]",
+    photoColWidth: "md:w-[28rem]",
     contentPad: "p-5",
     railPad: "p-5",
     railWidth: "md:w-64",
@@ -76,10 +76,10 @@ const TOKENS: Record<StorSize, StorSizeTokens> = {
     cardWrapper: "",
     packageGap: "space-y-2",
   },
-  // ~70 % height — narrower photo column, smaller paddings.
+  // ~70 % height — narrower photo column, hero slightly wider than tall.
   h70: {
-    heroAspect: "aspect-[16/7]",
-    photoColWidth: "md:w-80",
+    heroAspect: "aspect-[5/4]",
+    photoColWidth: "md:w-96",
     contentPad: "p-4 md:p-5",
     railPad: "p-4 md:p-5",
     railWidth: "md:w-60",
@@ -90,10 +90,10 @@ const TOKENS: Record<StorSize, StorSizeTokens> = {
     cardWrapper: "",
     packageGap: "space-y-1.5",
   },
-  // ~60 % height — short hero, compact text, tightest paddings.
+  // ~60 % height — short hero (4:3), compact text, tightest paddings.
   h60: {
-    heroAspect: "aspect-[16/6]",
-    photoColWidth: "md:w-72",
+    heroAspect: "aspect-[4/3]",
+    photoColWidth: "md:w-80",
     contentPad: "p-4",
     railPad: "p-4",
     railWidth: "md:w-56",
@@ -104,10 +104,10 @@ const TOKENS: Record<StorSize, StorSizeTokens> = {
     cardWrapper: "",
     packageGap: "space-y-1.5",
   },
-  // Width + height — narrower whole card AND shorter hero.
+  // Width + height — narrower whole card AND square hero.
   both80: {
-    heroAspect: "aspect-[16/8]",
-    photoColWidth: "md:w-80",
+    heroAspect: "aspect-[1/1]",
+    photoColWidth: "md:w-96",
     contentPad: "p-4 md:p-5",
     railPad: "p-4 md:p-5",
     railWidth: "md:w-60",

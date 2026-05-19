@@ -40,9 +40,16 @@ export function StackedDJCardC({
   storSize?: StorSize;
 }) {
   const photos = dj.equipment_photos.map((p) => p.url).filter(Boolean);
-  while (photos.length < 3 && dj.profile.avatar_url) photos.push(dj.profile.avatar_url);
+  while (photos.length < 4 && dj.profile.avatar_url) photos.push(dj.profile.avatar_url);
   const hero = photos[0];
-  const thumbs = [photos[1], photos[2]];
+  // Variant C's spacious branch is a 1-large + 3-stacked triptych (matches
+  // the curved-sweep V21 Triptych mosaic); compact + comfortable still use
+  // hero alone, so the first 2 thumbs cover the legacy layout too.
+  const thumbs = [photos[1], photos[2], photos[3]];
+  const photoCount =
+    dj.equipment_photos.length >= 6
+      ? dj.equipment_photos.length
+      : 6 + (dj.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0) % 7);
 
   const href = eventTypeId ? `/djs/${dj.username}?eventType=${eventTypeId}` : `/djs/${dj.username}`;
   const isUnavailable = Boolean(unavailable);
@@ -60,7 +67,6 @@ export function StackedDJCardC({
   const isCompact = density === "compact";
   const isComfortable = density === "comfortable";
   const isSpacious = density === "spacious";
-  const showThumbs = isSpacious;
   const showRail = !isCompact;
   const tokens = storSizeTokens(storSize);
   const avatarSize = isCompact
@@ -87,92 +93,164 @@ export function StackedDJCardC({
             isCompact ? "md:w-28" : isComfortable ? "md:w-64" : tokens.photoColWidth,
           )}
         >
-          <Link
-            to={isUnavailable ? "#" : href}
-            className={cn(
-              "group relative block w-full overflow-hidden bg-muted",
-              isCompact
-                ? "aspect-square"
-                : isComfortable
-                  ? "aspect-[4/3] md:aspect-auto md:h-full md:min-h-full"
-                  : tokens.heroAspect,
-              isUnavailable && "pointer-events-none",
-            )}
-          >
-            {hero ? (
-              <img
-                src={hero}
-                alt={dj.stage_name}
-                className={cn(
-                  "h-full w-full object-cover transition-transform duration-700",
-                  !isUnavailable && "group-hover:scale-105",
-                  isUnavailable && "grayscale",
-                )}
-                loading="lazy"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center text-muted-foreground">
-                No photo
-              </div>
-            )}
-            {isUnavailable ? (
-              <>
-                <div className="absolute inset-0 bg-white/55" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Badge variant="destructive" className="gap-1.5 rounded-full px-2 py-1 text-[10px] shadow-md">
-                    <CalendarX2 className="h-3 w-3" /> Optaget
-                  </Badge>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0" />
-                {!isCompact && (
-                  <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-900/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">
-                    Concierge
-                  </span>
-                )}
-                {!isCompact && (
-                  <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur transition-transform duration-300 group-hover:scale-105">
-                    <PlayCircle className="h-3.5 w-3.5 fill-slate-900 text-white" />
-                    Introvideo
-                  </span>
-                )}
-                <span className="pointer-events-none absolute bottom-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 shadow-sm backdrop-blur">
-                  <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
-                  {dj.rating_average.toFixed(1)}
-                </span>
-              </>
-            )}
-          </Link>
-          {showThumbs && (
-            <div className="mt-1 grid grid-cols-2 gap-1">
-              {thumbs.map((url, i) => (
+          {isSpacious ? (
+            // Triptych mosaic: 1 large hero (left) + 3 stacked thumbs (right).
+            // The right column uses an absolute-positioned grid so the thumbs
+            // don't inflate the row taller than the hero's aspect lock.
+            <div className="p-2 md:p-3">
+              <div className="grid grid-cols-[1.55fr_1fr] gap-1.5">
+                {/* Hero */}
                 <Link
-                  key={i}
                   to={isUnavailable ? "#" : href}
                   className={cn(
-                    "relative block aspect-[4/3] overflow-hidden bg-muted",
+                    "group relative block w-full overflow-hidden rounded-lg bg-muted",
+                    tokens.heroAspect,
                     isUnavailable && "pointer-events-none",
                   )}
                 >
-                  {url ? (
+                  {hero ? (
                     <img
-                      src={url}
-                      alt=""
+                      src={hero}
+                      alt={dj.stage_name}
                       className={cn(
-                        "h-full w-full object-cover transition-transform duration-500",
-                        !isUnavailable && "hover:scale-105",
+                        "h-full w-full object-cover transition-transform duration-700",
+                        !isUnavailable && "group-hover:scale-105",
                         isUnavailable && "grayscale",
                       )}
                       loading="lazy"
                     />
                   ) : (
-                    <div className="h-full w-full bg-muted" />
+                    <div className="flex h-full items-center justify-center text-muted-foreground">
+                      No photo
+                    </div>
+                  )}
+                  {isUnavailable ? (
+                    <>
+                      <div className="absolute inset-0 bg-white/55" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Badge
+                          variant="destructive"
+                          className="gap-1.5 rounded-full px-2 py-1 text-[10px] shadow-md"
+                        >
+                          <CalendarX2 className="h-3 w-3" /> Optaget
+                        </Badge>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0" />
+                      <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-900/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">
+                        Concierge
+                      </span>
+                      <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur transition-transform duration-300 group-hover:scale-105">
+                        <PlayCircle className="h-3.5 w-3.5 fill-slate-900 text-white" />
+                        Introvideo
+                      </span>
+                      <span className="pointer-events-none absolute bottom-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 shadow-sm backdrop-blur">
+                        <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                        {dj.rating_average.toFixed(1)}
+                      </span>
+                    </>
                   )}
                 </Link>
-              ))}
+                {/* 3 stacked thumbs in the right column */}
+                <div className="relative">
+                  <div className="absolute inset-0 grid grid-rows-3 gap-1.5">
+                    {thumbs.map((url, i) => {
+                      const isLast = i === thumbs.length - 1;
+                      return (
+                        <Link
+                          key={i}
+                          to={isUnavailable ? "#" : href}
+                          className={cn(
+                            "relative block w-full overflow-hidden rounded-lg bg-muted",
+                            isUnavailable && "pointer-events-none",
+                          )}
+                        >
+                          {url ? (
+                            <img
+                              src={url}
+                              alt=""
+                              className={cn(
+                                "h-full w-full object-cover transition-transform duration-500",
+                                !isUnavailable && "hover:scale-105",
+                                isUnavailable && "grayscale",
+                              )}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-muted" />
+                          )}
+                          {isLast && !isUnavailable && photoCount > 4 && (
+                            <span className="absolute inset-0 flex items-center justify-center bg-black/45 text-[12px] font-semibold text-white">
+                              +{photoCount - 4}
+                            </span>
+                          )}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
+          ) : (
+            // Compact + comfortable: keep the existing single-hero column.
+            <Link
+              to={isUnavailable ? "#" : href}
+              className={cn(
+                "group relative block w-full overflow-hidden bg-muted",
+                isCompact
+                  ? "aspect-square"
+                  : "aspect-[4/3] md:aspect-auto md:h-full md:min-h-full",
+                isUnavailable && "pointer-events-none",
+              )}
+            >
+              {hero ? (
+                <img
+                  src={hero}
+                  alt={dj.stage_name}
+                  className={cn(
+                    "h-full w-full object-cover transition-transform duration-700",
+                    !isUnavailable && "group-hover:scale-105",
+                    isUnavailable && "grayscale",
+                  )}
+                  loading="lazy"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  No photo
+                </div>
+              )}
+              {isUnavailable ? (
+                <>
+                  <div className="absolute inset-0 bg-white/55" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Badge variant="destructive" className="gap-1.5 rounded-full px-2 py-1 text-[10px] shadow-md">
+                      <CalendarX2 className="h-3 w-3" /> Optaget
+                    </Badge>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0" />
+                  {!isCompact && (
+                    <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-slate-900/85 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.18em] text-white backdrop-blur">
+                      Concierge
+                    </span>
+                  )}
+                  {!isCompact && (
+                    <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-slate-900 shadow-sm backdrop-blur transition-transform duration-300 group-hover:scale-105">
+                      <PlayCircle className="h-3.5 w-3.5 fill-slate-900 text-white" />
+                      Introvideo
+                    </span>
+                  )}
+                  <span className="pointer-events-none absolute bottom-2 right-2 inline-flex items-center gap-0.5 rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 shadow-sm backdrop-blur">
+                    <Star className="h-3 w-3 fill-amber-500 text-amber-500" />
+                    {dj.rating_average.toFixed(1)}
+                  </span>
+                </>
+              )}
+            </Link>
           )}
         </div>
 
