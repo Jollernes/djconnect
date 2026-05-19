@@ -1,4 +1,4 @@
-import { useEffect, type ComponentType } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { Filter, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +22,11 @@ import { StackedDJCardA } from "@/components/event-djs/stacked/StackedDJCardA";
 import { StackedDJCardB } from "@/components/event-djs/stacked/StackedDJCardB";
 import { StackedDJCardC } from "@/components/event-djs/stacked/StackedDJCardC";
 import { DensityToggle } from "@/components/event-djs/stacked/DensityToggle";
+import {
+  StorScaledCard,
+  StorScaleToggle,
+  type StorScale,
+} from "@/components/event-djs/stacked/StorScale";
 import { useStackedDensity, type Density } from "@/components/event-djs/stacked/density";
 import type { DJProfileWithRelations } from "@/types/domain";
 
@@ -87,6 +92,8 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
 
   const city = filters.city;
   const [density, setDensity] = useStackedDensity();
+  const [storScale, setStorScale] = useState<StorScale>("stor");
+  const showStorScale = variant === "c" && density === "spacious";
 
   useEffect(() => {
     if (!city) openBrowseDJsGate({ eventTypeId: config.id });
@@ -192,6 +199,9 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
 
             <div className="ml-auto flex items-center gap-2">
               <DensityToggle value={density} onChange={setDensity} />
+              {showStorScale && (
+                <StorScaleToggle value={storScale} onChange={setStorScale} />
+              )}
               <Select
                 value={filters.sortBy ?? "relevance"}
                 onValueChange={(val) => update({ sort: val === "relevance" ? undefined : val })}
@@ -233,9 +243,15 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
             <div className="space-y-10">
               {availableDJs.length > 0 ? (
                 <div className={density === "compact" ? "space-y-2" : "space-y-4"}>
-                  {availableDJs.map((dj) => (
-                    <Card key={dj.id} dj={dj} eventTypeId={config.id} density={density} />
-                  ))}
+                  {availableDJs.map((dj) =>
+                    showStorScale ? (
+                      <StorScaledCard key={dj.id} scale={storScale}>
+                        <Card dj={dj} eventTypeId={config.id} density={density} />
+                      </StorScaledCard>
+                    ) : (
+                      <Card key={dj.id} dj={dj} eventTypeId={config.id} density={density} />
+                    ),
+                  )}
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
@@ -255,15 +271,26 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
                     </span>
                   </div>
                   <div className={density === "compact" ? "space-y-2" : "space-y-4"}>
-                    {unavailableDJs.map((u) => (
-                      <Card
-                        key={u.dj.id}
-                        dj={u.dj}
-                        eventTypeId={config.id}
-                        density={density}
-                        unavailable={{ reason: u.reason, subReason: u.subReason }}
-                      />
-                    ))}
+                    {unavailableDJs.map((u) =>
+                      showStorScale ? (
+                        <StorScaledCard key={u.dj.id} scale={storScale}>
+                          <Card
+                            dj={u.dj}
+                            eventTypeId={config.id}
+                            density={density}
+                            unavailable={{ reason: u.reason, subReason: u.subReason }}
+                          />
+                        </StorScaledCard>
+                      ) : (
+                        <Card
+                          key={u.dj.id}
+                          dj={u.dj}
+                          eventTypeId={config.id}
+                          density={density}
+                          unavailable={{ reason: u.reason, subReason: u.subReason }}
+                        />
+                      ),
+                    )}
                   </div>
                 </div>
               )}
