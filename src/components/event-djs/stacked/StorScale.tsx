@@ -1,44 +1,139 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Scaling options for the Stor (spacious) row variant on `/wedding-djs-stacked-c`.
- * The card design is identical across all options — only CSS scaling differs.
+ * Stor-size variants for `StackedDJCardC`. The card design and every element
+ * stays identical — only the **proportions** of images, paddings, and text
+ * are recalibrated per size so the smaller cards remain readable and visually
+ * balanced.
  *
- *   · stor    → 100 % (no scaling)
- *   · h80     → height only, scaled to 80 % (–20 %)
- *   · h70     → height only, scaled to 70 % (–30 %)
- *   · h60     → height only, scaled to 60 % (–40 %)
- *   · both80  → width and height both scaled to 80 %
+ *   · stor    → reference (current Stor variant)
+ *   · h80     → height target ~80 %, full width
+ *   · h70     → height target ~70 %, full width
+ *   · h60     → height target ~60 %, full width
+ *   · both80  → width + height both reduced (narrower max-width + shorter hero)
  */
-export type StorScale = "stor" | "h80" | "h70" | "h60" | "both80";
+export type StorSize = "stor" | "h80" | "h70" | "h60" | "both80";
 
-export const STOR_SCALE_OPTIONS: { value: StorScale; label: string; hint: string }[] = [
-  { value: "stor", label: "Stor", hint: "100 %" },
-  { value: "h80", label: "−20 % H", hint: "kun højde 80 %" },
-  { value: "h70", label: "−30 % H", hint: "kun højde 70 %" },
-  { value: "h60", label: "−40 % H", hint: "kun højde 60 %" },
-  { value: "both80", label: "−20 % B+H", hint: "begge akser 80 %" },
+export const STOR_SIZE_OPTIONS: { value: StorSize; label: string; hint: string }[] = [
+  { value: "stor", label: "Stor", hint: "fuld størrelse" },
+  { value: "h80", label: "−20 % H", hint: "kun højde, ~80 %" },
+  { value: "h70", label: "−30 % H", hint: "kun højde, ~70 %" },
+  { value: "h60", label: "−40 % H", hint: "kun højde, ~60 %" },
+  { value: "both80", label: "−20 % B+H", hint: "smallere + lavere" },
 ];
 
-const SCALE_VALUE: Record<StorScale, number> = {
-  stor: 1,
-  h80: 0.8,
-  h70: 0.7,
-  h60: 0.6,
-  both80: 0.8,
+export type StorSizeTokens = {
+  /** Tailwind aspect class for the hero photo. */
+  heroAspect: string;
+  /** Tailwind width class (with md: prefix) for the photo column. */
+  photoColWidth: string;
+  /** Padding for the middle (content) column. */
+  contentPad: string;
+  /** Padding for the right rail. */
+  railPad: string;
+  /** Width of the right rail (md+). */
+  railWidth: string;
+  /** Font size for the serif headline (DJ stage name). */
+  nameSize: string;
+  /** Line-clamp for the bio paragraph. */
+  bioClamp: string;
+  /** Avatar size token (passed to <HostAvatar />). */
+  avatarSize: "md" | "lg";
+  /** Vertical gap between elements in the middle column. */
+  contentGap: string;
+  /** Outer wrapper class (used by `both80` to narrow the whole card). */
+  cardWrapper: string;
+  /** Tweak the second package row's vertical density. */
+  packageGap: string;
 };
 
+const TOKENS: Record<StorSize, StorSizeTokens> = {
+  // Baseline — matches the current Spacious branch values verbatim.
+  stor: {
+    heroAspect: "aspect-[16/10]",
+    photoColWidth: "md:w-96",
+    contentPad: "p-5 md:p-6",
+    railPad: "p-5 md:p-6",
+    railWidth: "md:w-72",
+    nameSize: "text-3xl",
+    bioClamp: "line-clamp-3",
+    avatarSize: "lg",
+    contentGap: "gap-2.5",
+    cardWrapper: "",
+    packageGap: "space-y-2",
+  },
+  // ~80 % height — wider hero frame, slightly tighter paddings, 2-line bio.
+  h80: {
+    heroAspect: "aspect-[16/8]",
+    photoColWidth: "md:w-96",
+    contentPad: "p-5",
+    railPad: "p-5",
+    railWidth: "md:w-64",
+    nameSize: "text-2xl",
+    bioClamp: "line-clamp-2",
+    avatarSize: "lg",
+    contentGap: "gap-2",
+    cardWrapper: "",
+    packageGap: "space-y-2",
+  },
+  // ~70 % height — narrower photo column, smaller paddings.
+  h70: {
+    heroAspect: "aspect-[16/7]",
+    photoColWidth: "md:w-80",
+    contentPad: "p-4 md:p-5",
+    railPad: "p-4 md:p-5",
+    railWidth: "md:w-60",
+    nameSize: "text-2xl",
+    bioClamp: "line-clamp-2",
+    avatarSize: "md",
+    contentGap: "gap-2",
+    cardWrapper: "",
+    packageGap: "space-y-1.5",
+  },
+  // ~60 % height — short hero, compact text, tightest paddings.
+  h60: {
+    heroAspect: "aspect-[16/6]",
+    photoColWidth: "md:w-72",
+    contentPad: "p-4",
+    railPad: "p-4",
+    railWidth: "md:w-56",
+    nameSize: "text-xl",
+    bioClamp: "line-clamp-2",
+    avatarSize: "md",
+    contentGap: "gap-1.5",
+    cardWrapper: "",
+    packageGap: "space-y-1.5",
+  },
+  // Width + height — narrower whole card AND shorter hero.
+  both80: {
+    heroAspect: "aspect-[16/8]",
+    photoColWidth: "md:w-80",
+    contentPad: "p-4 md:p-5",
+    railPad: "p-4 md:p-5",
+    railWidth: "md:w-60",
+    nameSize: "text-2xl",
+    bioClamp: "line-clamp-2",
+    avatarSize: "md",
+    contentGap: "gap-2",
+    cardWrapper: "max-w-4xl",
+    packageGap: "space-y-2",
+  },
+};
+
+export function storSizeTokens(size: StorSize): StorSizeTokens {
+  return TOKENS[size];
+}
+
 /**
- * Small 5-button pill toggle that mirrors the look of `DensityToggle`.
+ * Pill toggle that mirrors the look of `DensityToggle`.
  * Only rendered on `/wedding-djs-stacked-c` when density === "spacious".
  */
-export function StorScaleToggle({
+export function StorSizeToggle({
   value,
   onChange,
 }: {
-  value: StorScale;
-  onChange: (next: StorScale) => void;
+  value: StorSize;
+  onChange: (next: StorSize) => void;
 }) {
   return (
     <div
@@ -46,7 +141,7 @@ export function StorScaleToggle({
       aria-label="Stor størrelse"
       className="inline-flex items-center gap-0.5 rounded-full border bg-card p-0.5 text-xs"
     >
-      {STOR_SCALE_OPTIONS.map((opt) => {
+      {STOR_SIZE_OPTIONS.map((opt) => {
         const active = opt.value === value;
         return (
           <button
@@ -68,88 +163,6 @@ export function StorScaleToggle({
           </button>
         );
       })}
-    </div>
-  );
-}
-
-/**
- * Wraps a card and applies the chosen Stor scale.
- *
- * Strategy:
- *   - `both80` uses CSS `zoom`, which scales both axes AND adjusts layout flow
- *     (so siblings stack correctly and the next card sits flush).
- *   - The three height-only options use `transform: scaleY(s)` with
- *     `transform-origin: top left`, paired with a measured wrapper height
- *     (`offsetHeight * s`) so the layout-box collapses to the visible height
- *     and the cards below don't get a gap.
- *
- * `offsetHeight` is read because it ignores CSS transforms — it reports the
- * natural layout-box height of the inner card.
- */
-export function StorScaledCard({
-  scale,
-  children,
-}: {
-  scale: StorScale;
-  children: ReactNode;
-}) {
-  const innerRef = useRef<HTMLDivElement>(null);
-  const [naturalHeight, setNaturalHeight] = useState<number | null>(null);
-
-  const isHeightOnly = scale === "h80" || scale === "h70" || scale === "h60";
-  const factor = SCALE_VALUE[scale];
-
-  useEffect(() => {
-    if (!isHeightOnly) return;
-    const el = innerRef.current;
-    if (!el) return;
-    const measure = () => setNaturalHeight(el.offsetHeight);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [isHeightOnly]);
-
-  if (scale === "stor") {
-    return <>{children}</>;
-  }
-
-  if (scale === "both80") {
-    // `zoom` scales both axes and participates in layout, so siblings stack
-    // naturally without needing measured heights.
-    return (
-      <div
-        style={{
-          zoom: factor,
-          // Centring fallback for browsers that treat `zoom` as a transform
-          // (older Firefox); width stays at 100 % of the centred container.
-        }}
-      >
-        {children}
-      </div>
-    );
-  }
-
-  // Height-only: measured wrapper + scaleY on the inner.
-  const outerHeight = naturalHeight !== null ? Math.ceil(naturalHeight * factor) : undefined;
-  return (
-    <div
-      style={{
-        height: outerHeight,
-        overflow: outerHeight !== undefined ? "hidden" : undefined,
-      }}
-    >
-      <div
-        ref={innerRef}
-        style={{
-          transform: `scaleY(${factor})`,
-          transformOrigin: "top left",
-          width: "100%",
-          willChange: "transform",
-        }}
-      >
-        {children}
-      </div>
     </div>
   );
 }

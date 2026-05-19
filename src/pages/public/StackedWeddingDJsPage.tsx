@@ -23,9 +23,8 @@ import { StackedDJCardB } from "@/components/event-djs/stacked/StackedDJCardB";
 import { StackedDJCardC } from "@/components/event-djs/stacked/StackedDJCardC";
 import { DensityToggle } from "@/components/event-djs/stacked/DensityToggle";
 import {
-  StorScaledCard,
-  StorScaleToggle,
-  type StorScale,
+  StorSizeToggle,
+  type StorSize,
 } from "@/components/event-djs/stacked/StorScale";
 import { useStackedDensity, type Density } from "@/components/event-djs/stacked/density";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -92,7 +91,7 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
 
   const city = filters.city;
   const [density, setDensity] = useStackedDensity();
-  const [storScale, setStorScale] = useState<StorScale>("stor");
+  const [storSize, setStorSize] = useState<StorSize>("stor");
   const showStorScale = variant === "c" && density === "spacious";
 
   useEffect(() => {
@@ -200,7 +199,7 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
             <div className="ml-auto flex items-center gap-2">
               <DensityToggle value={density} onChange={setDensity} />
               {showStorScale && (
-                <StorScaleToggle value={storScale} onChange={setStorScale} />
+                <StorSizeToggle value={storSize} onChange={setStorSize} />
               )}
               <Select
                 value={filters.sortBy ?? "relevance"}
@@ -245,9 +244,13 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
                 <div className={density === "compact" ? "space-y-2" : "space-y-4"}>
                   {availableDJs.map((dj) =>
                     showStorScale ? (
-                      <StorScaledCard key={dj.id} scale={storScale}>
-                        <Card dj={dj} eventTypeId={config.id} density={density} />
-                      </StorScaledCard>
+                      <StackedDJCardC
+                        key={dj.id}
+                        dj={dj}
+                        eventTypeId={config.id}
+                        density={density}
+                        storSize={storSize}
+                      />
                     ) : (
                       <Card key={dj.id} dj={dj} eventTypeId={config.id} density={density} />
                     ),
@@ -273,14 +276,14 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
                   <div className={density === "compact" ? "space-y-2" : "space-y-4"}>
                     {unavailableDJs.map((u) =>
                       showStorScale ? (
-                        <StorScaledCard key={u.dj.id} scale={storScale}>
-                          <Card
-                            dj={u.dj}
-                            eventTypeId={config.id}
-                            density={density}
-                            unavailable={{ reason: u.reason, subReason: u.subReason }}
-                          />
-                        </StorScaledCard>
+                        <StackedDJCardC
+                          key={u.dj.id}
+                          dj={u.dj}
+                          eventTypeId={config.id}
+                          density={density}
+                          storSize={storSize}
+                          unavailable={{ reason: u.reason, subReason: u.subReason }}
+                        />
                       ) : (
                         <Card
                           key={u.dj.id}

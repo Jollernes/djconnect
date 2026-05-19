@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
+import { storSizeTokens, type StorSize } from "./StorScale";
 import { HostAvatar } from "./HostAvatar";
 import { StatsRow } from "./StatsRow";
 
@@ -30,11 +31,13 @@ export function StackedDJCardC({
   eventTypeId,
   unavailable,
   density = "comfortable",
+  storSize = "stor",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
   unavailable?: { reason: string; subReason?: string } | null;
   density?: Density;
+  storSize?: StorSize;
 }) {
   const photos = dj.equipment_photos.map((p) => p.url).filter(Boolean);
   while (photos.length < 3 && dj.profile.avatar_url) photos.push(dj.profile.avatar_url);
@@ -59,7 +62,12 @@ export function StackedDJCardC({
   const isSpacious = density === "spacious";
   const showThumbs = isSpacious;
   const showRail = !isCompact;
-  const avatarSize = isCompact ? "sm" : isComfortable ? "md" : "lg";
+  const tokens = storSizeTokens(storSize);
+  const avatarSize = isCompact
+    ? "sm"
+    : isComfortable
+      ? "md"
+      : tokens.avatarSize;
   const description = dj.bio || dj.tagline;
 
   return (
@@ -68,6 +76,7 @@ export function StackedDJCardC({
         "overflow-hidden border-slate-200 bg-[#fcfaf6] transition-shadow",
         !isUnavailable && "hover:shadow-xl",
         isUnavailable && "border-dashed bg-muted/30",
+        isSpacious && tokens.cardWrapper,
       )}
     >
       <div className="flex flex-col gap-0 md:flex-row">
@@ -75,7 +84,7 @@ export function StackedDJCardC({
         <div
           className={cn(
             "relative w-full shrink-0",
-            isCompact ? "md:w-28" : isComfortable ? "md:w-64" : "md:w-96",
+            isCompact ? "md:w-28" : isComfortable ? "md:w-64" : tokens.photoColWidth,
           )}
         >
           <Link
@@ -86,7 +95,7 @@ export function StackedDJCardC({
                 ? "aspect-square"
                 : isComfortable
                   ? "aspect-[4/3] md:aspect-auto md:h-full md:min-h-full"
-                  : "aspect-[16/10]",
+                  : tokens.heroAspect,
               isUnavailable && "pointer-events-none",
             )}
           >
@@ -170,8 +179,9 @@ export function StackedDJCardC({
         {/* MIDDLE */}
         <div
           className={cn(
-            "flex flex-1 flex-col gap-2.5",
-            isCompact ? "p-3" : isComfortable ? "p-4" : "p-5 md:p-6",
+            "flex flex-1 flex-col",
+            isSpacious ? tokens.contentGap : "gap-2.5",
+            isCompact ? "p-3" : isComfortable ? "p-4" : tokens.contentPad,
             isUnavailable && "opacity-75",
           )}
         >
@@ -239,7 +249,7 @@ export function StackedDJCardC({
                 />
                 <h3 className={cn(
                   "font-serif font-semibold leading-tight tracking-tight text-slate-900",
-                  isComfortable ? "text-2xl" : "text-3xl",
+                  isComfortable ? "text-2xl" : tokens.nameSize,
                 )}>
                   <Link to={href} className="hover:underline">{dj.stage_name}</Link>
                 </h3>
@@ -247,7 +257,7 @@ export function StackedDJCardC({
               {description && (
                 <p className={cn(
                   "text-sm leading-relaxed text-slate-700",
-                  isComfortable ? "line-clamp-2" : "line-clamp-3",
+                  isComfortable ? "line-clamp-2" : tokens.bioClamp,
                 )}>
                   {description}
                 </p>
@@ -270,7 +280,7 @@ export function StackedDJCardC({
           <div
             className={cn(
               "flex shrink-0 flex-col items-stretch justify-between gap-3 border-t bg-slate-900 text-white md:border-l md:border-t-0",
-              isComfortable ? "p-4 md:w-56" : "p-5 md:w-72 md:p-6",
+              isComfortable ? "p-4 md:w-56" : cn(tokens.railPad, tokens.railWidth),
               isUnavailable && "opacity-70",
             )}
           >
@@ -280,7 +290,7 @@ export function StackedDJCardC({
               </p>
               {packages ? (
                 isSpacious ? (
-                  <ul className="space-y-2 text-xs">
+                  <ul className={cn("text-xs", tokens.packageGap)}>
                     <li className="flex items-baseline justify-between gap-2 border-b border-white/10 pb-2">
                       <span className="text-slate-200">
                         <span className="block font-medium text-white">Reception · 5t</span>
