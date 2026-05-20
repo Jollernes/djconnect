@@ -10,6 +10,13 @@ import { cn } from "@/lib/utils";
 
 const config = EVENT_LISTING_CONFIG.wedding;
 
+/** Stable public sample MP4 — short, ~1 MB, hosted by Google Cloud
+ * Storage. Used so the [▶] button in the hero actually plays
+ * something in the demo. Production cards would pass a per-DJ
+ * intro-video URL instead. */
+const SAMPLE_VIDEO_URL =
+  "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4";
+
 type VariantId =
   | "soft-wedding-stats-inline-colour"
   | "soft-wedding-triptych";
@@ -57,6 +64,7 @@ const VARIANTS: Variant[] = [
         statStyle="inline"
         ctaProminence="filled"
         availabilityDate="d. 14. juni 2025"
+        videoUrl={SAMPLE_VIDEO_URL}
       />
     ),
   },
@@ -87,6 +95,7 @@ const VARIANTS: Variant[] = [
         ctaProminence="filled"
         availabilityDate="d. 14. juni 2025"
         photoLayout="triptych"
+        videoUrl={SAMPLE_VIDEO_URL}
       />
     ),
   },

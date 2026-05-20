@@ -1,14 +1,17 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   BadgeCheck,
   CalendarX2,
   Clock,
   Disc3,
   Heart,
+  Images,
   MapPin,
   MessageCircle,
   Play,
   Star,
+  X,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -540,6 +543,7 @@ export function GridCardV23SoftWedding({
   availabilityDate,
   photoLayout = "carved",
   eventTheme = WEDDING_THEME,
+  videoUrl,
   unavailable,
 }: {
   dj: DJProfileWithRelations;
@@ -666,6 +670,12 @@ export function GridCardV23SoftWedding({
    * colourway tokens, and editorial hero treatment identical. Defaults
    * to `WEDDING_THEME` so existing callers are unaffected. */
   eventTheme?: EventTheme;
+  /** Optional intro-video URL. When provided, a small `[▶]` button
+   * appears in the hero's top-right corner; tapping it swaps the
+   * hero photo for an autoplaying `<video>` element. When omitted,
+   * the video button is hidden and only the picture-button (links
+   * to profile) is shown. */
+  videoUrl?: string;
   /** Photo treatment above the content body. Defaults to `"carved"`
    * (single hero photo with the circular avatar carved into the
    * lower-middle via a radial mask — the Soft Wedding hallmark).
@@ -718,6 +728,78 @@ export function GridCardV23SoftWedding({
   const ratingCount = dj.rating_count;
   const isUnavailable = Boolean(unavailable);
 
+  // Hero → video toggle. When `showVideo` is true and the parent
+  // supplied a `videoUrl`, the hero `<img>` is replaced with an
+  // autoplaying muted `<video>`. The video button itself flips to a
+  // close (✕) icon so users can revert to the photo. Disabled when
+  // the card is in the `unavailable` state — booked DJs don't
+  // get to flaunt their reel.
+  const [showVideo, setShowVideo] = useState(false);
+  const navigate = useNavigate();
+  const canPlayVideo = Boolean(videoUrl) && !isUnavailable;
+  const handleToggleVideo = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (canPlayVideo) setShowVideo((v) => !v);
+  };
+  const handleOpenProfile = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isUnavailable) navigate(href);
+  };
+
+  /** Two small circular icon buttons rendered in the hero's top-right
+   * corner, mirroring the hallmark badge on the top-left. The left
+   * button toggles video playback in place of the hero photo; the
+   * right button navigates to the DJ's profile (where the full
+   * gallery + booking flow live). Both stop click propagation so
+   * the surrounding hero `<Link>` doesn't double-navigate. */
+  const renderHeroActions = (opts: { position: "carved" | "triptych" }) => {
+    const btnSize = compact ? "h-6 w-6" : "h-7 w-7";
+    const iconSize = compact ? "h-3 w-3" : "h-3.5 w-3.5";
+    const wrapPos =
+      opts.position === "triptych"
+        ? "absolute right-2 top-2"
+        : "absolute right-3 top-3";
+    return (
+      <div className={cn(wrapPos, "z-10 inline-flex items-center gap-1.5")}>
+        {canPlayVideo && (
+          <button
+            type="button"
+            aria-label={showVideo ? "Skjul video" : "Afspil introvideo"}
+            title={showVideo ? "Skjul video" : "Afspil introvideo"}
+            onClick={handleToggleVideo}
+            className={cn(
+              "inline-flex items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-sm ring-1 ring-amber-200/80 backdrop-blur transition-colors hover:bg-white hover:text-slate-900",
+              btnSize,
+            )}
+          >
+            {showVideo ? (
+              <X className={iconSize} strokeWidth={2.25} />
+            ) : (
+              <Play
+                className={cn(iconSize, "translate-x-[1px] fill-slate-700")}
+                strokeWidth={1.5}
+              />
+            )}
+          </button>
+        )}
+        <button
+          type="button"
+          aria-label="Se billeder & profil"
+          title="Se billeder & profil"
+          onClick={handleOpenProfile}
+          className={cn(
+            "inline-flex items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-sm ring-1 ring-amber-200/80 backdrop-blur transition-colors hover:bg-white hover:text-slate-900",
+            btnSize,
+          )}
+        >
+          <Images className={iconSize} strokeWidth={1.75} />
+        </button>
+      </div>
+    );
+  };
+
   return (
     <Card
       className={cn(
@@ -750,22 +832,34 @@ export function GridCardV23SoftWedding({
               to={href}
               className="relative block aspect-[3/4] w-full overflow-hidden rounded-lg bg-amber-50"
             >
-              {hero && (
-                <img
-                  src={hero}
-                  alt={dj.stage_name}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  style={{
-                    filter:
-                      [
-                        tintFilter(tint),
-                        grayscaleFilter(heroGrayscale),
-                      ]
-                        .filter(Boolean)
-                        .join(" ") || undefined,
-                  }}
-                  loading="lazy"
+              {showVideo && videoUrl ? (
+                <video
+                  src={videoUrl}
+                  className="absolute inset-0 h-full w-full bg-black object-cover"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
                 />
+              ) : (
+                hero && (
+                  <img
+                    src={hero}
+                    alt={dj.stage_name}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    style={{
+                      filter:
+                        [
+                          tintFilter(tint),
+                          grayscaleFilter(heroGrayscale),
+                        ]
+                          .filter(Boolean)
+                          .join(" ") || undefined,
+                    }}
+                    loading="lazy"
+                  />
+                )
               )}
               <TintOverlay tint={tint} />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
@@ -787,11 +881,9 @@ export function GridCardV23SoftWedding({
                 />
                 {eventTheme.hallmarkLabel}
               </span>
-              {/* Intro video play badge — bottom-left of the hero. */}
-              <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur">
-                <Play className="h-2.5 w-2.5 fill-white text-white" />
-                1:00
-              </span>
+              {/* Video + picture action buttons — top-right of the
+                  hero, mirroring the hallmark on the top-left. */}
+              {renderHeroActions({ position: "triptych" })}
             </Link>
             {/* Three stacked thumbnails on the right. The wrapper is a
                 relative grid item that stretches to the row's height
@@ -892,22 +984,34 @@ export function GridCardV23SoftWedding({
             maskImage: heroMask,
           }}
         >
-          {hero && (
-            <img
-              src={hero}
-              alt={dj.stage_name}
-              className={cn(
-                "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",
-                isUnavailable && "grayscale",
-              )}
-              style={{
-                filter:
-                  [tintFilter(tint), grayscaleFilter(heroGrayscale)]
-                    .filter(Boolean)
-                    .join(" ") || undefined,
-              }}
-              loading="lazy"
+          {showVideo && videoUrl ? (
+            <video
+              src={videoUrl}
+              className="absolute inset-0 h-full w-full bg-black object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
             />
+          ) : (
+            hero && (
+              <img
+                src={hero}
+                alt={dj.stage_name}
+                className={cn(
+                  "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",
+                  isUnavailable && "grayscale",
+                )}
+                style={{
+                  filter:
+                    [tintFilter(tint), grayscaleFilter(heroGrayscale)]
+                      .filter(Boolean)
+                      .join(" ") || undefined,
+                }}
+                loading="lazy"
+              />
+            )
           )}
           {/* Warm wedding-tone overlays. Driven entirely by the tint
               mode; `none` leaves the photo alone. */}
@@ -945,6 +1049,10 @@ export function GridCardV23SoftWedding({
           />
           {eventTheme.hallmarkLabel}
         </span>
+
+        {/* Video + picture action buttons — top-right of the hero,
+            mirroring the hallmark on the top-left. */}
+        {renderHeroActions({ position: "carved" })}
 
         {/* Carved-in avatar. Positioned so its centre sits exactly on
             the hero's bottom edge — the upper half drops into the
