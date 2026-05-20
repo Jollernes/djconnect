@@ -319,11 +319,28 @@ export function DJSignupPage() {
         </div>
       </div>
 
+      {/* Horizontal stepper. Sits between the page header and the
+          main onboarding card so users can read all 6 steps at a
+          glance instead of scanning a column on the left. Hidden on
+          narrow widths since the page header already shows
+          "Step X of Y · <title>". */}
+      <div className="border-b bg-background">
+        <div className="container hidden py-5 md:block">
+          <Stepper
+            steps={STEPS}
+            current={step}
+            completed={completed}
+            onJump={(i) => {
+              if (completed.has(i) || i <= step) goTo(i);
+            }}
+            orientation="horizontal"
+          />
+        </div>
+      </div>
+
       <div className="container grid gap-6 py-8 lg:grid-cols-[260px_minmax(0,1fr)_320px] lg:gap-10">
         <aside className="hidden lg:block">
-          <Stepper steps={STEPS} current={step} completed={completed} onJump={(i) => { if (completed.has(i) || i <= step) goTo(i); }} />
-
-          <div className="mt-8 rounded-xl border bg-background p-4">
+          <div className="rounded-xl border bg-background p-4">
             <h4 className="text-sm font-semibold">Why join DJConnect?</h4>
             <ul className="mt-3 space-y-2.5 text-xs text-muted-foreground">
               <li className="flex items-start gap-2"><Shield className="mt-0.5 h-3.5 w-3.5 text-accent" />Verified DJs rank higher in search</li>
