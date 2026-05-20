@@ -1516,7 +1516,7 @@ export function GridCardV23SoftWedding({
             Visual treatment selected by `footerStyle`. */}
         {(() => {
           const locationText = showRegion
-            ? `${dj.base_location} · Hele ${regionFor(dj)}`
+            ? `Kører i hele ${regionFor(dj)}`
             : dj.base_location;
           const priceText = priceFromLabel(dj);
           const inclusion =
