@@ -1777,7 +1777,7 @@ export function GridCardV23SoftWedding({
                       className="inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-500"
                     />
                     <span className="truncate">
-                      Sandsynligvis ledig {availabilityDate}
+                      Åben {availabilityDate}
                     </span>
                   </span>
                   <Link
