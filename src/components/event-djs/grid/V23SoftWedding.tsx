@@ -748,15 +748,22 @@ export function GridCardV23SoftWedding({
     if (!isUnavailable) navigate(href);
   };
 
-  /** Two small circular icon buttons rendered in the hero's top-right
-   * corner, mirroring the hallmark badge on the top-left. The left
-   * button toggles video playback in place of the hero photo; the
-   * right button navigates to the DJ's profile (where the full
-   * gallery + booking flow live). Both stop click propagation so
-   * the surrounding hero `<Link>` doesn't double-navigate. */
+  /** Two small chip-style action buttons rendered in the hero's
+   * top-right corner, mirroring the hallmark badge on the top-left.
+   * Visual treatment matches the Coral Grid "Video" / "Setup" chips
+   * from `/wedding-djs-stacked-b-explore` variant 06 — rectangular
+   * `rounded-md` pills, slate border, icon + label, white body with
+   * backdrop-blur so they stay readable over varied hero photos.
+   * The left chip toggles video playback in place of the hero
+   * photo; the right chip navigates to the DJ's profile. Both stop
+   * click propagation so the surrounding hero `<Link>` doesn't
+   * double-navigate. */
   const renderHeroActions = (opts: { position: "carved" | "triptych" }) => {
-    const btnSize = compact ? "h-6 w-6" : "h-7 w-7";
-    const iconSize = compact ? "h-3 w-3" : "h-3.5 w-3.5";
+    const iconSize = compact ? "h-3 w-3" : "h-3 w-3";
+    const chipClass = cn(
+      "inline-flex items-center justify-center gap-1 rounded-md border border-slate-200 bg-white/95 px-1.5 py-1 font-medium text-slate-700 shadow-sm backdrop-blur transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900",
+      compact ? "text-[10px]" : "text-[10.5px]",
+    );
     const wrapPos =
       opts.position === "triptych"
         ? "absolute right-2 top-2"
@@ -769,19 +776,14 @@ export function GridCardV23SoftWedding({
             aria-label={showVideo ? "Skjul video" : "Afspil introvideo"}
             title={showVideo ? "Skjul video" : "Afspil introvideo"}
             onClick={handleToggleVideo}
-            className={cn(
-              "inline-flex items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-sm ring-1 ring-amber-200/80 backdrop-blur transition-colors hover:bg-white hover:text-slate-900",
-              btnSize,
-            )}
+            className={chipClass}
           >
             {showVideo ? (
               <X className={iconSize} strokeWidth={2.25} />
             ) : (
-              <Play
-                className={cn(iconSize, "translate-x-[1px] fill-slate-700")}
-                strokeWidth={1.5}
-              />
+              <Play className={iconSize} strokeWidth={2} />
             )}
+            {showVideo ? "Skjul" : "Video"}
           </button>
         )}
         <button
@@ -789,12 +791,10 @@ export function GridCardV23SoftWedding({
           aria-label="Se billeder & profil"
           title="Se billeder & profil"
           onClick={handleOpenProfile}
-          className={cn(
-            "inline-flex items-center justify-center rounded-full bg-white/95 text-slate-700 shadow-sm ring-1 ring-amber-200/80 backdrop-blur transition-colors hover:bg-white hover:text-slate-900",
-            btnSize,
-          )}
+          className={chipClass}
         >
-          <Images className={iconSize} strokeWidth={1.75} />
+          <Images className={iconSize} strokeWidth={2} />
+          Billeder
         </button>
       </div>
     );
