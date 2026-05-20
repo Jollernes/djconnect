@@ -559,7 +559,7 @@ export function GridCardV23SoftWedding({
   priceIncludes,
   statStyle = "default",
   footerStyle = "default",
-  ctaLabel = "Se profil",
+  ctaLabel = "Se profil & kontakt DJen",
   colourway = "default",
   ctaProminence = "ghost",
   availabilityDate,
@@ -1516,7 +1516,7 @@ export function GridCardV23SoftWedding({
             Visual treatment selected by `footerStyle`. */}
         {(() => {
           const locationText = showRegion
-            ? `Kører i hele ${regionFor(dj)}`
+            ? `${dj.base_location} · Hele ${regionFor(dj)}`
             : dj.base_location;
           const priceText = priceFromLabel(dj);
           const inclusion =
@@ -1761,82 +1761,60 @@ export function GridCardV23SoftWedding({
                 </div>
               )}
 
-              {showSeeProfileCta && availabilityDate && (
-                // Compact row: availability hint on the left + auto-
-                // width pill button on the right. CTA shrinks so the
-                // two affordances can share one line without crowding.
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <span
-                    className={cn(
-                      "inline-flex min-w-0 items-center gap-1.5 text-slate-600",
-                      compact ? "text-[11.5px]" : "text-[12px]",
-                    )}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-500"
-                    />
-                    <span className="truncate">
-                      Åben {availabilityDate}
-                    </span>
-                  </span>
+              {showSeeProfileCta && (
+                <>
+                  {availabilityDate && (
+                    // Availability caption sits as a small grey line on
+                    // its own, immediately above the full-width CTA, so
+                    // the button can claim the entire row at a larger
+                    // size again.
+                    <div
+                      className={cn(
+                        "flex items-center justify-center gap-1.5 text-slate-600",
+                        compact ? "mt-3 text-[11.5px]" : "mt-3.5 text-[12px]",
+                      )}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="inline-block h-2 w-2 shrink-0 rounded-full bg-emerald-500"
+                      />
+                      <span className="truncate">
+                        Åben {availabilityDate}
+                      </span>
+                    </div>
+                  )}
                   <Link
                     to={href}
                     className={cn(
-                      "inline-flex shrink-0 items-center gap-1 rounded-full border text-slate-900 transition-colors",
+                      "inline-flex w-full items-center justify-center gap-1.5 rounded-full border text-slate-900 transition-colors",
+                      // Slight separation between the availability
+                      // caption and the button when the caption is
+                      // shown; full top margin otherwise.
+                      availabilityDate ? "mt-1.5" : "mt-4",
                       ctaProminence === "filled"
                         ? cn(
-                            "font-semibold shadow-sm",
+                            // Filled treatment: warm palette-driven
+                            // fill, slightly darker border, semibold
+                            // text + more padding + softer lift shadow
+                            // so it reads as the visual end-anchor of
+                            // the card.
+                            "font-semibold shadow-md",
                             palette.ctaFilledBg,
                             palette.ctaFilledBorder,
                             palette.ctaFilledHover,
-                            compact
-                              ? "px-3 py-1.5 text-[11.5px]"
-                              : "px-3.5 py-1.5 text-[12px]",
+                            compact ? "py-3 text-[13.5px]" : "py-3.5 text-[14.5px]",
                           )
                         : cn(
                             "bg-white font-medium shadow-sm",
                             palette.ctaBorder,
                             palette.ctaHover,
-                            compact
-                              ? "px-3 py-1.5 text-[11.5px]"
-                              : "px-3.5 py-1.5 text-[12px]",
+                            compact ? "py-2.5 text-[13px]" : "py-3 text-[13.5px]",
                           ),
                     )}
                   >
                     {ctaLabel} <span aria-hidden="true">→</span>
                   </Link>
-                </div>
-              )}
-              {showSeeProfileCta && !availabilityDate && (
-                <Link
-                  to={href}
-                  className={cn(
-                    "mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-full border text-slate-900 transition-colors",
-                    ctaProminence === "filled"
-                      ? cn(
-                          // Filled treatment: warm palette-driven fill,
-                          // slightly darker border, semibold text + a
-                          // touch more padding + softer lift shadow so
-                          // it reads as the visual end-anchor of the
-                          // card rather than a ghost secondary action.
-                          "font-semibold shadow-md",
-                          palette.ctaFilledBg,
-                          palette.ctaFilledBorder,
-                          palette.ctaFilledHover,
-                          compact ? "py-2.5 text-[13px]" : "py-3 text-[13.5px]",
-                        )
-                      : cn(
-                          // Ghost treatment: white bg + faint outline.
-                          "bg-white font-medium shadow-sm",
-                          palette.ctaBorder,
-                          palette.ctaHover,
-                          compact ? "py-2 text-[12.5px]" : "py-2.5 text-[13px]",
-                        ),
-                  )}
-                >
-                  {ctaLabel} <span aria-hidden="true">→</span>
-                </Link>
+                </>
               )}
             </>
           );
