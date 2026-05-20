@@ -4,7 +4,6 @@ import type { ReactElement } from "react";
 import { useEventDJsListing } from "@/hooks/useEventDJsListing";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { EVENT_LISTING_CONFIG } from "@/lib/eventDJsContent";
-import { GridCardV21Triptych } from "@/components/event-djs/grid/V21Triptych";
 import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
 import type { DJProfileWithRelations } from "@/types/domain";
 import { cn } from "@/lib/utils";
@@ -12,13 +11,7 @@ import { cn } from "@/lib/utils";
 const config = EVENT_LISTING_CONFIG.wedding;
 
 type VariantId =
-  | "triptych"
-  | "soft-wedding-clean"
-  | "soft-wedding-stats-inline"
   | "soft-wedding-stats-inline-colour"
-  | "soft-wedding-stats-inline-blush"
-  | "soft-wedding-stats-inline-sage"
-  | "soft-wedding-stats-inline-champagne"
   | "soft-wedding-triptych";
 type Density = "3" | "4";
 
@@ -35,71 +28,6 @@ const COLS_3 = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
 const COLS_4 = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
 
 const VARIANTS: Variant[] = [
-  {
-    id: "triptych",
-    label: "Triptych",
-    blurb:
-      "1 hero + 3 stacked thumbnails as a mosaic · intro-video play badge on the hero · '+N' image counter on the bottom thumbnail · B&W avatar overlapping the seam.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV21Triptych dj={dj} eventTypeId={config.id} density={density} />
-    ),
-  },
-  {
-    id: "soft-wedding-clean",
-    label: "Soft Wedding · Clean",
-    blurb:
-      "Variant 7a — same premium marketplace card with the elegant BryllupsDJ badge and the circular avatar carved into the lower-middle of the hero. The hero photo is rendered with a 60 % grayscale wash for a calmer monochrome backdrop, the avatar keeps its original colours, the bio expands to a 3-line summary, the event-type pills are hidden, and a small rose-gold \"X+ brylluper spillet\" row sits under the rating to emphasise wedding expertise.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="none"
-        heroGrayscale={60}
-        avatarGrayscale={false}
-        bioLines={3}
-        showWeddingsPlayed
-        hideEventTypes
-        hideStarRating
-        showRegion
-        showSeeProfileCta
-        ctaLabel="Se profil & bryllupspakker"
-        priceIncludes={["5 timer inkl. lyd & lys"]}
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-stats-inline",
-    label: "Soft Wedding · Stats · Inline",
-    blurb:
-      "Alt G — central stat row collapsed to a single line of plain text with tiny rose-gold icons and thin slate-300 bullet separators. Star rating added as a 4th item to keep proportions balanced: \"★ 4,9 · 87 anmeldelser · 320+ brylluper · 10+ års erfaring\". Tightest possible footprint — barely taller than one text line.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="none"
-        heroGrayscale={60}
-        avatarGrayscale={false}
-        bioLines={3}
-        showWeddingsPlayed
-        hideEventTypes
-        hideStarRating
-        showRegion
-        showSeeProfileCta
-        priceIncludes={["5 timer inkl. lyd & lys"]}
-        statStyle="inline"
-        ctaProminence="filled"
-        availabilityDate="d. 14. juni 2025"
-      />
-    ),
-  },
   {
     id: "soft-wedding-stats-inline-colour",
     label: "Soft Wedding · Stats · Inline · Colour",
@@ -123,93 +51,6 @@ const VARIANTS: Variant[] = [
         showSeeProfileCta
         priceIncludes={["5 timer inkl. lyd & lys"]}
         statStyle="inline"
-        ctaProminence="filled"
-        availabilityDate="d. 14. juni 2025"
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-stats-inline-blush",
-    label: "Soft Wedding · Stats · Inline · Blush",
-    blurb:
-      "Colour alt 1 — dusty rose (`#c08487`) replaces the rose-gold accent on the stat-row icons, with a soft pink CTA border (`#f0d6d6`) and a pale blush hover (`#fbf2f2`). Romantic / floral wedding palette (peony, blush tablescapes). Card body and BryllupsDJ hallmark unchanged.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="none"
-        heroGrayscale={60}
-        avatarGrayscale={false}
-        bioLines={3}
-        showWeddingsPlayed
-        hideEventTypes
-        hideStarRating
-        showRegion
-        showSeeProfileCta
-        priceIncludes={["5 timer inkl. lyd & lys"]}
-        statStyle="inline"
-        colourway="blush"
-        ctaProminence="filled"
-        availabilityDate="d. 14. juni 2025"
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-stats-inline-sage",
-    label: "Soft Wedding · Stats · Inline · Sage",
-    blurb:
-      "Colour alt 2 — muted sage (`#7d8b6e`) on the stat-row icons, sage-pale CTA border (`#d6dccc`) and hover (`#f3f5ee`). Botanical / greenery wedding palette (eucalyptus, olive). Cool, calm, modern. Card body and BryllupsDJ hallmark unchanged.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="none"
-        heroGrayscale={60}
-        avatarGrayscale={false}
-        bioLines={3}
-        showWeddingsPlayed
-        hideEventTypes
-        hideStarRating
-        showRegion
-        showSeeProfileCta
-        priceIncludes={["5 timer inkl. lyd & lys"]}
-        statStyle="inline"
-        colourway="sage"
-        ctaProminence="filled"
-        availabilityDate="d. 14. juni 2025"
-      />
-    ),
-  },
-  {
-    id: "soft-wedding-stats-inline-champagne",
-    label: "Soft Wedding · Stats · Inline · Champagne",
-    blurb:
-      "Colour alt 3 — warmer champagne gold (`#c9a16b`) on the stat-row icons, champagne CTA border (`#e8d09e`) + hover (`#f9f1de`), and the card body itself subtly tinted to a pale champagne (`#fcfaf6`) so the whole card reads warm rather than muted brown. Closest to the default palette but lifted in temperature.",
-    count3: 6,
-    count4: 8,
-    render: (dj, density) => (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={config.id}
-        density={density}
-        tint="none"
-        heroGrayscale={60}
-        avatarGrayscale={false}
-        bioLines={3}
-        showWeddingsPlayed
-        hideEventTypes
-        hideStarRating
-        showRegion
-        showSeeProfileCta
-        priceIncludes={["5 timer inkl. lyd & lys"]}
-        statStyle="inline"
-        colourway="champagne"
         ctaProminence="filled"
         availabilityDate="d. 14. juni 2025"
       />
