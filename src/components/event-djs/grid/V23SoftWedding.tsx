@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   BadgeCheck,
+  CalendarX2,
   Clock,
   Disc3,
   Heart,
@@ -564,6 +565,7 @@ export function GridCardV23SoftWedding({
   ctaProminence = "ghost",
   availabilityDate,
   photoLayout = "carved",
+  unavailable,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
@@ -692,6 +694,12 @@ export function GridCardV23SoftWedding({
    * seam between the panes. The content body below is identical
    * across both layouts. */
   photoLayout?: "carved" | "triptych";
+  /** When set, the card replaces its CTA + availability hint with a
+   * small dashed-bordered reason notice (mirroring the global
+   * `DJCard` unavailable treatment) and dims the hero. Used by the
+   * listings page to render DJs that are booked or don't list the
+   * selected event type, without removing them from the grid. */
+  unavailable?: { reason: string; subReason?: string } | null;
 }) {
   const palette = SOFT_WEDDING_COLOURWAYS[colourway];
   const hero =
@@ -722,12 +730,18 @@ export function GridCardV23SoftWedding({
 
   const ratingValue = dj.rating_average.toFixed(1).replace(".", ",");
   const ratingCount = dj.rating_count;
+  const isUnavailable = Boolean(unavailable);
 
   return (
     <Card
       className={cn(
         "group flex flex-col overflow-hidden rounded-2xl border border-amber-100/70 shadow-sm transition-shadow hover:shadow-md",
         palette.cardBg,
+        // Muted treatment for booked / non-matching DJs. Mirrors the
+        // standard `DJCard` unavailable language: dashed border, soft
+        // wash, and content opacity — the dashed reason banner that
+        // replaces the CTA tells the user why.
+        isUnavailable && "border-dashed bg-muted/30",
       )}
     >
       {/* Hero. Two layouts: the default `"carved"` is a single hero
@@ -894,7 +908,10 @@ export function GridCardV23SoftWedding({
             <img
               src={hero}
               alt={dj.stage_name}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className={cn(
+                "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105",
+                isUnavailable && "grayscale",
+              )}
               style={{
                 filter:
                   [tintFilter(tint), grayscaleFilter(heroGrayscale)]
@@ -909,6 +926,17 @@ export function GridCardV23SoftWedding({
           <TintOverlay tint={tint} />
           {tint !== "none" && !WEDDING_TINTS.includes(tint) && (
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/12 via-transparent to-transparent" />
+          )}
+          {isUnavailable && (
+            <>
+              <div className="pointer-events-none absolute inset-0 bg-white/55" />
+              <div className="pointer-events-none absolute inset-x-0 top-1/3 flex items-center justify-center">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900/90 px-3 py-1.5 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-white shadow-md">
+                  <CalendarX2 className="h-3.5 w-3.5" />
+                  Ikke ledig
+                </span>
+              </div>
+            </>
           )}
         </Link>
 
@@ -1761,7 +1789,22 @@ export function GridCardV23SoftWedding({
                 </div>
               )}
 
-              {showSeeProfileCta && (
+              {showSeeProfileCta && unavailable ? (
+                // Unavailable treatment: replace the availability hint
+                // and CTA with a small dashed reason banner so the DJ
+                // still appears in the grid but the action is muted.
+                <div
+                  className={cn(
+                    "rounded-md border border-dashed border-slate-300 bg-slate-50/60 px-3 py-2 text-slate-700",
+                    compact ? "mt-3 text-[11.5px]" : "mt-4 text-[12px]",
+                  )}
+                >
+                  <span className="font-medium text-slate-900">{unavailable.reason}</span>
+                  {unavailable.subReason && (
+                    <span className="ml-1 text-slate-500">· {unavailable.subReason}</span>
+                  )}
+                </div>
+              ) : showSeeProfileCta ? (
                 <>
                   {availabilityDate && (
                     // Availability caption sits as a small grey line on
@@ -1815,7 +1858,7 @@ export function GridCardV23SoftWedding({
                     {ctaLabel} <span aria-hidden="true">→</span>
                   </Link>
                 </>
-              )}
+              ) : null}
             </>
           );
         })()}

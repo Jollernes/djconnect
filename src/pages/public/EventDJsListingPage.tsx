@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import type { ReactNode } from "react";
 import { Filter, MapPin, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,20 @@ import { SetupSizePicker } from "@/components/wedding/SetupSizePicker";
 import { useEventDJsListing } from "@/hooks/useEventDJsListing";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import type { EventListingConfig } from "@/lib/eventDJsContent";
+import type { DJProfileWithRelations } from "@/types/domain";
 import { openBrowseDJsGate } from "@/components/event-djs/BrowseDJsGate";
+
+/** Render-prop signature for a DJ card slot on the listings page.
+ *  Callers receive the DJ + event-type id + a derived availability
+ *  date (the customer-selected event date, when present) plus an
+ *  optional `unavailable` reason struct. Returning `null` falls back
+ *  to the default `<DJCard />` rendering. */
+export type DJCardRenderer = (props: {
+  dj: DJProfileWithRelations;
+  eventTypeId: string;
+  selectedDate?: string;
+  unavailable?: { reason: string; subReason?: string } | null;
+}) => ReactNode;
 
 /**
  * Shared listing page for an event-specific DJ search. The same layout
@@ -26,7 +40,16 @@ import { openBrowseDJsGate } from "@/components/event-djs/BrowseDJsGate";
  * for every event type — only the config and the underlying event-type
  * filter change.
  */
-export function EventDJsListingPage({ config }: { config: EventListingConfig }) {
+export function EventDJsListingPage({
+  config,
+  renderCard,
+}: {
+  config: EventListingConfig;
+  /** Optional override for the DJ card rendered inside the grid.
+   *  Defaults to the shared `<DJCard />` used across event types.
+   *  Wedding swaps in the Soft Wedding · Stats · Inline · Colour card. */
+  renderCard?: DJCardRenderer;
+}) {
   useDocumentHead({
     title: config.metaTitle,
     description: config.metaDescription,
@@ -151,9 +174,20 @@ export function EventDJsListingPage({ config }: { config: EventListingConfig }) 
             <div className="space-y-10">
               {availableDJs.length > 0 ? (
                 <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {availableDJs.map((dj) => (
-                    <DJCard key={dj.id} dj={dj} eventTypeId={config.id} />
-                  ))}
+                  {availableDJs.map((dj) => {
+                    const custom = renderCard?.({
+                      dj,
+                      eventTypeId: config.id,
+                      selectedDate,
+                    });
+                    return (
+                      <div key={dj.id}>
+                        {custom ?? (
+                          <DJCard dj={dj} eventTypeId={config.id} />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="rounded-xl border border-dashed bg-card p-6 text-sm text-muted-foreground">
@@ -173,14 +207,26 @@ export function EventDJsListingPage({ config }: { config: EventListingConfig }) 
                     </span>
                   </div>
                   <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                    {unavailableDJs.map((u) => (
-                      <DJCard
-                        key={u.dj.id}
-                        dj={u.dj}
-                        eventTypeId={config.id}
-                        unavailable={{ reason: u.reason, subReason: u.subReason }}
-                      />
-                    ))}
+                    {unavailableDJs.map((u) => {
+                      const reason = { reason: u.reason, subReason: u.subReason };
+                      const custom = renderCard?.({
+                        dj: u.dj,
+                        eventTypeId: config.id,
+                        selectedDate,
+                        unavailable: reason,
+                      });
+                      return (
+                        <div key={u.dj.id}>
+                          {custom ?? (
+                            <DJCard
+                              dj={u.dj}
+                              eventTypeId={config.id}
+                              unavailable={reason}
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
