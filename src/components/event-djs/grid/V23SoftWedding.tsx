@@ -544,7 +544,7 @@ export function GridCardV23SoftWedding({
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
-  density?: "3" | "4";
+  density?: "3" | "4" | "5";
   /** How much warm-wedding wash to apply on top of the hero. `none`
    * shows the raw photo, `light` is a very subtle blush, `soft` is
    * the original champagne/blush wedding wash. */
@@ -689,14 +689,19 @@ export function GridCardV23SoftWedding({
     dj.profile.avatar_url ||
     "";
   const href = djHref(dj, eventTypeId);
-  const compact = density === "4";
+  // 4-col and 5-col cards both collapse paddings, fonts, and the
+  // avatar to the tighter "compact" set. 5-col gets a few additional
+  // tweaks (`ultraCompact`) further below so the inline stat row and
+  // hero crop don't feel claustrophobic at the narrowest width.
+  const compact = density !== "3";
+  const ultraCompact = density === "5";
 
   // Avatar / notch geometry. The radial-gradient mask carves a half-
   // circle out of the bottom-center of the hero so the avatar drops
   // into a real cutout (not just a circle pasted on top). The notch
   // hugs the avatar with only a hairline ivory gap so the integration
   // feels tight and elegant rather than a halo of empty space.
-  const avatarSize = compact ? 90 : 108;
+  const avatarSize = ultraCompact ? 78 : compact ? 90 : 108;
   const notchRadius = avatarSize / 2 + 2;
 
   const heroMask = `radial-gradient(circle ${notchRadius}px at 50% 100%, transparent ${notchRadius}px, black ${
@@ -986,7 +991,7 @@ export function GridCardV23SoftWedding({
         className={cn(
           "flex flex-1 flex-col",
           palette.cardBg,
-          compact ? "px-4 pb-4" : "px-5 pb-5",
+          ultraCompact ? "px-3 pb-3" : compact ? "px-4 pb-4" : "px-5 pb-5",
         )}
         style={{
           // Carved layout: clear the half of the avatar that spills
@@ -1006,7 +1011,7 @@ export function GridCardV23SoftWedding({
             fontStyle === "serif"
               ? "font-serif tracking-tight"
               : "font-sans tracking-normal",
-            compact ? "text-[19px]" : "text-[22px]",
+            ultraCompact ? "text-[17.5px]" : compact ? "text-[19px]" : "text-[22px]",
           )}
         >
           <Link to={href} className="hover:underline">

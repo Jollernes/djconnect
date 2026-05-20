@@ -13,7 +13,7 @@ const config = EVENT_LISTING_CONFIG.wedding;
 type VariantId =
   | "soft-wedding-stats-inline-colour"
   | "soft-wedding-triptych";
-type Density = "3" | "4";
+type Density = "3" | "4" | "5";
 
 type Variant = {
   id: VariantId;
@@ -21,11 +21,14 @@ type Variant = {
   blurb: string;
   count3: number;
   count4: number;
+  count5: number;
   render: (dj: DJProfileWithRelations, density: Density) => ReactElement;
 };
 
 const COLS_3 = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
 const COLS_4 = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+const COLS_5 =
+  "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5";
 
 const VARIANTS: Variant[] = [
   {
@@ -35,6 +38,7 @@ const VARIANTS: Variant[] = [
       "Identical to Soft Wedding · Stats · Inline but with the hero photo rendered in full colour (no grayscale wash). Direct A/B against the base variant — same stat row, same compact CTA + availability hint, same cream-amber palette.",
     count3: 6,
     count4: 8,
+    count5: 10,
     render: (dj, density) => (
       <GridCardV23SoftWedding
         dj={dj}
@@ -63,6 +67,7 @@ const VARIANTS: Variant[] = [
       "Hybrid — Triptych's photo mosaic (1 large hero + 3 stacked thumbnails with intro-video play badge + image-count overlay + small B&W avatar overlapping the seam) wears the Soft Wedding · Stats · Inline content body: BryllupsDJ hallmark, serif name + 3-line bio, inline stat row (anmeldelser · brylluper · års erfaring · Pro DJ-udstyr), and the compact CTA row with the availability hint. Photos render in full colour.",
     count3: 6,
     count4: 8,
+    count5: 10,
     render: (dj, density) => (
       <GridCardV23SoftWedding
         dj={dj}
@@ -102,7 +107,8 @@ export function WeddingDJsCurvedSweepDemoPage() {
     const found = VARIANTS.find((v) => v.id === variantParam);
     return found || VARIANTS[0]!;
   }, [variantParam]);
-  const density: Density = colsParam === "4" ? "4" : "3";
+  const density: Density =
+    colsParam === "5" ? "5" : colsParam === "4" ? "4" : "3";
 
   useDocumentHead({
     title: `[${activeVariant.label} · ${density}-col] ${config.metaTitle}`,
@@ -114,8 +120,13 @@ export function WeddingDJsCurvedSweepDemoPage() {
     config.label.toLowerCase(),
   );
 
-  const count = density === "4" ? activeVariant.count4 : activeVariant.count3;
-  const cols = density === "4" ? COLS_4 : COLS_3;
+  const count =
+    density === "5"
+      ? activeVariant.count5
+      : density === "4"
+        ? activeVariant.count4
+        : activeVariant.count3;
+  const cols = density === "5" ? COLS_5 : density === "4" ? COLS_4 : COLS_3;
   const examples = availableDJs.slice(0, count);
 
   const setVariant = (id: VariantId) => {
@@ -191,7 +202,7 @@ export function WeddingDJsCurvedSweepDemoPage() {
               aria-label="Cards per row"
               className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-white p-1 shadow-sm"
             >
-              {(["3", "4"] as const).map((d) => {
+              {(["3", "4", "5"] as const).map((d) => {
                 const active = d === density;
                 return (
                   <button
