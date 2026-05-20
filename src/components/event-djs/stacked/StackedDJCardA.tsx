@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { cn, formatCurrency } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
 import type { Density } from "./density";
+import { stackedASizeTokens, type StackedASize } from "./StackedASize";
 import { HostAvatar } from "./HostAvatar";
 import { StatsRow } from "./StatsRow";
 
@@ -28,11 +29,17 @@ export function StackedDJCardA({
   eventTypeId,
   unavailable,
   density = "comfortable",
+  aSize = "default",
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
   unavailable?: { reason: string; subReason?: string } | null;
   density?: Density;
+  /** Standard-density size variant. `"default"` is the reference
+   * proportions; `"small"` recalibrates the photo / paddings / fonts
+   * to ~80 % so the card collapses cleanly without overflowing. Only
+   * applied when density === "comfortable". */
+  aSize?: StackedASize;
 }) {
   const photos = dj.equipment_photos.map((p) => p.url).filter(Boolean);
   while (photos.length < 3 && dj.profile.avatar_url) photos.push(dj.profile.avatar_url);
@@ -48,9 +55,16 @@ export function StackedDJCardA({
       : "—";
 
   const isCompact = density === "compact";
+  const isComfortable = density === "comfortable";
   const showThumbs = density === "spacious";
   const showRail = density !== "compact";
-  const avatarSize = isCompact ? "sm" : density === "spacious" ? "lg" : "md";
+  const tokens = stackedASizeTokens(aSize);
+  const useSmall = isComfortable && aSize === "small";
+  const avatarSize = isCompact
+    ? "sm"
+    : density === "spacious"
+      ? "lg"
+      : tokens.avatarSize;
   const description = dj.bio || dj.tagline;
 
   return (
@@ -66,7 +80,11 @@ export function StackedDJCardA({
         <div
           className={cn(
             "relative w-full shrink-0",
-            isCompact ? "md:w-28" : density === "comfortable" ? "md:w-56" : "md:w-80",
+            isCompact
+              ? "md:w-28"
+              : isComfortable
+                ? tokens.photoColWidth
+                : "md:w-80",
           )}
         >
           <Link
@@ -151,7 +169,7 @@ export function StackedDJCardA({
         <div
           className={cn(
             "flex flex-1 flex-col gap-1.5",
-            isCompact ? "p-3" : density === "comfortable" ? "p-4" : "p-5",
+            isCompact ? "p-3" : isComfortable ? tokens.contentPad : "p-5",
             isUnavailable && "opacity-70",
           )}
         >
@@ -209,7 +227,12 @@ export function StackedDJCardA({
                   tone="neutral"
                   verified
                 />
-                <h3 className="font-serif text-2xl font-semibold leading-tight tracking-tight text-slate-900">
+                <h3
+                  className={cn(
+                    "font-serif font-semibold leading-tight tracking-tight text-slate-900",
+                    useSmall ? tokens.nameSize : "text-2xl",
+                  )}
+                >
                   <Link to={href} className="hover:underline">{dj.stage_name}</Link>
                 </h3>
               </div>
@@ -239,7 +262,9 @@ export function StackedDJCardA({
           <div
             className={cn(
               "flex shrink-0 flex-col items-stretch justify-between gap-3 border-t bg-muted/30 md:border-l md:border-t-0",
-              density === "comfortable" ? "p-4 md:w-48" : "p-5 md:w-56",
+              isComfortable
+                ? cn(tokens.railPad, tokens.railWidth)
+                : "p-5 md:w-56",
               isUnavailable && "opacity-70",
             )}
           >
@@ -254,7 +279,8 @@ export function StackedDJCardA({
               </p>
               <p
                 className={cn(
-                  "text-xl font-semibold tracking-tight",
+                  "font-semibold tracking-tight",
+                  useSmall ? tokens.railPriceSize : "text-xl",
                   isUnavailable && "text-muted-foreground line-through",
                 )}
               >

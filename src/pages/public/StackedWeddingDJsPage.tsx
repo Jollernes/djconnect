@@ -26,6 +26,10 @@ import {
   StorSizeToggle,
   type StorSize,
 } from "@/components/event-djs/stacked/StorScale";
+import {
+  StackedASizeToggle,
+  type StackedASize,
+} from "@/components/event-djs/stacked/StackedASize";
 import { useStackedDensity, type Density } from "@/components/event-djs/stacked/density";
 import type { DJProfileWithRelations } from "@/types/domain";
 
@@ -92,7 +96,9 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
   const city = filters.city;
   const [density, setDensity] = useStackedDensity();
   const [storSize, setStorSize] = useState<StorSize>("stor");
+  const [aSize, setASize] = useState<StackedASize>("default");
   const showStorScale = variant === "c" && density === "spacious";
+  const showStackedAScale = variant === "a" && density === "comfortable";
 
   useEffect(() => {
     if (!city) openBrowseDJsGate({ eventTypeId: config.id });
@@ -201,6 +207,9 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
               {showStorScale && (
                 <StorSizeToggle value={storSize} onChange={setStorSize} />
               )}
+              {showStackedAScale && (
+                <StackedASizeToggle value={aSize} onChange={setASize} />
+              )}
               <Select
                 value={filters.sortBy ?? "relevance"}
                 onValueChange={(val) => update({ sort: val === "relevance" ? undefined : val })}
@@ -251,6 +260,14 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
                         density={density}
                         storSize={storSize}
                       />
+                    ) : variant === "a" ? (
+                      <StackedDJCardA
+                        key={dj.id}
+                        dj={dj}
+                        eventTypeId={config.id}
+                        density={density}
+                        aSize={aSize}
+                      />
                     ) : (
                       <Card key={dj.id} dj={dj} eventTypeId={config.id} density={density} />
                     ),
@@ -282,6 +299,15 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
                           eventTypeId={config.id}
                           density={density}
                           storSize={storSize}
+                          unavailable={{ reason: u.reason, subReason: u.subReason }}
+                        />
+                      ) : variant === "a" ? (
+                        <StackedDJCardA
+                          key={u.dj.id}
+                          dj={u.dj}
+                          eventTypeId={config.id}
+                          density={density}
+                          aSize={aSize}
                           unavailable={{ reason: u.reason, subReason: u.subReason }}
                         />
                       ) : (

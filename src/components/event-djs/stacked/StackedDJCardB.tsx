@@ -155,9 +155,9 @@ export function StackedDJCardB({
         {/* MIDDLE */}
         <div
           className={cn(
-            "flex flex-1 flex-col gap-2",
+            "flex flex-1 flex-col gap-2 bg-white",
             isCompact ? "p-3" : isComfortable ? "p-4" : "p-5",
-            isUnavailable && "opacity-70",
+            isUnavailable && "bg-muted/30 opacity-70",
           )}
         >
           {isCompact ? (
