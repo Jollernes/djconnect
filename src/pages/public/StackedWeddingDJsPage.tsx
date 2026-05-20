@@ -98,7 +98,7 @@ export function StackedWeddingDJsPage({ variant }: { variant: "a" | "b" | "c" })
   const [storSize, setStorSize] = useState<StorSize>("stor");
   const [aSize, setASize] = useState<StackedASize>("default");
   const showStorScale = variant === "c" && density === "spacious";
-  const showStackedAScale = variant === "a" && density === "comfortable";
+  const showStackedAScale = variant === "a" && density !== "compact";
 
   useEffect(() => {
     if (!city) openBrowseDJsGate({ eventTypeId: config.id });

@@ -1,15 +1,21 @@
 import { cn } from "@/lib/utils";
+import type { Density } from "./density";
 
 /**
- * Size variants for `StackedDJCardA` on the **Standard** (comfortable)
- * density. The card design and every element stays identical — only
- * the **proportions** of the photo, paddings, headline, and rail are
- * recalibrated so the smaller version remains readable and visually
+ * Size variants for `StackedDJCardA`. Applies to both the **Standard**
+ * (comfortable) and **Stor** (spacious) densities. The card design and
+ * every element stays identical — only the **proportions** of the
+ * photo, paddings, headline, and rail are recalibrated per density-+-
+ * size combination so the smaller version remains readable and visually
  * balanced (rather than a CSS-scale of the full-size card).
  *
- *   · default → reference proportions (224-px photo, 192-px rail).
- *   · small   → ~80 % proportions (176-px photo, 160-px rail, tighter
- *               paddings, smaller headline + rail price).
+ *   · default → reference proportions for the active density.
+ *   · small   → ~80 % proportions: narrower photo column, narrower rail,
+ *               tighter paddings, smaller headline + rail price, smaller
+ *               avatar.
+ *
+ * On `compact` density the toggle is not exposed — that density already
+ * has its own compressed layout.
  */
 export type StackedASize = "default" | "small";
 
@@ -36,37 +42,70 @@ export type StackedASizeTokens = {
   /** Font size for the rail price. */
   railPriceSize: string;
   /** Avatar size token (passed to <HostAvatar />). */
-  avatarSize: "sm" | "md";
+  avatarSize: "sm" | "md" | "lg";
 };
 
-const TOKENS: Record<StackedASize, StackedASizeTokens> = {
-  default: {
-    photoColWidth: "md:w-56",
-    contentPad: "p-4",
-    railPad: "p-4",
-    railWidth: "md:w-48",
-    nameSize: "text-2xl",
-    railPriceSize: "text-xl",
-    avatarSize: "md",
+const TOKENS: Record<
+  "comfortable" | "spacious",
+  Record<StackedASize, StackedASizeTokens>
+> = {
+  comfortable: {
+    default: {
+      photoColWidth: "md:w-56",
+      contentPad: "p-4",
+      railPad: "p-4",
+      railWidth: "md:w-48",
+      nameSize: "text-2xl",
+      railPriceSize: "text-xl",
+      avatarSize: "md",
+    },
+    small: {
+      photoColWidth: "md:w-44",
+      contentPad: "p-3 md:p-3.5",
+      railPad: "p-3 md:p-3.5",
+      railWidth: "md:w-40",
+      nameSize: "text-xl",
+      railPriceSize: "text-lg",
+      avatarSize: "sm",
+    },
   },
-  small: {
-    photoColWidth: "md:w-44",
-    contentPad: "p-3 md:p-3.5",
-    railPad: "p-3 md:p-3.5",
-    railWidth: "md:w-40",
-    nameSize: "text-xl",
-    railPriceSize: "text-lg",
-    avatarSize: "sm",
+  spacious: {
+    default: {
+      photoColWidth: "md:w-80",
+      contentPad: "p-5",
+      railPad: "p-5",
+      railWidth: "md:w-56",
+      nameSize: "text-2xl",
+      railPriceSize: "text-xl",
+      avatarSize: "lg",
+    },
+    small: {
+      photoColWidth: "md:w-64",
+      contentPad: "p-4",
+      railPad: "p-4",
+      railWidth: "md:w-44",
+      nameSize: "text-xl",
+      railPriceSize: "text-lg",
+      avatarSize: "md",
+    },
   },
 };
 
-export function stackedASizeTokens(size: StackedASize): StackedASizeTokens {
-  return TOKENS[size];
+export function stackedASizeTokens(
+  density: Density,
+  size: StackedASize,
+): StackedASizeTokens {
+  // On `compact` we just fall back to the comfortable-default tokens so
+  // the function stays total — the card never actually uses them on
+  // compact (compact has its own layout) but this keeps callers simple.
+  if (density === "compact") return TOKENS.comfortable.default;
+  return TOKENS[density][size];
 }
 
 /**
  * Pill toggle that mirrors the look of `DensityToggle` / `StorSizeToggle`.
- * Only rendered on `/wedding-djs-stacked-a` when density === "comfortable".
+ * Only rendered on `/wedding-djs-stacked-a` when density === "comfortable"
+ * or "spacious".
  */
 export function StackedASizeToggle({
   value,

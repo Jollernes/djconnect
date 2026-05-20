@@ -55,16 +55,11 @@ export function StackedDJCardA({
       : "—";
 
   const isCompact = density === "compact";
-  const isComfortable = density === "comfortable";
   const showThumbs = density === "spacious";
   const showRail = density !== "compact";
-  const tokens = stackedASizeTokens(aSize);
-  const useSmall = isComfortable && aSize === "small";
-  const avatarSize = isCompact
-    ? "sm"
-    : density === "spacious"
-      ? "lg"
-      : tokens.avatarSize;
+  const tokens = stackedASizeTokens(density, aSize);
+  const useSmall = !isCompact && aSize === "small";
+  const avatarSize = isCompact ? "sm" : tokens.avatarSize;
   const description = dj.bio || dj.tagline;
 
   return (
@@ -80,11 +75,7 @@ export function StackedDJCardA({
         <div
           className={cn(
             "relative w-full shrink-0",
-            isCompact
-              ? "md:w-28"
-              : isComfortable
-                ? tokens.photoColWidth
-                : "md:w-80",
+            isCompact ? "md:w-28" : tokens.photoColWidth,
           )}
         >
           <Link
@@ -169,7 +160,7 @@ export function StackedDJCardA({
         <div
           className={cn(
             "flex flex-1 flex-col gap-1.5",
-            isCompact ? "p-3" : isComfortable ? tokens.contentPad : "p-5",
+            isCompact ? "p-3" : tokens.contentPad,
             isUnavailable && "opacity-70",
           )}
         >
@@ -262,9 +253,8 @@ export function StackedDJCardA({
           <div
             className={cn(
               "flex shrink-0 flex-col items-stretch justify-between gap-3 border-t bg-muted/30 md:border-l md:border-t-0",
-              isComfortable
-                ? cn(tokens.railPad, tokens.railWidth)
-                : "p-5 md:w-56",
+              tokens.railPad,
+              tokens.railWidth,
               isUnavailable && "opacity-70",
             )}
           >
