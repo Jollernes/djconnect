@@ -338,18 +338,7 @@ export function DJSignupPage() {
         </div>
       </div>
 
-      <div className="container grid gap-6 py-8 lg:grid-cols-[260px_minmax(0,1fr)_320px] lg:gap-10">
-        <aside className="hidden lg:block">
-          <div className="rounded-xl border bg-background p-4">
-            <h4 className="text-sm font-semibold">Why join DJConnect?</h4>
-            <ul className="mt-3 space-y-2.5 text-xs text-muted-foreground">
-              <li className="flex items-start gap-2"><Shield className="mt-0.5 h-3.5 w-3.5 text-accent" />Verified DJs rank higher in search</li>
-              <li className="flex items-start gap-2"><HeartHandshake className="mt-0.5 h-3.5 w-3.5 text-accent" />Payouts 24h after event, no chasing</li>
-              <li className="flex items-start gap-2"><BadgeCheck className="mt-0.5 h-3.5 w-3.5 text-accent" />10% platform fee, no exclusivity</li>
-            </ul>
-          </div>
-        </aside>
-
+      <div className="container grid gap-6 py-8 xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-10">
         <main className="min-w-0">
           <div className="rounded-2xl border bg-background shadow-sm">
             <div className="relative overflow-hidden">
