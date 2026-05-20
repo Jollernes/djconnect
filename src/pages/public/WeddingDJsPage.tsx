@@ -1,6 +1,13 @@
 import { EventDJsListingPage } from "@/pages/public/EventDJsListingPage";
 import { EVENT_LISTING_CONFIG } from "@/lib/eventDJsContent";
 import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
+import {
+  WEDDING_THEME,
+  type EventTheme,
+} from "@/components/event-djs/grid/eventThemes";
+import { formatDanishDate } from "@/lib/formatDanishDate";
+import type { DJProfileWithRelations } from "@/types/domain";
+import type { EventListingConfig } from "@/lib/eventDJsContent";
 
 /**
  * Wedding listings (`/wedding-djs`) — Browse DJ flow when the user
@@ -16,45 +23,78 @@ import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWeddi
  * `/wedding-djs-curved-sweep?variant=soft-wedding-triptych` so it can
  * be swapped in later without re-implementing it.
  */
-export function WeddingDJsPage() {
+/** Shared renderer for the live event-DJs browse pages. Drops a
+ * Soft Wedding · Stats · Inline · Colour card into the listing
+ * grid, with the hallmark badge + "events-played" stat swapped
+ * out per `eventTheme` (BryllupsDJ / FødselsdagsDJ / FirmaDJ /
+ * EventDJ). Card layout, colourway, and editorial hero treatment
+ * are identical across event types so the marketplace reads as a
+ * single surface. */
+export function renderSoftWeddingCard(
+  eventTheme: EventTheme,
+  priceIncludes?: string[],
+) {
+  return function renderCard({
+    dj,
+    eventTypeId,
+    selectedDate,
+    unavailable,
+  }: {
+    dj: DJProfileWithRelations;
+    eventTypeId: string;
+    selectedDate?: string;
+    unavailable?: { reason: string; subReason?: string } | null;
+  }) {
+    return (
+      <GridCardV23SoftWedding
+        dj={dj}
+        eventTypeId={eventTypeId}
+        density="4"
+        tint="none"
+        heroGrayscale={0}
+        avatarGrayscale={false}
+        bioLines={3}
+        showWeddingsPlayed
+        hideEventTypes
+        hideStarRating
+        showRegion
+        showSeeProfileCta
+        priceIncludes={priceIncludes ?? eventTheme.defaultPriceIncludes}
+        statStyle="inline"
+        ctaProminence="filled"
+        availabilityDate={formatDanishDate(selectedDate)}
+        eventTheme={eventTheme}
+        unavailable={unavailable}
+      />
+    );
+  };
+}
+
+/** Shared scaffold used by the four live event-DJs browse pages.
+ * Picks the listing config + event-theme pack from a single call
+ * site so each page becomes a 1-line component. */
+export function SoftWeddingListingPage({
+  config,
+  eventTheme,
+  priceIncludes,
+}: {
+  config: EventListingConfig;
+  eventTheme: EventTheme;
+  priceIncludes?: string[];
+}) {
   return (
     <EventDJsListingPage
-      config={EVENT_LISTING_CONFIG.wedding}
-      renderCard={({ dj, eventTypeId, selectedDate, unavailable }) => (
-        <GridCardV23SoftWedding
-          dj={dj}
-          eventTypeId={eventTypeId}
-          density="4"
-          tint="none"
-          heroGrayscale={0}
-          avatarGrayscale={false}
-          bioLines={3}
-          showWeddingsPlayed
-          hideEventTypes
-          hideStarRating
-          showRegion
-          showSeeProfileCta
-          priceIncludes={["5 timer inkl. lyd & lys"]}
-          statStyle="inline"
-          ctaProminence="filled"
-          availabilityDate={formatDanishDate(selectedDate)}
-          unavailable={unavailable}
-        />
-      )}
+      config={config}
+      renderCard={renderSoftWeddingCard(eventTheme, priceIncludes)}
     />
   );
 }
 
-/** Format an ISO date (`2025-06-14`) as `d. 14. juni 2025` for the
- *  availability hint. Returns `undefined` when no date is selected
- *  so the card omits the hint and lets the CTA own the full footer. */
-function formatDanishDate(iso?: string): string | undefined {
-  if (!iso) return undefined;
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return undefined;
-  return `d. ${d.toLocaleDateString("da-DK", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })}`;
+export function WeddingDJsPage() {
+  return (
+    <SoftWeddingListingPage
+      config={EVENT_LISTING_CONFIG.wedding}
+      eventTheme={WEDDING_THEME}
+    />
+  );
 }

@@ -21,33 +21,12 @@ import {
   thumbnailsFor,
 } from "./shared";
 
-/** Wedding-rings glyph for the BryllupsDJ badge — two slightly-
- * overlapping outline rings in warm champagne / rose-gold. Drawn as
- * inline SVG because lucide-react does not include this symbol.
- * `stroke` defaults to the rose-gold hallmark but can be overridden
- * so the glyph picks up alternate colourways (blush, sage,
- * champagne) when used inside the stat row. */
-export function WeddingRings({
-  className,
-  stroke = "#b8884a",
-}: {
-  className?: string;
-  stroke?: string;
-}) {
-  return (
-    <svg
-      viewBox="0 0 26 16"
-      fill="none"
-      stroke={stroke}
-      strokeWidth={1.5}
-      aria-hidden="true"
-      className={className}
-    >
-      <circle cx="9" cy="9" r="5.25" />
-      <circle cx="17" cy="9" r="5.25" />
-    </svg>
-  );
-}
+// `WeddingRings` is now defined in `./eventThemes` (as the
+// wedding-theme hallmark glyph). Re-export it here so older imports
+// from this module keep working.
+export { WeddingRings, WEDDING_THEME, BIRTHDAY_THEME, CORPORATE_THEME, OTHER_THEME } from "./eventThemes";
+export type { EventTheme } from "./eventThemes";
+import { WEDDING_THEME, type EventTheme } from "./eventThemes";
 
 /** A subtle colour wash applied on top of the (otherwise neutral)
  * Soft Wedding card. Used to retint the stat-row icons and the CTA
@@ -517,18 +496,13 @@ export function responseHoursFor(dj: DJProfileWithRelations): number {
  * and modulated by review count so adjacent DJs in the same
  * experience bracket still show different numbers. Result is
  * rounded down to the nearest 10 for a marketing-friendly "X+"
- * read. Returns `null` when we don't have enough signal. */
+ * read. Returns `null` when we don't have enough signal.
+ *
+ * Thin wrapper around `WEDDING_THEME.playedCount` kept for older
+ * external imports (V24–V27 alternate cards still reference this
+ * name). New callers should prefer `eventTheme.playedCount(dj)`. */
 export function weddingsPlayedFor(dj: DJProfileWithRelations): number | null {
-  const base: Record<string, number> = {
-    "10+": 200,
-    "5-10": 95,
-    "3-5": 45,
-    "1-3": 18,
-  };
-  const seed = base[dj.years_experience];
-  if (seed === undefined) return null;
-  const bumped = seed + Math.floor((dj.rating_count ?? 0) * 1.4);
-  return Math.max(20, Math.round(bumped / 10) * 10);
+  return WEDDING_THEME.playedCount(dj);
 }
 
 const WEDDING_TINTS: SoftWeddingTint[] = [
@@ -565,6 +539,7 @@ export function GridCardV23SoftWedding({
   ctaProminence = "ghost",
   availabilityDate,
   photoLayout = "carved",
+  eventTheme = WEDDING_THEME,
   unavailable,
 }: {
   dj: DJProfileWithRelations;
@@ -685,6 +660,12 @@ export function GridCardV23SoftWedding({
    * pill button on the right. Intended to reflect a customer-
    * selected event date from the listings page. */
   availabilityDate?: string;
+  /** Per-event theme pack that swaps the hallmark badge label/glyph
+   * and the played-events stat (`brylluper` → `fødselsdage`,
+   * `firmaevents`, `events`) while keeping the card layout,
+   * colourway tokens, and editorial hero treatment identical. Defaults
+   * to `WEDDING_THEME` so existing callers are unaffected. */
+  eventTheme?: EventTheme;
   /** Photo treatment above the content body. Defaults to `"carved"`
    * (single hero photo with the circular avatar carved into the
    * lower-middle via a radial mask — the Soft Wedding hallmark).
@@ -783,9 +764,11 @@ export function GridCardV23SoftWedding({
               )}
               <TintOverlay tint={tint} />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-              {/* BryllupsDJ hallmark — same cream/amber pill as the
+              {/* Event-tailored hallmark — same cream/amber pill as the
                   carved layout, just sized down a touch to suit the
-                  narrower triptych hero. */}
+                  narrower triptych hero. Label + glyph swap per
+                  `eventTheme` (BryllupsDJ / FødselsdagsDJ /
+                  FirmaDJ / EventDJ). */}
               <span
                 className={cn(
                   "absolute left-2 top-2 inline-flex items-center rounded-full bg-white/95 font-sans font-medium uppercase text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
@@ -794,10 +777,10 @@ export function GridCardV23SoftWedding({
                     : "gap-1 px-2.5 py-1 text-[10px] tracking-[0.14em]",
                 )}
               >
-                <WeddingRings
+                <eventTheme.HallmarkIcon
                   className={compact ? "h-2.5 w-[18px]" : "h-3 w-[20px]"}
                 />
-                BryllupsDJ
+                {eventTheme.hallmarkLabel}
               </span>
               {/* Intro video play badge — bottom-left of the hero. */}
               <span className="absolute bottom-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur">
@@ -940,10 +923,10 @@ export function GridCardV23SoftWedding({
           )}
         </Link>
 
-        {/* BryllupsDJ badge. Single editorial trust mark, top-
-            left. Cream backdrop + thin amber ring + serif italic deep-
-            navy text keeps it premium / wedding-magazine rather than
-            marketplace-tag-y. */}
+        {/* Event-tailored hallmark badge. Single editorial trust
+            mark, top-left. Cream backdrop + thin amber ring keeps it
+            premium / wedding-magazine rather than marketplace-tag-y.
+            Label + glyph swap per `eventTheme`. */}
         <span
           className={cn(
             "absolute left-3 top-3 inline-flex items-center rounded-full bg-white/95 font-sans font-medium uppercase text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
@@ -952,10 +935,10 @@ export function GridCardV23SoftWedding({
               : "gap-1.5 px-3 py-1 text-[10.5px] tracking-[0.14em]",
           )}
         >
-          <WeddingRings
+          <eventTheme.HallmarkIcon
             className={compact ? "h-3 w-[20px]" : "h-3.5 w-[22px]"}
           />
-          BryllupsDJ
+          {eventTheme.hallmarkLabel}
         </span>
 
         {/* Carved-in avatar. Positioned so its centre sits exactly on
@@ -1102,8 +1085,9 @@ export function GridCardV23SoftWedding({
          *     row — same data, lighter footprint. */}
         {showWeddingsPlayed &&
           (() => {
-            const weddings = weddingsPlayedFor(dj);
+            const playedValue = eventTheme.playedCount(dj);
             const years = dj.years_experience;
+            const PlayedIcon = eventTheme.PlayedIcon;
             const stats: Array<{
               icon: React.ReactNode;
               value: string;
@@ -1122,13 +1106,13 @@ export function GridCardV23SoftWedding({
               },
               {
                 icon: (
-                  <WeddingRings
+                  <PlayedIcon
                     className={compact ? "h-2.5 w-2.5" : "h-3 w-3"}
                     stroke={palette.accent}
                   />
                 ),
-                value: weddings !== null ? `${weddings}+` : "—",
-                label: "brylluper",
+                value: playedValue !== null ? `${playedValue}+` : "—",
+                label: eventTheme.playedLabel,
               },
               {
                 icon: (
