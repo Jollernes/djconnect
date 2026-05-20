@@ -15,7 +15,10 @@ export function useStackedDensity(): [Density, (next: Density) => void] {
   const [density, setDensityState] = useState<Density>(() => {
     if (typeof window === "undefined") return DEFAULT_DENSITY;
     const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "compact" || stored === "comfortable" || stored === "spacious") {
+    // Migrate the removed "compact" density to the new default so
+    // returning users aren't stuck on a density that no longer has a
+    // toggle button.
+    if (stored === "comfortable" || stored === "spacious") {
       return stored;
     }
     return DEFAULT_DENSITY;
@@ -29,8 +32,11 @@ export function useStackedDensity(): [Density, (next: Density) => void] {
   return [density, setDensityState];
 }
 
+// `compact` is intentionally omitted — the Kompakt density was removed
+// from the user-facing toggle. The type still includes it so the card
+// components' compact branches keep type-checking; it just can't be
+// selected from the UI any more.
 export const DENSITY_OPTIONS: { value: Density; label: string; hint: string }[] = [
-  { value: "compact", label: "Kompakt", hint: "list-style, ~130 px" },
   { value: "comfortable", label: "Standard", hint: "default, ~200 px" },
   { value: "spacious", label: "Stor", hint: "full showcase, ~300 px" },
 ];

@@ -14,12 +14,13 @@ import { cn } from "@/lib/utils";
  */
 export type StorSize = "stor" | "h80" | "h70" | "h60" | "both80";
 
+// Two visible options. The underlying `TOKENS` map below still holds
+// recipes for `h70`, `h60`, and `both80` so the smaller-size designs
+// can be brought back later by adding their entries here; they're
+// just hidden from the user-facing Stor toggle for now.
 export const STOR_SIZE_OPTIONS: { value: StorSize; label: string; hint: string }[] = [
   { value: "stor", label: "Stor", hint: "fuld størrelse" },
   { value: "h80", label: "−20 % H", hint: "kun højde, ~80 %" },
-  { value: "h70", label: "−30 % H", hint: "kun højde, ~70 %" },
-  { value: "h60", label: "−40 % H", hint: "kun højde, ~60 %" },
-  { value: "both80", label: "−20 % B+H", hint: "smallere + lavere" },
 ];
 
 export type StorSizeTokens = {
