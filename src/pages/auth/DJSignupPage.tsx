@@ -183,8 +183,6 @@ export function DJSignupPage() {
 
   const passesStep = useMemo(() => validateStep(step, draft, profilePhoto, equipmentPhotos, stageNameState), [step, draft, profilePhoto, equipmentPhotos, stageNameState]);
 
-  const overallPct = Math.round((completed.size / STEPS.length) * 100);
-
   function update<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((d) => ({ ...d, [key]: value }));
   }
@@ -290,42 +288,44 @@ export function DJSignupPage() {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-muted/30">
+      {/* Merged onboarding header. One bordered region containing the
+          minimal chrome (DJ-onboarding pill + draft-restored hint +
+          login link) and, on lg+, the horizontal stepper underneath.
+          The redundant "Step X of Y · <title>" line and the standalone
+          progress bar were removed — the stepper itself conveys both
+          the active step and the overall progress (via its filled
+          connector rails), so a separate text + bar would just be
+          noise. On narrow widths the stepper hides and the title +
+          step counter come back so users still know where they are. */}
       <div className="border-b bg-background">
         <div className="container flex items-center justify-between gap-4 py-3">
           <div className="flex items-center gap-3 text-sm">
-            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">DJ onboarding</span>
-            <span className="text-muted-foreground">Step {step + 1} of {STEPS.length} · {STEPS[step]!.title}</span>
+            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+              DJ onboarding
+            </span>
+            <span className="text-muted-foreground md:hidden">
+              Step {step + 1} of {STEPS.length} · {STEPS[step]!.title}
+            </span>
           </div>
           <div className="flex items-center gap-3">
             {restored && (
-              <motion.span initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex">
+              <motion.span
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex"
+              >
                 <Check className="h-3 w-3 text-accent" /> Draft restored
               </motion.span>
             )}
-            <div className="hidden w-40 items-center gap-2 sm:flex">
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-                <motion.div
-                  className="h-full bg-accent"
-                  animate={{ width: `${overallPct}%` }}
-                  transition={{ duration: 0.4 }}
-                />
-              </div>
-              <span className="text-xs font-medium text-muted-foreground">{overallPct}%</span>
-            </div>
-            <Link to="/login" className="text-xs text-muted-foreground underline-offset-4 hover:underline">
+            <Link
+              to="/login"
+              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+            >
               Already a DJ? Log in
             </Link>
           </div>
         </div>
-      </div>
-
-      {/* Horizontal stepper. Sits between the page header and the
-          main onboarding card so users can read all 6 steps at a
-          glance instead of scanning a column on the left. Hidden on
-          narrow widths since the page header already shows
-          "Step X of Y · <title>". */}
-      <div className="border-b bg-background">
-        <div className="container hidden py-5 md:block">
+        <div className="container hidden pb-5 md:block">
           <Stepper
             steps={STEPS}
             current={step}
