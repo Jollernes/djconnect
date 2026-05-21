@@ -1937,11 +1937,18 @@ export function GridCardV23SoftWedding({
                             // fill, slightly darker border, semibold
                             // text + more padding + softer lift shadow
                             // so it reads as the visual end-anchor of
-                            // the card.
+                            // the card. When the active event theme
+                            // provides a `ctaTokens` override (used by
+                            // birthday / corporate / other), those
+                            // tokens win over the colourway palette —
+                            // so non-wedding pages can break out of
+                            // the rose-gold family for the CTA without
+                            // touching the rest of the card.
                             "font-semibold shadow-md",
-                            palette.ctaFilledBg,
-                            palette.ctaFilledBorder,
-                            palette.ctaFilledHover,
+                            eventTheme.ctaTokens?.bg ?? palette.ctaFilledBg,
+                            eventTheme.ctaTokens?.border ?? palette.ctaFilledBorder,
+                            eventTheme.ctaTokens?.hover ?? palette.ctaFilledHover,
+                            eventTheme.ctaTokens?.text,
                             compact ? "py-3 text-[13.5px]" : "py-3.5 text-[14.5px]",
                           )
                         : cn(

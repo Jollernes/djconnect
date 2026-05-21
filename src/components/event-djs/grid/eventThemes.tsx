@@ -104,6 +104,25 @@ export type EventTheme = {
    * "5 timer inkl. lyd & lys" for weddings). The parent page can
    * override this per-listing if needed. */
   defaultPriceIncludes: string[];
+  /** Optional override for the filled "Se profil & kontakt DJen"
+   * CTA's colour tokens. When omitted the CTA inherits the active
+   * Soft Wedding `colourway` palette (rose-gold default). Non-
+   * wedding event types use this to swap to a dark navy fill so
+   * the CTA reads as the visual end-anchor without leaning on the
+   * wedding-magazine palette. */
+  ctaTokens?: {
+    /** Tailwind bg class for the resting state. */
+    bg: string;
+    /** Tailwind border class. Slightly darker than `bg` so the
+     * button has a defined edge. */
+    border: string;
+    /** Tailwind hover class (typically `hover:bg-…`). */
+    hover: string;
+    /** Optional text-colour class. Defaults to inherit when not
+     * provided — set this when the bg is dark enough to need
+     * white/light text. */
+    text?: string;
+  };
 };
 
 /** Build a per-event "played count" heuristic from the same
@@ -139,6 +158,17 @@ export const WEDDING_THEME: EventTheme = {
   defaultPriceIncludes: ["5 timer inkl. lyd & lys"],
 };
 
+/** Shared dark-navy CTA tokens for non-wedding event browse pages.
+ * Reads as professional / energetic without leaning on the warm
+ * wedding-magazine palette. Stays on the slate family so it sits
+ * comfortably next to the existing slate-text typography. */
+const NAVY_CTA_TOKENS = {
+  bg: "bg-[#1e2a44]",
+  border: "border-[#172238]",
+  hover: "hover:bg-[#172238]",
+  text: "text-white",
+};
+
 export const BIRTHDAY_THEME: EventTheme = {
   id: "birthday",
   hallmarkLabel: "FødselsdagsDJ",
@@ -153,6 +183,7 @@ export const BIRTHDAY_THEME: EventTheme = {
     40,
   ),
   defaultPriceIncludes: ["4 timer inkl. lyd & lys"],
+  ctaTokens: NAVY_CTA_TOKENS,
 };
 
 export const CORPORATE_THEME: EventTheme = {
@@ -171,6 +202,7 @@ export const CORPORATE_THEME: EventTheme = {
     25,
   ),
   defaultPriceIncludes: ["4 timer inkl. lyd & lys"],
+  ctaTokens: NAVY_CTA_TOKENS,
 };
 
 export const OTHER_THEME: EventTheme = {
@@ -186,4 +218,5 @@ export const OTHER_THEME: EventTheme = {
     30,
   ),
   defaultPriceIncludes: ["4 timer inkl. lyd & lys"],
+  ctaTokens: NAVY_CTA_TOKENS,
 };
