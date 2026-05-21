@@ -3,11 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   User2,
-  Sparkles,
+  Compass,
   Speaker,
-  Trophy,
-  CreditCard,
-  Rocket,
+  Coins,
+  Camera,
   ChevronLeft,
   ChevronRight,
   Check,
@@ -26,6 +25,15 @@ import {
   Cake,
   Crown,
   Wine,
+  Sparkles,
+  Lightbulb,
+  Rocket,
+  Trophy,
+  Info,
+  PhoneCall,
+  Mail,
+  Star,
+  ArrowRight,
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Button } from "@/components/ui/button";
@@ -36,30 +44,63 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { EXPERIENCE_YEARS, EVENTS_PERFORMED, SETUP_SIZES } from "@/lib/constants";
-import { Stepper, type Step } from "@/components/dj-signup/Stepper";
 import { FilePicker, type FileWithPreview } from "@/components/dj-signup/FilePicker";
 import { OptionCards } from "@/components/dj-signup/OptionCards";
 import { LivePreview } from "@/components/dj-signup/LivePreview";
+import { BrandMark } from "@/components/common/BrandMark";
 import { cn } from "@/lib/utils";
 import { fileToDataUrl, writeDemoDJProfile } from "@/lib/demoDJProfile";
 
+/**
+ * DJ signup wizard — redesigned to a 5-step Danish flow that owns its
+ * own full-screen layout (same chrome pattern as the customer-facing
+ * /get-offers wizard: minimal brand-mark + close + thin progress bar in
+ * the top menu, no site header/footer).
+ *
+ * Steps:
+ *   1. Opret konto                  — name, email, password, contact
+ *   2. Sådan fungerer det           — informational explainer (no form)
+ *   3. DJ Erfaring & Mobildiskotek  — experience + gear merged
+ *   4. Pris & ydelser               — pricing + payout setup
+ *   5. Profil & billeder            — public-facing profile (DJ card)
+ *
+ * Right rail behaviour:
+ *   • Steps 1-4 show a "Sådan hjælper det dig" tips panel that explains
+ *     *why* we ask for that step's information so the form doesn't feel
+ *     transactional.
+ *   • Step 5 (Profil & billeder) swaps the tips panel for the
+ *     `LivePreview` DJ-card so the applicant can see exactly how their
+ *     profile will appear to customers as they fill it in. This is the
+ *     only step where the live card is shown.
+ */
+
 type Draft = {
+  // Step 1 — Opret konto
   fullName: string;
   email: string;
   password: string;
   phone: string;
   city: string;
   country: string;
-  stageName: string;
-  bio: string;
+  // Step 3 — DJ Erfaring & Mobildiskotek
   yearsExperience: string;
-  eventTypes: string[];
+  eventsPerformed: string;
+  notableClients: string;
   equipmentOwned: boolean;
   equipmentPresets: string[];
   equipmentDescription: string;
   setupSize: string;
-  eventsPerformed: string;
-  notableClients: string;
+  // Step 4 — Pris & ydelser
+  pricingMode: "hourly" | "package" | "";
+  hourlyRate: string;
+  minimumHours: string;
+  packagePrice: string;
+  includedHours: string;
+  addOns: string[];
+  // Step 5 — Profil & billeder
+  stageName: string;
+  bio: string;
+  eventTypes: string[];
 };
 
 const EMPTY_DRAFT: Draft = {
@@ -69,34 +110,61 @@ const EMPTY_DRAFT: Draft = {
   phone: "",
   city: "",
   country: "Denmark",
-  stageName: "",
-  bio: "",
   yearsExperience: "",
-  eventTypes: [],
+  eventsPerformed: "",
+  notableClients: "",
   equipmentOwned: false,
   equipmentPresets: [],
   equipmentDescription: "",
   setupSize: "",
-  eventsPerformed: "",
-  notableClients: "",
+  pricingMode: "",
+  hourlyRate: "",
+  minimumHours: "",
+  packagePrice: "",
+  includedHours: "",
+  addOns: [],
+  stageName: "",
+  bio: "",
+  eventTypes: [],
 };
 
-const STEPS: Step[] = [
-  { id: "account", title: "Account", description: "Name, email, password", icon: User2, est: "1 min" },
-  { id: "profile", title: "Your vibe", description: "Stage name, bio, event types", icon: Sparkles, est: "3 min" },
-  { id: "equipment", title: "Equipment", description: "Gear & photos of your rig", icon: Speaker, est: "4 min" },
-  { id: "experience", title: "Experience", description: "Track record & credentials", icon: Trophy, est: "2 min" },
-  { id: "payout", title: "Get paid", description: "Stripe Connect setup", icon: CreditCard, est: "3 min" },
-  { id: "submit", title: "Submit", description: "Review & go live", icon: Rocket, est: "1 min" },
+type StepDef = {
+  id: string;
+  title: string;
+  shortTitle: string;
+  icon: typeof User2;
+};
+
+const STEPS: StepDef[] = [
+  { id: "account", title: "Opret konto", shortTitle: "Konto", icon: User2 },
+  {
+    id: "how-it-works",
+    title: "Sådan fungerer det",
+    shortTitle: "Sådan",
+    icon: Compass,
+  },
+  {
+    id: "experience",
+    title: "DJ Erfaring & Mobildiskotek",
+    shortTitle: "Erfaring & udstyr",
+    icon: Speaker,
+  },
+  { id: "pricing", title: "Pris & ydelser", shortTitle: "Pris", icon: Coins },
+  {
+    id: "profile",
+    title: "Profil & billeder",
+    shortTitle: "Profil",
+    icon: Camera,
+  },
 ];
 
 const EVENT_TYPE_CARDS = [
-  { id: "wedding", label: "Wedding", description: "First dance, ceremonies", icon: Heart },
-  { id: "birthday", label: "Birthday", description: "Milestone parties", icon: Cake },
-  { id: "corporate_event", label: "Corporate", description: "Conferences, launches", icon: Briefcase },
-  { id: "corporate_party", label: "Corporate party", description: "Summer & Christmas", icon: Wine },
-  { id: "private_party", label: "Private party", description: "Intimate gatherings", icon: Crown },
-  { id: "other", label: "Other", description: "Clubs, festivals…", icon: Sparkles },
+  { id: "wedding", label: "Bryllup", description: "Første dans & ceremoni", icon: Heart },
+  { id: "birthday", label: "Fødselsdag", description: "Runde dage & jubilæum", icon: Cake },
+  { id: "corporate_event", label: "Firmaevent", description: "Konference & launch", icon: Briefcase },
+  { id: "corporate_party", label: "Firmafest", description: "Sommer- & julefest", icon: Wine },
+  { id: "private_party", label: "Privatfest", description: "Mindre selskaber", icon: Crown },
+  { id: "other", label: "Andet", description: "Klubber, festivaler…", icon: Sparkles },
 ];
 
 const EQUIPMENT_PRESETS = [
@@ -106,16 +174,29 @@ const EQUIPMENT_PRESETS = [
   "Pioneer DDJ-FLX6",
   "Allen & Heath Xone",
   "Denon Prime 4",
-  "QSC K12.2 speakers",
-  "JBL EON speakers",
-  "RCF subwoofers",
-  "Shure SM58 mic",
-  "Sennheiser wireless mic",
+  "QSC K12.2 højtalere",
+  "JBL EON højtalere",
+  "RCF subwoofere",
+  "Shure SM58 mikrofon",
+  "Sennheiser trådløs mik.",
   "Chauvet LED wash",
-  "Smoke machine",
-  "Moving head lights",
-  "Confetti cannon",
-  "DMX controller",
+  "Røgmaskine",
+  "Moving heads",
+  "Konfetti-kanon",
+  "DMX-controller",
+];
+
+const ADDON_PRESETS = [
+  "Ekstra time",
+  "Ekstra højtaler",
+  "Uplights",
+  "Trådløs mikrofon",
+  "Røgmaskine",
+  "Moving heads",
+  "Fotobooth",
+  "Konfetti-kanon",
+  "MC / vært",
+  "Pakketransport > 50 km",
 ];
 
 const DRAFT_KEY = "djconnect.djsignup.draft";
@@ -127,13 +208,16 @@ export function DJSignupPage() {
   const [step, setStep] = useState(0);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [profilePhoto, setProfilePhoto] = useState<FileWithPreview[]>([]);
+  const [galleryPhotos, setGalleryPhotos] = useState<FileWithPreview[]>([]);
   const [equipmentPhotos, setEquipmentPhotos] = useState<FileWithPreview[]>([]);
   const [credentials, setCredentials] = useState<FileWithPreview[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [restored, setRestored] = useState(false);
-  const [stageNameState, setStageNameState] = useState<"idle" | "checking" | "available" | "taken">("idle");
+  const [stageNameState, setStageNameState] = useState<
+    "idle" | "checking" | "available" | "taken"
+  >("idle");
   const [direction, setDirection] = useState<1 | -1>(1);
   const [submitted, setSubmitted] = useState(false);
 
@@ -141,10 +225,22 @@ export function DJSignupPage() {
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as { draft: Draft; step: number; completed: number[] };
+        const parsed = JSON.parse(raw) as {
+          draft: Partial<Draft>;
+          step: number;
+          completed: number[];
+        };
+        // Spread EMPTY_DRAFT first so any new fields added since the
+        // draft was saved get sensible defaults.
         setDraft({ ...EMPTY_DRAFT, ...parsed.draft, password: "" });
-        setStep(parsed.step ?? 0);
-        setCompleted(new Set(parsed.completed ?? []));
+        const restoredStep = Math.min(
+          STEPS.length - 1,
+          Math.max(0, parsed.step ?? 0),
+        );
+        setStep(restoredStep);
+        setCompleted(
+          new Set((parsed.completed ?? []).filter((i) => i < STEPS.length)),
+        );
         setRestored(true);
       }
     } catch {
@@ -157,7 +253,11 @@ export function DJSignupPage() {
     void _password;
     localStorage.setItem(
       DRAFT_KEY,
-      JSON.stringify({ draft: { ...rest, password: "" }, step, completed: Array.from(completed) }),
+      JSON.stringify({
+        draft: { ...rest, password: "" },
+        step,
+        completed: Array.from(completed),
+      }),
     );
   }, [draft, step, completed]);
 
@@ -169,19 +269,29 @@ export function DJSignupPage() {
     setStageNameState("checking");
     const t = setTimeout(() => {
       const taken = ["dj snake", "tiesto", "calvin harris", "dj khaled"];
-      setStageNameState(taken.includes(draft.stageName.toLowerCase()) ? "taken" : "available");
+      setStageNameState(
+        taken.includes(draft.stageName.toLowerCase()) ? "taken" : "available",
+      );
     }, 600);
     return () => clearTimeout(t);
   }, [draft.stageName]);
 
   const profilePhotoUrl = profilePhoto[0]?.preview ?? null;
-
   const bioMin = 100;
   const bioPct = Math.min(100, Math.round((draft.bio.length / bioMin) * 100));
-
   const pwStrength = passwordStrength(draft.password);
 
-  const passesStep = useMemo(() => validateStep(step, draft, profilePhoto, equipmentPhotos, stageNameState), [step, draft, profilePhoto, equipmentPhotos, stageNameState]);
+  const passesStep = useMemo(
+    () =>
+      validateStep(
+        step,
+        draft,
+        profilePhoto,
+        equipmentPhotos,
+        stageNameState,
+      ),
+    [step, draft, profilePhoto, equipmentPhotos, stageNameState],
+  );
 
   function update<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -190,11 +300,13 @@ export function DJSignupPage() {
   function goTo(next: number) {
     setDirection(next > step ? 1 : -1);
     setStep(next);
+    if (typeof window !== "undefined")
+      window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function advance() {
     if (!passesStep.ok) {
-      toast.error(passesStep.reason ?? "Please complete this step");
+      toast.error(passesStep.reason ?? "Udfyld venligst dette trin");
       return;
     }
     setCompleted((c) => new Set(c).add(step));
@@ -203,7 +315,7 @@ export function DJSignupPage() {
 
   async function submitApplication() {
     if (!passesStep.ok) {
-      toast.error(passesStep.reason ?? "Please complete this step");
+      toast.error(passesStep.reason ?? "Udfyld venligst dette trin");
       return;
     }
     setLoading(true);
@@ -217,11 +329,8 @@ export function DJSignupPage() {
         });
       }
 
-      // Persist everything the user just entered as a "demo DJ profile" so
-      // the new DJ panel can render their data straight away. Photos are
-      // converted to data URLs so they survive a page reload.
       const profilePhotoDataUrl = profilePhoto[0]
-        ? (await fileToDataUrl(profilePhoto[0])) ?? undefined
+        ? ((await fileToDataUrl(profilePhoto[0])) ?? undefined)
         : undefined;
       const equipmentPhotoDataUrls = (
         await Promise.all(equipmentPhotos.map((p) => fileToDataUrl(p)))
@@ -253,9 +362,6 @@ export function DJSignupPage() {
       fireConfetti();
       localStorage.removeItem(DRAFT_KEY);
 
-      // In demo mode (no Supabase) we drop the user straight into the new
-      // DJ panel so they can see the profile they just built. With a real
-      // backend they still go to pending-verification first.
       if (isConfigured) {
         setTimeout(() => navigate("/dj/pending-verification"), 2800);
       } else {
@@ -265,10 +371,7 @@ export function DJSignupPage() {
             mockLogin("dj");
             loggedIn = true;
           } catch {
-            // localStorage may be full or blocked — fall through and send
-            // the user to /login so they're not stranded on /dj/dashboard,
-            // which is auth-gated and would just bounce them to /login
-            // anyway, losing the toast context.
+            // localStorage may be full or blocked — fall back to /login.
           }
           if (loggedIn) {
             navigate("/dj/dashboard");
@@ -281,190 +384,230 @@ export function DJSignupPage() {
         }, 1800);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Submission failed");
+      toast.error(err instanceof Error ? err.message : "Indsendelse fejlede");
       setLoading(false);
     }
   }
 
+  const isLastStep = step === STEPS.length - 1;
+  const currentStep = STEPS[step]!;
+  const pct = Math.round(((step + 1) / STEPS.length) * 100);
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-muted/30">
-      {/* Merged onboarding header. One bordered region containing the
-          minimal chrome (DJ-onboarding pill + draft-restored hint +
-          login link) and, on lg+, the horizontal stepper underneath.
-          The redundant "Step X of Y · <title>" line and the standalone
-          progress bar were removed — the stepper itself conveys both
-          the active step and the overall progress (via its filled
-          connector rails), so a separate text + bar would just be
-          noise. On narrow widths the stepper hides and the title +
-          step counter come back so users still know where they are. */}
-      <div className="border-b bg-background">
-        <div className="container flex items-center justify-between gap-4 py-3">
-          <div className="flex items-center gap-3 text-sm">
-            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
-              DJ onboarding
+    <div className="flex min-h-[100dvh] flex-col bg-gradient-to-b from-amber-50/30 via-background to-background">
+      {/* Top bar — mirrors the /get-offers wizard chrome: brand on the
+          left, centred step counter + progress bar, secondary actions on
+          the right. The page owns the full screen (no site header/footer)
+          so the funnel reads as a guided flow rather than a generic page. */}
+      <header className="sticky top-0 z-30 border-b bg-background/95 backdrop-blur">
+        <div className="container flex h-14 items-center justify-between gap-3">
+          <Link to="/" className="flex items-center gap-2 font-semibold">
+            <BrandMark size="sm" />
+            <span className="hidden text-base tracking-tight sm:inline">
+              DJConnect
             </span>
-            <span className="text-muted-foreground md:hidden">
-              Step {step + 1} of {STEPS.length} · {STEPS[step]!.title}
+            <span className="ml-1 hidden rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent sm:inline">
+              DJ-onboarding
+            </span>
+          </Link>
+
+          <div className="flex flex-1 items-center justify-center gap-3 px-2">
+            <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
+              Trin {step + 1} af {STEPS.length}
+            </span>
+            <div className="relative h-1.5 w-full max-w-md overflow-hidden rounded-full bg-amber-100/60">
+              <motion.div
+                className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-accent to-amber-400"
+                initial={false}
+                animate={{ width: `${pct}%` }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              />
+            </div>
+            <span className="text-xs font-medium tabular-nums text-muted-foreground">
+              {pct}%
             </span>
           </div>
-          <div className="flex items-center gap-3">
+
+          <div className="flex items-center gap-2">
             {restored && (
               <motion.span
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex"
+                className="hidden items-center gap-1 text-xs text-muted-foreground md:inline-flex"
               >
-                <Check className="h-3 w-3 text-accent" /> Draft restored
+                <Check className="h-3 w-3 text-accent" /> Kladde gendannet
               </motion.span>
             )}
             <Link
               to="/login"
-              className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+              className="hidden text-xs text-muted-foreground underline-offset-4 hover:underline sm:inline"
             >
-              Already a DJ? Log in
+              Log ind
             </Link>
+            <Button asChild variant="ghost" size="icon" aria-label="Luk">
+              <Link to="/">
+                <X className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
-        <div className="container hidden pb-5 md:block">
-          <Stepper
-            steps={STEPS}
-            current={step}
-            completed={completed}
-            onJump={(i) => {
-              if (completed.has(i) || i <= step) goTo(i);
-            }}
-            orientation="horizontal"
-          />
-        </div>
-      </div>
+      </header>
 
-      <div className="container grid gap-6 py-8 xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-10">
-        <main className="min-w-0">
-          <div className="rounded-2xl border bg-background shadow-sm">
-            <div className="relative overflow-hidden">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={step}
-                  initial={{ opacity: 0, x: direction * 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: direction * -30 }}
-                  transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-                  className="p-6 md:p-8"
-                >
-                  {step === 0 && (
-                    <StepAccount
-                      draft={draft}
-                      update={update}
-                      showPassword={showPassword}
-                      setShowPassword={setShowPassword}
-                      pwStrength={pwStrength}
-                    />
-                  )}
-                  {step === 1 && (
-                    <StepProfile
-                      draft={draft}
-                      update={update}
-                      stageNameState={stageNameState}
-                      bioPct={bioPct}
-                      bioMin={bioMin}
-                      profilePhoto={profilePhoto}
-                      setProfilePhoto={setProfilePhoto}
-                    />
-                  )}
-                  {step === 2 && (
-                    <StepEquipment
-                      draft={draft}
-                      update={update}
-                      equipmentPhotos={equipmentPhotos}
-                      setEquipmentPhotos={setEquipmentPhotos}
-                    />
-                  )}
-                  {step === 3 && (
-                    <StepExperience
-                      draft={draft}
-                      update={update}
-                      credentials={credentials}
-                      setCredentials={setCredentials}
-                    />
-                  )}
-                  {step === 4 && <StepPayout />}
-                  {step === 5 && (
-                    <StepSubmit
-                      draft={draft}
-                      profilePhotoUrl={profilePhotoUrl}
-                      equipmentPhotos={equipmentPhotos}
-                      submitted={submitted}
-                    />
-                  )}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t bg-background/95 px-6 py-4 backdrop-blur md:px-8">
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => { if (step > 0) goTo(step - 1); }}
-                disabled={step === 0 || loading}
-              >
-                <ChevronLeft className="h-4 w-4" /> Back
-              </Button>
-
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Lock className="h-3.5 w-3.5" /> Your data is encrypted. Draft auto-saves.
+      {/* Body — main content on the left, contextual right rail. The
+          right rail shows the live DJ card preview ONLY on the final
+          step (Profil & billeder); every earlier step shows a tip card
+          that explains why we're asking for that step's information so
+          the form feels less transactional. */}
+      <main className="flex-1">
+        <div className="container grid gap-6 py-8 md:py-10 xl:grid-cols-[minmax(0,1fr)_320px] xl:gap-10">
+          <section className="min-w-0">
+            <div className="rounded-2xl border bg-background shadow-sm">
+              <div className="relative overflow-hidden">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={step}
+                    initial={{ opacity: 0, x: direction * 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: direction * -30 }}
+                    transition={{
+                      duration: 0.32,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="p-6 md:p-8"
+                  >
+                    {step === 0 && (
+                      <StepAccount
+                        draft={draft}
+                        update={update}
+                        showPassword={showPassword}
+                        setShowPassword={setShowPassword}
+                        pwStrength={pwStrength}
+                      />
+                    )}
+                    {step === 1 && <StepHowItWorks />}
+                    {step === 2 && (
+                      <StepExperience
+                        draft={draft}
+                        update={update}
+                        equipmentPhotos={equipmentPhotos}
+                        setEquipmentPhotos={setEquipmentPhotos}
+                        credentials={credentials}
+                        setCredentials={setCredentials}
+                      />
+                    )}
+                    {step === 3 && (
+                      <StepPricing draft={draft} update={update} />
+                    )}
+                    {step === 4 && (
+                      <StepProfile
+                        draft={draft}
+                        update={update}
+                        stageNameState={stageNameState}
+                        bioPct={bioPct}
+                        bioMin={bioMin}
+                        profilePhoto={profilePhoto}
+                        setProfilePhoto={setProfilePhoto}
+                        galleryPhotos={galleryPhotos}
+                        setGalleryPhotos={setGalleryPhotos}
+                      />
+                    )}
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
-              {step < STEPS.length - 1 ? (
+              <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t bg-background/95 px-6 py-4 backdrop-blur md:px-8">
                 <Button
                   type="button"
-                  variant="accent"
-                  size="lg"
-                  onClick={advance}
-                  disabled={loading}
-                  className={cn("min-w-[140px]", passesStep.ok && "shadow-lg shadow-accent/30")}
+                  variant="ghost"
+                  onClick={() => {
+                    if (step > 0) goTo(step - 1);
+                  }}
+                  disabled={step === 0 || loading}
                 >
-                  Continue <ChevronRight className="h-4 w-4" />
+                  <ChevronLeft className="h-4 w-4" /> Tilbage
                 </Button>
-              ) : (
-                <Button
-                  type="button"
-                  variant="accent"
-                  size="lg"
-                  onClick={submitApplication}
-                  disabled={loading || submitted}
-                  className="min-w-[180px] shadow-lg shadow-accent/40"
-                >
-                  {submitted ? (
-                    <><PartyPopper className="h-4 w-4" /> Submitted!</>
-                  ) : loading ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> Submitting…</>
-                  ) : (
-                    <>Submit application <Rocket className="h-4 w-4" /></>
-                  )}
-                </Button>
-              )}
+
+                <div className="hidden items-center gap-2 text-xs text-muted-foreground md:flex">
+                  <Lock className="h-3.5 w-3.5" /> Data krypteret · Kladde
+                  gemmes
+                </div>
+
+                {!isLastStep ? (
+                  <Button
+                    type="button"
+                    variant="accent"
+                    size="lg"
+                    onClick={advance}
+                    disabled={loading}
+                    className={cn(
+                      "min-w-[140px]",
+                      passesStep.ok && "shadow-lg shadow-accent/30",
+                    )}
+                  >
+                    Næste <ChevronRight className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="accent"
+                    size="lg"
+                    onClick={submitApplication}
+                    disabled={loading || submitted}
+                    className="min-w-[180px] shadow-lg shadow-accent/40"
+                  >
+                    {submitted ? (
+                      <>
+                        <PartyPopper className="h-4 w-4" /> Sendt!
+                      </>
+                    ) : loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" /> Sender…
+                      </>
+                    ) : (
+                      <>
+                        Send ansøgning <Rocket className="h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-            <span>Need a hand? <a href="mailto:support@djconnect.example" className="underline-offset-4 hover:underline">support@djconnect.example</a></span>
-            <span>Join <b className="text-foreground">124</b> verified DJs already on the platform.</span>
-          </div>
-        </main>
+            <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+              <span>
+                Brug for hjælp?{" "}
+                <a
+                  href="mailto:support@djconnect.example"
+                  className="underline-offset-4 hover:underline"
+                >
+                  support@djconnect.example
+                </a>
+              </span>
+              <span>
+                Bliv en del af <b className="text-foreground">124</b>{" "}
+                verificerede DJs.
+              </span>
+            </div>
+          </section>
 
-        <aside className="hidden xl:block">
-          <LivePreview
-            stageName={draft.stageName}
-            city={draft.city}
-            country={draft.country}
-            bio={draft.bio}
-            yearsExperience={draft.yearsExperience}
-            eventTypes={draft.eventTypes}
-            setupSize={draft.setupSize}
-            profilePhotoUrl={profilePhotoUrl}
-          />
-        </aside>
-      </div>
+          <aside className="hidden xl:block">
+            {isLastStep ? (
+              <LivePreview
+                stageName={draft.stageName}
+                city={draft.city}
+                country={draft.country}
+                bio={draft.bio}
+                yearsExperience={draft.yearsExperience}
+                eventTypes={draft.eventTypes}
+                setupSize={draft.setupSize}
+                profilePhotoUrl={profilePhotoUrl}
+              />
+            ) : (
+              <TipsPanel stepId={currentStep.id} />
+            )}
+          </aside>
+        </div>
+      </main>
 
       <AnimatePresence>
         {submitted && (
@@ -483,11 +626,14 @@ export function DJSignupPage() {
               <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/15 text-accent">
                 <Rocket className="h-8 w-8" />
               </span>
-              <h3 className="mt-5 text-2xl font-semibold">You're on the list!</h3>
+              <h3 className="mt-5 text-2xl font-semibold">Du er på listen!</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                We'll review your application within 2 business days and email you at <b>{draft.email}</b>.
+                Vi gennemgår din ansøgning inden for 2 hverdage og sender en
+                mail til <b>{draft.email}</b>.
               </p>
-              <p className="mt-5 text-xs text-muted-foreground">Redirecting…</p>
+              <p className="mt-5 text-xs text-muted-foreground">
+                Sender dig videre…
+              </p>
             </motion.div>
           </motion.div>
         )}
@@ -495,6 +641,10 @@ export function DJSignupPage() {
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Step 1 — Opret konto                                                */
+/* ------------------------------------------------------------------ */
 
 type AccountProps = {
   draft: Draft;
@@ -504,25 +654,44 @@ type AccountProps = {
   pwStrength: { score: number; label: string; color: string };
 };
 
-function StepAccount({ draft, update, showPassword, setShowPassword, pwStrength }: AccountProps) {
+function StepAccount({
+  draft,
+  update,
+  showPassword,
+  setShowPassword,
+  pwStrength,
+}: AccountProps) {
   return (
     <div className="space-y-6">
       <Header
         icon={User2}
-        eyebrow="Step 1"
-        title="Let's get you an account"
-        subtitle="We'll use this to sign you in and reach you about bookings. You can edit everything later."
+        eyebrow="Trin 1"
+        title="Opret konto"
+        subtitle="Vi bruger oplysningerne til at logge dig ind og kontakte dig om bookinger. Du kan redigere alt senere."
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Full legal name" hint="As it appears on your ID">
-          <Input value={draft.fullName} onChange={(e) => update("fullName", e.target.value)} placeholder="e.g. Alex Morgan" />
+        <Field label="Fulde navn" hint="Som det står på dit ID">
+          <Input
+            value={draft.fullName}
+            onChange={(e) => update("fullName", e.target.value)}
+            placeholder="fx Alex Morgan"
+          />
         </Field>
-        <Field label="Email" hint="We'll send a verification link">
-          <Input type="email" autoComplete="email" value={draft.email} onChange={(e) => update("email", e.target.value)} placeholder="you@domain.com" />
+        <Field label="Email" hint="Vi sender et bekræftelseslink">
+          <Input
+            type="email"
+            autoComplete="email"
+            value={draft.email}
+            onChange={(e) => update("email", e.target.value)}
+            placeholder="dig@domæne.dk"
+          />
         </Field>
 
-        <Field label="Password" hint="8+ characters, mix letters, numbers, symbols">
+        <Field
+          label="Adgangskode"
+          hint="Mindst 8 tegn — gerne med tal og symboler"
+        >
           <div className="relative">
             <Input
               type={showPassword ? "text" : "password"}
@@ -535,9 +704,13 @@ function StepAccount({ draft, update, showPassword, setShowPassword, pwStrength 
               type="button"
               className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground hover:text-foreground"
               onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={showPassword ? "Skjul adgangskode" : "Vis adgangskode"}
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </button>
           </div>
           {draft.password && (
@@ -547,30 +720,553 @@ function StepAccount({ draft, update, showPassword, setShowPassword, pwStrength 
                   <motion.div
                     key={i}
                     initial={false}
-                    animate={{ backgroundColor: i < pwStrength.score ? pwStrength.color : "hsl(214, 32%, 91%)" }}
+                    animate={{
+                      backgroundColor:
+                        i < pwStrength.score
+                          ? pwStrength.color
+                          : "hsl(214, 32%, 91%)",
+                    }}
                     className="h-1 rounded-full"
                   />
                 ))}
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">{pwStrength.label}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {pwStrength.label}
+              </p>
             </div>
           )}
         </Field>
 
-        <Field label="Phone" hint="For urgent booking-day contact only">
-          <Input type="tel" value={draft.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+45 …" />
+        <Field label="Telefon" hint="Kun til akut kontakt på eventdagen">
+          <Input
+            type="tel"
+            value={draft.phone}
+            onChange={(e) => update("phone", e.target.value)}
+            placeholder="+45 …"
+          />
         </Field>
 
-        <Field label="City / region" hint="Where are you based?">
-          <Input value={draft.city} onChange={(e) => update("city", e.target.value)} placeholder="Copenhagen" />
+        <Field label="By / region" hint="Hvor er du baseret?">
+          <Input
+            value={draft.city}
+            onChange={(e) => update("city", e.target.value)}
+            placeholder="København"
+          />
         </Field>
-        <Field label="Country">
-          <Input value={draft.country} onChange={(e) => update("country", e.target.value)} />
+        <Field label="Land">
+          <Input
+            value={draft.country}
+            onChange={(e) => update("country", e.target.value)}
+          />
         </Field>
       </div>
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Step 2 — Sådan fungerer det                                         */
+/* ------------------------------------------------------------------ */
+
+function StepHowItWorks() {
+  const points: Array<{
+    icon: typeof Shield;
+    title: string;
+    body: string;
+  }> = [
+    {
+      icon: Shield,
+      title: "Escrow-beskyttet betaling",
+      body: "Kunden betaler op front. Pengene står sikkert hos os indtil 24 timer efter eventet — så bliver de frigivet til dig.",
+    },
+    {
+      icon: HeartHandshake,
+      title: "Hurtige udbetalinger",
+      body: "Pengene lander på din bankkonto inden for 2-5 hverdage efter eventet, via Stripe Connect.",
+    },
+    {
+      icon: BadgeCheck,
+      title: "Verificeret profil",
+      body: "Vi tjekker dit udstyr og dine referencer — så kunderne ved præcis hvad de booker, og du får et 'Verified'-badge.",
+    },
+    {
+      icon: Trophy,
+      title: "Ingen provision på de første 5",
+      body: "Dine første 5 bookinger er provisionsfrie. Du beholder 100% af din pris. Derefter 8% i serviceafgift.",
+    },
+  ];
+
+  const flow: Array<{ n: number; title: string; body: string }> = [
+    {
+      n: 1,
+      title: "Kunden sender en forespørgsel",
+      body: "Kunden vælger dato, by og eventtype — du modtager forespørgslen direkte i dit DJ-panel.",
+    },
+    {
+      n: 2,
+      title: "Du sender et personligt tilbud",
+      body: "Du svarer inden for 24 timer med din pris og pakke. Ingen budrunde, intet spam.",
+    },
+    {
+      n: 3,
+      title: "Kunden booker & betaler",
+      body: "Når kunden accepterer, går pengene i escrow. Booking-detaljerne lander automatisk i din kalender.",
+    },
+    {
+      n: 4,
+      title: "Du spiller — vi udbetaler",
+      body: "Spil dit set. 24 timer efter eventet udbetales pengene til din konto.",
+    },
+  ];
+
+  return (
+    <div className="space-y-8">
+      <Header
+        icon={Compass}
+        eyebrow="Trin 2"
+        title="Sådan fungerer det"
+        subtitle="Vi har bygget DJConnect, så du kan fokusere på det du er god til — spille for fyldte gulve. Her er hvordan platformen fungerer for dig:"
+      />
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {points.map((p, i) => (
+          <motion.div
+            key={p.title}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.05 * i }}
+            className="flex items-start gap-3 rounded-xl border bg-card p-4"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+              <p.icon className="h-4 w-4" />
+            </span>
+            <div>
+              <div className="text-sm font-semibold">{p.title}</div>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                {p.body}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <div>
+        <div className="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Fra forespørgsel til udbetaling
+        </div>
+        <ol className="space-y-3">
+          {flow.map((s, i) => (
+            <motion.li
+              key={s.n}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.08 * i }}
+              className="flex items-start gap-3 rounded-xl border bg-background p-4"
+            >
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border bg-accent/10 text-xs font-semibold text-accent">
+                {s.n}
+              </span>
+              <div>
+                <div className="text-sm font-semibold">{s.title}</div>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  {s.body}
+                </p>
+              </div>
+            </motion.li>
+          ))}
+        </ol>
+      </div>
+
+      <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 text-sm">
+        <div className="flex items-start gap-2">
+          <Info className="mt-0.5 h-4 w-4 text-accent" />
+          <p className="text-xs leading-relaxed text-foreground/80">
+            <b className="text-foreground">Næste:</b> fortæl os om din erfaring
+            og dit mobildiskotek. Det tager 3-4 minutter og giver dig et
+            bedre match i søgeresultaterne.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Step 3 — DJ Erfaring & Mobildiskotek                                */
+/* ------------------------------------------------------------------ */
+
+type ExperienceProps = {
+  draft: Draft;
+  update: <K extends keyof Draft>(k: K, v: Draft[K]) => void;
+  equipmentPhotos: FileWithPreview[];
+  setEquipmentPhotos: (f: FileWithPreview[]) => void;
+  credentials: FileWithPreview[];
+  setCredentials: (f: FileWithPreview[]) => void;
+};
+
+function StepExperience({
+  draft,
+  update,
+  equipmentPhotos,
+  setEquipmentPhotos,
+  credentials,
+  setCredentials,
+}: ExperienceProps) {
+  function togglePreset(id: string) {
+    const next = draft.equipmentPresets.includes(id)
+      ? draft.equipmentPresets.filter((p) => p !== id)
+      : [...draft.equipmentPresets, id];
+    update("equipmentPresets", next);
+  }
+  return (
+    <div className="space-y-8">
+      <Header
+        icon={Speaker}
+        eyebrow="Trin 3"
+        title="DJ Erfaring & Mobildiskotek"
+        subtitle="Vi verificerer hver DJ's track record og udstyr, så kunder ved præcis hvad de booker. Jo flere detaljer, jo bedre match."
+      />
+
+      {/* --- Erfaring --- */}
+      <section className="space-y-5">
+        <SectionDivider icon={Trophy} label="Din erfaring" />
+
+        <div>
+          <div className="mb-2 text-sm font-medium">
+            Års professionel erfaring
+          </div>
+          <OptionCards
+            options={EXPERIENCE_YEARS.map((y) => ({ id: y.id, label: y.label }))}
+            value={draft.yearsExperience}
+            onChange={(v) => update("yearsExperience", v as string)}
+            columns={4}
+          />
+        </div>
+
+        <div>
+          <div className="mb-2 text-sm font-medium">Antal events spillet</div>
+          <OptionCards
+            options={EVENTS_PERFORMED.map((e) => ({ id: e.id, label: e.label }))}
+            value={draft.eventsPerformed}
+            onChange={(v) => update("eventsPerformed", v as string)}
+            columns={4}
+          />
+        </div>
+
+        <Field
+          label="Bemærkelsesværdige kunder eller events (valgfri)"
+          hint="Venues, bureauer, festivaler, firmakunder"
+        >
+          <Textarea
+            rows={3}
+            value={draft.notableClients}
+            onChange={(e) => update("notableClients", e.target.value)}
+            placeholder="Tivoli sommer-serien, Acme A/S kickoff, Operaen julefest…"
+          />
+        </Field>
+
+        <FilePicker
+          label="Referencer eller certifikater (valgfri)"
+          hint="PDF eller billeder af anbefalinger, certifikater, awards"
+          accept="application/pdf,image/*"
+          max={3}
+          value={credentials}
+          onChange={setCredentials}
+          variant="document"
+        />
+      </section>
+
+      {/* --- Mobildiskotek --- */}
+      <section className="space-y-5">
+        <SectionDivider icon={Speaker} label="Dit mobildiskotek" />
+
+        <div
+          className={cn(
+            "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
+            draft.equipmentOwned
+              ? "border-accent bg-accent/5"
+              : "border-border hover:border-accent/40",
+          )}
+          onClick={() => update("equipmentOwned", !draft.equipmentOwned)}
+        >
+          <Checkbox
+            checked={draft.equipmentOwned}
+            onCheckedChange={(v) => update("equipmentOwned", !!v)}
+            className="mt-0.5"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div>
+            <div className="text-sm font-medium">
+              Jeg ejer og driver et komplet mobildiskotek
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Decks, mixer, højtalere, kabler, basis-lys — alt det der skal til
+              for at køre et event.
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-sm font-medium">Quick-pick dit udstyr</div>
+            <div className="text-xs text-muted-foreground">
+              {draft.equipmentPresets.length} valgt
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {EQUIPMENT_PRESETS.map((preset) => {
+              const selected = draft.equipmentPresets.includes(preset);
+              return (
+                <motion.button
+                  key={preset}
+                  type="button"
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => togglePreset(preset)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                    selected
+                      ? "border-accent bg-accent text-accent-foreground"
+                      : "border-border bg-background hover:border-accent/40",
+                  )}
+                >
+                  {selected ? (
+                    <Check className="h-3 w-3" />
+                  ) : (
+                    <Plus className="h-3 w-3" />
+                  )}
+                  {preset}
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+
+        <Field
+          label="Beskriv noget unikt (min. 50 tegn)"
+          hint="Lyssætning, custom DMX, fotobooth-tillæg etc."
+        >
+          <Textarea
+            rows={4}
+            value={draft.equipmentDescription}
+            onChange={(e) => update("equipmentDescription", e.target.value)}
+            placeholder="Komplet bryllups-pakke med uplighters, trådløs mik, moving heads og en 15 kW sub-rig…"
+          />
+          <div className="mt-1 text-xs text-muted-foreground">
+            {draft.equipmentDescription.length} / 50
+          </div>
+        </Field>
+
+        <FilePicker
+          label="Billeder af dit rig"
+          hint="1-5 klare billeder. Det første bruges som cover."
+          accept="image/*"
+          max={5}
+          value={equipmentPhotos}
+          onChange={setEquipmentPhotos}
+        />
+
+        <div>
+          <div className="mb-2 text-sm font-medium">Setup-størrelse</div>
+          <OptionCards
+            options={SETUP_SIZES.map((s) => ({
+              id: s.id,
+              label: s.label,
+              description: s.description,
+            }))}
+            value={draft.setupSize}
+            onChange={(v) => update("setupSize", v as string)}
+            columns={3}
+          />
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Step 4 — Pris & ydelser                                             */
+/* ------------------------------------------------------------------ */
+
+type PricingProps = {
+  draft: Draft;
+  update: <K extends keyof Draft>(k: K, v: Draft[K]) => void;
+};
+
+function StepPricing({ draft, update }: PricingProps) {
+  function toggleAddOn(id: string) {
+    const next = draft.addOns.includes(id)
+      ? draft.addOns.filter((a) => a !== id)
+      : [...draft.addOns, id];
+    update("addOns", next);
+  }
+  return (
+    <div className="space-y-8">
+      <Header
+        icon={Coins}
+        eyebrow="Trin 4"
+        title="Pris & ydelser"
+        subtitle="Sæt din pris og dine pakker. Du kan ændre alt senere fra dit DJ-panel — det her er bare en start."
+      />
+
+      <section className="space-y-5">
+        <SectionDivider icon={Coins} label="Sådan vil du tage betaling" />
+
+        <OptionCards
+          options={[
+            {
+              id: "hourly",
+              label: "Per time",
+              description: "Du sætter en timepris og minimumstimer",
+            },
+            {
+              id: "package",
+              label: "Pakkepris",
+              description: "En fast pris inkl. et antal timer",
+            },
+          ]}
+          value={draft.pricingMode}
+          onChange={(v) =>
+            update("pricingMode", v as "hourly" | "package")
+          }
+          columns={2}
+        />
+
+        <AnimatePresence mode="wait" initial={false}>
+          {draft.pricingMode === "hourly" && (
+            <motion.div
+              key="hourly"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="grid gap-4 sm:grid-cols-2"
+            >
+              <Field label="Timepris (DKK)" hint="Eks. 1.200">
+                <Input
+                  type="number"
+                  min={0}
+                  value={draft.hourlyRate}
+                  onChange={(e) => update("hourlyRate", e.target.value)}
+                  placeholder="1200"
+                />
+              </Field>
+              <Field
+                label="Minimumstimer"
+                hint="Hvor få timer kan du booke ad?"
+              >
+                <Input
+                  type="number"
+                  min={1}
+                  value={draft.minimumHours}
+                  onChange={(e) => update("minimumHours", e.target.value)}
+                  placeholder="4"
+                />
+              </Field>
+            </motion.div>
+          )}
+
+          {draft.pricingMode === "package" && (
+            <motion.div
+              key="package"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="grid gap-4 sm:grid-cols-2"
+            >
+              <Field label="Pakkepris (DKK)" hint="Inkl. lyd & basis-lys">
+                <Input
+                  type="number"
+                  min={0}
+                  value={draft.packagePrice}
+                  onChange={(e) => update("packagePrice", e.target.value)}
+                  placeholder="6500"
+                />
+              </Field>
+              <Field
+                label="Inkluderede timer"
+                hint="Hvor mange timers DJ-set er pakken?"
+              >
+                <Input
+                  type="number"
+                  min={1}
+                  value={draft.includedHours}
+                  onChange={(e) => update("includedHours", e.target.value)}
+                  placeholder="5"
+                />
+              </Field>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </section>
+
+      <section className="space-y-3">
+        <SectionDivider icon={Plus} label="Tilkøb du tilbyder" />
+        <p className="text-xs text-muted-foreground">
+          Vælg de tilkøb du tilbyder. Du sætter prisen pr. tilkøb i dit
+          DJ-panel når du er kommet ind.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {ADDON_PRESETS.map((addon) => {
+            const selected = draft.addOns.includes(addon);
+            return (
+              <motion.button
+                key={addon}
+                type="button"
+                whileTap={{ scale: 0.96 }}
+                onClick={() => toggleAddOn(addon)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                  selected
+                    ? "border-accent bg-accent text-accent-foreground"
+                    : "border-border bg-background hover:border-accent/40",
+                )}
+              >
+                {selected ? (
+                  <Check className="h-3 w-3" />
+                ) : (
+                  <Plus className="h-3 w-3" />
+                )}
+                {addon}
+              </motion.button>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="rounded-xl border bg-gradient-to-br from-muted/40 via-background to-background p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-md">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Shield className="h-4 w-4 text-accent" /> Sådan får du betalt
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Vi bruger Stripe Connect, så pengene går direkte til din
+              bankkonto. DJConnect ser eller holder aldrig dine
+              bank-detaljer. Du kan koble Stripe på nu eller efter første
+              booking — det tager ~3 minutter.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() =>
+              toast.info(
+                "Stripe Connect åbner når din konto er oprettet. Vi sender dig tilbage hertil bagefter.",
+              )
+            }
+          >
+            Forbind Stripe <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Step 5 — Profil & billeder                                          */
+/* ------------------------------------------------------------------ */
 
 type ProfileProps = {
   draft: Draft;
@@ -580,24 +1276,39 @@ type ProfileProps = {
   bioMin: number;
   profilePhoto: FileWithPreview[];
   setProfilePhoto: (f: FileWithPreview[]) => void;
+  galleryPhotos: FileWithPreview[];
+  setGalleryPhotos: (f: FileWithPreview[]) => void;
 };
 
-function StepProfile({ draft, update, stageNameState, bioPct, bioMin, profilePhoto, setProfilePhoto }: ProfileProps) {
+function StepProfile({
+  draft,
+  update,
+  stageNameState,
+  bioPct,
+  bioMin,
+  profilePhoto,
+  setProfilePhoto,
+  galleryPhotos,
+  setGalleryPhotos,
+}: ProfileProps) {
   return (
     <div className="space-y-6">
       <Header
-        icon={Sparkles}
-        eyebrow="Step 2"
-        title="Show customers your vibe"
-        subtitle="Your profile is the first impression. The preview on the right updates as you type."
+        icon={Camera}
+        eyebrow="Trin 5"
+        title="Profil & billeder"
+        subtitle="Dette er hvad kunder ser når de browser efter DJs. Preview-kortet til højre opdaterer sig live."
       />
 
-      <Field label="Stage name" hint="How you'll appear across the site">
+      <Field
+        label="Kunstnernavn"
+        hint="Sådan vil du fremstå på platformen"
+      >
         <div className="relative">
           <Input
             value={draft.stageName}
             onChange={(e) => update("stageName", e.target.value)}
-            placeholder="e.g. DJ Nova"
+            placeholder="fx DJ Nova"
             className={cn(
               "pr-32",
               stageNameState === "taken" && "border-destructive",
@@ -605,56 +1316,81 @@ function StepProfile({ draft, update, stageNameState, bioPct, bioMin, profilePho
             )}
           />
           <div className="absolute inset-y-0 right-3 flex items-center gap-1 text-xs">
-            {stageNameState === "checking" && <span className="flex items-center gap-1 text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> checking…</span>}
-            {stageNameState === "available" && <span className="flex items-center gap-1 text-emerald-600"><Check className="h-3 w-3" /> available</span>}
-            {stageNameState === "taken" && <span className="flex items-center gap-1 text-destructive"><X className="h-3 w-3" /> taken</span>}
+            {stageNameState === "checking" && (
+              <span className="flex items-center gap-1 text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" /> tjekker…
+              </span>
+            )}
+            {stageNameState === "available" && (
+              <span className="flex items-center gap-1 text-emerald-600">
+                <Check className="h-3 w-3" /> ledigt
+              </span>
+            )}
+            {stageNameState === "taken" && (
+              <span className="flex items-center gap-1 text-destructive">
+                <X className="h-3 w-3" /> optaget
+              </span>
+            )}
           </div>
         </div>
       </Field>
 
       <FilePicker
-        label="Profile photo"
-        hint="Pick one high-quality photo of you or your setup"
+        label="Profilbillede"
+        hint="Vælg ét skarpt billede af dig eller dit setup"
         accept="image/*"
         max={1}
         value={profilePhoto}
         onChange={setProfilePhoto}
       />
 
-      <Field label="Bio" hint={`Tell your story — genre, vibe, what makes you unforgettable (minimum ${bioMin} characters)`}>
+      <FilePicker
+        label="Galleri (valgfri)"
+        hint="Op til 6 billeder fra dine sets — de vises på din profil"
+        accept="image/*"
+        max={6}
+        value={galleryPhotos}
+        onChange={setGalleryPhotos}
+      />
+
+      <Field
+        label="Bio"
+        hint={`Fortæl din historie — genre, vibe, det der gør dig uforglemmelig (mindst ${bioMin} tegn)`}
+      >
         <Textarea
           rows={5}
           value={draft.bio}
           onChange={(e) => update("bio", e.target.value)}
-          placeholder="I've been DJing weddings, corporate parties, and summer festivals across Denmark for the past 8 years…"
+          placeholder="Jeg har spillet bryllupper, firmafester og sommerfestivaler over hele Danmark i 8 år…"
         />
         <div className="mt-2 flex items-center gap-2">
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
             <motion.div
-              animate={{ width: `${bioPct}%`, backgroundColor: bioPct >= 100 ? "hsl(142,71%,45%)" : "hsl(21,90%,53%)" }}
+              animate={{
+                width: `${bioPct}%`,
+                backgroundColor:
+                  bioPct >= 100 ? "hsl(142,71%,45%)" : "hsl(21,90%,53%)",
+              }}
               className="h-full"
             />
           </div>
-          <span className={cn("text-xs", bioPct >= 100 ? "text-emerald-600" : "text-muted-foreground")}>
+          <span
+            className={cn(
+              "text-xs",
+              bioPct >= 100 ? "text-emerald-600" : "text-muted-foreground",
+            )}
+          >
             {draft.bio.length} / {bioMin}
           </span>
         </div>
       </Field>
 
       <div>
-        <div className="mb-2 text-sm font-medium">Years of professional experience</div>
-        <OptionCards
-          options={EXPERIENCE_YEARS.map((y) => ({ id: y.id, label: y.label }))}
-          value={draft.yearsExperience}
-          onChange={(v) => update("yearsExperience", v as string)}
-          columns={4}
-        />
-      </div>
-
-      <div>
         <div className="mb-2 flex items-center justify-between">
-          <div className="text-sm font-medium">Event types you cover</div>
-          <div className="text-xs text-muted-foreground">{draft.eventTypes.length} selected</div>
+          <div className="text-sm font-medium">Eventtyper du spiller</div>
+          <div className="text-xs text-muted-foreground">
+            {draft.eventTypes.length} valgt
+          </div>
         </div>
         <OptionCards
           options={EVENT_TYPE_CARDS}
@@ -663,291 +1399,166 @@ function StepProfile({ draft, update, stageNameState, bioPct, bioMin, profilePho
           onChange={(v) => update("eventTypes", v as string[])}
         />
       </div>
-    </div>
-  );
-}
-
-type EquipmentProps = {
-  draft: Draft;
-  update: <K extends keyof Draft>(k: K, v: Draft[K]) => void;
-  equipmentPhotos: FileWithPreview[];
-  setEquipmentPhotos: (f: FileWithPreview[]) => void;
-};
-
-function StepEquipment({ draft, update, equipmentPhotos, setEquipmentPhotos }: EquipmentProps) {
-  function togglePreset(id: string) {
-    const next = draft.equipmentPresets.includes(id)
-      ? draft.equipmentPresets.filter((p) => p !== id)
-      : [...draft.equipmentPresets, id];
-    update("equipmentPresets", next);
-  }
-  return (
-    <div className="space-y-6">
-      <Header
-        icon={Speaker}
-        eyebrow="Step 3"
-        title="Your mobile disco setup"
-        subtitle="We verify every DJ's gear so customers know exactly what they're getting. The more detail the better."
-      />
-
-      <div
-        className={cn(
-          "flex items-start gap-3 rounded-xl border p-4 transition-colors cursor-pointer",
-          draft.equipmentOwned ? "border-accent bg-accent/5" : "border-border hover:border-accent/40",
-        )}
-        onClick={() => update("equipmentOwned", !draft.equipmentOwned)}
-      >
-        <Checkbox
-          checked={draft.equipmentOwned}
-          onCheckedChange={(v) => update("equipmentOwned", !!v)}
-          className="mt-0.5"
-          onClick={(e) => e.stopPropagation()}
-        />
-        <div>
-          <div className="text-sm font-medium">I own and operate a complete mobile disco setup</div>
-          <div className="text-xs text-muted-foreground">Decks, mixer, speakers, cables, basic lighting — everything needed to run an event.</div>
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-2 flex items-center justify-between">
-          <div className="text-sm font-medium">Quick-pick your gear</div>
-          <div className="text-xs text-muted-foreground">{draft.equipmentPresets.length} selected</div>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {EQUIPMENT_PRESETS.map((preset) => {
-            const selected = draft.equipmentPresets.includes(preset);
-            return (
-              <motion.button
-                key={preset}
-                type="button"
-                whileTap={{ scale: 0.96 }}
-                onClick={() => togglePreset(preset)}
-                className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                  selected
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border bg-background hover:border-accent/40",
-                )}
-              >
-                {selected ? <Check className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
-                {preset}
-              </motion.button>
-            );
-          })}
-        </div>
-      </div>
-
-      <Field label="Describe anything unique (min 50 characters)" hint="Lighting rigs, custom DMX, photo-booth add-ons, etc.">
-        <Textarea
-          rows={4}
-          value={draft.equipmentDescription}
-          onChange={(e) => update("equipmentDescription", e.target.value)}
-          placeholder="Full wedding package with uplighters, wireless mic, moving head lights, and a 15kW subwoofer rig…"
-        />
-        <div className="mt-1 text-xs text-muted-foreground">{draft.equipmentDescription.length} / 50</div>
-      </Field>
-
-      <FilePicker
-        label="Photos of your rig"
-        hint="1–5 clear photos. The first is used as cover."
-        accept="image/*"
-        max={5}
-        value={equipmentPhotos}
-        onChange={setEquipmentPhotos}
-      />
-
-      <div>
-        <div className="mb-2 text-sm font-medium">Setup size</div>
-        <OptionCards
-          options={SETUP_SIZES.map((s) => ({ id: s.id, label: s.label, description: s.description }))}
-          value={draft.setupSize}
-          onChange={(v) => update("setupSize", v as string)}
-          columns={3}
-        />
-      </div>
-    </div>
-  );
-}
-
-type ExperienceProps = {
-  draft: Draft;
-  update: <K extends keyof Draft>(k: K, v: Draft[K]) => void;
-  credentials: FileWithPreview[];
-  setCredentials: (f: FileWithPreview[]) => void;
-};
-
-function StepExperience({ draft, update, credentials, setCredentials }: ExperienceProps) {
-  return (
-    <div className="space-y-6">
-      <Header
-        icon={Trophy}
-        eyebrow="Step 4"
-        title="Your track record"
-        subtitle="Verification is about trust — the more context you provide, the faster we can approve you."
-      />
-
-      <div>
-        <div className="mb-2 text-sm font-medium">Events performed</div>
-        <OptionCards
-          options={EVENTS_PERFORMED.map((e) => ({ id: e.id, label: e.label }))}
-          value={draft.eventsPerformed}
-          onChange={(v) => update("eventsPerformed", v as string)}
-          columns={4}
-        />
-      </div>
-
-      <Field label="Notable clients or events (optional)" hint="Venues, agencies, festivals, corporate clients">
-        <Textarea
-          rows={3}
-          value={draft.notableClients}
-          onChange={(e) => update("notableClients", e.target.value)}
-          placeholder="Copenhagen Opera staff Christmas party, Tivoli summer series, Acme A/S annual kickoff…"
-        />
-      </Field>
-
-      <FilePicker
-        label="References or certificates (optional)"
-        hint="PDFs or images of testimonials, certifications, awards"
-        accept="application/pdf,image/*"
-        max={3}
-        value={credentials}
-        onChange={setCredentials}
-        variant="document"
-      />
-    </div>
-  );
-}
-
-function StepPayout() {
-  return (
-    <div className="space-y-6">
-      <Header
-        icon={CreditCard}
-        eyebrow="Step 5"
-        title="Get paid securely with Stripe"
-        subtitle="We use Stripe Connect so funds go straight to your bank account. DJConnect never holds or sees your banking details."
-      />
-
-      <div className="grid gap-4 md:grid-cols-3">
-        {[
-          { icon: Shield, title: "Escrow-protected", body: "Customers pay upfront. Funds are held safely until 24h after the event." },
-          { icon: HeartHandshake, title: "Fast payouts", body: "Money lands in your bank account within 2–5 business days of release." },
-          { icon: BadgeCheck, title: "Automated invoices", body: "Every booking generates a receipt & payout summary for your accounting." },
-        ].map((f, i) => (
-          <motion.div
-            key={f.title}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 * i }}
-            className="rounded-xl border bg-card p-4"
-          >
-            <f.icon className="mb-2 h-5 w-5 text-accent" />
-            <div className="text-sm font-semibold">{f.title}</div>
-            <div className="mt-1 text-xs text-muted-foreground">{f.body}</div>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="rounded-xl border bg-gradient-to-br from-muted/40 via-background to-background p-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="text-sm font-semibold">Connect Stripe now (recommended)</div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              This opens Stripe in a new tab. It takes ~3 minutes — you'll need your ID and a bank account.
-              If you'd rather do it later, you can still submit your application and connect before your first booking.
-            </p>
-          </div>
-          <Button
-            type="button"
-            variant="default"
-            onClick={() => toast.info("Stripe Connect opens once your account is created. We'll redirect you here after onboarding.")}
-          >
-            Connect Stripe <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-type SubmitProps = {
-  draft: Draft;
-  profilePhotoUrl: string | null;
-  equipmentPhotos: FileWithPreview[];
-  submitted: boolean;
-};
-
-function StepSubmit({ draft, profilePhotoUrl, equipmentPhotos, submitted }: SubmitProps) {
-  const summary: Array<{ label: string; value: string }> = [
-    { label: "Name", value: draft.fullName || "—" },
-    { label: "Email", value: draft.email || "—" },
-    { label: "Location", value: [draft.city, draft.country].filter(Boolean).join(", ") || "—" },
-    { label: "Stage name", value: draft.stageName || "—" },
-    { label: "Experience", value: draft.yearsExperience || "—" },
-    { label: "Event types", value: draft.eventTypes.length ? `${draft.eventTypes.length} selected` : "—" },
-    { label: "Gear items", value: draft.equipmentPresets.length ? `${draft.equipmentPresets.length} items` : "—" },
-    { label: "Setup size", value: draft.setupSize || "—" },
-    { label: "Events performed", value: draft.eventsPerformed || "—" },
-    { label: "Photos", value: `${equipmentPhotos.length} uploaded` },
-  ];
-
-  return (
-    <div className="space-y-6">
-      <Header
-        icon={Rocket}
-        eyebrow="Step 6"
-        title="Final check — ready to launch?"
-        subtitle="This is exactly what our verification team will review. You can go back and edit anything before submitting."
-      />
-
-      <div className="grid gap-5 md:grid-cols-[1fr_1.4fr]">
-        <div className="overflow-hidden rounded-2xl border bg-card">
-          <div className="relative aspect-square bg-gradient-to-br from-primary to-accent/50">
-            {profilePhotoUrl ? (
-              <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-primary-foreground/60">
-                <Sparkles className="h-10 w-10" />
-              </div>
-            )}
-          </div>
-          <div className="p-4">
-            <div className="text-lg font-semibold">{draft.stageName || "Your stage name"}</div>
-            <div className="text-xs text-muted-foreground">{[draft.city, draft.country].filter(Boolean).join(", ")}</div>
-          </div>
-        </div>
-        <dl className="grid grid-cols-2 gap-3 self-start">
-          {summary.map((row) => (
-            <div key={row.label} className="rounded-lg border bg-card p-3">
-              <dt className="text-[11px] uppercase tracking-wider text-muted-foreground">{row.label}</dt>
-              <dd className="mt-0.5 truncate text-sm font-medium">{row.value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
 
       <div className="rounded-xl border bg-accent/5 p-4 text-sm">
         <div className="flex items-start gap-2">
           <BadgeCheck className="mt-0.5 h-4 w-4 text-accent" />
           <div>
-            <div className="font-medium">What happens next</div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              We'll review your application within 2 business days. You'll receive an email at{" "}
-              <b>{draft.email || "your email"}</b> once verified, and your profile goes live instantly.
+            <div className="font-medium">Hvad sker der nu?</div>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Når du sender din ansøgning gennemgår vi den inden for 2
+              hverdage. Du får en mail på <b>{draft.email || "din mail"}</b>{" "}
+              når du er verificeret — og din profil går live med det
+              samme.
             </p>
           </div>
         </div>
       </div>
-
-      {submitted && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2 text-sm text-emerald-600">
-          <Check className="h-4 w-4" /> Application received — redirecting…
-        </motion.div>
-      )}
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* TipsPanel — right-rail "why we ask" content for steps 1-4           */
+/* ------------------------------------------------------------------ */
+
+type Tip = {
+  icon: typeof Mail;
+  title: string;
+  body: string;
+};
+
+const TIPS: Record<string, { eyebrow: string; title: string; tips: Tip[] }> = {
+  account: {
+    eyebrow: "Hvorfor vi spørger",
+    title: "Vi bruger kun det vi har brug for",
+    tips: [
+      {
+        icon: Mail,
+        title: "Din email",
+        body: "Til booking-notifikationer og verificering. Vi sælger eller deler aldrig din mail.",
+      },
+      {
+        icon: PhoneCall,
+        title: "Dit telefonnummer",
+        body: "Kun synligt for kunder efter de har booket dig — så de kan nå dig akut på selve dagen.",
+      },
+      {
+        icon: Lock,
+        title: "Sikker adgangskode",
+        body: "Mindst 8 tegn. Vi gemmer adgangskoder krypteret og ser dem aldrig i klartekst.",
+      },
+    ],
+  },
+  "how-it-works": {
+    eyebrow: "Det gode at vide",
+    title: "Hvad gør DJConnect anderledes?",
+    tips: [
+      {
+        icon: Shield,
+        title: "Ingen forudbetaling",
+        body: "Du betaler intet for at være på platformen. Vi tjener kun penge når du gør (8% efter dine første 5 bookinger).",
+      },
+      {
+        icon: Star,
+        title: "Verificerede kunder",
+        body: "Alle bookinger går gennem escrow, så du ved at pengene er der inden du spiller.",
+      },
+      {
+        icon: Lightbulb,
+        title: "Læs på",
+        body: "Tag et minut på dette trin — det er gratis indsigt i hvordan du får mest ud af platformen.",
+      },
+    ],
+  },
+  experience: {
+    eyebrow: "Hvorfor det betyder noget",
+    title: "Detaljerede profiler booker bedst",
+    tips: [
+      {
+        icon: Trophy,
+        title: "Mere erfaring = højere placering",
+        body: "DJs med en udfyldt track record ranker højere i søgeresultater og får flere forespørgsler.",
+      },
+      {
+        icon: Camera,
+        title: "Udstyrsfotos øger konvertering",
+        body: "Profiler med rig-fotos får op til 3× flere booking-forespørgsler end profiler uden.",
+      },
+      {
+        icon: BadgeCheck,
+        title: "Vi verificerer dit udstyr",
+        body: "Når dit udstyr er bekræftet får du et 'Verified Gear'-badge der vises tydeligt på din profil.",
+      },
+    ],
+  },
+  pricing: {
+    eyebrow: "Sæt prisen med selvtillid",
+    title: "Du bestemmer — vi sikrer betalingen",
+    tips: [
+      {
+        icon: Coins,
+        title: "Din pris er din egen",
+        body: "Ingen provision på dine første 5 bookinger. Du beholder 100% af det du tager.",
+      },
+      {
+        icon: BadgeCheck,
+        title: "Pakker booker hurtigere",
+        body: "Faste pakkepriser booker 2× hurtigere end timepriser — kunder ved præcis hvad de får.",
+      },
+      {
+        icon: Info,
+        title: "Du kan ændre alt senere",
+        body: "Justér dine takster, pakker og tilkøb når som helst fra dit DJ-panel.",
+      },
+    ],
+  },
+};
+
+function TipsPanel({ stepId }: { stepId: string }) {
+  const data = TIPS[stepId];
+  if (!data) return null;
+  return (
+    <div className="sticky top-24">
+      <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+        <Lightbulb className="h-3.5 w-3.5 text-accent" />
+        {data.eyebrow}
+      </div>
+      <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+        <h3 className="text-base font-semibold leading-tight">{data.title}</h3>
+        <ul className="space-y-3">
+          {data.tips.map((tip, i) => (
+            <motion.li
+              key={tip.title}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 * i }}
+              className="flex items-start gap-2.5"
+            >
+              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                <tip.icon className="h-3.5 w-3.5" />
+              </span>
+              <div>
+                <div className="text-sm font-medium">{tip.title}</div>
+                <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                  {tip.body}
+                </p>
+              </div>
+            </motion.li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
+        <ArrowRight className="h-3 w-3" />
+        DJ-kortet vises på sidste trin
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Helpers                                                             */
+/* ------------------------------------------------------------------ */
 
 function Header({
   icon: Icon,
@@ -966,20 +1577,52 @@ function Header({
         <Icon className="h-5 w-5" />
       </span>
       <div>
-        <div className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">{eyebrow}</div>
+        <div className="text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+          {eyebrow}
+        </div>
         <h2 className="mt-1 text-2xl font-semibold tracking-tight">{title}</h2>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{subtitle}</p>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+          {subtitle}
+        </p>
       </div>
     </div>
   );
 }
 
-function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <Label className="text-sm font-medium">{label}</Label>
       {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
       <div className="mt-2">{children}</div>
+    </div>
+  );
+}
+
+function SectionDivider({
+  icon: Icon,
+  label,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+}) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-accent/10 text-accent">
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <div className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+        {label}
+      </div>
+      <div className="h-px flex-1 bg-border" />
     </div>
   );
 }
@@ -993,28 +1636,67 @@ function validateStep(
 ): { ok: boolean; reason?: string } {
   switch (step) {
     case 0:
-      if (draft.fullName.trim().length < 2) return { ok: false, reason: "Full name is required" };
-      if (!/^\S+@\S+\.\S+$/.test(draft.email)) return { ok: false, reason: "Enter a valid email" };
-      if (draft.password.length < 8) return { ok: false, reason: "Password must be at least 8 characters" };
-      if (!draft.phone.trim()) return { ok: false, reason: "Phone is required" };
-      if (!draft.city.trim() || !draft.country.trim()) return { ok: false, reason: "City and country are required" };
+      if (draft.fullName.trim().length < 2)
+        return { ok: false, reason: "Fulde navn er påkrævet" };
+      if (!/^\S+@\S+\.\S+$/.test(draft.email))
+        return { ok: false, reason: "Indtast en gyldig email" };
+      if (draft.password.length < 8)
+        return { ok: false, reason: "Adgangskoden skal være mindst 8 tegn" };
+      if (!draft.phone.trim())
+        return { ok: false, reason: "Telefonnummer er påkrævet" };
+      if (!draft.city.trim() || !draft.country.trim())
+        return { ok: false, reason: "By og land er påkrævet" };
       return { ok: true };
     case 1:
-      if (!draft.stageName.trim()) return { ok: false, reason: "Stage name is required" };
-      if (stageNameState === "taken") return { ok: false, reason: "That stage name is taken" };
-      if (profilePhoto.length === 0) return { ok: false, reason: "Add a profile photo" };
-      if (draft.bio.length < 100) return { ok: false, reason: "Bio must be at least 100 characters" };
-      if (!draft.yearsExperience) return { ok: false, reason: "Select years of experience" };
-      if (draft.eventTypes.length === 0) return { ok: false, reason: "Pick at least one event type" };
+      // Sådan fungerer det — purely informational
       return { ok: true };
     case 2:
-      if (!draft.equipmentOwned) return { ok: false, reason: "Confirm you own a complete mobile disco setup" };
-      if (draft.equipmentDescription.length < 50) return { ok: false, reason: "Equipment description must be at least 50 characters" };
-      if (equipmentPhotos.length < 1) return { ok: false, reason: "Upload at least 1 equipment photo" };
-      if (!draft.setupSize) return { ok: false, reason: "Select a setup size" };
+      if (!draft.yearsExperience)
+        return { ok: false, reason: "Vælg års erfaring" };
+      if (!draft.eventsPerformed)
+        return { ok: false, reason: "Vælg antal events spillet" };
+      if (!draft.equipmentOwned)
+        return {
+          ok: false,
+          reason: "Bekræft at du ejer et komplet mobildiskotek",
+        };
+      if (draft.equipmentDescription.length < 50)
+        return {
+          ok: false,
+          reason: "Beskrivelse af udstyr skal være mindst 50 tegn",
+        };
+      if (equipmentPhotos.length < 1)
+        return { ok: false, reason: "Upload mindst 1 billede af dit rig" };
+      if (!draft.setupSize)
+        return { ok: false, reason: "Vælg en setup-størrelse" };
       return { ok: true };
     case 3:
-      if (!draft.eventsPerformed) return { ok: false, reason: "Select number of events performed" };
+      if (!draft.pricingMode)
+        return { ok: false, reason: "Vælg en prismodel" };
+      if (draft.pricingMode === "hourly") {
+        if (!draft.hourlyRate)
+          return { ok: false, reason: "Indtast en timepris" };
+        if (!draft.minimumHours)
+          return { ok: false, reason: "Indtast minimumstimer" };
+      }
+      if (draft.pricingMode === "package") {
+        if (!draft.packagePrice)
+          return { ok: false, reason: "Indtast en pakkepris" };
+        if (!draft.includedHours)
+          return { ok: false, reason: "Indtast inkluderede timer" };
+      }
+      return { ok: true };
+    case 4:
+      if (!draft.stageName.trim())
+        return { ok: false, reason: "Kunstnernavn er påkrævet" };
+      if (stageNameState === "taken")
+        return { ok: false, reason: "Det kunstnernavn er optaget" };
+      if (profilePhoto.length === 0)
+        return { ok: false, reason: "Tilføj et profilbillede" };
+      if (draft.bio.length < 100)
+        return { ok: false, reason: "Bio skal være mindst 100 tegn" };
+      if (draft.eventTypes.length === 0)
+        return { ok: false, reason: "Vælg mindst én eventtype" };
       return { ok: true };
     default:
       return { ok: true };
@@ -1027,17 +1709,39 @@ function passwordStrength(pw: string) {
   if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
   if (/\d/.test(pw)) score++;
   if (/[^A-Za-z0-9]/.test(pw)) score++;
-  const labels = ["Too short", "Weak", "Okay", "Strong", "Excellent"];
-  const colors = ["hsl(0,84%,60%)", "hsl(21,90%,53%)", "hsl(38,92%,50%)", "hsl(142,71%,45%)", "hsl(142,71%,35%)"];
-  return { score, label: labels[score] ?? "Weak", color: colors[score] ?? colors[1]! };
+  const labels = ["For kort", "Svag", "Okay", "Stærk", "Fremragende"];
+  const colors = [
+    "hsl(0,84%,60%)",
+    "hsl(21,90%,53%)",
+    "hsl(38,92%,50%)",
+    "hsl(142,71%,45%)",
+    "hsl(142,71%,35%)",
+  ];
+  return {
+    score,
+    label: labels[score] ?? "Svag",
+    color: colors[score] ?? colors[1]!,
+  };
 }
 
 function fireConfetti() {
   const end = Date.now() + 1400;
   const colors = ["#F97316", "#FBBF24", "#38BDF8", "#A855F7", "#F472B6"];
   (function frame() {
-    confetti({ particleCount: 3, angle: 60, spread: 60, origin: { x: 0 }, colors });
-    confetti({ particleCount: 3, angle: 120, spread: 60, origin: { x: 1 }, colors });
+    confetti({
+      particleCount: 3,
+      angle: 60,
+      spread: 60,
+      origin: { x: 0 },
+      colors,
+    });
+    confetti({
+      particleCount: 3,
+      angle: 120,
+      spread: 60,
+      origin: { x: 1 },
+      colors,
+    });
     if (Date.now() < end) requestAnimationFrame(frame);
   })();
 }

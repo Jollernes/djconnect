@@ -96,7 +96,6 @@ function App() {
 
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/signup/dj" element={<DJSignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
@@ -172,6 +171,11 @@ function App() {
 
           {/* Get-3-offers wizard owns its own full-screen layout (no site header/footer) */}
           <Route path="/get-offers" element={<GetOffersPage />} />
+
+          {/* DJ signup wizard owns its own full-screen layout — same shell
+              pattern as /get-offers (minimal top bar + thin progress, no
+              site chrome) so the funnel feels guided. */}
+          <Route path="/signup/dj" element={<DJSignupPage />} />
 
           {/* Personal advisory wizard — same full-screen shell as Get-3-offers */}
           <Route path="/personal-advice/wedding" element={<PersonalAdviceWeddingPage />} />
