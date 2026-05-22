@@ -13,6 +13,7 @@ import {
   Star,
   Clapperboard,
   PartyPopper,
+  Inbox,
 } from "lucide-react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -23,6 +24,7 @@ import type { Profile, UserRole } from "@/types/domain";
 
 const corporateCustomerNav = [
   { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
+  { to: "/dashboard/requests", label: "My requests", icon: Inbox },
   { to: "/dashboard/bookings", label: "Bookings", icon: Calendar },
   { to: "/dashboard/favourites", label: "Favourites", icon: Heart },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
@@ -30,6 +32,7 @@ const corporateCustomerNav = [
 
 const privateCustomerNav = [
   { to: "/dashboard", label: "My event", icon: PartyPopper, end: true },
+  { to: "/dashboard/requests", label: "My requests", icon: Inbox },
   { to: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 

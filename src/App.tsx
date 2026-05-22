@@ -4,15 +4,22 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { RoleGuard } from "@/components/common/RoleGuard";
+import { ViewportPreview } from "@/components/dev/ViewportPreview";
 
 import { HomePage } from "@/pages/public/HomePage";
 import { SearchPage } from "@/pages/public/SearchPage";
 import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
+import { StackedWeddingDJsPage } from "@/pages/public/StackedWeddingDJsPage";
+import { WeddingDJsStackedBExplorePage } from "@/pages/public/WeddingDJsStackedBExplorePage";
+import { WeddingDJsCurvedCardsDemoPage } from "@/pages/public/WeddingDJsCurvedCardsDemoPage";
+import { WeddingDJsCurvedSweepDemoPage } from "@/pages/public/WeddingDJsCurvedSweepDemoPage";
+import { BirthdayDJsPage } from "@/pages/public/BirthdayDJsPage";
+import { CorporateDJsPage } from "@/pages/public/CorporateDJsPage";
+import { OtherDJsPage } from "@/pages/public/OtherDJsPage";
 import { GetOffersPage } from "@/pages/public/GetOffersPage";
+import { PersonalAdvicePage } from "@/pages/public/PersonalAdvicePage";
+import { PersonalAdviceWeddingPage } from "@/pages/public/PersonalAdviceWeddingPage";
 import { MyRequestPage } from "@/pages/public/MyRequestPage";
-import { WeddingDJsTestAPage } from "@/pages/public/WeddingDJsTestAPage";
-import { WeddingDJsTestBPage } from "@/pages/public/WeddingDJsTestBPage";
-import { WeddingDJsTestCPage } from "@/pages/public/WeddingDJsTestCPage";
 import { DJProfilePage } from "@/pages/public/DJProfilePage";
 import { BookingRequestPage } from "@/pages/public/BookingRequestPage";
 import { AboutPage } from "@/pages/public/AboutPage";
@@ -36,6 +43,9 @@ import { CustomerBookingsPage } from "@/pages/customer/BookingsPage";
 import { CustomerBookingDetailPage } from "@/pages/customer/BookingDetailPage";
 import { CustomerFavouritesPage } from "@/pages/customer/FavouritesPage";
 import { CustomerSettingsPage } from "@/pages/customer/SettingsPage";
+import { CustomerRequestsListPage } from "@/pages/customer/RequestsListPage";
+import { CustomerRequestDetailPage } from "@/pages/customer/RequestDetailPage";
+import { PersonalAdviceDetailPage } from "@/pages/customer/PersonalAdviceDetailPage";
 
 import { DJDashboardPage } from "@/pages/dj/DashboardPage";
 import { DJBookingsPage } from "@/pages/dj/BookingsPage";
@@ -44,6 +54,10 @@ import { DJAvailabilityPage } from "@/pages/dj/AvailabilityPage";
 import { DJEarningsPage } from "@/pages/dj/EarningsPage";
 import { DJMessagesPage } from "@/pages/dj/MessagesPage";
 import { DJProfileEditorPage } from "@/pages/dj/ProfileEditorPage";
+import { ProfileMockupsIndexPage } from "@/pages/dj/profileMockups/MockupIndex";
+import { SplitStudioMockup } from "@/pages/dj/profileMockups/SplitStudio";
+import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
+import { CardCanvasMockup } from "@/pages/dj/profileMockups/CardCanvas";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
 import { DJGuideGate } from "@/components/common/DJGuideGate";
 
@@ -59,14 +73,21 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ViewportPreview>
         <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/wedding-djs" element={<WeddingDJsPage />} />
-            <Route path="/wedding-djs-test-a" element={<WeddingDJsTestAPage />} />
-            <Route path="/wedding-djs-test-b" element={<WeddingDJsTestBPage />} />
-            <Route path="/wedding-djs-test-c" element={<WeddingDJsTestCPage />} />
+            <Route path="/wedding-djs-stacked-a" element={<StackedWeddingDJsPage variant="a" />} />
+            <Route path="/wedding-djs-stacked-b" element={<StackedWeddingDJsPage variant="b" />} />
+            <Route path="/wedding-djs-stacked-c" element={<StackedWeddingDJsPage variant="c" />} />
+            <Route path="/wedding-djs-stacked-b-explore" element={<WeddingDJsStackedBExplorePage />} />
+            <Route path="/wedding-djs-curved-cards" element={<WeddingDJsCurvedCardsDemoPage />} />
+            <Route path="/wedding-djs-curved-sweep" element={<WeddingDJsCurvedSweepDemoPage />} />
+            <Route path="/birthday-djs" element={<BirthdayDJsPage />} />
+            <Route path="/corporate-djs" element={<CorporateDJsPage />} />
+            <Route path="/other-djs" element={<OtherDJsPage />} />
             <Route path="/djs/:username" element={<DJProfilePage />} />
             <Route path="/book/:username" element={<BookingRequestPage />} />
             <Route path="/about" element={<AboutPage />} />
@@ -75,10 +96,10 @@ function App() {
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/personal-advice" element={<PersonalAdvicePage />} />
 
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/signup/dj" element={<DJSignupPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
@@ -93,6 +114,15 @@ function App() {
             }
           >
             <Route path="/dashboard" element={<CustomerDashboardPage />} />
+            <Route path="/dashboard/requests" element={<CustomerRequestsListPage />} />
+            <Route
+              path="/dashboard/requests/:requestId"
+              element={<CustomerRequestDetailPage />}
+            />
+            <Route
+              path="/dashboard/personlig-radgivning/:adviceId"
+              element={<PersonalAdviceDetailPage />}
+            />
             <Route path="/dashboard/bookings" element={<CustomerBookingsPage />} />
             <Route path="/dashboard/bookings/:id" element={<CustomerBookingDetailPage />} />
             <Route path="/dashboard/favourites" element={<CustomerFavouritesPage />} />
@@ -124,6 +154,19 @@ function App() {
             <Route path="/dj/earnings" element={<DJEarningsPage />} />
             <Route path="/dj/messages" element={<DJMessagesPage />} />
             <Route path="/dj/profile" element={<DJProfileEditorPage />} />
+            <Route path="/dj/profile-mockups" element={<ProfileMockupsIndexPage />} />
+            <Route
+              path="/dj/profile-mockups/split-studio"
+              element={<SplitStudioMockup />}
+            />
+            <Route
+              path="/dj/profile-mockups/guided-sections"
+              element={<GuidedSectionsMockup />}
+            />
+            <Route
+              path="/dj/profile-mockups/card-canvas"
+              element={<CardCanvasMockup />}
+            />
           </Route>
 
           <Route
@@ -146,6 +189,14 @@ function App() {
           {/* Get-3-offers wizard owns its own full-screen layout (no site header/footer) */}
           <Route path="/get-offers" element={<GetOffersPage />} />
 
+          {/* DJ signup wizard owns its own full-screen layout — same shell
+              pattern as /get-offers (minimal top bar + thin progress, no
+              site chrome) so the funnel feels guided. */}
+          <Route path="/signup/dj" element={<DJSignupPage />} />
+
+          {/* Personal advisory wizard — same full-screen shell as Get-3-offers */}
+          <Route path="/personal-advice/wedding" element={<PersonalAdviceWeddingPage />} />
+
           {/* Live progress page for an offer request — public for now;
               eventually gated behind a magic link. */}
           <Route path="/my-requests/:requestId" element={<MyRequestPage />} />
@@ -153,6 +204,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Toaster richColors position="top-center" />
+        </ViewportPreview>
       </BrowserRouter>
     </AuthProvider>
   );

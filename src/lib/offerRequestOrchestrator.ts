@@ -73,6 +73,7 @@ const DECLINE_REASONS: DeclineReason[] = [
 export function createRequestRecord(
   brief: OfferRequest,
   djs: DJProfileWithRelations[],
+  options: { customerId?: string | null } = {},
 ): OfferRequestRecord {
   const id = newRequestId();
   const now = Date.now();
@@ -89,6 +90,7 @@ export function createRequestRecord(
   const record: OfferRequestRecord = {
     id,
     createdAtMs: now,
+    customerId: options.customerId ?? undefined,
     brief,
     matchedEventType: brief.eventType,
     compressionFactor: DEFAULT_COMPRESSION,

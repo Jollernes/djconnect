@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Menu, Search, User, LogOut, LayoutDashboard, Settings, Shield } from "lucide-react";
 import { BrandMark } from "@/components/common/BrandMark";
 import { Button } from "@/components/ui/button";
@@ -13,12 +13,39 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
 import { PLATFORM_NAME } from "@/lib/constants";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
+import { readPersistedEventType } from "@/hooks/useEventContext";
+import { slugForEventType } from "@/lib/eventDJsContent";
+import {
+  BROWSE_GATE_EVENT,
+  BrowseDJsGate,
+  type OpenBrowseGateDetail,
+} from "@/components/event-djs/BrowseDJsGate";
 
-const navLinks = [
-  { to: "/search", label: "Browse DJs" },
-  { to: "/get-offers", label: "Get 3 offers", highlight: true },
+/**
+ * "Browse DJs" routes the customer to the event-specific listing page
+ * matching whatever event context they've already chosen (or to
+ * `/wedding-djs` as the default).
+ */
+function browseDJsPath(): string {
+  return `/${slugForEventType(readPersistedEventType())}`;
+}
+
+type NavLinkSpec = {
+  to: string;
+  label: string;
+  highlight?: "primary" | "secondary";
+  /**
+   * When set, clicking the link triggers the Browse-DJs gate modal instead
+   * of navigating. The `to` is still used by NavLink for isActive matching.
+   */
+  opensBrowseGate?: boolean;
+};
+
+const STATIC_LINKS: NavLinkSpec[] = [
+  { to: "/get-offers", label: "Get 3 offers", highlight: "primary" },
+  { to: "/personal-advice", label: "Personlig Rådgivning", highlight: "secondary" },
   { to: "/how-it-works", label: "How it works" },
   { to: "/about", label: "About" },
   { to: "/faq", label: "FAQ" },
@@ -27,7 +54,41 @@ const navLinks = [
 export function Header() {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Recompute the Browse-DJs link target on every navigation so the
+  // NavLink's `to` (and therefore its isActive matching) stays in sync
+  // with the current event-context, which may have just changed.
+  const navLinks = useMemo<NavLinkSpec[]>(
+    () => [
+      { to: browseDJsPath(), label: "Browse DJs", opensBrowseGate: true },
+      ...STATIC_LINKS,
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [location.pathname],
+  );
+
+  // Browse-DJs gate state. Opened by the header link, the search icon, or
+  // a `djconnect:open-browse-djs-gate` event from anywhere else (e.g. the
+  // "Change" link in the listing-page filter bar).
+  const [gateOpen, setGateOpen] = useState(false);
+  const [gateInitial, setGateInitial] = useState<OpenBrowseGateDetail | undefined>(undefined);
+
+  useEffect(() => {
+    function onOpen(e: Event) {
+      const detail = (e as CustomEvent<OpenBrowseGateDetail>).detail;
+      setGateInitial(detail ?? undefined);
+      setGateOpen(true);
+    }
+    window.addEventListener(BROWSE_GATE_EVENT, onOpen);
+    return () => window.removeEventListener(BROWSE_GATE_EVENT, onOpen);
+  }, []);
+
+  function openGate(initial?: OpenBrowseGateDetail) {
+    setGateInitial(initial);
+    setGateOpen(true);
+  }
 
   const dashboardPath =
     profile?.role === "admin" ? "/admin" : profile?.role === "dj" ? "/dj/dashboard" : "/dashboard";
@@ -43,19 +104,32 @@ export function Header() {
           <nav className="hidden md:flex md:items-center md:gap-6">
             {navLinks.map((link) => (
               <NavLink
-                key={link.to}
+                key={link.label}
                 to={link.to}
+                onClick={
+                  link.opensBrowseGate
+                    ? (e) => {
+                        e.preventDefault();
+                        openGate();
+                      }
+                    : undefined
+                }
                 className={({ isActive }) =>
                   cn(
                     "text-sm font-medium transition-colors hover:text-foreground",
-                    link.highlight
+                    link.highlight === "primary"
                       ? cn(
                           "rounded-full bg-gradient-to-r from-rose-500 to-rose-600 px-3.5 py-1.5 text-white shadow-sm hover:from-rose-600 hover:to-rose-700 hover:text-white",
                           isActive && "ring-2 ring-rose-300",
                         )
-                      : isActive
-                        ? "text-foreground"
-                        : "text-muted-foreground",
+                      : link.highlight === "secondary"
+                        ? cn(
+                            "rounded-full border border-foreground/80 bg-background px-3.5 py-1.5 text-foreground shadow-sm hover:bg-foreground hover:text-background",
+                            isActive && "bg-foreground text-background",
+                          )
+                        : isActive
+                          ? "text-foreground"
+                          : "text-muted-foreground",
                   )
                 }
               >
@@ -69,10 +143,14 @@ export function Header() {
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu">
             <Menu className="h-5 w-5" />
           </Button>
-          <Button asChild variant="ghost" size="icon" className="hidden sm:inline-flex">
-            <Link to="/search" aria-label="Search DJs">
-              <Search className="h-5 w-5" />
-            </Link>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden sm:inline-flex"
+            aria-label="Search DJs"
+            onClick={() => openGate()}
+          >
+            <Search className="h-5 w-5" />
           </Button>
 
           {profile ? (
@@ -145,7 +223,18 @@ export function Header() {
         <div className="border-t bg-background md:hidden">
           <div className="container flex flex-col py-3">
             {navLinks.map((l) => (
-              <Link key={l.to} to={l.to} className="py-2 text-sm font-medium" onClick={() => setMobileOpen(false)}>
+              <Link
+                key={l.label}
+                to={l.to}
+                className="py-2 text-sm font-medium"
+                onClick={(e) => {
+                  setMobileOpen(false);
+                  if (l.opensBrowseGate) {
+                    e.preventDefault();
+                    openGate();
+                  }
+                }}
+              >
                 {l.label}
               </Link>
             ))}
@@ -166,6 +255,8 @@ export function Header() {
           </div>
         </div>
       )}
+
+      <BrowseDJsGate open={gateOpen} onOpenChange={setGateOpen} initial={gateInitial} />
     </header>
   );
 }

@@ -25,6 +25,7 @@ import { ContactStep } from "@/components/offers/steps/ContactStep";
 import { ReviewStep } from "@/components/offers/steps/ReviewStep";
 import { mockDJs } from "@/data/mock";
 import { createRequestRecord } from "@/lib/offerRequestOrchestrator";
+import { useAuth } from "@/hooks/useAuth";
 import { Heart } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -48,6 +49,7 @@ import { motion } from "framer-motion";
  */
 export function GetOffersPage() {
   const navigate = useNavigate();
+  const { profile } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const { request, update, updateContact, toggleArrayValue, reset } = useOfferRequest();
   const { djs, loading } = useDJs();
@@ -94,10 +96,19 @@ export function GetOffersPage() {
     if (submitting) return;
     setSubmitting(true);
     const catalog = djs.length > 0 ? djs : mockDJs;
-    const record = createRequestRecord(request, catalog);
+    const record = createRequestRecord(request, catalog, {
+      customerId: profile?.role === "customer" ? profile.id : null,
+    });
     // Wizard answers are no longer needed — the record now owns the brief.
     reset();
-    navigate(`/my-requests/${record.id}`);
+    // Logged-in customers land on the dashboard-embedded view; guests land on
+    // the standalone public page (which itself redirects into the dashboard
+    // once they sign in).
+    const target =
+      profile?.role === "customer"
+        ? `/dashboard/requests/${record.id}`
+        : `/my-requests/${record.id}`;
+    navigate(target);
   }
 
   function handleStartOver() {
