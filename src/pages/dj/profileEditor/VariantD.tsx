@@ -4,11 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowLeft, ArrowRight, Camera, Check, ChevronRight, Copy, Lightbulb,
-  MapPin, Shield, Sparkles, Star, Wand2, Image as ImageIcon, Trophy,
+  ArrowLeft, ArrowRight, Check, ChevronRight, Copy, Lightbulb,
+  Sparkles, Wand2, Image as ImageIcon, Trophy,
 } from "lucide-react";
 import {
   SUB_PROFILE_KEYS, SUB_PROFILE_META,
@@ -16,8 +15,9 @@ import {
 } from "@/lib/demoDJProfile";
 import { AccountWideSection } from "./AccountWideSection";
 import { FeaturedPhotoSlot, GalleryRow } from "./MediaUploader";
+import { LiveProfilePreview } from "./LiveProfilePreview";
 import type { DJProfileEditorState } from "./useEditorState";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 /**
  * Variant D — Guided wizard with inheritance + live preview.
@@ -475,7 +475,7 @@ function ChapterScreen({
   }, [isGeneral, chapter, general]);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1fr,360px]">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_480px] xl:items-start">
       {/* Main column */}
       <div className="space-y-6">
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
@@ -593,23 +593,9 @@ function ChapterScreen({
         </div>
       </div>
 
-      {/* Live preview sidebar */}
-      <aside className="space-y-3 lg:sticky lg:top-20 lg:h-fit">
-        <p className="flex items-center justify-between text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          <span>How customers see you</span>
-          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-            Live
-          </span>
-        </p>
-        <PreviewCard
-          state={state}
-          subKey={subKey}
-          highlight={chapter}
-        />
-        <p className="rounded-md bg-muted/40 p-2.5 text-[11px] text-muted-foreground">
-          Customers booking <span className="font-medium text-foreground">{meta.label.toLowerCase()}s</span>{" "}
-          see this card in search results and your full profile when they tap it.
-        </p>
+      {/* Live preview sidebar — full public profile, sticky on xl+ */}
+      <aside>
+        <LiveProfilePreview state={state} />
       </aside>
     </div>
   );
@@ -773,77 +759,6 @@ function ChapterVibe({
         <p className="mt-1 text-xs text-muted-foreground">
           You can charge differently for {eventLabel.toLowerCase()}s. Blank = use your account default.
         </p>
-      </div>
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------- */
-/* Live preview                                                           */
-/* -------------------------------------------------------------------- */
-
-function PreviewCard({
-  state,
-  subKey,
-  highlight,
-}: {
-  state: DJProfileEditorState;
-  subKey: DemoDJSubProfileKey;
-  highlight: Chapter;
-}) {
-  const { subProfiles, stageName, profilePhotoUrl, priceFrom, priceOnRequest, seed } = state;
-  const sub = subProfiles[subKey];
-  const meta = SUB_PROFILE_META[subKey];
-  const featured = sub.featuredPhotoDataUrl ?? profilePhotoUrl ?? undefined;
-  const price = sub.priceFromMajor || priceFrom;
-
-  return (
-    <div className="overflow-hidden rounded-2xl border bg-card shadow-sm">
-      <div
-        className={cn(
-          "relative aspect-[4/3] overflow-hidden bg-muted",
-          highlight === "show" && "ring-2 ring-foreground ring-offset-2",
-        )}
-      >
-        {featured ? (
-          <img src={featured} alt={stageName} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-1 text-xs text-muted-foreground">
-            <Camera className="h-6 w-6" />
-            <span>Featured photo placeholder</span>
-          </div>
-        )}
-        <Badge variant="success" className="absolute right-3 top-3 gap-1">
-          <Shield className="h-3 w-3" /> Verified
-        </Badge>
-      </div>
-      <div className="space-y-2 p-3">
-        <div className={cn(highlight === "tell" && "rounded-md bg-foreground/5 p-1.5 ring-1 ring-foreground/20")}>
-          <h3 className="line-clamp-1 text-base font-semibold">{stageName}</h3>
-          <p className="line-clamp-1 text-sm text-muted-foreground">
-            {sub.tagline || `Your ${meta.label.toLowerCase()} tagline appears here`}
-          </p>
-        </div>
-        <div className={cn("flex items-center gap-1.5 text-xs", highlight === "vibe" && "rounded-md bg-foreground/5 p-1.5 ring-1 ring-foreground/20")}>
-          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-          <span className="font-semibold">{seed.rating_average.toFixed(1)}</span>
-          <span className="text-muted-foreground">({seed.rating_count})</span>
-          <Badge variant="secondary" className="ml-1">
-            {meta.label}
-          </Badge>
-        </div>
-        <div className="flex items-center justify-between text-xs">
-          <span className="flex items-center gap-1 text-muted-foreground">
-            <MapPin className="h-3 w-3" /> {seed.base_location}
-          </span>
-          <span className="font-semibold">
-            {priceOnRequest
-              ? "Price on request"
-              : price
-              ? `From ${formatCurrency(price * 100, seed.currency)}`
-              : "—"}
-          </span>
-        </div>
       </div>
     </div>
   );

@@ -9,6 +9,7 @@ import { FeaturedPhotoSlot, GalleryRow, ProgressRing } from "./MediaUploader";
 import { SubProfileTextFields } from "./SubProfileTextFields";
 import type { DJProfileEditorState } from "./useEditorState";
 import { cn, formatCurrency } from "@/lib/utils";
+import { LiveProfilePreview } from "./LiveProfilePreview";
 
 /**
  * Variant B — Side-by-side editor + live customer preview.
@@ -26,7 +27,6 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
     setFeaturedPhoto, appendGalleryItems, removeGalleryItem,
     completion, completedCount, completionPct, allComplete,
     handleSaveSubProfile, handleSaveAll, seed,
-    stageName, profilePhotoUrl, priceFrom, priceOnRequest,
   } = state;
 
   const sub = subProfiles[activeKey];
@@ -89,7 +89,7 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
         })}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr,420px]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_480px] xl:items-start">
         {/* Editor panel (left) */}
         <Card>
           <CardContent className="space-y-6 p-6">
@@ -159,33 +159,8 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
         </Card>
 
         {/* Live preview (right) — sticky on lg+ */}
-        <aside className="space-y-3 lg:sticky lg:top-20 lg:h-fit">
-          <p className="flex items-center justify-between text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            <span>Live customer preview</span>
-            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-              Updates as you edit
-            </span>
-          </p>
-
-          <CustomerCardPreview
-            stageName={stageName}
-            tagline={sub.tagline}
-            featuredPhoto={sub.featuredPhotoDataUrl ?? profilePhotoUrl ?? undefined}
-            location={seed.base_location}
-            priceFromMajor={sub.priceFromMajor || priceFrom}
-            priceOnRequest={priceOnRequest}
-            currency={seed.currency}
-            ratingAverage={seed.rating_average}
-            ratingCount={seed.rating_count}
-            eventLabel={meta.label}
-          />
-
-          <CustomerProfilePreview
-            stageName={stageName}
-            sub={sub}
-            profilePhoto={profilePhotoUrl ?? undefined}
-            eventLabel={meta.label}
-          />
+        <aside>
+          <LiveProfilePreview state={state} />
         </aside>
       </div>
 

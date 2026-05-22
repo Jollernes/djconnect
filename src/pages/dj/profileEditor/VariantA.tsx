@@ -29,7 +29,7 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
   } = state;
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_480px] xl:items-start">
       <div className="min-w-0 space-y-6">
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold">Edit your profile</h1>
@@ -187,16 +187,9 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
         <Button onClick={handleSaveAll}>Save all changes</Button>
       </div>
 
-      <p className="text-xs text-muted-foreground xl:hidden">
-        Live preview is shown alongside the editor on wider screens.
-      </p>
-
-      <div className="xl:hidden">
-        <LiveProfilePreview state={state} />
-      </div>
       </div>
 
-      <aside className="hidden xl:block">
+      <aside>
         <LiveProfilePreview state={state} />
       </aside>
     </div>

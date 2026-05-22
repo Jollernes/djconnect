@@ -8,7 +8,7 @@ import {
 import { SUB_PROFILE_KEYS, SUB_PROFILE_META, type DemoDJSubProfileKey } from "@/lib/demoDJProfile";
 import { AccountWideSection } from "./AccountWideSection";
 import { FeaturedPhotoSlot, GalleryRow, ProgressRing } from "./MediaUploader";
-import { CustomerCardPreview, CustomerProfilePreview } from "./VariantB";
+import { LiveProfilePreview } from "./LiveProfilePreview";
 import type { DJProfileEditorState } from "./useEditorState";
 import { cn } from "@/lib/utils";
 
@@ -34,7 +34,6 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
     setFeaturedPhoto, appendGalleryItems, removeGalleryItem,
     completion, completedCount, completionPct, allComplete,
     handleSaveSubProfile, handleSaveAll, seed,
-    stageName, profilePhotoUrl, priceFrom, priceOnRequest,
   } = state;
 
   const sub = subProfiles[activeKey];
@@ -203,7 +202,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
         })}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr,420px]">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_480px] xl:items-start">
         {/* Editor panel */}
         <Card>
           <CardContent className="space-y-6 p-6">
@@ -307,40 +306,9 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
           </CardContent>
         </Card>
 
-        {/* Live preview (right) — same as Variant B, slightly quieter eyebrow */}
-        <aside className="space-y-3 lg:sticky lg:top-20 lg:h-fit">
-          <p className="flex items-center justify-between text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            <span>Customer preview</span>
-            <span className="text-[10px] font-normal normal-case text-muted-foreground/80">
-              updates as you edit
-            </span>
-          </p>
-
-          <CustomerCardPreview
-            stageName={stageName}
-            tagline={sub.tagline}
-            featuredPhoto={sub.featuredPhotoDataUrl ?? profilePhotoUrl ?? undefined}
-            location={seed.base_location}
-            priceFromMajor={sub.priceFromMajor || priceFrom}
-            priceOnRequest={priceOnRequest}
-            currency={seed.currency}
-            ratingAverage={seed.rating_average}
-            ratingCount={seed.rating_count}
-            eventLabel={meta.label}
-          />
-
-          {!sub.featuredPhotoDataUrl && !sub.tagline.trim() && (
-            <p className="rounded-md bg-muted/30 p-2 text-[11px] italic text-muted-foreground">
-              Empty for now — upload a featured photo or write a tagline and you'll see it appear here.
-            </p>
-          )}
-
-          <CustomerProfilePreview
-            stageName={stageName}
-            sub={sub}
-            profilePhoto={profilePhotoUrl ?? undefined}
-            eventLabel={meta.label}
-          />
+        {/* Live preview (right) — full public profile, same as Variant B */}
+        <aside>
+          <LiveProfilePreview state={state} />
         </aside>
       </div>
 

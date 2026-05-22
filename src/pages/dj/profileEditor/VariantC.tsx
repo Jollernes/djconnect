@@ -36,7 +36,7 @@ export function VariantC({ state }: { state: DJProfileEditorState }) {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_480px] xl:items-start">
       <div className="min-w-0 space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
@@ -132,12 +132,9 @@ export function VariantC({ state }: { state: DJProfileEditorState }) {
         <Button onClick={handleSaveAll}>Save all changes</Button>
       </div>
 
-      <div className="xl:hidden">
-        <LiveProfilePreview state={state} />
-      </div>
       </div>
 
-      <aside className="hidden xl:block">
+      <aside>
         <LiveProfilePreview state={state} />
       </aside>
 
@@ -276,8 +273,8 @@ function FullscreenEditor({
           </CardContent>
         </Card>
 
-        <div className="mt-6 rounded-2xl border bg-muted/30 p-4">
-          <LiveProfilePreview state={state} density="compact" />
+        <div className="mt-6">
+          <LiveProfilePreview state={state} />
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4">
