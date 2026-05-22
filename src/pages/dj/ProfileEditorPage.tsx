@@ -17,7 +17,7 @@ export function DJProfileEditorPage() {
   const [variant, setVariant] = useEditorVariant();
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-7xl">
       {variant === "A" && <VariantA state={state} />}
       {variant === "B" && <VariantB state={state} />}
       {variant === "C" && <VariantC state={state} />}

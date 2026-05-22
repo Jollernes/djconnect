@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { AlertCircle, ArrowRight, Check, Image as ImageIcon, Sparkles } from "lucide-react";
 import { SUB_PROFILE_KEYS, SUB_PROFILE_META } from "@/lib/demoDJProfile";
 import { AccountWideSection } from "./AccountWideSection";
+import { LiveProfilePreview } from "./LiveProfilePreview";
 import { FeaturedPhotoSlot, GalleryRow } from "./MediaUploader";
 import { SubProfileTextFields } from "./SubProfileTextFields";
 import type { DJProfileEditorState } from "./useEditorState";
@@ -24,11 +25,12 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
     subProfiles, activeKey, setActiveKey, updateSubProfile,
     setFeaturedPhoto, appendGalleryItems, removeGalleryItem,
     completion, completedCount, completionPct, allComplete,
-    handleSaveSubProfile, handleSaveAll, seed,
+    handleSaveSubProfile, handleSaveAll,
   } = state;
 
   return (
-    <div className="space-y-6">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+      <div className="min-w-0 space-y-6">
       <header className="space-y-2">
         <h1 className="text-2xl font-semibold">Edit your profile</h1>
         <p className="text-sm text-muted-foreground">
@@ -183,12 +185,20 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
 
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={handleSaveAll}>Save all changes</Button>
-        <Button variant="outline" asChild>
-          <a href={`/djs/${seed.username}`} target="_blank" rel="noreferrer">
-            Preview public profile
-          </a>
-        </Button>
       </div>
+
+      <p className="text-xs text-muted-foreground xl:hidden">
+        Live preview is shown alongside the editor on wider screens.
+      </p>
+
+      <div className="xl:hidden">
+        <LiveProfilePreview state={state} />
+      </div>
+      </div>
+
+      <aside className="hidden xl:block">
+        <LiveProfilePreview state={state} />
+      </aside>
     </div>
   );
 }

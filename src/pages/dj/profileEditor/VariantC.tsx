@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { SUB_PROFILE_KEYS, SUB_PROFILE_META, type DemoDJSubProfileKey } from "@/lib/demoDJProfile";
 import { AccountWideSection } from "./AccountWideSection";
+import { LiveProfilePreview } from "./LiveProfilePreview";
 import { FeaturedPhotoSlot, GalleryRow, ProgressRing, describeMedia } from "./MediaUploader";
 import { SubProfileTextFields } from "./SubProfileTextFields";
 import type { DJProfileEditorState } from "./useEditorState";
@@ -26,7 +27,7 @@ export function VariantC({ state }: { state: DJProfileEditorState }) {
   const [openKey, setOpenKey] = useState<DemoDJSubProfileKey | null>(null);
   const {
     subProfiles, completion, completedCount, completionPct,
-    setActiveKey, profilePhotoUrl, seed, handleSaveAll,
+    setActiveKey, profilePhotoUrl, handleSaveAll,
   } = state;
 
   function openCard(k: DemoDJSubProfileKey) {
@@ -35,7 +36,8 @@ export function VariantC({ state }: { state: DJProfileEditorState }) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start">
+      <div className="min-w-0 space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
           <h1 className="text-2xl font-semibold">Edit your profile</h1>
@@ -128,12 +130,16 @@ export function VariantC({ state }: { state: DJProfileEditorState }) {
 
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={handleSaveAll}>Save all changes</Button>
-        <Button variant="outline" asChild>
-          <a href={`/djs/${seed.username}`} target="_blank" rel="noreferrer">
-            Preview public profile
-          </a>
-        </Button>
       </div>
+
+      <div className="xl:hidden">
+        <LiveProfilePreview state={state} />
+      </div>
+      </div>
+
+      <aside className="hidden xl:block">
+        <LiveProfilePreview state={state} />
+      </aside>
 
       <AnimatePresence>
         {openKey && (
@@ -269,6 +275,10 @@ function FullscreenEditor({
             />
           </CardContent>
         </Card>
+
+        <div className="mt-6 rounded-2xl border bg-muted/30 p-4">
+          <LiveProfilePreview state={state} density="compact" />
+        </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-4">
           <p className="text-xs text-muted-foreground">

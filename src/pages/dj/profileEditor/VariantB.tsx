@@ -195,11 +195,14 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
         <Button onClick={handleSaveAll} disabled={!allComplete && completedCount === 0}>
           Save all changes
         </Button>
-        <Button variant="outline" asChild>
-          <a href={`/djs/${seed.username}`} target="_blank" rel="noreferrer">
-            Preview full public profile
-          </a>
-        </Button>
+        <a
+          href={`/djs/${seed.username}`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Open full public profile in new tab
+        </a>
       </div>
     </div>
   );

@@ -908,13 +908,16 @@ function FinalScreen({
           );
         })}
       </div>
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Button onClick={handleSaveAll}>Save all changes</Button>
-        <Button variant="outline" asChild>
-          <a href={`/djs/${seed.username}`} target="_blank" rel="noreferrer">
-            Preview public profile
-          </a>
-        </Button>
+        <a
+          href={`/djs/${seed.username}`}
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Open full public profile in new tab
+        </a>
       </div>
     </div>
   );
