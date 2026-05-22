@@ -54,6 +54,10 @@ import { DJAvailabilityPage } from "@/pages/dj/AvailabilityPage";
 import { DJEarningsPage } from "@/pages/dj/EarningsPage";
 import { DJMessagesPage } from "@/pages/dj/MessagesPage";
 import { DJProfileEditorPage } from "@/pages/dj/ProfileEditorPage";
+import { ProfileMockupsIndexPage } from "@/pages/dj/profileMockups/MockupIndex";
+import { SplitStudioMockup } from "@/pages/dj/profileMockups/SplitStudio";
+import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
+import { CardCanvasMockup } from "@/pages/dj/profileMockups/CardCanvas";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
 import { DJGuideGate } from "@/components/common/DJGuideGate";
 
@@ -150,6 +154,19 @@ function App() {
             <Route path="/dj/earnings" element={<DJEarningsPage />} />
             <Route path="/dj/messages" element={<DJMessagesPage />} />
             <Route path="/dj/profile" element={<DJProfileEditorPage />} />
+            <Route path="/dj/profile-mockups" element={<ProfileMockupsIndexPage />} />
+            <Route
+              path="/dj/profile-mockups/split-studio"
+              element={<SplitStudioMockup />}
+            />
+            <Route
+              path="/dj/profile-mockups/guided-sections"
+              element={<GuidedSectionsMockup />}
+            />
+            <Route
+              path="/dj/profile-mockups/card-canvas"
+              element={<CardCanvasMockup />}
+            />
           </Route>
 
           <Route

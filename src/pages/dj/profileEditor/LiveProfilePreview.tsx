@@ -89,7 +89,7 @@ export function LiveProfilePreview({
 /* Build a DJProfileWithRelations from editor state                       */
 /* -------------------------------------------------------------------- */
 
-function buildPreviewDJ(state: DJProfileEditorState): DJProfileWithRelations {
+export function buildPreviewDJ(state: DJProfileEditorState): DJProfileWithRelations {
   const {
     seed,
     stageName,
