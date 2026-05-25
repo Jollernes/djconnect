@@ -2,9 +2,12 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const MOCKUPS = [
-  { slug: "split-studio", label: "1 · Split Studio" },
-  { slug: "guided-sections", label: "2 · Guided Sections" },
-  { slug: "card-canvas", label: "3 · Card Canvas" },
+  { slug: "split-studio", label: "1" },
+  { slug: "guided-sections", label: "2" },
+  { slug: "card-canvas", label: "3" },
+  { slug: "compact-split-studio", label: "4" },
+  { slug: "compact-guided-sections", label: "5" },
+  { slug: "compact-card-canvas", label: "6" },
 ];
 
 /**

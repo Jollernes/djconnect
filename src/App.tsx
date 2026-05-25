@@ -58,6 +58,9 @@ import { ProfileMockupsIndexPage } from "@/pages/dj/profileMockups/MockupIndex";
 import { SplitStudioMockup } from "@/pages/dj/profileMockups/SplitStudio";
 import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
 import { CardCanvasMockup } from "@/pages/dj/profileMockups/CardCanvas";
+import { CompactSplitStudioMockup } from "@/pages/dj/profileMockups/CompactSplitStudio";
+import { CompactGuidedSectionsMockup } from "@/pages/dj/profileMockups/CompactGuidedSections";
+import { CompactCardCanvasMockup } from "@/pages/dj/profileMockups/CompactCardCanvas";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
 import { DJGuideGate } from "@/components/common/DJGuideGate";
 
@@ -166,6 +169,18 @@ function App() {
             <Route
               path="/dj/profile-mockups/card-canvas"
               element={<CardCanvasMockup />}
+            />
+            <Route
+              path="/dj/profile-mockups/compact-split-studio"
+              element={<CompactSplitStudioMockup />}
+            />
+            <Route
+              path="/dj/profile-mockups/compact-guided-sections"
+              element={<CompactGuidedSectionsMockup />}
+            />
+            <Route
+              path="/dj/profile-mockups/compact-card-canvas"
+              element={<CompactCardCanvasMockup />}
             />
           </Route>
 
