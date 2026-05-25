@@ -50,9 +50,9 @@ export function CompletionBars({
           const isActive = activeKey === key;
           const accentBar =
             meta.accent === "amber"
-              ? "bg-emerald-500"
-              : meta.accent === "rose"
               ? "bg-amber-500"
+              : meta.accent === "rose"
+              ? "bg-rose-500"
               : "bg-slate-700";
           const RowEl: "button" | "div" = onJump ? "button" : "div";
           return (
