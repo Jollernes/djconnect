@@ -102,8 +102,8 @@ export function CompactGuidedSectionsMockup() {
   return (
     <div
       className={cn(
-        "relative max-w-[1100px] space-y-3 pb-20 transition-[padding] duration-200",
-        previewOpen ? "lg:pr-[380px]" : "lg:pr-12",
+        "relative max-w-[1300px] space-y-3 pb-20 transition-[padding] duration-200",
+        previewOpen ? "lg:pr-[540px]" : "lg:pr-12",
       )}
     >
       <CompactGuidedHeader state={state} />
@@ -187,7 +187,7 @@ export function CompactGuidedSectionsMockup() {
       <aside
         className={cn(
           "fixed inset-y-16 right-3 z-30 hidden flex-col rounded-xl border bg-card shadow-lg transition-all lg:flex",
-          previewOpen ? "w-[360px]" : "w-10",
+          previewOpen ? "w-[520px]" : "w-10",
         )}
       >
         <div className="flex items-center justify-between gap-1.5 border-b border-border/60 px-2.5 py-1.5">
