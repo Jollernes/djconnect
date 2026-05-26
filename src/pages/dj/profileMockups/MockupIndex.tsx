@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import {
-  ArrowRight, LayoutGrid, LayoutPanelLeft, ListChecks, Minimize2,
+  ArrowRight, LayoutGrid, LayoutPanelLeft, ListChecks, Minimize2, PenLine,
 } from "lucide-react";
 
 const MOCKUPS = [
@@ -73,6 +73,18 @@ const MOCKUPS = [
     matchScreenshot: false,
     compact: true,
   },
+  {
+    slug: "reference-editor",
+    number: "7",
+    title: "Reference Editor",
+    icon: PenLine,
+    summary:
+      "Baseret på referencebilledet — ren split-panel med venstre editor-kort (profilbillede, hero-position, bio, approach, pris, udstyr) og højre live preview-kort.",
+    bestFor:
+      "DJs der foretrækker det traditionelle editor-layout med en professionel finish, Profilside/DJ Kort toggle og alle felter samlet i ét kort.",
+    matchScreenshot: true,
+    reference: true,
+  },
 ];
 
 /**
@@ -87,11 +99,10 @@ export function ProfileMockupsIndexPage() {
         <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           Edit Profile — design review
         </p>
-        <h1 className="text-3xl font-semibold">Seks mockup-versioner</h1>
+        <h1 className="text-3xl font-semibold">Syv mockup-versioner</h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Seks forskellige designs for DJ-profil-editoren — tre originale og tre
-          kompakte varianter med tættere layout, mindre skriftstørrelser og mere
-          struktureret preview. Klik nedenfor for at prøve dem live.
+          Syv forskellige designs for DJ-profil-editoren — tre originale, tre
+          kompakte varianter, og én reference-baseret version. Klik nedenfor for at prøve dem live.
         </p>
       </header>
 
@@ -120,6 +131,16 @@ export function ProfileMockupsIndexPage() {
       </p>
       <div className="mt-3 grid gap-4 md:grid-cols-1">
         {MOCKUPS.filter((m) => 'compact' in m && m.compact).map((m) => (
+          <MockupCard key={m.slug} m={m} />
+        ))}
+      </div>
+
+      <h2 className="mt-8 text-lg font-semibold">Reference-baseret (7)</h2>
+      <p className="text-xs text-muted-foreground">
+        Baseret på et referencebillede — traditionelt editor-layout med Profilside/DJ Kort toggle.
+      </p>
+      <div className="mt-3 grid gap-4 md:grid-cols-1">
+        {MOCKUPS.filter((m) => 'reference' in m && m.reference).map((m) => (
           <MockupCard key={m.slug} m={m} />
         ))}
       </div>
@@ -155,6 +176,11 @@ function MockupCard({ m }: { m: typeof MOCKUPS[number] }) {
           {'compact' in m && m.compact && (
             <span className="rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-medium text-sky-700 ring-1 ring-sky-200">
               Kompakt variant
+            </span>
+          )}
+          {'reference' in m && m.reference && (
+            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-emerald-200">
+              Reference-baseret
             </span>
           )}
         </div>

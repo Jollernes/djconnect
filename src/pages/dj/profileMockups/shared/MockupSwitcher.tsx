@@ -8,6 +8,7 @@ const MOCKUPS = [
   { slug: "compact-split-studio", label: "4" },
   { slug: "compact-guided-sections", label: "5" },
   { slug: "compact-card-canvas", label: "6" },
+  { slug: "reference-editor", label: "7" },
 ];
 
 /**

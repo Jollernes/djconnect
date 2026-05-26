@@ -61,6 +61,7 @@ import { CardCanvasMockup } from "@/pages/dj/profileMockups/CardCanvas";
 import { CompactSplitStudioMockup } from "@/pages/dj/profileMockups/CompactSplitStudio";
 import { CompactGuidedSectionsMockup } from "@/pages/dj/profileMockups/CompactGuidedSections";
 import { CompactCardCanvasMockup } from "@/pages/dj/profileMockups/CompactCardCanvas";
+import { ReferenceEditorMockup } from "@/pages/dj/profileMockups/ReferenceEditor";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
 import { DJGuideGate } from "@/components/common/DJGuideGate";
 
@@ -181,6 +182,10 @@ function App() {
             <Route
               path="/dj/profile-mockups/compact-card-canvas"
               element={<CompactCardCanvasMockup />}
+            />
+            <Route
+              path="/dj/profile-mockups/reference-editor"
+              element={<ReferenceEditorMockup />}
             />
           </Route>
 
