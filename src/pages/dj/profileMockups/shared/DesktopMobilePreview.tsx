@@ -122,6 +122,15 @@ export function DesktopMobilePreview({
   );
 }
 
+/**
+ * Scale factor applied to the preview content. The profile is rendered at
+ * its natural width inside a wider virtual viewport and then CSS-scaled
+ * down so images, text, and spacing appear at their real proportions —
+ * like a zoomed-out browser window rather than a squeezed layout.
+ */
+const DESKTOP_SCALE = 0.55;
+const MOBILE_SCALE = 0.5;
+
 function PreviewFrame({
   device,
   children,
@@ -132,19 +141,42 @@ function PreviewFrame({
   maxHeightClass: string;
 }) {
   if (device === "mobile") {
+    const scale = MOBILE_SCALE;
     return (
       <div
         className={cn(
           "mx-auto max-w-[260px] overflow-hidden rounded-[20px] border-4 border-foreground/10 bg-background shadow-sm",
         )}
       >
-        <div className={cn("overflow-y-auto", maxHeightClass)}>{children}</div>
+        <div className={cn("overflow-y-auto", maxHeightClass)}>
+          <div
+            style={{
+              width: `${100 / scale}%`,
+              transform: `scale(${scale})`,
+              transformOrigin: "top left",
+            }}
+          >
+            {children}
+          </div>
+        </div>
       </div>
     );
   }
+
+  const scale = DESKTOP_SCALE;
   return (
     <div className="overflow-hidden rounded-xl border bg-background shadow-inner">
-      <div className={cn("overflow-y-auto", maxHeightClass)}>{children}</div>
+      <div className={cn("overflow-y-auto", maxHeightClass)}>
+        <div
+          style={{
+            width: `${100 / scale}%`,
+            transform: `scale(${scale})`,
+            transformOrigin: "top left",
+          }}
+        >
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
