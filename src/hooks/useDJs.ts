@@ -9,12 +9,15 @@ export function useDJs(filters: SearchFilters = {}) {
   const [djs, setDJs] = useState<DJProfileWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const filtersKey = JSON.stringify(filters);
+
   const loadDemoData = useCallback(() => {
+    const f: SearchFilters = JSON.parse(filtersKey);
     const base = mockDJs.map((dj) =>
       dj.id === mockDJs[0]!.id ? applyDemoEdits(dj) : dj,
     );
-    return applyFilters(base, filters);
-  }, [filters]);
+    return applyFilters(base, f);
+  }, [filtersKey]);
 
   useEffect(() => {
     let cancelled = false;
@@ -51,7 +54,7 @@ export function useDJs(filters: SearchFilters = {}) {
     return () => {
       cancelled = true;
     };
-  }, [JSON.stringify(filters), loadDemoData]);
+  }, [filtersKey, loadDemoData]);
 
   useEffect(() => {
     if (isSupabaseConfigured) return;
