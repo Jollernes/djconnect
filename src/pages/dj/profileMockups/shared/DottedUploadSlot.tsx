@@ -46,7 +46,7 @@ export function DottedUploadSlot({
       };
       reader.readAsDataURL(f);
     } else {
-      resizeImage(f, 1600).then((dataUrl) => {
+      resizeImage(f).then((dataUrl) => {
         if (dataUrl) onChange(dataUrl);
       });
     }
@@ -125,26 +125,46 @@ export function DottedUploadSlot({
   );
 }
 
-function resizeImage(file: Blob, maxWidth: number): Promise<string | null> {
+const MAX_WIDTH = 2400;
+const JPEG_QUALITY = 0.92;
+const RAW_SIZE_THRESHOLD = 1_500_000; // 1.5 MB — skip canvas for small files
+
+function resizeImage(file: Blob, maxWidth: number = MAX_WIDTH): Promise<string | null> {
   return new Promise((resolve) => {
+    const objectUrl = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
-      let { width, height } = img;
-      if (width > maxWidth) {
-        height = Math.round(height * (maxWidth / width));
-        width = maxWidth;
+      const needsResize = img.width > maxWidth;
+      // For images that don't need resizing AND are small enough for
+      // localStorage, use the raw file to avoid any quality loss from
+      // re-encoding through canvas.
+      if (!needsResize && file.size <= RAW_SIZE_THRESHOLD) {
+        URL.revokeObjectURL(objectUrl);
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(typeof reader.result === "string" ? reader.result : null);
+        };
+        reader.onerror = () => resolve(null);
+        reader.readAsDataURL(file);
+        return;
+      }
+      let w = img.width;
+      let h = img.height;
+      if (needsResize) {
+        h = Math.round(h * (maxWidth / w));
+        w = maxWidth;
       }
       const canvas = document.createElement("canvas");
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = w;
+      canvas.height = h;
       const ctx = canvas.getContext("2d");
       if (!ctx) { resolve(null); return; }
       ctx.imageSmoothingQuality = "high";
-      ctx.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL("image/jpeg", 0.85));
-      URL.revokeObjectURL(img.src);
+      ctx.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL("image/jpeg", JPEG_QUALITY));
+      URL.revokeObjectURL(objectUrl);
     };
     img.onerror = () => resolve(null);
-    img.src = URL.createObjectURL(file);
+    img.src = objectUrl;
   });
 }
