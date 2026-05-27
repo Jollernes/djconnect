@@ -43,12 +43,12 @@ export function ProfileGallery({ images, className }: Props) {
     <div className={cn("relative", className)}>
       {/* Desktop: hero (left, 2 rows) + 6 smaller images (3×2 grid, right) */}
       <div className="relative mx-auto hidden w-full md:block">
-        <div className="grid h-[340px] grid-cols-4 grid-rows-2 gap-1.5 lg:gap-2">
-          {/* Hero spans left column, full height */}
+        <div className="grid h-[340px] grid-cols-[1fr_2fr] gap-1.5 lg:gap-2">
+          {/* Hero: 33% width, full height */}
           <button
             type="button"
             onClick={() => setOpenIdx(0)}
-            className="group relative row-span-2 overflow-hidden rounded-l-2xl bg-muted"
+            className="group relative overflow-hidden rounded-l-2xl bg-muted"
           >
             <img
               src={hero.url}
@@ -57,40 +57,42 @@ export function ProfileGallery({ images, className }: Props) {
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
           </button>
-          {/* 6 smaller images: 3 cols × 2 rows */}
-          {grid.map((img, i) => (
-            <button
-              key={img.id}
-              type="button"
-              onClick={() => setOpenIdx(i + 1)}
-              className={cn(
-                "group relative overflow-hidden bg-muted",
-                i === 2 && "rounded-tr-2xl",
-                i === 5 && "rounded-br-2xl",
-              )}
-            >
-              <img
-                src={img.url}
-                alt={img.alt ?? ""}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-            </button>
-          ))}
-          {Array.from({ length: placeholders }).map((_, i) => (
-            <div
-              key={`ph-${i}`}
-              className={cn(
-                "relative overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
-                grid.length + i === 2 && "rounded-tr-2xl",
-                grid.length + i === 5 && "rounded-br-2xl",
-              )}
-            >
-              <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
-                DJConnect
+          {/* 6 smaller images: 3 cols × 2 rows, 66% width */}
+          <div className="grid h-full grid-cols-3 grid-rows-2 gap-1.5 lg:gap-2">
+            {grid.map((img, i) => (
+              <button
+                key={img.id}
+                type="button"
+                onClick={() => setOpenIdx(i + 1)}
+                className={cn(
+                  "group relative overflow-hidden bg-muted",
+                  i === 2 && "rounded-tr-2xl",
+                  i === 5 && "rounded-br-2xl",
+                )}
+              >
+                <img
+                  src={img.url}
+                  alt={img.alt ?? ""}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+              </button>
+            ))}
+            {Array.from({ length: placeholders }).map((_, i) => (
+              <div
+                key={`ph-${i}`}
+                className={cn(
+                  "relative overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
+                  grid.length + i === 2 && "rounded-tr-2xl",
+                  grid.length + i === 5 && "rounded-br-2xl",
+                )}
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
+                  DJConnect
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
