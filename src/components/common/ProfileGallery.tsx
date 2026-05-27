@@ -18,10 +18,6 @@ export function ProfileGallery({ images, className }: Props) {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [allOpen, setAllOpen] = useState(false);
 
-  // Convert base64 data: URLs to Blob object URLs for sharper rendering.
-  // Browsers can decode Blob URLs more efficiently than large inline base64.
-  const displayImages = useBlobUrls(images);
-
   useEffect(() => {
     if (openIdx === null) return;
     function onKey(e: KeyboardEvent) {
@@ -39,8 +35,8 @@ export function ProfileGallery({ images, className }: Props) {
     );
   }
 
-  const hero = displayImages[0];
-  const grid = displayImages.slice(1, 7);
+  const hero = images[0];
+  const grid = images.slice(1, 7);
   const placeholders = Math.max(0, 6 - grid.length);
 
   return (
@@ -109,14 +105,14 @@ export function ProfileGallery({ images, className }: Props) {
         <img src={hero.url} alt={hero.alt ?? ""} className="absolute inset-0 h-full w-full object-cover" />
       </button>
 
-      {displayImages.length > 1 && (
+      {images.length > 1 && (
         <button
           type="button"
           onClick={() => setAllOpen(true)}
           className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-foreground shadow-lg ring-1 ring-black/5 transition hover:bg-white/95 hover:shadow-xl"
         >
           <Grid2X2 className="h-4 w-4" />
-          Show all {displayImages.length} photos
+          Show all {images.length} photos
         </button>
       )}
 
@@ -126,8 +122,8 @@ export function ProfileGallery({ images, className }: Props) {
           {openIdx !== null && (
             <div className="relative">
               <img
-                src={displayImages[openIdx]!.url}
-                alt={displayImages[openIdx]!.alt ?? ""}
+                src={images[openIdx]!.url}
+                alt={images[openIdx]!.alt ?? ""}
                 className="max-h-[85vh] w-full object-contain"
               />
               <button
@@ -155,7 +151,7 @@ export function ProfileGallery({ images, className }: Props) {
                 <X className="h-5 w-5" />
               </button>
               <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs font-medium text-white">
-                {openIdx + 1} / {displayImages.length}
+                {openIdx + 1} / {images.length}
               </div>
             </div>
           )}
@@ -177,7 +173,7 @@ export function ProfileGallery({ images, className }: Props) {
             </button>
           </div>
           <div className="space-y-2 p-4 sm:p-6">
-            {displayImages.map((img, i) => (
+            {images.map((img, i) => (
               <button
                 key={img.id}
                 type="button"
@@ -195,45 +191,4 @@ export function ProfileGallery({ images, className }: Props) {
       </Dialog>
     </div>
   );
-}
-
-/* ------------------------------------------------------------------ */
-/* Convert data: URLs → Blob object URLs for better browser rendering */
-/* ------------------------------------------------------------------ */
-
-function dataUrlToBlob(dataUrl: string): string | null {
-  try {
-    const [header, b64] = dataUrl.split(",");
-    if (!header || !b64) return null;
-    const mime = header.match(/:(.*?);/)?.[1] ?? "image/jpeg";
-    const bin = atob(b64);
-    const bytes = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    return URL.createObjectURL(new Blob([bytes], { type: mime }));
-  } catch {
-    return null;
-  }
-}
-
-function useBlobUrls(images: Image[]): Image[] {
-  const [display, setDisplay] = useState<Image[]>(images);
-
-  useEffect(() => {
-    const blobUrls: string[] = [];
-    const result = images.map((img) => {
-      if (!img.url.startsWith("data:")) return img;
-      const blob = dataUrlToBlob(img.url);
-      if (blob) {
-        blobUrls.push(blob);
-        return { ...img, url: blob };
-      }
-      return img;
-    });
-    setDisplay(result);
-    return () => {
-      blobUrls.forEach((u) => URL.revokeObjectURL(u));
-    };
-  }, [images]);
-
-  return display;
 }
