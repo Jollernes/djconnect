@@ -42,7 +42,7 @@ export function ProfileGallery({ images, className }: Props) {
   return (
     <div className={cn("relative", className)}>
       {/* Desktop: 2-col asymmetric collage with fixed aspect frame */}
-      <div className="relative hidden aspect-[2/1] w-full max-h-[320px] max-w-[960px] md:block">
+      <div className="relative hidden h-[480px] w-full max-w-[960px] md:block">
         <div className="grid h-full grid-cols-[2fr_3fr] gap-2 lg:gap-3">
           <button
             type="button"
