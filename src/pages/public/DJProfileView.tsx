@@ -7,7 +7,6 @@ import {
   Users,
   Calendar as CalendarIcon,
   Star,
-  Heart,
   Share2,
   Headphones,
   Speaker,
@@ -77,7 +76,6 @@ export function DJProfileView({
   mode = "page",
 }: DJProfileViewProps) {
   const preview = mode === "preview";
-  const [favourited, setFavourited] = useState(false);
   const [aboutExpanded, setAboutExpanded] = useState(false);
 
   const bookHref = eventTypeId
@@ -142,43 +140,12 @@ export function DJProfileView({
                 </Badge>
               )}
             </div>
-            {!preview && eventTypeId && onEventTypeChange && (
-              <div className="mt-2 inline-flex items-center">
-                <span className="text-[11px] text-muted-foreground/60">Viewing</span>
-                <div className="relative ml-1">
-                  <select
-                    value={eventTypeId}
-                    onChange={(e) => onEventTypeChange(e.target.value)}
-                    className="appearance-none border-none bg-transparent py-0 pl-0 pr-4 text-[11px] font-medium text-muted-foreground/70 outline-none hover:text-muted-foreground cursor-pointer"
-                  >
-                    {EVENT_TYPE_OPTIONS.map((opt) => (
-                      <option key={opt.id} value={opt.id}>
-                        {opt.label} profile
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-muted-foreground/40" />
-                </div>
-              </div>
-            )}
           </div>
           {!preview && (
             <div className="flex shrink-0 items-center gap-1">
               <Button variant="ghost" size="sm" className="gap-1.5 underline underline-offset-4">
                 <Share2 className="h-4 w-4" />
                 <span className="hidden sm:inline">Share</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={
-                  "gap-1.5 underline underline-offset-4 " +
-                  (favourited ? "text-rose-500" : "")
-                }
-                onClick={() => setFavourited((f) => !f)}
-              >
-                <Heart className={"h-4 w-4 " + (favourited ? "fill-current" : "")} />
-                <span className="hidden sm:inline">{favourited ? "Saved" : "Save"}</span>
               </Button>
             </div>
           )}
@@ -542,6 +509,26 @@ export function DJProfileView({
                   </ul>
                 </CardContent>
               </Card>
+
+              {eventTypeId && onEventTypeChange && (
+                <div className="mt-3 inline-flex items-center px-2">
+                  <span className="text-[11px] text-muted-foreground/60">Viewing</span>
+                  <div className="relative ml-1">
+                    <select
+                      value={eventTypeId}
+                      onChange={(e) => onEventTypeChange(e.target.value)}
+                      className="appearance-none border-none bg-transparent py-0 pl-0 pr-4 text-[11px] font-medium text-muted-foreground/70 outline-none hover:text-muted-foreground cursor-pointer"
+                    >
+                      {EVENT_TYPE_OPTIONS.map((opt) => (
+                        <option key={opt.id} value={opt.id}>
+                          {opt.label} profile
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-muted-foreground/40" />
+                  </div>
+                </div>
+              )}
 
               <p className="mt-4 px-2 text-xs text-muted-foreground">
                 Report this profile · Last updated {formatDate(dj.updated_at)}
