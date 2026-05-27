@@ -41,6 +41,8 @@ import { DJCard } from "@/components/common/DJCard";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { DJProfileWithRelations, Review } from "@/types/domain";
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
+import { EVENT_TYPE_OPTIONS } from "@/lib/eventTypeOptions";
 
 export interface DJProfileViewProps {
   dj: DJProfileWithRelations;
@@ -71,7 +73,7 @@ export function DJProfileView({
   reviews,
   similarDJs,
   eventTypeId = null,
-  onEventTypeChange: _onEventTypeChange,
+  onEventTypeChange,
   mode = "page",
 }: DJProfileViewProps) {
   const preview = mode === "preview";
@@ -140,6 +142,25 @@ export function DJProfileView({
                 </Badge>
               )}
             </div>
+            {!preview && eventTypeId && onEventTypeChange && (
+              <div className="mt-2 inline-flex items-center">
+                <span className="text-[11px] text-muted-foreground/60">Viewing</span>
+                <div className="relative ml-1">
+                  <select
+                    value={eventTypeId}
+                    onChange={(e) => onEventTypeChange(e.target.value)}
+                    className="appearance-none border-none bg-transparent py-0 pl-0 pr-4 text-[11px] font-medium text-muted-foreground/70 outline-none hover:text-muted-foreground cursor-pointer"
+                  >
+                    {EVENT_TYPE_OPTIONS.map((opt) => (
+                      <option key={opt.id} value={opt.id}>
+                        {opt.label} profile
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 text-muted-foreground/40" />
+                </div>
+              </div>
+            )}
           </div>
           {!preview && (
             <div className="flex shrink-0 items-center gap-1">
