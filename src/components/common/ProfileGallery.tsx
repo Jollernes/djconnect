@@ -36,8 +36,8 @@ export function ProfileGallery({ images, className }: Props) {
   }
 
   const hero = images[0];
-  const grid = images.slice(1, 5);
-  const placeholders = Math.max(0, 4 - grid.length);
+  const grid = images.slice(1, 7);
+  const placeholders = Math.max(0, 6 - grid.length);
 
   return (
     <div className={cn("relative", className)}>
@@ -56,7 +56,7 @@ export function ProfileGallery({ images, className }: Props) {
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
           </button>
-          <div className="grid h-full grid-cols-2 grid-rows-2 gap-2 lg:gap-3">
+          <div className="grid h-full grid-cols-3 grid-rows-2 gap-2 lg:gap-3">
             {grid.map((img, i) => (
               <button
                 key={img.id}
@@ -64,8 +64,8 @@ export function ProfileGallery({ images, className }: Props) {
                 onClick={() => setOpenIdx(i + 1)}
                 className={cn(
                   "group relative h-full overflow-hidden bg-muted",
-                  i === 1 && "rounded-tr-3xl",
-                  i === 3 && "rounded-br-3xl",
+                  i === 2 && "rounded-tr-3xl",
+                  i === 5 && "rounded-br-3xl",
                 )}
               >
                 <img
@@ -81,8 +81,8 @@ export function ProfileGallery({ images, className }: Props) {
                 key={`ph-${i}`}
                 className={cn(
                   "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
-                  grid.length + i === 1 && "rounded-tr-3xl",
-                  grid.length + i === 3 && "rounded-br-3xl",
+                  grid.length + i === 2 && "rounded-tr-3xl",
+                  grid.length + i === 5 && "rounded-br-3xl",
                 )}
               >
                 <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
