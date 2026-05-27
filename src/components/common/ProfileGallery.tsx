@@ -36,18 +36,19 @@ export function ProfileGallery({ images, className }: Props) {
   }
 
   const hero = images[0];
-  const grid = images.slice(1, 5);
-  const placeholders = Math.max(0, 4 - grid.length);
+  const grid = images.slice(1, 7);
+  const placeholders = Math.max(0, 6 - grid.length);
 
   return (
     <div className={cn("relative", className)}>
-      {/* Desktop: 2-col asymmetric collage with fixed aspect frame */}
-      <div className="relative mx-auto hidden aspect-[2/1] w-full max-h-[320px] max-w-[960px] md:block">
-        <div className="grid h-full grid-cols-[2fr_3fr] gap-2 lg:gap-3">
+      {/* Desktop: hero (left, 2 rows) + 6 smaller images (3×2 grid, right) */}
+      <div className="relative mx-auto hidden w-full md:block">
+        <div className="grid h-[340px] grid-cols-4 grid-rows-2 gap-1.5 lg:gap-2">
+          {/* Hero spans left column, full height */}
           <button
             type="button"
             onClick={() => setOpenIdx(0)}
-            className="group relative h-full overflow-hidden rounded-l-3xl bg-muted"
+            className="group relative row-span-2 overflow-hidden rounded-l-2xl bg-muted"
           >
             <img
               src={hero.url}
@@ -56,41 +57,40 @@ export function ProfileGallery({ images, className }: Props) {
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
           </button>
-          <div className="grid h-full grid-cols-2 grid-rows-2 gap-2 lg:gap-3">
-            {grid.map((img, i) => (
-              <button
-                key={img.id}
-                type="button"
-                onClick={() => setOpenIdx(i + 1)}
-                className={cn(
-                  "group relative h-full overflow-hidden bg-muted",
-                  i === 1 && "rounded-tr-3xl",
-                  i === 3 && "rounded-br-3xl",
-                )}
-              >
-                <img
-                  src={img.url}
-                  alt={img.alt ?? ""}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-              </button>
-            ))}
-            {Array.from({ length: placeholders }).map((_, i) => (
-              <div
-                key={`ph-${i}`}
-                className={cn(
-                  "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
-                  grid.length + i === 1 && "rounded-tr-3xl",
-                  grid.length + i === 3 && "rounded-br-3xl",
-                )}
-              >
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
-                  DJConnect
-                </div>
+          {/* 6 smaller images: 3 cols × 2 rows */}
+          {grid.map((img, i) => (
+            <button
+              key={img.id}
+              type="button"
+              onClick={() => setOpenIdx(i + 1)}
+              className={cn(
+                "group relative overflow-hidden bg-muted",
+                i === 2 && "rounded-tr-2xl",
+                i === 5 && "rounded-br-2xl",
+              )}
+            >
+              <img
+                src={img.url}
+                alt={img.alt ?? ""}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+            </button>
+          ))}
+          {Array.from({ length: placeholders }).map((_, i) => (
+            <div
+              key={`ph-${i}`}
+              className={cn(
+                "relative overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
+                grid.length + i === 2 && "rounded-tr-2xl",
+                grid.length + i === 5 && "rounded-br-2xl",
+              )}
+            >
+              <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
+                DJConnect
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
