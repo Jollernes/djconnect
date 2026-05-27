@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { mockDJs } from "@/data/mock";
 import {
@@ -130,8 +130,11 @@ export function useDJProfileEditor() {
   /* ------------------------------------------------------------------ */
   /* Persistence                                                          */
   /* ------------------------------------------------------------------ */
+  const selfSaveRef = useRef(false);
+
   useEffect(() => {
     const onUpdate = () => {
+      if (selfSaveRef.current) { selfSaveRef.current = false; return; }
       const next = readDemoDJProfile();
       if (!next) return;
       if (next.stageName?.trim()) setStageName(next.stageName);
@@ -144,6 +147,17 @@ export function useDJProfileEditor() {
     window.addEventListener("demoDJProfile:update", onUpdate);
     return () => window.removeEventListener("demoDJProfile:update", onUpdate);
   }, []);
+
+  /* Auto-save: debounce writes so every keystroke is persisted and the
+     browsing views pick up the changes via the custom event. */
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      selfSaveRef.current = true;
+      writeDemoDJProfile(buildPersistedProfile(readDemoDJProfile()));
+    }, 400);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stageName, bio, equipment, setupSize, travelRadius, priceFrom, priceOnRequest, selectedEventTypes, subProfiles]);
 
   function buildPersistedProfile(existing: DemoDJProfile | null): DemoDJProfile {
     return {
