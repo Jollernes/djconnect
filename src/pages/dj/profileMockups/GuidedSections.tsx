@@ -11,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { EventTypeTabs } from "./shared/EventTypeTabs";
 import { DesktopMobilePreview } from "./shared/DesktopMobilePreview";
 import { AutosaveIndicator } from "./shared/AutosaveIndicator";
-import { MockupSwitcher } from "./shared/MockupSwitcher";
 import { DottedUploadSlot } from "./shared/DottedUploadSlot";
 import { ChipMultiSelect } from "./shared/ChipMultiSelect";
 import { CompletionBars } from "./shared/CompletionBars";
@@ -187,8 +186,6 @@ export function GuidedSectionsMockup() {
           );
         })}
       </div>
-
-      <MockupSwitcher />
 
       {/* Floating preview drawer (right side) */}
       <aside

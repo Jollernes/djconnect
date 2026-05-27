@@ -53,15 +53,7 @@ import { DJBookingDetailPage } from "@/pages/dj/BookingDetailPage";
 import { DJAvailabilityPage } from "@/pages/dj/AvailabilityPage";
 import { DJEarningsPage } from "@/pages/dj/EarningsPage";
 import { DJMessagesPage } from "@/pages/dj/MessagesPage";
-import { DJProfileEditorPage } from "@/pages/dj/ProfileEditorPage";
-import { ProfileMockupsIndexPage } from "@/pages/dj/profileMockups/MockupIndex";
-import { SplitStudioMockup } from "@/pages/dj/profileMockups/SplitStudio";
 import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
-import { CardCanvasMockup } from "@/pages/dj/profileMockups/CardCanvas";
-import { CompactSplitStudioMockup } from "@/pages/dj/profileMockups/CompactSplitStudio";
-import { CompactGuidedSectionsMockup } from "@/pages/dj/profileMockups/CompactGuidedSections";
-import { CompactCardCanvasMockup } from "@/pages/dj/profileMockups/CompactCardCanvas";
-import { ReferenceEditorMockup } from "@/pages/dj/profileMockups/ReferenceEditor";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
 import { DJGuideGate } from "@/components/common/DJGuideGate";
 
@@ -157,36 +149,7 @@ function App() {
             <Route path="/dj/availability" element={<DJAvailabilityPage />} />
             <Route path="/dj/earnings" element={<DJEarningsPage />} />
             <Route path="/dj/messages" element={<DJMessagesPage />} />
-            <Route path="/dj/profile" element={<DJProfileEditorPage />} />
-            <Route path="/dj/profile-mockups" element={<ProfileMockupsIndexPage />} />
-            <Route
-              path="/dj/profile-mockups/split-studio"
-              element={<SplitStudioMockup />}
-            />
-            <Route
-              path="/dj/profile-mockups/guided-sections"
-              element={<GuidedSectionsMockup />}
-            />
-            <Route
-              path="/dj/profile-mockups/card-canvas"
-              element={<CardCanvasMockup />}
-            />
-            <Route
-              path="/dj/profile-mockups/compact-split-studio"
-              element={<CompactSplitStudioMockup />}
-            />
-            <Route
-              path="/dj/profile-mockups/compact-guided-sections"
-              element={<CompactGuidedSectionsMockup />}
-            />
-            <Route
-              path="/dj/profile-mockups/compact-card-canvas"
-              element={<CompactCardCanvasMockup />}
-            />
-            <Route
-              path="/dj/profile-mockups/reference-editor"
-              element={<ReferenceEditorMockup />}
-            />
+            <Route path="/dj/profile" element={<GuidedSectionsMockup />} />
           </Route>
 
           <Route
