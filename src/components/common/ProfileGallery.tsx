@@ -36,14 +36,16 @@ export function ProfileGallery({ images, className }: Props) {
   }
 
   const hero = images[0];
-  const grid = images.slice(1, 7);
-  const placeholders = Math.max(0, 6 - grid.length);
+  const grid = images.slice(1, 5);
+  const extra = images.slice(5, 7);
+  const placeholders = Math.max(0, 4 - grid.length);
+  const extraPlaceholders = Math.max(0, 2 - extra.length);
 
   return (
     <div className={cn("relative", className)}>
-      {/* Desktop: 2-col asymmetric collage with fixed aspect frame */}
-      <div className="relative hidden h-[480px] w-full max-w-[960px] md:block">
-        <div className="grid h-full grid-cols-[2fr_3fr] gap-2 lg:gap-3">
+      {/* Desktop: hero + 4 grid (original 960px proportions) + 2 extra to fill width */}
+      <div className="relative hidden h-[320px] w-full md:block">
+        <div className="grid h-full grid-cols-[2fr_3fr_1.5fr] gap-2 lg:gap-3">
           <button
             type="button"
             onClick={() => setOpenIdx(0)}
@@ -56,7 +58,7 @@ export function ProfileGallery({ images, className }: Props) {
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
           </button>
-          <div className="grid h-full grid-cols-3 grid-rows-2 gap-2 lg:gap-3">
+          <div className="grid h-full grid-cols-2 grid-rows-2 gap-2 lg:gap-3">
             {grid.map((img, i) => (
               <button
                 key={img.id}
@@ -64,8 +66,8 @@ export function ProfileGallery({ images, className }: Props) {
                 onClick={() => setOpenIdx(i + 1)}
                 className={cn(
                   "group relative h-full overflow-hidden bg-muted",
-                  i === 2 && "rounded-tr-3xl",
-                  i === 5 && "rounded-br-3xl",
+                  i === 1 && "rounded-tr-none",
+                  i === 3 && "rounded-br-none",
                 )}
               >
                 <img
@@ -81,8 +83,41 @@ export function ProfileGallery({ images, className }: Props) {
                 key={`ph-${i}`}
                 className={cn(
                   "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
-                  grid.length + i === 2 && "rounded-tr-3xl",
-                  grid.length + i === 5 && "rounded-br-3xl",
+                )}
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
+                  DJConnect
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="grid h-full grid-rows-2 gap-2 lg:gap-3">
+            {extra.map((img, i) => (
+              <button
+                key={img.id}
+                type="button"
+                onClick={() => setOpenIdx(i + 5)}
+                className={cn(
+                  "group relative h-full overflow-hidden bg-muted",
+                  i === 0 && "rounded-tr-3xl",
+                  i === 1 && "rounded-br-3xl",
+                )}
+              >
+                <img
+                  src={img.url}
+                  alt={img.alt ?? ""}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+              </button>
+            ))}
+            {Array.from({ length: extraPlaceholders }).map((_, i) => (
+              <div
+                key={`eph-${i}`}
+                className={cn(
+                  "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
+                  extra.length + i === 0 && "rounded-tr-3xl",
+                  extra.length + i === 1 && "rounded-br-3xl",
                 )}
               >
                 <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
