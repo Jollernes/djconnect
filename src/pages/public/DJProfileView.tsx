@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/accordion";
 import { StarRating } from "@/components/common/StarRating";
 import { ProfileGallery } from "@/components/common/ProfileGallery";
-import { EventContextBanner } from "@/components/common/EventContextBanner";
 import { Equalizer } from "@/components/common/Equalizer";
 import { AvailabilityCalendar } from "@/components/common/AvailabilityCalendar";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -72,7 +71,7 @@ export function DJProfileView({
   reviews,
   similarDJs,
   eventTypeId = null,
-  onEventTypeChange,
+  onEventTypeChange: _onEventTypeChange,
   mode = "page",
 }: DJProfileViewProps) {
   const preview = mode === "preview";
@@ -163,15 +162,6 @@ export function DJProfileView({
             </div>
           )}
         </div>
-
-        {eventTypeId && onEventTypeChange && (
-          <EventContextBanner
-            eventTypeId={eventTypeId}
-            onChange={onEventTypeChange}
-            variant="profile"
-            className="mb-4"
-          />
-        )}
 
         {/* Photo collage */}
         <ProfileGallery images={galleryImages} />
