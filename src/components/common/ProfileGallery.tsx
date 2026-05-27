@@ -42,7 +42,7 @@ export function ProfileGallery({ images, className }: Props) {
   return (
     <div className={cn("relative", className)}>
       {/* Desktop: 2-col asymmetric collage with fixed aspect frame */}
-      <div className="relative hidden aspect-[2/1] w-full md:block">
+      <div className="relative mx-auto hidden aspect-[2/1] w-full max-h-[420px] md:block">
         <div className="grid h-full grid-cols-2 gap-2 lg:gap-3">
           <button
             type="button"
@@ -98,7 +98,7 @@ export function ProfileGallery({ images, className }: Props) {
       <button
         type="button"
         onClick={() => setOpenIdx(0)}
-        className="relative block aspect-[4/3] w-full overflow-hidden rounded-3xl bg-muted md:hidden"
+        className="relative block aspect-[4/3] w-full max-h-[320px] overflow-hidden rounded-3xl bg-muted md:hidden"
       >
         <img src={hero.url} alt={hero.alt ?? ""} className="absolute inset-0 h-full w-full object-cover" />
       </button>
