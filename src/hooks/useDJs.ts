@@ -147,6 +147,9 @@ function applyDemoEdits(base: DJProfileWithRelations): DJProfileWithRelations {
       photos.push(stubPhoto(`demo-equip-${i}`, url)),
     );
   }
+  // Append seed equipment photos as fallback grid content so the
+  // gallery stays populated even when only a hero photo is uploaded.
+  base.equipment_photos.forEach((p) => photos.push(p));
 
   return {
     ...base,
@@ -164,7 +167,7 @@ function applyDemoEdits(base: DJProfileWithRelations): DJProfileWithRelations {
       avatar_url: demo.profilePhotoDataUrl ?? base.profile.avatar_url,
       city: demo.city?.trim() || base.profile.city,
     },
-    equipment_photos: photos.length ? photos : base.equipment_photos,
+    equipment_photos: photos,
   };
 }
 

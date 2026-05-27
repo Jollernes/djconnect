@@ -39,11 +39,17 @@ export function DottedUploadSlot({
   function handleFile(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") onChange(reader.result);
-    };
-    reader.readAsDataURL(f);
+    if (isVideo || !f.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") onChange(reader.result);
+      };
+      reader.readAsDataURL(f);
+    } else {
+      resizeImage(f, 1600).then((dataUrl) => {
+        if (dataUrl) onChange(dataUrl);
+      });
+    }
     e.target.value = "";
   }
 
@@ -117,4 +123,28 @@ export function DottedUploadSlot({
       {hint && <span className="text-[10px] uppercase tracking-wide">{hint}</span>}
     </button>
   );
+}
+
+function resizeImage(file: Blob, maxWidth: number): Promise<string | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = Math.round(height * (maxWidth / width));
+        width = maxWidth;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(null); return; }
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL("image/jpeg", 0.85));
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => resolve(null);
+    img.src = URL.createObjectURL(file);
+  });
 }
