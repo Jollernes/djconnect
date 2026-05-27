@@ -7,7 +7,6 @@ import {
   Users,
   Calendar as CalendarIcon,
   Star,
-  Share2,
   Headphones,
   Speaker,
   Mic2,
@@ -107,50 +106,6 @@ export function DJProfileView({
   return (
     <div className={cn("bg-gradient-to-b from-white via-white to-slate-50", preview ? "pb-6" : "pb-28")}>
       <div className={cn(preview ? "px-4 pt-4 sm:px-6 sm:pt-6" : "container pt-6 sm:pt-10")}>
-        {/* Headline strip */}
-        <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-end sm:justify-between">
-          <div className="min-w-0">
-            <h1 className="text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-              {dj.stage_name}
-            </h1>
-            {dj.tagline && (
-              <p className="mt-1 max-w-2xl text-pretty text-base text-muted-foreground">
-                {dj.tagline}
-              </p>
-            )}
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
-              <span className="inline-flex items-center gap-1 font-medium">
-                <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-                {dj.rating_average.toFixed(2)}
-                <span className="text-muted-foreground">
-                  · {dj.rating_count} reviews
-                </span>
-              </span>
-              <span className="inline-flex items-center gap-1 text-muted-foreground">
-                <Shield className="h-4 w-4 text-emerald-600" />
-                Verified DJ
-              </span>
-              <span className="inline-flex items-center gap-1 text-muted-foreground">
-                <MapPin className="h-4 w-4" />
-                {dj.base_location}
-              </span>
-              {dj.is_featured && (
-                <Badge variant="accent" className="gap-1">
-                  <Sparkles className="h-3 w-3" /> Top-rated
-                </Badge>
-              )}
-            </div>
-          </div>
-          {!preview && (
-            <div className="flex shrink-0 items-center gap-1">
-              <Button variant="ghost" size="sm" className="gap-1.5 underline underline-offset-4">
-                <Share2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Share</span>
-              </Button>
-            </div>
-          )}
-        </div>
-
         {/* Photo collage */}
         <ProfileGallery images={galleryImages} />
 
@@ -196,16 +151,29 @@ export function DJProfileView({
       >
         {/* Main column */}
         <div className="min-w-0 space-y-10">
-          {/* Hosted by */}
+          {/* DJ identity */}
           <section className="flex items-start justify-between gap-6 border-b pb-8">
             <div>
               <h2 className="text-xl font-semibold sm:text-2xl">
-                Hosted by {dj.profile.full_name?.split(" ")[0] ?? dj.stage_name}
+                DJ {dj.stage_name}
               </h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Professional DJ · {dj.years_experience} years on the decks · Travels up to{" "}
-                {dj.travel_radius_km}km
-              </p>
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-1 font-medium text-foreground">
+                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  {dj.rating_average.toFixed(2)}
+                  <span className="text-muted-foreground">
+                    · {dj.rating_count} reviews
+                  </span>
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <Shield className="h-4 w-4 text-emerald-600" />
+                  Verified DJ
+                </span>
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  Kører i hele {dj.base_location}
+                </span>
+              </div>
             </div>
             <Avatar className="h-16 w-16 ring-2 ring-white sm:h-20 sm:w-20">
               <AvatarImage src={dj.profile.avatar_url ?? undefined} alt={dj.stage_name} />
