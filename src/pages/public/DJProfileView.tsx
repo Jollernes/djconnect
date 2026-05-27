@@ -109,24 +109,34 @@ export function DJProfileView({
         {/* Photo collage */}
         <ProfileGallery images={galleryImages} />
 
-        {/* Credential ribbon — soft, elegant style */}
-        <div className="relative mt-5 overflow-hidden rounded-2xl border border-rose-100/80 bg-gradient-to-r from-rose-50/80 via-amber-50/60 to-rose-50/80 px-4 py-3 sm:px-6">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm">
-            <span className="inline-flex items-center gap-2 font-semibold text-rose-800/80">
-              <Equalizer bars={4} className="h-4 text-rose-400" />
+        {/* Festive ribbon — neon strip with equalizer + signal pills */}
+        <div className="relative mt-5 overflow-hidden rounded-2xl border bg-[hsl(222_47%_10%)] px-4 py-3 text-white sm:px-6">
+          <div
+            className="absolute inset-0 opacity-80"
+            style={{
+              background:
+                "linear-gradient(90deg, hsla(21,90%,53%,0.55) 0%, hsla(280,85%,60%,0.45) 35%, hsla(199,89%,60%,0.4) 65%, hsla(21,90%,53%,0.55) 100%)",
+              backgroundSize: "200% 100%",
+              animation: "marquee 14s linear infinite",
+            }}
+          />
+          <div className="absolute inset-0 bg-grid opacity-30" />
+          <div className="relative flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm">
+            <span className="inline-flex items-center gap-2 font-medium">
+              <Equalizer bars={4} className="h-4 text-amber-300" />
               <span>LIVE on DJConnect</span>
             </span>
-            <Separator orientation="vertical" className="hidden h-4 bg-rose-200/60 sm:block" />
-            <span className="inline-flex items-center gap-1.5 text-foreground/70">
-              <Award className="h-4 w-4 text-amber-500" /> {dj.events_performed} events performed
+            <Separator orientation="vertical" className="hidden h-4 bg-white/30 sm:block" />
+            <span className="inline-flex items-center gap-1.5">
+              <Award className="h-4 w-4 text-amber-300" /> {dj.events_performed} events performed
             </span>
-            <Separator orientation="vertical" className="hidden h-4 bg-rose-200/60 sm:block" />
-            <span className="inline-flex items-center gap-1.5 text-foreground/70">
-              <Clock className="h-4 w-4 text-foreground/50" /> Replies within 2h
+            <Separator orientation="vertical" className="hidden h-4 bg-white/30 sm:block" />
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="h-4 w-4" /> Replies within 2h
             </span>
-            <Separator orientation="vertical" className="hidden h-4 bg-rose-200/60 sm:block" />
-            <span className="inline-flex items-center gap-1.5 text-foreground/70">
-              <Disc3 className="h-4 w-4 text-rose-400" />
+            <Separator orientation="vertical" className="hidden h-4 bg-white/30 sm:block" />
+            <span className="inline-flex items-center gap-1.5">
+              <Disc3 className="h-4 w-4 animate-spin-slow" style={{ animationDuration: "8s" }} />
               {dj.years_experience} yrs experience
             </span>
           </div>
