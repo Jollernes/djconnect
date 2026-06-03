@@ -29,8 +29,9 @@ import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { DJCard } from "@/components/common/DJCard";
 import { Equalizer } from "@/components/common/Equalizer";
-import { WeddingDJScene } from "@/components/common/WeddingDJScene";
+import { HeroDJCluster } from "@/components/common/HeroDJCluster";
 import { useDJs } from "@/hooks/useDJs";
+import type { DJProfileWithRelations } from "@/types/domain";
 
 const marqueeItems = [
   "Bryllupper",
@@ -58,6 +59,9 @@ export function HomePage() {
   const navigate = useNavigate();
   const { djs } = useDJs({ sortBy: "relevance" });
   const featured = djs.filter((d) => d.is_featured).slice(0, 3);
+  // Hero cluster: prefer featured DJs, then top up with the rest so we
+  // always have up to 3 cards for social proof.
+  const heroDJs = [...featured, ...djs.filter((d) => !d.is_featured)].slice(0, 3);
 
   const [eventType, setEventType] = useState<string>("");
   const [city, setCity] = useState("");
@@ -83,7 +87,7 @@ export function HomePage() {
 
   return (
     <>
-      <Hero eventType={eventType} setEventType={setEventType} city={city} setCity={setCity} date={date} setDate={setDate} onSubmit={submit} />
+      <Hero heroDJs={heroDJs} eventType={eventType} setEventType={setEventType} city={city} setCity={setCity} date={date} setDate={setDate} onSubmit={submit} />
 
       <Marquee />
 
@@ -124,6 +128,7 @@ export function HomePage() {
 }
 
 type HeroProps = {
+  heroDJs: DJProfileWithRelations[];
   eventType: string;
   setEventType: (v: string) => void;
   city: string;
@@ -133,7 +138,7 @@ type HeroProps = {
   onSubmit: (e: React.FormEvent) => void;
 };
 
-function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit }: HeroProps) {
+function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, onSubmit }: HeroProps) {
   return (
     <section className="relative isolate overflow-hidden text-primary-foreground hero-gradient">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-40" />
@@ -188,7 +193,7 @@ function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit 
             className="relative"
           >
             <div aria-hidden className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl" />
-            <WeddingDJScene className="relative" />
+            <HeroDJCluster djs={heroDJs} className="relative" />
           </motion.div>
         </div>
 
