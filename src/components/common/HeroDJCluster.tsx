@@ -204,23 +204,27 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
               onError={advance}
               aria-label={`${featured.stage_name} spiller live`}
             />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-4 pb-4 pt-14">
-              <span className="block text-[10px] font-semibold uppercase tracking-[0.18em] text-white/70">
+            {/* Centered event caption — the prominent headline on the clip */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/55" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 bottom-24 flex flex-col items-center justify-center px-4 text-center">
+              <span className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/80 drop-shadow">
                 DJConnect
               </span>
               <AnimatePresence mode="wait">
                 <motion.span
                   key={active}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-0.5 block max-w-[85%] text-base font-bold leading-snug text-white drop-shadow"
+                  initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.96 }}
+                  transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="block text-2xl font-extrabold leading-tight text-white [text-shadow:0_2px_14px_rgba(0,0,0,0.65)]"
                 >
                   {media.caption}
                 </motion.span>
               </AnimatePresence>
-              <div className="mt-3 flex items-center gap-1.5">
+            </div>
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-4 pb-4 pt-14">
+              <div className="flex items-center justify-center gap-1.5">
                 {Array.from({ length: n }).map((_, i) => (
                   <span
                     key={i}
