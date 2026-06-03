@@ -5,6 +5,7 @@ import { PublicLayout } from "@/components/layout/PublicLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { RoleGuard } from "@/components/common/RoleGuard";
 import { ViewportPreview } from "@/components/dev/ViewportPreview";
+import { RoleSwitcher } from "@/components/dev/RoleSwitcher";
 
 import { HomePage } from "@/pages/public/HomePage";
 import { SearchPage } from "@/pages/public/SearchPage";
@@ -187,6 +188,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         <Toaster richColors position="top-center" />
+        <RoleSwitcher />
         </ViewportPreview>
       </BrowserRouter>
     </AuthProvider>

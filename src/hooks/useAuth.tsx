@@ -124,9 +124,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithPassword = useCallback(async (email: string, password: string) => {
     if (!supabase) throw new Error("Supabase is not configured.");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-  }, []);
+    // Load the profile before resolving so callers can navigate to a
+    // role-gated route without racing the async onAuthStateChange handler.
+    await loadProfile(data.user ?? null);
+  }, [loadProfile]);
 
   const signUpWithPassword = useCallback(
     async ({ email, password, fullName, role, company }: { email: string; password: string; fullName: string; role: RoleEnum; company?: string }) => {
