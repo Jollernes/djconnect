@@ -19,19 +19,19 @@ function seed(booking: BookingWithRelations): ChatMsg[] {
     {
       id: "m1",
       from: "dj",
-      text: `Hi ${booking.customer.full_name.split(" ")[0]}! Thanks for the booking — I'm thrilled to be playing your event. Let me know any songs you'd love to hear or themes you're going for.`,
+      text: `Hej ${booking.customer.full_name.split(" ")[0]}! Tak for bookingen — jeg glæder mig vildt til at spille til jeres event. Sig endelig til, hvis I har ønskenumre eller et tema, I går efter.`,
       at: new Date(base + 4 * 3600_000).toISOString(),
     },
     {
       id: "m2",
       from: "customer",
-      text: `Hi ${dj}! So happy you said yes. We'd love a mix of 80s/90s and current chart, and definitely no metal :) — I'll fill in the music planner today.`,
+      text: `Hej ${dj}! Så glad for, at du sagde ja. Vi vil elske en blanding af 80'er/90'er og nye hits, og helt sikkert ingen metal :) — jeg udfylder musikplanlæggeren i dag.`,
       at: new Date(base + 5 * 3600_000).toISOString(),
     },
     {
       id: "m3",
       from: "dj",
-      text: "Perfect — I'll watch the music planner for updates. Let's also lock the run-of-show two weeks before the event. Talk soon!",
+      text: "Perfekt — jeg holder øje med musikplanlæggeren for opdateringer. Lad os også låse køreplanen to uger før eventet. Vi snakkes!",
       at: new Date(base + 6 * 3600_000).toISOString(),
     },
   ];
@@ -87,12 +87,12 @@ export function MessagesThread({ booking }: { booking: BookingWithRelations }) {
     } catch {
       /* ignore */
     }
-    toast.success("Message sent");
+    toast.success("Besked sendt");
     setTimeout(() => {
       const reply: ChatMsg = {
         id: crypto.randomUUID(),
         from: "dj",
-        text: "Got it — thanks! I'll review and get back to you within 24h.",
+        text: "Modtaget — tak! Jeg kigger på det og vender tilbage inden for 24 timer.",
         at: new Date().toISOString(),
       };
       const after = [...next, reply];
@@ -109,13 +109,13 @@ export function MessagesThread({ booking }: { booking: BookingWithRelations }) {
     <div id="messages" className="flex flex-col rounded-2xl border bg-card">
       <div className="flex items-center justify-between border-b p-5">
         <div>
-          <h2 className="text-lg font-semibold">Messages</h2>
+          <h2 className="text-lg font-semibold">Beskeder</h2>
           <p className="text-xs text-muted-foreground">
-            Stay in the platform for full booking protection.
+            Bliv på platformen for fuld bookingbeskyttelse.
           </p>
         </div>
         <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-800">
-          ● Online recently
+          ● Online for nylig
         </span>
       </div>
 
@@ -149,7 +149,7 @@ export function MessagesThread({ booking }: { booking: BookingWithRelations }) {
           rows={2}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder={`Message ${booking.dj_profile.stage_name}…`}
+          placeholder={`Skriv til ${booking.dj_profile.stage_name}…`}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();

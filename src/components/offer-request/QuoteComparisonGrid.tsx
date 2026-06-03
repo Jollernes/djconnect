@@ -47,14 +47,14 @@ export function QuoteComparisonGrid({
       <div>
         <h2 className="text-lg font-semibold text-foreground">
           {offers.length === 1
-            ? "Your first quote"
+            ? "Dit første tilbud"
             : offers.length >= 3
-              ? "Your 3 personal quotes"
-              : `Your ${offers.length} quotes so far`}
+              ? "Dine 3 personlige tilbud"
+              : `Dine ${offers.length} tilbud indtil videre`}
         </h2>
         {offers.length < 3 && (
           <p className="mt-0.5 text-sm text-muted-foreground">
-            We'll add the next one here as soon as it arrives. No need to refresh.
+            Vi tilføjer det næste her, så snart det ankommer. Du behøver ikke opdatere.
           </p>
         )}
       </div>
@@ -166,7 +166,7 @@ function QuoteCard({
         {/* Price — typography is the hierarchy, no coloured box */}
         <div className="mt-5">
           <p className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
-            Quoted price
+            Tilbudt pris
           </p>
           <p className="mt-0.5 text-[28px] font-semibold tabular-nums leading-none text-foreground">
             {formatPrice(quote.priceMinor)}
@@ -204,10 +204,10 @@ function QuoteCard({
           >
             {booked ? (
               <>
-                <Check className="mr-1.5 h-4 w-4" /> Booked
+                <Check className="mr-1.5 h-4 w-4" /> Booket
               </>
             ) : (
-              "Book with escrow"
+              "Book med escrow"
             )}
           </Button>
           <div className="mt-2 flex items-center justify-between gap-2 text-xs">
@@ -217,7 +217,7 @@ function QuoteCard({
               disabled={booked}
               className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
-              <MessageSquare className="h-3.5 w-3.5" /> Message
+              <MessageSquare className="h-3.5 w-3.5" /> Skriv besked
             </button>
             <button
               type="button"
@@ -226,7 +226,7 @@ function QuoteCard({
               className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
             >
               <PhoneCall className="h-3.5 w-3.5" />
-              {slot.callbackRequested ? "Call requested" : "Request a call"}
+              {slot.callbackRequested ? "Opkald anmodet" : "Anmod om opkald"}
             </button>
           </div>
         </footer>
@@ -254,32 +254,32 @@ function PendingPlaceholder({ index }: { index: number }) {
   return (
     <div
       className="flex h-full min-h-[260px] flex-col items-start rounded-2xl border border-dashed border-border/60 bg-transparent p-5 text-sm text-muted-foreground"
-      aria-label={`Quote slot ${index + 1} pending`}
+      aria-label={`Tilbudsplads ${index + 1} afventer`}
     >
       <p className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/80">
         Slot {index + 1}
       </p>
-      <p className="mt-1 text-foreground/70">Awaiting next quote</p>
+      <p className="mt-1 text-foreground/70">Afventer næste tilbud</p>
       <p className="mt-1 text-xs text-muted-foreground">
-        It will appear here automatically.
+        Det vises her automatisk.
       </p>
     </div>
   );
 }
 
 function eventTypeLabel(ids: string[]): string {
-  if (ids.includes("wedding")) return "Wedding";
+  if (ids.includes("wedding")) return "Bryllup";
   if (ids.includes("corporate_event") || ids.includes("corporate_party"))
-    return "Corporate";
-  if (ids.includes("birthday")) return "Birthday";
-  if (ids.includes("private_party")) return "Private party";
+    return "Firma";
+  if (ids.includes("birthday")) return "Fødselsdag";
+  if (ids.includes("private_party")) return "Privatfest";
   return "DJ";
 }
 
 function packageDescription(packageId: "small" | "medium" | "large"): string {
-  if (packageId === "small") return "Small setup · sound + warm lights · ~5h";
-  if (packageId === "medium") return "Medium setup · sound + lights · 5–6h";
-  return "Large setup · full sound + lighting rig · 6h+";
+  if (packageId === "small") return "Lille setup · lyd + varme lys · ~5t";
+  if (packageId === "medium") return "Mellem setup · lyd + lys · 5–6t";
+  return "Stor setup · fuld lyd + lysrig · 6t+";
 }
 
 function formatPrice(priceMinor: number): string {

@@ -155,7 +155,7 @@ function BriefRecap({
     eventType?.label,
     dateLabel,
     cityLabel,
-    guestBucket?.range && `${guestBucket.range} guests`,
+    guestBucket?.range && `${guestBucket.range} gæster`,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -170,7 +170,7 @@ function BriefRecap({
       >
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-            Your brief
+            Din forespørgsel
           </p>
           <p className="mt-0.5 truncate text-sm text-foreground">{summary || "—"}</p>
         </div>
@@ -186,16 +186,16 @@ function BriefRecap({
         <div className="border-t border-border/60 px-5 py-4">
           <dl className="grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
             <BriefRow label="Event">{eventType?.label ?? "—"}</BriefRow>
-            <BriefRow label="Date">{dateLabel}</BriefRow>
-            <BriefRow label="City">{cityLabel}</BriefRow>
-            <BriefRow label="Guests">{guestBucket?.range ?? "—"}</BriefRow>
+            <BriefRow label="Dato">{dateLabel}</BriefRow>
+            <BriefRow label="By">{cityLabel}</BriefRow>
+            <BriefRow label="Gæster">{guestBucket?.range ?? "—"}</BriefRow>
             {brief.genres && brief.genres.length > 0 && (
-              <BriefRow label="Vibe" full>
+              <BriefRow label="Stemning" full>
                 {brief.genres.join(", ")}
               </BriefRow>
             )}
             {brief.extras && brief.extras.length > 0 && (
-              <BriefRow label="Extras" full>
+              <BriefRow label="Ekstra" full>
                 {brief.extras.join(", ")}
               </BriefRow>
             )}
@@ -205,7 +205,7 @@ function BriefRecap({
               </BriefRow>
             )}
             {brief.contact?.email && (
-              <BriefRow label="Contact">{brief.contact.email}</BriefRow>
+              <BriefRow label="Kontakt">{brief.contact.email}</BriefRow>
             )}
           </dl>
 
@@ -215,7 +215,7 @@ function BriefRecap({
                 to="/get-offers"
                 className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
               >
-                <Pencil className="h-3 w-3" /> Edit brief
+                <Pencil className="h-3 w-3" /> Rediger forespørgsel
               </Link>
             </div>
           )}
@@ -247,18 +247,18 @@ function BriefRow({
 function FootNote({ record }: { record: OfferRequestRecord }) {
   return (
     <p className="text-xs text-muted-foreground">
-      All chat and payment stay on platform. DJ contact details are shared after
-      a confirmed booking.
+      Al chat og betaling forbliver på platformen. DJ'ens kontaktoplysninger deles efter
+      en bekræftet booking.
       <span className="ml-2 text-muted-foreground/70">
-        · Demo: simulated timeline, factor {record.compressionFactor}×
+        · Demo: simuleret tidslinje, faktor {record.compressionFactor}×
       </span>
     </p>
   );
 }
 
 function budgetLabel(id: string): string {
-  if (id === "tight") return "Tight (≤ 6.500 kr)";
-  if (id === "comfortable") return "Comfortable (6.500–12.000 kr)";
+  if (id === "tight") return "Stramt (≤ 6.500 kr)";
+  if (id === "comfortable") return "Komfortabelt (6.500–12.000 kr)";
   if (id === "premium") return "Premium (12.000+ kr)";
   return id;
 }
@@ -267,7 +267,7 @@ function formatDate(date?: string | null): string {
   if (!date) return "—";
   try {
     const d = new Date(date);
-    return d.toLocaleDateString("en-GB", {
+    return d.toLocaleDateString("da-DK", {
       day: "numeric",
       month: "short",
       year: "numeric",

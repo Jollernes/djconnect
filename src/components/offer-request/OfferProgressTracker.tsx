@@ -19,16 +19,16 @@ import { cn } from "@/lib/utils";
  */
 
 const STATUS_LABEL: Record<DJSlot["status"], string> = {
-  awaiting_response: "Waiting",
-  confirmed_preparing: "Preparing quote",
-  quote_received: "Quote sent",
-  declined: "Unavailable",
+  awaiting_response: "Afventer",
+  confirmed_preparing: "Forbereder tilbud",
+  quote_received: "Tilbud sendt",
+  declined: "Ikke ledig",
 };
 
 const DECLINE_LABEL: Record<NonNullable<DJSlot["declineReason"]>, string> = {
-  fully_booked: "Fully booked",
-  not_available: "Not available",
-  out_of_coverage: "Out of coverage",
+  fully_booked: "Fuldt booket",
+  not_available: "Ikke ledig",
+  out_of_coverage: "Uden for dækning",
 };
 
 export function OfferProgressTracker({
@@ -61,7 +61,7 @@ export function OfferProgressTracker({
 
   return (
     <section
-      aria-label="Request status"
+      aria-label="Forespørgselsstatus"
       className="rounded-2xl border border-border/60 bg-card/40 p-5 md:p-6"
     >
       {/* Single sentence answers the only question */}
@@ -72,8 +72,8 @@ export function OfferProgressTracker({
       {/* Minimal numeric breakdown — only shown if non-trivial */}
       {agg.total > 0 && (
         <p className="mt-1 text-sm text-muted-foreground">
-          {agg.quotesReady} of up to 3 quotes ready
-          {agg.declined > 0 && ` · ${agg.declined} unavailable`}
+          {agg.quotesReady} af op til 3 tilbud klar
+          {agg.declined > 0 && ` · ${agg.declined} ikke ledige`}
         </p>
       )}
 
@@ -87,17 +87,17 @@ export function OfferProgressTracker({
       {/* Expansion + 36h alerts — quiet */}
       {record.expansionTriggered && (
         <CalmNote
-          title="Expanded to more DJs"
-          body="We didn't reach 3 quotes within the first window, so we've added 3 more matched DJs. They're being contacted now."
+          title="Udvidet til flere DJs"
+          body="Vi nåede ikke 3 tilbud inden for det første vindue, så vi har tilføjet 3 flere matchede DJs. De bliver kontaktet nu."
         />
       )}
       {record.alertedAt36h && agg.quotesReady < 3 && (
         <CalmNote
-          title="You can review what's available now"
+          title="Du kan se, hvad der er tilgængeligt nu"
           body={
             agg.quotesReady > 0
-              ? `${agg.quotesReady} quote${agg.quotesReady === 1 ? "" : "s"} are ready. You can wait for the remaining DJs or move ahead with what's here.`
-              : "We haven't received 3 quotes yet. We'll keep trying — check back soon, or browse DJs directly."
+              ? `${agg.quotesReady} tilbud er klar. Du kan vente på de resterende DJs eller gå videre med det, der er her.`
+              : "Vi har ikke modtaget 3 tilbud endnu. Vi bliver ved med at forsøge — kig forbi snart, eller find DJs direkte."
           }
         />
       )}
@@ -137,7 +137,7 @@ function SlotRow({
             {stage}
             {isExpansion && (
               <span className="ml-1.5 text-[11px] font-normal text-muted-foreground">
-                · added later
+                · tilføjet senere
               </span>
             )}
           </p>
@@ -164,7 +164,7 @@ function StatusDot({ status }: { status: DJSlot["status"] }) {
   if (status === "quote_received") {
     return (
       <span
-        aria-label="Quote sent"
+        aria-label="Tilbud sendt"
         className="grid h-2 w-2 shrink-0 place-items-center rounded-full bg-emerald-600"
       />
     );
@@ -172,7 +172,7 @@ function StatusDot({ status }: { status: DJSlot["status"] }) {
   if (status === "confirmed_preparing") {
     return (
       <span
-        aria-label="Preparing quote"
+        aria-label="Forbereder tilbud"
         className="h-2 w-2 shrink-0 rounded-full ring-1 ring-foreground/40"
       />
     );
@@ -180,14 +180,14 @@ function StatusDot({ status }: { status: DJSlot["status"] }) {
   if (status === "declined") {
     return (
       <span
-        aria-label="Declined"
+        aria-label="Afvist"
         className="h-2 w-2 shrink-0 rounded-full bg-muted-foreground/40"
       />
     );
   }
   return (
     <span
-      aria-label="Waiting"
+      aria-label="Afventer"
       className="h-2 w-2 shrink-0 rounded-full ring-1 ring-border"
     />
   );
@@ -211,19 +211,19 @@ function headlineFor(
     // already responded.
     const active = agg.total - agg.declined;
     if (active === 0) {
-      return "All matched DJs have responded — none were available this date.";
+      return "Alle matchede DJs har svaret — ingen var ledige på denne dato.";
     }
     return etaPhrase
-      ? `Awaiting quotes from ${active} matched DJ${active === 1 ? "" : "s"}. Expected ${etaPhrase}.`
-      : `Awaiting quotes from ${active} matched DJ${active === 1 ? "" : "s"}.`;
+      ? `Afventer tilbud fra ${active} matchede DJs. Forventet ${etaPhrase}.`
+      : `Afventer tilbud fra ${active} matchede DJs.`;
   }
   if (agg.quotesReady >= 3) {
-    return "Your 3 personal quotes are ready below.";
+    return "Dine 3 personlige tilbud er klar nedenfor.";
   }
   if (etaPhrase) {
-    return `${agg.quotesReady} of up to 3 personal quote${agg.quotesReady === 1 ? "" : "s"} ready. Expected ${etaPhrase}.`;
+    return `${agg.quotesReady} af op til 3 personlige tilbud klar. Forventet ${etaPhrase}.`;
   }
-  return `${agg.quotesReady} of up to 3 personal quote${agg.quotesReady === 1 ? "" : "s"} ready.`;
+  return `${agg.quotesReady} af op til 3 personlige tilbud klar.`;
 }
 
 function quietETA(record: OfferRequestRecord, remainingHours: number): string | null {
@@ -241,12 +241,12 @@ function formatExpected(target: Date): string {
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const isTomorrow = target.toDateString() === tomorrow.toDateString();
-  const time = target.toLocaleTimeString("en-GB", {
+  const time = target.toLocaleTimeString("da-DK", {
     hour: "2-digit",
     minute: "2-digit",
   });
-  if (sameDay) return `today at ${time}`;
-  if (isTomorrow) return `tomorrow at ${time}`;
-  const weekday = target.toLocaleDateString("en-GB", { weekday: "long" });
-  return `${weekday} at ${time}`;
+  if (sameDay) return `i dag kl. ${time}`;
+  if (isTomorrow) return `i morgen kl. ${time}`;
+  const weekday = target.toLocaleDateString("da-DK", { weekday: "long" });
+  return `${weekday} kl. ${time}`;
 }
