@@ -20,9 +20,9 @@ export function CustomerRequestDetailPage() {
   const customerId = profile?.role === "customer" ? profile.id : null;
 
   useDocumentHead({
-    title: "Your DJ offers · DJConnect",
+    title: "Dine DJ-tilbud · DJConnect",
     description:
-      "Track your matched DJs and incoming personal quotes — quietly, in real time.",
+      "Følg dine matchede DJs og indkomne personlige tilbud — i ro og mag, i realtid.",
   });
 
   // Belt-and-braces guard: don't let a logged-in customer open someone
@@ -34,25 +34,25 @@ export function CustomerRequestDetailPage() {
 
   if (loading) {
     return (
-      <div className="text-sm text-muted-foreground">Loading your request…</div>
+      <div className="text-sm text-muted-foreground">Indlæser din forespørgsel…</div>
     );
   }
   if (!record || !requestId) {
     return (
       <div className="mx-auto max-w-2xl py-10 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
-          We couldn't find that request
+          Vi kunne ikke finde den forespørgsel
         </h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          It may have been started on a different device. You can return to your
-          list of requests, or send a new brief.
+          Den er måske startet på en anden enhed. Du kan vende tilbage til din
+          liste over forespørgsler eller sende en ny brief.
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <Button asChild variant="outline">
-            <Link to="/dashboard/requests">My requests</Link>
+            <Link to="/dashboard/requests">Mine forespørgsler</Link>
           </Button>
           <Button asChild>
-            <Link to="/get-offers">Send a new brief</Link>
+            <Link to="/get-offers">Send en ny brief</Link>
           </Button>
         </div>
       </div>
@@ -65,7 +65,7 @@ export function CustomerRequestDetailPage() {
         to="/dashboard/requests"
         className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
       >
-        <ArrowLeft className="h-3.5 w-3.5" /> All requests
+        <ArrowLeft className="h-3.5 w-3.5" /> Alle forespørgsler
       </Link>
       <OfferRequestStatusView
         record={record}

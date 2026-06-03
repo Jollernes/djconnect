@@ -23,15 +23,15 @@ export function CustomerBookingDetailPage() {
   const booking = bookings.find((b) => b.id === id);
 
   if (loading) {
-    return <div className="py-8 text-sm text-muted-foreground">Loading…</div>;
+    return <div className="py-8 text-sm text-muted-foreground">Indlæser…</div>;
   }
 
   if (!booking) {
     return (
       <div className="py-8 text-center">
-        <p>Booking not found.</p>
+        <p>Booking ikke fundet.</p>
         <Button asChild variant="link">
-          <Link to="/dashboard/bookings">Back to bookings</Link>
+          <Link to="/dashboard/bookings">Tilbage til bookinger</Link>
         </Button>
       </div>
     );
@@ -43,7 +43,7 @@ export function CustomerBookingDetailPage() {
   return (
     <div className="space-y-6">
       <Button variant="ghost" onClick={() => navigate(-1)} className="gap-1.5 -ml-2">
-        <ArrowLeft className="h-4 w-4" /> Back
+        <ArrowLeft className="h-4 w-4" /> Tilbage
       </Button>
 
       <BookingHero booking={booking} />
