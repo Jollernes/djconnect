@@ -9,81 +9,81 @@ export const CANONICAL_PATH = "/wedding-djs";
 export const valueProps = [
   {
     Icon: Shield,
-    title: "Verified, vetted DJs",
-    body: "Interviewed, equipment-checked, and reference-verified before they're listed. No surprises on the night.",
+    title: "Verificerede, godkendte DJs",
+    body: "Interviewet, udstyrstjekket og referencetjekket, før de bliver vist. Ingen overraskelser på aftenen.",
   },
   {
     Icon: Heart,
-    title: "Reads the room",
-    body: "Mixes across generations — first dance through grandparents through dancefloor closers.",
+    title: "Læser stemningen",
+    body: "Mixer på tværs af generationer — fra første dans over bedsteforældre til aftenens sidste numre.",
   },
   {
     Icon: CheckCircle2,
-    title: "Escrow-protected payment",
-    body: "Pay through Stripe. Money stays in escrow until 24h after your wedding.",
+    title: "Escrow-beskyttet betaling",
+    body: "Betal via Stripe. Pengene bliver i escrow indtil 24 timer efter dit bryllup.",
   },
   {
     Icon: Sparkles,
-    title: "Contract included",
-    body: "Clear written agreement: arrival time, equipment, music lists, cancellation terms.",
+    title: "Kontrakt inkluderet",
+    body: "Tydelig skriftlig aftale: ankomsttid, udstyr, musiklister, annulleringsvilkår.",
   },
 ];
 
 export const runOfShow = [
-  { time: "16:00", label: "Setup & sound check", body: "Discreet load-in 2h before guests arrive." },
-  { time: "17:30", label: "Ceremony / arrival music", body: "Soft acoustic set as guests arrive." },
-  { time: "18:30", label: "Reception drinks", body: "Lounge & bossanova while photos happen outside." },
-  { time: "20:00", label: "Dinner & speeches", body: "Background bed under speeches, mic'd toasts." },
-  { time: "22:00", label: "First dance", body: "Your chosen song, room set, lighting cued." },
-  { time: "22:15", label: "Dancefloor opens", body: "Mid-tempo openers; older guests still up." },
-  { time: "23:00", label: "Peak set", body: "Floor-fillers across decades; everyone in." },
-  { time: "01:00", label: "Closer", body: "One last big sing-along then a soft fade-out." },
+  { time: "16:00", label: "Opstilling & lydtjek", body: "Diskret indrykning 2 timer før gæsterne ankommer." },
+  { time: "17:30", label: "Ceremoni / ankomstmusik", body: "Blødt akustisk sæt mens gæsterne ankommer." },
+  { time: "18:30", label: "Velkomstdrinks", body: "Lounge & bossanova mens billederne tages udenfor." },
+  { time: "20:00", label: "Middag & taler", body: "Baggrundsmusik under taler, mikrofon til skåltaler." },
+  { time: "22:00", label: "Første dans", body: "Jeres valgte sang, lokalet klar, lyset sat." },
+  { time: "22:15", label: "Dansegulvet åbner", body: "Numre i mellemtempo; de ældre gæster er stadig oppe." },
+  { time: "23:00", label: "Højdepunkt", body: "Dansegulvsfyldere på tværs af årtier; alle er med." },
+  { time: "01:00", label: "Afslutning", body: "En sidste stor fællessang og så en blød udtoning." },
 ];
 
 export const playlistArc = [
-  { label: "Arrival", energy: 18, hint: "Acoustic / bossa" },
-  { label: "Dinner", energy: 28, hint: "Soul / standards" },
-  { label: "First dance", energy: 55, hint: "Your song" },
-  { label: "Opening", energy: 62, hint: "Pop classics" },
-  { label: "Build", energy: 78, hint: "Disco / 80s" },
-  { label: "Peak", energy: 95, hint: "Floor-fillers" },
-  { label: "Late", energy: 82, hint: "Sing-alongs" },
-  { label: "Closer", energy: 60, hint: "One big finish" },
+  { label: "Ankomst", energy: 18, hint: "Akustisk / bossa" },
+  { label: "Middag", energy: 28, hint: "Soul / standards" },
+  { label: "Første dans", energy: 55, hint: "Jeres sang" },
+  { label: "Opvarmning", energy: 62, hint: "Popklassikere" },
+  { label: "Stigning", energy: 78, hint: "Disco / 80'er" },
+  { label: "Højdepunkt", energy: 95, hint: "Dansegulvsfyldere" },
+  { label: "Sent", energy: 82, hint: "Fællessange" },
+  { label: "Afslutning", energy: 60, hint: "Én stor finale" },
 ];
 
 export const equipmentChecklist = [
-  { Icon: Speaker, label: "Pro PA system (sized to venue)" },
+  { Icon: Speaker, label: "Professionelt PA-system (tilpasset lokalet)" },
   { Icon: Disc3, label: "Pioneer DDJ-1000 / CDJ-3000 setup" },
-  { Icon: Mic2, label: "Wireless mic for speeches & toasts" },
-  { Icon: Lightbulb, label: "Discreet uplighting & moving heads" },
-  { Icon: Sparkles, label: "Light haze for dancefloor cinematography" },
-  { Icon: Headphones, label: "Backup laptop, decks & cables" },
+  { Icon: Mic2, label: "Trådløs mikrofon til taler & skåltaler" },
+  { Icon: Lightbulb, label: "Diskret uplighting & moving heads" },
+  { Icon: Sparkles, label: "Let røg/haze til dansegulvets stemning" },
+  { Icon: Headphones, label: "Backup-laptop, afspillere & kabler" },
 ];
 
 export const faq = [
   {
-    q: "How far in advance should I book a wedding DJ?",
-    a: "6–12 months for Saturday weddings May–September. Off-peak (winter, weekdays) — 2–3 months is usually fine. The most-booked DJs sell out 9+ months ahead.",
+    q: "Hvor lang tid i forvejen skal jeg booke en bryllups-DJ?",
+    a: "6–12 måneder for lørdagsbryllupper maj–september. Uden for højsæson (vinter, hverdage) — 2–3 måneder er normalt fint. De mest bookede DJs er udsolgt 9+ måneder i forvejen.",
   },
   {
-    q: "Will the DJ act as MC for speeches and announcements?",
-    a: "Yes. Every wedding DJ on DJConnect can MC the night — announce the entrance, speeches, cake cut, and first dance. You can also bring your own MC and we'll just supply the sound.",
+    q: "Fungerer DJ'en som toastmaster for taler og annonceringer?",
+    a: "Ja. Alle bryllups-DJs på DJConnect kan være toastmaster for aftenen — annoncere entréen, talerne, kagen og første dans. Du kan også medbringe din egen toastmaster, så leverer vi blot lyden.",
   },
   {
-    q: "Can I send a must-play and do-not-play list?",
-    a: "Absolutely — once you've booked, the music planner in your dashboard lets you build must-play, do-not-play, and special-moment lists. Your DJ sees them in real time and confirms they have everything before the day.",
+    q: "Kan jeg sende en skal-spilles- og må-ikke-spilles-liste?",
+    a: "Helt sikkert — når du har booket, kan du i musikplanlæggeren i dit dashboard bygge skal-spilles-, må-ikke-spilles- og øjebliks-lister. Din DJ ser dem i realtid og bekræfter, at de har alt klar inden dagen.",
   },
   {
-    q: "What if our wedding runs late?",
-    a: "Each DJ has an overtime rate listed on their profile. You can extend on the night — your DJ confirms via the messages thread, and the extension is added to the final invoice (still escrow-protected).",
+    q: "Hvad hvis vores bryllup trækker ud?",
+    a: "Hver DJ har en overtidstakst angivet på deres profil. Du kan forlænge på aftenen — din DJ bekræfter via beskedtråden, og forlængelsen tilføjes den endelige faktura (stadig escrow-beskyttet).",
   },
   {
-    q: "What does it cost to book a wedding DJ in Denmark?",
-    a: "Most DJConnect wedding DJs are between DKK 7,500 and DKK 18,000 for a full evening (5–7 hours), including PA, lighting, and travel within their region. Premium / award-winning DJs go higher.",
+    q: "Hvad koster det at booke en bryllups-DJ i Danmark?",
+    a: "De fleste bryllups-DJs på DJConnect ligger mellem 7.500 og 18.000 kr for en hel aften (5–7 timer), inklusive PA, lys og transport inden for deres region. Premium- / prisvindende DJs ligger højere.",
   },
   {
-    q: "What happens if our DJ has to cancel last-minute?",
-    a: "It's extremely rare, but DJConnect maintains a backup roster. If your DJ can't make it, we re-book a verified replacement at no extra cost or refund 100% via the escrow if you'd prefer to cancel.",
+    q: "Hvad sker der, hvis vores DJ er nødt til at aflyse i sidste øjeblik?",
+    a: "Det er yderst sjældent, men DJConnect har et backup-hold. Hvis din DJ ikke kan komme, ombooker vi en verificeret afløser uden ekstra omkostninger eller tilbagebetaler 100% via escrow, hvis du hellere vil aflyse.",
   },
 ];
 

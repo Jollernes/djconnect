@@ -24,65 +24,65 @@ type SetupOption = {
 const SETUPS: SetupOption[] = [
   {
     id: "small",
-    label: "Small",
-    guestRange: "Up to ~60 guests",
-    shortRange: "≤60 guests",
-    tagline: "Apartment, intimate gathering, ceremony only",
+    label: "Lille",
+    guestRange: "Op til ~60 gæster",
+    shortRange: "≤60 gæster",
+    tagline: "Lejlighed, intim sammenkomst, kun ceremoni",
     typical: [
       "Pioneer DDJ-FLX4 / DDJ-1000 controller",
-      "1× active 12\" speaker (up to ~500W)",
-      "Wireless mic for speeches",
-      "2× LED par cans + simple stand",
-      "Backup laptop, cables, stand",
+      "1× aktiv 12\" højttaler (op til ~500W)",
+      "Trådløs mikrofon til taler",
+      "2× LED par-spots + simpelt stativ",
+      "Backup-laptop, kabler, stativ",
     ],
     minimum: [
-      "DJ controller + laptop",
-      "1× active speaker",
-      "Wired mic",
-      "Power-conditioned cabling",
+      "DJ-controller + laptop",
+      "1× aktiv højttaler",
+      "Mikrofon med ledning",
+      "Strømbeskyttede kabler",
     ],
   },
   {
     id: "medium",
-    label: "Medium",
-    guestRange: "100–200 guests",
+    label: "Mellem",
+    guestRange: "100–200 gæster",
     shortRange: "100–200",
-    tagline: "Most weddings, mid-size venues, full evening",
+    tagline: "De fleste bryllupper, mellemstore lokaler, hele aftenen",
     typical: [
-      "Pioneer CDJ-3000 + DJM mixer (or pro controller)",
-      "2× active 12\" tops (1,000–1,500W total)",
-      "Wireless mic + reception music bed",
-      "2× LED moving heads + 4× par cans + light haze",
-      "Light DJ booth / lectern, backup gear",
+      "Pioneer CDJ-3000 + DJM-mixer (eller pro-controller)",
+      "2× aktive 12\" toppe (1.000–1.500W i alt)",
+      "Trådløs mikrofon + baggrundsmusik til reception",
+      "2× LED moving heads + 4× par-spots + let haze",
+      "Let DJ-pult / talerstol, backup-udstyr",
     ],
     minimum: [
-      "Pro decks + mixer",
-      "2× powered tops",
-      "Wireless mic",
-      "Basic moving-head or LED rig",
-      "Backup deck or laptop",
+      "Pro-afspillere + mixer",
+      "2× aktive toppe",
+      "Trådløs mikrofon",
+      "Simpelt moving-head- eller LED-rig",
+      "Backup-afspiller eller laptop",
     ],
   },
   {
     id: "large",
-    label: "Large",
-    guestRange: "200+ guests / outdoor / two rooms",
-    shortRange: "200+ guests",
-    tagline: "Big halls, outdoor weddings, company galas",
+    label: "Stor",
+    guestRange: "200+ gæster / udendørs / to lokaler",
+    shortRange: "200+ gæster",
+    tagline: "Store sale, udendørs bryllupper, firmagallaer",
     typical: [
-      "2× CDJ-3000 + DJM-900NXS2 (or equivalent)",
-      "2× 12\" tops + 1× 18\" subwoofer (~2,000–3,000W)",
-      "2× wireless mics (toast + MC)",
-      "Truss rig: 4–6× moving heads, LED wash, strobe, haze",
-      "DJ booth with branded face, dedicated power",
-      "Full backup: 2nd laptop, mic, redundant decks",
+      "2× CDJ-3000 + DJM-900NXS2 (eller tilsvarende)",
+      "2× 12\" toppe + 1× 18\" subwoofer (~2.000–3.000W)",
+      "2× trådløse mikrofoner (skåltale + toastmaster)",
+      "Truss-rig: 4–6× moving heads, LED wash, strobe, haze",
+      "DJ-pult med brandet front, dedikeret strøm",
+      "Fuld backup: ekstra laptop, mikrofon, redundante afspillere",
     ],
     minimum: [
-      "Pro decks + mixer with backup",
-      "2× tops + sub",
-      "2× wireless mics",
-      "DMX rig with moving heads + haze",
-      "Branded booth or lectern",
+      "Pro-afspillere + mixer med backup",
+      "2× toppe + sub",
+      "2× trådløse mikrofoner",
+      "DMX-rig med moving heads + haze",
+      "Brandet pult eller talerstol",
     ],
   },
 ];
@@ -111,7 +111,7 @@ export function SetupSizePicker({
         onValueChange={(v) => onChange(v === SENTINEL_ANY ? null : (v as SetupId))}
       >
         <SelectTrigger className="h-9 w-full min-w-[180px] max-w-[220px] gap-2 rounded-full pl-1.5 pr-3 text-xs [&>span]:flex [&>span]:min-w-0 [&>span]:flex-1 [&>span]:items-center [&>span]:gap-2 [&>span]:overflow-hidden">
-          <SelectValue placeholder="Setup size" asChild>
+          <SelectValue placeholder="Setup-størrelse" asChild>
             <span>
               {selected ? (
                 <>
@@ -132,7 +132,7 @@ export function SetupSizePicker({
                   <span className="block h-6 w-10 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
                     <SetupSizeIcon size="medium" />
                   </span>
-                  <span className="truncate text-xs text-muted-foreground">Setup size</span>
+                  <span className="truncate text-xs text-muted-foreground">Setup-størrelse</span>
                 </>
               )}
             </span>
@@ -140,7 +140,7 @@ export function SetupSizePicker({
         </SelectTrigger>
         <SelectContent className="min-w-[280px] p-1">
           <SelectItem value={SENTINEL_ANY} className="rounded-md py-2 pl-3">
-            <span className="text-xs text-muted-foreground">Any setup size</span>
+            <span className="text-xs text-muted-foreground">Enhver setup-størrelse</span>
           </SelectItem>
           {SETUPS.map((s) => (
             <SelectItem key={s.id} value={s.id} className="rounded-md py-1.5 pl-2 pr-3">
@@ -163,7 +163,7 @@ export function SetupSizePicker({
         <PopoverTrigger asChild>
           <button
             type="button"
-            aria-label="What's included in each setup"
+            aria-label="Hvad er inkluderet i hvert setup"
             className="grid h-9 w-9 place-items-center rounded-full border bg-background text-muted-foreground shadow-sm transition-colors hover:bg-foreground hover:text-background"
           >
             <Info className="h-4 w-4" />
@@ -178,7 +178,7 @@ export function SetupSizePicker({
         <button
           type="button"
           onClick={() => onChange(null)}
-          aria-label="Clear setup size"
+          aria-label="Ryd setup-størrelse"
           className="grid h-9 w-9 place-items-center rounded-full border text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <X className="h-3.5 w-3.5" />
@@ -193,9 +193,9 @@ function PackageDetails({ option }: { option: SetupOption | null }) {
     return (
       <div>
         <div className="border-b bg-gradient-to-br from-rose-50 to-amber-50 px-4 py-3">
-          <h4 className="text-sm font-semibold leading-tight">What's included at each setup</h4>
+          <h4 className="text-sm font-semibold leading-tight">Hvad er inkluderet i hvert setup</h4>
           <p className="mt-0.5 text-xs text-foreground/70">
-            Pick a setup size in the dropdown to see the full kit list and minimum guarantees.
+            Vælg en setup-størrelse i dropdownen for at se den fulde udstyrsliste og minimumsgarantier.
           </p>
         </div>
         <div className="grid gap-3 px-4 py-3">
@@ -233,7 +233,7 @@ function PackageDetails({ option }: { option: SetupOption | null }) {
       </div>
       <div className="space-y-3 px-4 py-3 text-xs">
         <div>
-          <p className="mb-1.5 font-semibold text-foreground">Typically included</p>
+          <p className="mb-1.5 font-semibold text-foreground">Typisk inkluderet</p>
           <ul className="space-y-1 text-muted-foreground">
             {option.typical.map((t) => (
               <li key={t} className="flex gap-1.5">
@@ -244,7 +244,7 @@ function PackageDetails({ option }: { option: SetupOption | null }) {
           </ul>
         </div>
         <div className="rounded-md border border-dashed bg-muted/40 p-2.5">
-          <p className="mb-1 font-semibold text-foreground">Minimum guaranteed</p>
+          <p className="mb-1 font-semibold text-foreground">Minimum garanteret</p>
           <ul className="space-y-1 text-muted-foreground">
             {option.minimum.map((m) => (
               <li key={m} className="flex gap-1.5">
@@ -255,7 +255,7 @@ function PackageDetails({ option }: { option: SetupOption | null }) {
           </ul>
         </div>
         <p className="text-[11px] text-muted-foreground">
-          Each DJ confirms exact gear in the booking thread before you pay.
+          Hver DJ bekræfter det præcise udstyr i bookingtråden, før du betaler.
         </p>
       </div>
     </div>

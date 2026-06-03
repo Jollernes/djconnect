@@ -81,38 +81,38 @@ export type EventListingConfig = {
 
 const VERIFIED = {
   Icon: Shield,
-  title: "Verified, vetted DJs",
-  body: "Interviewed, equipment-checked, and reference-verified before they're listed. No surprises on the night.",
+  title: "Verificerede, godkendte DJs",
+  body: "Interviewet, udstyrstjekket og referencetjekket, før de bliver vist. Ingen overraskelser på aftenen.",
 };
 
 const ESCROW = {
   Icon: CheckCircle2,
-  title: "Escrow-protected payment",
-  body: "Pay through Stripe. Money stays in escrow until 24h after your event.",
+  title: "Escrow-beskyttet betaling",
+  body: "Betal via Stripe. Pengene bliver i escrow indtil 24 timer efter dit event.",
 };
 
 const CONTRACT = {
   Icon: Sparkles,
-  title: "Contract included",
-  body: "Clear written agreement: arrival time, equipment, music lists, cancellation terms.",
+  title: "Kontrakt inkluderet",
+  body: "Tydelig skriftlig aftale: ankomsttid, udstyr, musiklister, annulleringsvilkår.",
 };
 
 export const EVENT_LISTING_CONFIG: Record<string, EventListingConfig> = {
   wedding: {
     id: "wedding",
-    label: "Wedding",
+    label: "Bryllup",
     slug: "wedding-djs",
     canonical: "/wedding-djs",
     heroImage:
       "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?q=80&w=2400&auto=format&fit=crop",
-    heroEyebrow: "Wedding DJs · Denmark",
-    heroTitle: "Find your wedding DJ.",
+    heroEyebrow: "Bryllups-DJs · Danmark",
+    heroTitle: "Find din bryllups-DJ.",
     heroLede:
-      "Verified DJs across Denmark. Written contract and escrow-protected payment included.",
-    metaTitle: "Wedding DJs · DJConnect",
+      "Verificerede DJs i hele Danmark. Skriftlig kontrakt og escrow-beskyttet betaling inkluderet.",
+    metaTitle: "Bryllups-DJs · DJConnect",
     metaDescription:
-      "Book a verified wedding DJ in Denmark. Compare DJs by setup, city and availability.",
-    emptyHint: "No wedding DJs available with these filters",
+      "Book en verificeret bryllups-DJ i Danmark. Sammenlign DJs efter setup, by og tilgængelighed.",
+    emptyHint: "Ingen bryllups-DJs tilgængelige med disse filtre",
     theme: {
       accentBg: "bg-rose-50",
       accentText: "text-rose-700",
@@ -128,61 +128,61 @@ export const EVENT_LISTING_CONFIG: Record<string, EventListingConfig> = {
       VERIFIED,
       {
         Icon: Heart,
-        title: "Reads the room",
-        body: "Mixes across generations \u2014 first dance through grandparents through dancefloor closers.",
+        title: "Læser stemningen",
+        body: "Mixer på tværs af generationer \u2014 fra første dans over bedsteforældre til aftenens sidste numre.",
       },
       ESCROW,
       CONTRACT,
     ],
     faq: [
       {
-        q: "How far in advance should I book a wedding DJ?",
-        a: "6\u201312 months for Saturday weddings May\u2013September. Off-peak (winter, weekdays) \u2014 2\u20133 months is usually fine. The most-booked DJs sell out 9+ months ahead.",
+        q: "Hvor lang tid i forvejen skal jeg booke en bryllups-DJ?",
+        a: "6\u201312 måneder for lørdagsbryllupper maj\u2013september. Uden for højsæson (vinter, hverdage) \u2014 2\u20133 måneder er normalt fint. De mest bookede DJs er udsolgt 9+ måneder i forvejen.",
       },
       {
-        q: "Will the DJ act as MC for speeches and announcements?",
-        a: "Yes. Every wedding DJ on DJConnect can MC the night \u2014 announce the entrance, speeches, cake cut, and first dance. You can also bring your own MC and we'll just supply the sound.",
+        q: "Fungerer DJ'en som toastmaster for taler og annonceringer?",
+        a: "Ja. Alle bryllups-DJs på DJConnect kan være toastmaster for aftenen \u2014 annoncere entréen, talerne, kagen og første dans. Du kan også medbringe din egen toastmaster, så leverer vi blot lyden.",
       },
       {
-        q: "Can I send a must-play and do-not-play list?",
-        a: "Absolutely \u2014 once you've booked, the music planner in your dashboard lets you build must-play, do-not-play, and special-moment lists. Your DJ sees them in real time and confirms they have everything before the day.",
+        q: "Kan jeg sende en skal-spilles- og må-ikke-spilles-liste?",
+        a: "Helt sikkert \u2014 når du har booket, kan du i musikplanlæggeren i dit dashboard bygge skal-spilles-, må-ikke-spilles- og øjebliks-lister. Din DJ ser dem i realtid og bekræfter, at de har alt klar inden dagen.",
       },
       {
-        q: "What if our wedding runs late?",
-        a: "Each DJ has an overtime rate listed on their profile. You can extend on the night \u2014 your DJ confirms via the messages thread, and the extension is added to the final invoice (still escrow-protected).",
+        q: "Hvad hvis vores bryllup trækker ud?",
+        a: "Hver DJ har en overtidstakst angivet på deres profil. Du kan forlænge på aftenen \u2014 din DJ bekræfter via beskedtråden, og forlængelsen tilføjes den endelige faktura (stadig escrow-beskyttet).",
       },
       {
-        q: "What does it cost to book a wedding DJ in Denmark?",
-        a: "Most DJConnect wedding DJs are between DKK 7,500 and DKK 18,000 for a full evening (5\u20137 hours), including PA, lighting, and travel within their region. Premium / award-winning DJs go higher.",
+        q: "Hvad koster det at booke en bryllups-DJ i Danmark?",
+        a: "De fleste bryllups-DJs på DJConnect ligger mellem 7.500 og 18.000 kr for en hel aften (5\u20137 timer), inklusive PA, lys og transport inden for deres region. Premium- / prisvindende DJs ligger højere.",
       },
       {
-        q: "What happens if our DJ has to cancel last-minute?",
-        a: "It's extremely rare, but DJConnect maintains a backup roster. If your DJ can't make it, we re-book a verified replacement at no extra cost or refund 100% via the escrow if you'd prefer to cancel.",
+        q: "Hvad sker der, hvis vores DJ er nødt til at aflyse i sidste øjeblik?",
+        a: "Det er yderst sjældent, men DJConnect har et backup-hold. Hvis din DJ ikke kan komme, ombooker vi en verificeret afløser uden ekstra omkostninger eller tilbagebetaler 100% via escrow, hvis du hellere vil aflyse.",
       },
     ],
     finalCta: {
-      title: "Ready to find your wedding DJ?",
+      title: "Klar til at finde din bryllups-DJ?",
       body: (n) =>
-        `Browse ${n} verified wedding DJs above, compare profiles, and message any of them before you decide. No payment until you book.`,
-      buttonLabel: "Browse wedding DJs",
+        `Se ${n} verificerede bryllups-DJs ovenfor, sammenlign profiler og skriv til hvem som helst af dem, før du beslutter dig. Ingen betaling, før du booker.`,
+      buttonLabel: "Se bryllups-DJs",
     },
   },
 
   birthday: {
     id: "birthday",
-    label: "Birthday Party",
+    label: "Fødselsdagsfest",
     slug: "birthday-djs",
     canonical: "/birthday-djs",
     heroImage:
       "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=2400&auto=format&fit=crop",
-    heroEyebrow: "Birthday DJs · Denmark",
-    heroTitle: "Find your birthday DJ.",
+    heroEyebrow: "Fødselsdags-DJs · Danmark",
+    heroTitle: "Find din fødselsdags-DJ.",
     heroLede:
-      "30ths, 40ths, 50ths, milestone parties \u2014 verified DJs who fill the floor across generations.",
-    metaTitle: "Birthday DJs · DJConnect",
+      "30 år, 40 år, 50 år, runde fødselsdage \u2014 verificerede DJs, der fylder dansegulvet på tværs af generationer.",
+    metaTitle: "Fødselsdags-DJs · DJConnect",
     metaDescription:
-      "Book a verified birthday-party DJ in Denmark. Mixed-age dancefloors, sing-alongs, mic for speeches.",
-    emptyHint: "No birthday DJs available with these filters",
+      "Book en verificeret fødselsdags-DJ i Danmark. Dansegulve for alle aldre, fælles-sang, mikrofon til taler.",
+    emptyHint: "Ingen fødselsdags-DJs tilgængelige med disse filtre",
     theme: {
       accentBg: "bg-violet-50",
       accentText: "text-violet-700",
@@ -198,57 +198,57 @@ export const EVENT_LISTING_CONFIG: Record<string, EventListingConfig> = {
       VERIFIED,
       {
         Icon: PartyPopper,
-        title: "Reads every age",
-        body: "Mixed-generation crowd? DJs at DJConnect blend disco, 80s/90s, current hits and your guest of honour's favourites.",
+        title: "Rammer alle aldre",
+        body: "Blandet publikum på tværs af generationer? DJs på DJConnect blander disco, 80'er/90'er, aktuelle hits og fødselarens favoritter.",
       },
       ESCROW,
       CONTRACT,
     ],
     faq: [
       {
-        q: "How far in advance should I book a birthday DJ?",
-        a: "2\u20134 months is the sweet spot. Saturdays during the spring and autumn party season sell out fastest \u2014 if your date is firm, book early.",
+        q: "Hvor lang tid i forvejen skal jeg booke en fødselsdags-DJ?",
+        a: "2\u20134 måneder er det ideelle. Lørdage i forårs- og efterårssæsonen bliver hurtigst udsolgt \u2014 hvis din dato er fast, så book tidligt.",
       },
       {
-        q: "Can the DJ play special moments \u2014 cake, speeches, surprises?",
-        a: "Yes. Every birthday DJ comes with a wireless mic and can cue your guest of honour's favourite song, lower volume for speeches, and back you up on a surprise singalong.",
+        q: "Kan DJ'en spille til særlige øjeblikke \u2014 kage, taler, overraskelser?",
+        a: "Ja. Alle fødselsdags-DJs medbringer en trådløs mikrofon og kan køre fødselarens yndlingssang, skrue ned til taler og bakke dig op til en overraskende fælles-sang.",
       },
       {
-        q: "What if the party is at home / in a small venue?",
-        a: "Filter by setup size. \u201cSmall\u201d setups are designed for living-room and apartment parties \u2014 compact PA, neat cabling, discreet lighting.",
+        q: "Hvad hvis festen er hjemme / i et lille lokale?",
+        a: "Filtrer efter setup-størrelse. \u201cSmå\u201d setups er designet til stue- og lejlighedsfester \u2014 kompakt PA, ryddelige kabler, diskret lys.",
       },
       {
-        q: "Can I send a must-play and do-not-play list?",
-        a: "Yes. Once booked, the music planner in your dashboard lets you build a must-play and do-not-play list. Your DJ confirms they have everything before the night.",
+        q: "Kan jeg sende en skal-spilles- og må-ikke-spilles-liste?",
+        a: "Ja. Når du har booket, kan du i musikplanlæggeren i dit dashboard bygge en skal-spilles- og må-ikke-spilles-liste. Din DJ bekræfter, at de har alt klar inden aftenen.",
       },
       {
-        q: "What does it cost to book a birthday DJ in Denmark?",
-        a: "Typically DKK 5,500\u201312,000 for a 4\u20136 hour party including PA, lighting, mic, and travel within the DJ's region. Smaller home parties land lower; club-quality production lands higher.",
+        q: "Hvad koster det at booke en fødselsdags-DJ i Danmark?",
+        a: "Typisk 5.500\u201312.000 kr for en fest på 4\u20136 timer inklusive PA, lys, mikrofon og transport inden for DJ'ens region. Mindre hjemmefester ligger lavere; klubkvalitets-produktion ligger højere.",
       },
     ],
     finalCta: {
-      title: "Ready to find your birthday DJ?",
+      title: "Klar til at finde din fødselsdags-DJ?",
       body: (n) =>
-        `Browse ${n} verified DJs who play birthday parties across Denmark. Compare, message, then book \u2014 with escrow and a written contract included.`,
-      buttonLabel: "Browse birthday DJs",
+        `Se ${n} verificerede DJs, der spiller til fødselsdagsfester i hele Danmark. Sammenlign, skriv, og book \u2014 med escrow og en skriftlig kontrakt inkluderet.`,
+      buttonLabel: "Se fødselsdags-DJs",
     },
   },
 
   corporate_party: {
     id: "corporate_party",
-    label: "Corporate Party",
+    label: "Firmafest",
     slug: "corporate-djs",
     canonical: "/corporate-djs",
     heroImage:
       "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2400&auto=format&fit=crop",
-    heroEyebrow: "Corporate DJs · Denmark",
-    heroTitle: "Find your corporate-party DJ.",
+    heroEyebrow: "Firma-DJs · Danmark",
+    heroTitle: "Find din firmafest-DJ.",
     heroLede:
-      "Summer parties, Christmas parties, brand launches, conferences \u2014 verified DJs with festival-grade kit and corporate experience.",
-    metaTitle: "Corporate Party DJs · DJConnect",
+      "Sommerfester, julefrokoster, brand-lanceringer, konferencer \u2014 verificerede DJs med festivaludstyr og firmaerfaring.",
+    metaTitle: "Firmafest-DJs · DJConnect",
     metaDescription:
-      "Book a verified corporate-party DJ in Denmark. Summer parties, Christmas parties, brand launches, conference after-parties.",
-    emptyHint: "No corporate-party DJs available with these filters",
+      "Book en verificeret firmafest-DJ i Danmark. Sommerfester, julefrokoster, brand-lanceringer, konference-afterparties.",
+    emptyHint: "Ingen firmafest-DJs tilgængelige med disse filtre",
     theme: {
       accentBg: "bg-sky-50",
       accentText: "text-sky-700",
@@ -264,61 +264,61 @@ export const EVENT_LISTING_CONFIG: Record<string, EventListingConfig> = {
       VERIFIED,
       {
         Icon: Building2,
-        title: "Corporate-ready",
-        body: "Smart-casual, on-time, MC-comfortable. Insurance, invoicing through the platform, and references on file.",
+        title: "Klar til firmaevents",
+        body: "Pæn-afslappet, til tiden, tryg som toastmaster. Forsikring, fakturering via platformen og referencer på plads.",
       },
       ESCROW,
       {
         Icon: Mic,
-        title: "MC, awards & speeches",
-        body: "Mic, monitor and a DJ who can MC announcements, awards and speeches \u2014 not just play music.",
+        title: "Toastmaster, priser & taler",
+        body: "Mikrofon, monitor og en DJ, der kan være toastmaster for annonceringer, prisuddelinger og taler \u2014 ikke bare spille musik.",
       },
     ],
     faq: [
       {
-        q: "How far in advance should I book a corporate-party DJ?",
-        a: "Christmas-party season (November\u2013early December) sells out from August. Summer parties: 2\u20134 months ahead. Brand launches and conference after-parties: 1\u20132 months.",
+        q: "Hvor lang tid i forvejen skal jeg booke en firmafest-DJ?",
+        a: "Julefrokost-sæsonen (november\u2013start december) bliver udsolgt fra august. Sommerfester: 2\u20134 måneder i forvejen. Brand-lanceringer og konference-afterparties: 1\u20132 måneder.",
       },
       {
-        q: "Can the DJ MC the awards / agenda / speeches?",
-        a: "Yes. Most corporate-party DJs on DJConnect MC awards and announcements as part of the booking \u2014 just confirm the run-of-show with them in the dashboard.",
+        q: "Kan DJ'en være toastmaster for prisuddelinger / program / taler?",
+        a: "Ja. De fleste firmafest-DJs på DJConnect er toastmaster for prisuddelinger og annonceringer som en del af bookingen \u2014 bekræft blot køreplanen med dem i dashboardet.",
       },
       {
-        q: "Can I get an invoice and pay against my company VAT number?",
-        a: "Yes. Bookings are invoiced through DJConnect with company name, address and CVR/VAT number on the invoice. Payment goes via the platform with full escrow.",
+        q: "Kan jeg få en faktura og betale via mit firmas CVR-nummer?",
+        a: "Ja. Bookinger faktureres via DJConnect med firmanavn, adresse og CVR-nummer på fakturaen. Betaling går via platformen med fuld escrow.",
       },
       {
-        q: "What kind of music do corporate DJs play?",
-        a: "Tailored to the brief: pop, dance, disco, 80s/90s, current charts. You can send a must-play / do-not-play list once booked \u2014 most companies send a 10\u201320 song reference list.",
+        q: "Hvilken slags musik spiller firma-DJs?",
+        a: "Tilpasset oplægget: pop, dance, disco, 80'er/90'er, aktuelle hitlister. Du kan sende en skal-spilles- / må-ikke-spilles-liste, når du har booket \u2014 de fleste virksomheder sender en referenceliste på 10\u201320 sange.",
       },
       {
-        q: "What does it cost to book a corporate DJ in Denmark?",
-        a: "Typically DKK 8,000\u201320,000 for a 4\u20136 hour party including PA, lighting, mic, and travel. Larger productions (250+ guests, full lighting, stage) land higher.",
+        q: "Hvad koster det at booke en firma-DJ i Danmark?",
+        a: "Typisk 8.000\u201320.000 kr for en fest på 4\u20136 timer inklusive PA, lys, mikrofon og transport. Større produktioner (250+ gæster, fuldt lys, scene) ligger højere.",
       },
     ],
     finalCta: {
-      title: "Ready to book your corporate DJ?",
+      title: "Klar til at booke din firma-DJ?",
       body: (n) =>
-        `Browse ${n} verified DJs with corporate experience \u2014 from Christmas parties to brand launches. Compare profiles, request a quote, book through the platform.`,
-      buttonLabel: "Browse corporate DJs",
+        `Se ${n} verificerede DJs med firmaerfaring \u2014 fra julefrokoster til brand-lanceringer. Sammenlign profiler, anmod om et tilbud, book via platformen.`,
+      buttonLabel: "Se firma-DJs",
     },
   },
 
   other: {
     id: "other",
-    label: "Other",
+    label: "Andet",
     slug: "other-djs",
     canonical: "/other-djs",
     heroImage:
       "https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?q=80&w=2400&auto=format&fit=crop",
-    heroEyebrow: "All DJs · Denmark",
-    heroTitle: "Find a DJ for your event.",
+    heroEyebrow: "Alle DJs · Danmark",
+    heroTitle: "Find en DJ til dit event.",
     heroLede:
-      "Confirmations, anniversaries, school galas, private parties \u2014 verified DJs across Denmark for every kind of celebration.",
-    metaTitle: "Find a DJ \u00b7 DJConnect",
+      "Konfirmationer, jubilæer, skolefester, private fester \u2014 verificerede DJs i hele Danmark til enhver form for fejring.",
+    metaTitle: "Find en DJ \u00b7 DJConnect",
     metaDescription:
-      "Book a verified DJ in Denmark for any event \u2014 confirmations, anniversaries, school galas, private parties.",
-    emptyHint: "No DJs available with these filters",
+      "Book en verificeret DJ i Danmark til ethvert event \u2014 konfirmationer, jubilæer, skolefester, private fester.",
+    emptyHint: "Ingen DJs tilgængelige med disse filtre",
     theme: {
       accentBg: "bg-slate-100",
       accentText: "text-slate-700",
@@ -334,43 +334,43 @@ export const EVENT_LISTING_CONFIG: Record<string, EventListingConfig> = {
       VERIFIED,
       {
         Icon: Calendar,
-        title: "Any date, any size",
-        body: "Confirmations to 50th anniversaries, school galas to private parties \u2014 DJs across the country, at every setup size.",
+        title: "Enhver dato, enhver størrelse",
+        body: "Fra konfirmationer til 50-års jubilæer, fra skolefester til private fester \u2014 DJs i hele landet, i alle setup-størrelser.",
       },
       ESCROW,
       {
         Icon: Music,
-        title: "Music tailored to you",
-        body: "Send your must-play and do-not-play lists once booked \u2014 your DJ confirms before the night.",
+        title: "Musik tilpasset dig",
+        body: "Send dine skal-spilles- og må-ikke-spilles-lister, når du har booket \u2014 din DJ bekræfter inden aftenen.",
       },
     ],
     faq: [
       {
-        q: "What kind of events can I book a DJ for here?",
-        a: "Any kind \u2014 confirmations, anniversaries, retirements, school galas, association parties, summer parties, private celebrations. If your event isn't a wedding, birthday or corporate party, this is the right place.",
+        q: "Hvilke slags events kan jeg booke en DJ til her?",
+        a: "Alle slags \u2014 konfirmationer, jubilæer, pensioneringer, skolefester, foreningsfester, sommerfester, private fejringer. Hvis dit event ikke er et bryllup, en fødselsdag eller en firmafest, er det her det rigtige sted.",
       },
       {
-        q: "How far in advance should I book?",
-        a: "2\u20133 months is comfortable for most events. Tight on time? Many DJs accept short-notice bookings \u2014 send a request and they'll confirm availability within hours.",
+        q: "Hvor lang tid i forvejen skal jeg booke?",
+        a: "2\u20133 måneder er passende for de fleste events. Knap med tid? Mange DJs tager imod bookinger med kort varsel \u2014 send en forespørgsel, så bekræfter de tilgængelighed inden for få timer.",
       },
       {
-        q: "What's included in the price?",
-        a: "PA, lighting, mic, travel within the DJ's region, and the contract. No hidden hire fees. You see the all-in price on every DJ profile.",
+        q: "Hvad er inkluderet i prisen?",
+        a: "PA, lys, mikrofon, transport inden for DJ'ens region og kontrakten. Ingen skjulte lejegebyrer. Du ser den samlede pris på hver DJ-profil.",
       },
       {
-        q: "Can I send a must-play and do-not-play list?",
-        a: "Yes. Once booked, the music planner in your dashboard lets you build a must-play, do-not-play and special-moments list. Your DJ confirms before the night.",
+        q: "Kan jeg sende en skal-spilles- og må-ikke-spilles-liste?",
+        a: "Ja. Når du har booket, kan du i musikplanlæggeren i dit dashboard bygge en skal-spilles-, må-ikke-spilles- og øjebliks-liste. Din DJ bekræfter inden aftenen.",
       },
       {
-        q: "What does it cost?",
-        a: "Most DJConnect DJs are DKK 5,500\u201315,000 for a 4\u20136 hour event including PA, lighting, mic, and travel. Smaller home events land lower; club-quality production lands higher.",
+        q: "Hvad koster det?",
+        a: "De fleste DJs på DJConnect ligger på 5.500\u201315.000 kr for et event på 4\u20136 timer inklusive PA, lys, mikrofon og transport. Mindre hjemmeevents ligger lavere; klubkvalitets-produktion ligger højere.",
       },
     ],
     finalCta: {
-      title: "Ready to find your DJ?",
+      title: "Klar til at finde din DJ?",
       body: (n) =>
-        `Browse ${n} verified DJs across Denmark. Compare profiles, message any of them, book with escrow and a written contract.`,
-      buttonLabel: "Browse DJs",
+        `Se ${n} verificerede DJs i hele Danmark. Sammenlign profiler, skriv til hvem som helst af dem, book med escrow og en skriftlig kontrakt.`,
+      buttonLabel: "Se DJs",
     },
   },
 };
