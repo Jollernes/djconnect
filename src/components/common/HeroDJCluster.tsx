@@ -7,11 +7,11 @@ import type { DJProfileWithRelations } from "@/types/domain";
 import { eventCountValue } from "@/components/event-djs/stacked/eventCountLabel";
 
 /**
- * Hero social-proof element: a large rotating video card flanked by two
- * floating DJ info cards. The main card autoplays a short muted clip and,
- * when it ends, advances to the next clip/event-type caption — cycling and
- * looping. The floating cards follow the rotation so the featured DJ and a
- * secondary "available" DJ update along with the video.
+ * Hero social-proof element: a smaller rotating video card with a stacked deck
+ * of DJ cards fanned behind it, and one unified info bar docked underneath.
+ * The main card autoplays a short muted clip and, when it ends, advances to the
+ * next clip/event-type caption — cycling and looping. The deck and the info bar
+ * follow the rotation so they always reflect the currently featured DJ.
  */
 
 // Royalty-free clips (Mixkit free license), served from public/. Each clip
@@ -82,59 +82,41 @@ function Avatar({ dj, className }: { dj: DJProfileWithRelations; className?: str
   );
 }
 
-// --- Floating info cards ---------------------------------------------------
+// --- Unified info bar ------------------------------------------------------
 
-function FeaturedCard({ dj }: { dj: DJProfileWithRelations }) {
+function InfoBar({ dj }: { dj: DJProfileWithRelations }) {
   return (
     <Link
       to={`/djs/${dj.username}`}
-      className="block w-[148px] rounded-xl bg-background/85 p-2 shadow-lg ring-1 ring-white/40 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
+      className="block rounded-2xl bg-background/95 p-3 shadow-xl ring-1 ring-black/5 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
     >
-      <div className="flex items-center gap-2">
-        <Avatar dj={dj} className="h-7 w-7 shrink-0" />
+      <div className="flex items-center gap-2.5">
+        <Avatar dj={dj} className="h-10 w-10 shrink-0" />
         <div className="min-w-0 flex-1">
-          <span className="flex items-center gap-1">
-            <span className="truncate text-xs font-semibold text-foreground">{dj.stage_name}</span>
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+          <span className="flex items-center gap-1.5">
+            <span className="truncate text-sm font-semibold text-foreground">{dj.stage_name}</span>
+            <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
           </span>
-          <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-            <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Star className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />
             {dj.rating_average.toFixed(1)}
-            <span className="truncate">· {dj.base_location}</span>
+            <span className="truncate">· {eventCountValue(dj.events_performed)} events · {dj.base_location}</span>
           </span>
         </div>
       </div>
-      <div className="mt-2 flex items-center gap-1">
-        <span className="flex-1 rounded-lg bg-muted/70 px-2 py-1 text-[10px] font-semibold text-foreground">
-          <span className="text-muted-foreground">Fra </span>
-          {compactPrice(dj)}
-        </span>
-        <span className="rounded-lg bg-muted/70 px-2 py-1 text-[10px] font-semibold text-foreground">
-          {responseTime(dj.id)}
-        </span>
-      </div>
-    </Link>
-  );
-}
-
-function AvailabilityCard({ dj }: { dj: DJProfileWithRelations }) {
-  return (
-    <Link
-      to={`/djs/${dj.username}`}
-      className="block w-[156px] rounded-xl bg-background/85 p-2 shadow-lg ring-1 ring-white/40 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
-    >
-      <div className="flex items-center gap-2">
-        <Avatar dj={dj} className="h-7 w-7 shrink-0" />
-        <div className="min-w-0 flex-1">
-          <span className="block truncate text-xs font-semibold text-foreground">{dj.stage_name}</span>
-          <span className="block truncate text-[10px] text-muted-foreground">
-            {eventCountValue(dj.events_performed)} events · {dj.base_location}
-          </span>
+      <div className="mt-2.5 grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-muted/60 px-2.5 py-1.5">
+          <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Pris fra</span>
+          <span className="block text-sm font-bold text-foreground">{compactPrice(dj)}</span>
         </div>
-      </div>
-      <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-emerald-500/15 px-2 py-1 text-[10px] font-semibold text-emerald-700">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-        Ledig {availabilityDate(dj.id)}
+        <div className="rounded-xl bg-muted/60 px-2.5 py-1.5">
+          <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Svartid</span>
+          <span className="block text-sm font-bold text-foreground">{responseTime(dj.id)}</span>
+        </div>
+        <div className="rounded-xl bg-emerald-500/15 px-2.5 py-1.5">
+          <span className="block text-[10px] font-semibold uppercase tracking-wide text-emerald-700/80">Ledig</span>
+          <span className="block truncate text-sm font-bold text-emerald-700">{availabilityDate(dj.id)}</span>
+        </div>
       </div>
     </Link>
   );
@@ -167,10 +149,11 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
 
   const media = MEDIA[active];
   const featured = cards[active];
-  const secondary = cards[(active + 1) % n];
 
   return (
     <div className={cn("relative mx-auto w-full max-w-[300px]", className)}>
+      {/* Video card + deck stage (sized by the video card) */}
+      <div className="relative">
       {/* Stacked deck behind the main card — shifts as the video rotates */}
       {Array.from({ length: Math.max(0, n - 1) }).map((_, d) => {
         const depth = d + 1;
@@ -239,7 +222,7 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-0.5 block max-w-[52%] text-sm font-bold leading-snug text-white drop-shadow"
+                  className="mt-0.5 block max-w-[85%] text-base font-bold leading-snug text-white drop-shadow"
                 >
                   {media.caption}
                 </motion.span>
@@ -259,14 +242,10 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
           </div>
         </Link>
       </motion.div>
+      </div>
 
-      {/* Floating featured-DJ card — hugs the video's upper-left corner */}
-      <motion.div
-        className="absolute -left-[12%] top-[12%] z-30"
-        initial={{ opacity: 0, x: -16 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.25, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      >
+      {/* Unified info bar docked under the video — updates with the rotation */}
+      <div className="relative z-20 mt-3">
         <AnimatePresence mode="wait">
           <motion.div
             key={featured.id}
@@ -275,30 +254,10 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            <FeaturedCard dj={featured} />
+            <InfoBar dj={featured} />
           </motion.div>
         </AnimatePresence>
-      </motion.div>
-
-      {/* Floating availability card — hugs the video's lower-right corner */}
-      <motion.div
-        className="absolute -bottom-[4%] -right-[9%] z-30"
-        initial={{ opacity: 0, x: 16 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={secondary.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <AvailabilityCard dj={secondary} />
-          </motion.div>
-        </AnimatePresence>
-      </motion.div>
+      </div>
     </div>
   );
 }
