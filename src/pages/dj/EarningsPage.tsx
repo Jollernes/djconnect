@@ -18,20 +18,20 @@ export function DJEarningsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Earnings</h1>
+        <h1 className="text-2xl font-semibold">Indtjening</h1>
         <Button variant="outline" asChild>
-          <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer">Open Stripe dashboard</a>
+          <a href="https://dashboard.stripe.com" target="_blank" rel="noreferrer">Åbn Stripe-dashboard</a>
         </Button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Total earned" value={formatCurrency(totalEarned, "DKK")} />
-        <StatCard label="Pending payouts" value={formatCurrency(pending, "DKK")} />
-        <StatCard label="Completed events" value={completed.length.toString()} />
+        <StatCard label="Samlet indtjent" value={formatCurrency(totalEarned, "DKK")} />
+        <StatCard label="Afventende udbetalinger" value={formatCurrency(pending, "DKK")} />
+        <StatCard label="Gennemførte events" value={completed.length.toString()} />
       </div>
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold">Payout history</h2>
+        <h2 className="mb-3 text-lg font-semibold">Udbetalingshistorik</h2>
         <div className="divide-y rounded-xl border bg-card">
           {[...completed, ...upcoming].map((b) => (
             <div key={b.id} className="flex items-center justify-between p-4">
@@ -43,17 +43,17 @@ export function DJEarningsPage() {
                 <div className="text-right">
                   <div className="font-semibold">{formatCurrency(b.payout_minor, b.currency)}</div>
                   <div className="text-xs text-muted-foreground">
-                    {b.status === "completed" ? "Released" : "Scheduled"}
+                    {b.status === "completed" ? "Frigivet" : "Planlagt"}
                   </div>
                 </div>
                 <Badge variant={b.status === "completed" ? "success" : "warning"}>
-                  {b.status === "completed" ? "Paid" : "Pending"}
+                  {b.status === "completed" ? "Betalt" : "Afventer"}
                 </Badge>
               </div>
             </div>
           ))}
           {completed.length + upcoming.length === 0 && (
-            <div className="p-8 text-center text-sm text-muted-foreground">No payouts yet.</div>
+            <div className="p-8 text-center text-sm text-muted-foreground">Ingen udbetalinger endnu.</div>
           )}
         </div>
       </section>

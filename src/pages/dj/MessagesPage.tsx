@@ -10,9 +10,9 @@ export function DJMessagesPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold">Messages</h1>
+      <h1 className="mb-6 text-2xl font-semibold">Beskeder</h1>
       {bookings.length === 0 ? (
-        <EmptyState title="No messages" description="Conversations appear here once customers book you." />
+        <EmptyState title="Ingen beskeder" description="Samtaler vises her, når kunder booker dig." />
       ) : (
         <div className="divide-y rounded-xl border bg-card">
           {bookings.map((b) => (
@@ -23,7 +23,7 @@ export function DJMessagesPage() {
                   {b.event_type.label} · {formatDate(b.event_date)}
                 </div>
               </div>
-              <div className="text-xs text-muted-foreground">Open booking →</div>
+              <div className="text-xs text-muted-foreground">Åbn booking →</div>
             </Link>
           ))}
         </div>

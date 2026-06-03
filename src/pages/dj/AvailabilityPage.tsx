@@ -13,14 +13,14 @@ export function DJAvailabilityPage() {
 
   async function save() {
     // In production: upsert into `availability` table
-    toast.success(`Saved ${blockedDates.length} unavailable date${blockedDates.length === 1 ? "" : "s"}`);
+    toast.success(`Gemte ${blockedDates.length} utilgængelig${blockedDates.length === 1 ? " dato" : "e datoer"}`);
   }
 
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Availability</h1>
-        <p className="text-sm text-muted-foreground">Tap a date to block or unblock it. Confirmed bookings can't be changed.</p>
+        <h1 className="text-2xl font-semibold">Tilgængelighed</h1>
+        <p className="text-sm text-muted-foreground">Tryk på en dato for at blokere eller frigive den. Bekræftede bookinger kan ikke ændres.</p>
       </div>
       <Card>
         <CardContent className="p-6">
@@ -32,7 +32,7 @@ export function DJAvailabilityPage() {
           />
         </CardContent>
       </Card>
-      <Button onClick={save}>Save changes</Button>
+      <Button onClick={save}>Gem ændringer</Button>
     </div>
   );
 }
