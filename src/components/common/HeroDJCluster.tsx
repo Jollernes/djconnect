@@ -176,12 +176,12 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
   const secondary = cards[(active + 1) % n];
 
   return (
-    <div className={cn("relative mx-auto aspect-[5/6] w-full max-w-md", className)}>
-      {/* Main rotating video card */}
+    <div className={cn("relative mx-auto w-full max-w-[360px]", className)}>
+      {/* Main rotating video card (defines the cluster size) */}
       <motion.div
-        className="absolute right-[4%] top-0 z-10 w-[64%]"
+        className="relative z-10"
         initial={{ opacity: 0, y: 12, rotate: 3 }}
-        animate={{ opacity: 1, y: 0, rotate: 2.5 }}
+        animate={{ opacity: 1, y: 0, rotate: 2 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
         <Link
@@ -214,7 +214,7 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-0.5 block text-lg font-bold leading-tight text-white drop-shadow"
+                  className="mt-0.5 block max-w-[48%] text-base font-bold leading-snug text-white drop-shadow"
                 >
                   {media.caption}
                 </motion.span>
@@ -235,9 +235,9 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
         </Link>
       </motion.div>
 
-      {/* Floating featured-DJ card (top-left) */}
+      {/* Floating featured-DJ card — hugs the video's upper-left corner */}
       <motion.div
-        className="absolute left-0 top-[22%] z-30 w-[56%]"
+        className="absolute -left-[7%] top-[15%] z-30 w-[66%]"
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -255,9 +255,9 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
         </AnimatePresence>
       </motion.div>
 
-      {/* Floating availability card (bottom-right) */}
+      {/* Floating availability card — hugs the video's lower-right corner */}
       <motion.div
-        className="absolute bottom-0 right-0 z-30 w-[58%]"
+        className="absolute -bottom-[6%] -right-[6%] z-30 w-[60%]"
         initial={{ opacity: 0, x: 16 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
