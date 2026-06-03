@@ -10,7 +10,7 @@ import type { OfferRequest } from "@/hooks/useOfferRequest";
 import { SetupSizeIcon } from "@/components/wedding/SetupSizeIcon";
 import { Pencil } from "lucide-react";
 
-const SETUP_LABEL = { small: "Small", medium: "Medium", large: "Large" } as const;
+const SETUP_LABEL = { small: "Lille", medium: "Mellem", large: "Stor" } as const;
 
 function Row({
   label,
@@ -32,7 +32,7 @@ function Row({
         onClick={onEdit}
         className="flex shrink-0 items-center gap-1 text-xs font-medium text-rose-700 hover:underline"
       >
-        <Pencil className="h-3 w-3" /> Edit
+        <Pencil className="h-3 w-3" /> Rediger
       </button>
     </div>
   );
@@ -47,34 +47,34 @@ export function ReviewStep({
 }) {
   const eventType = EVENT_TYPE_OPTIONS.find((e) => e.id === request.eventType);
   const cityLabel =
-    CITY_OPTIONS.find((c) => c.id === request.city)?.label || request.customCity || "Not set";
+    CITY_OPTIONS.find((c) => c.id === request.city)?.label || request.customCity || "Ikke angivet";
   const guestBucket = GUEST_BUCKETS.find((b) => b.id === request.guestBucket);
   const budget = BUDGET_OPTIONS.find((b) => b.id === request.budget);
   const dateFormatted = request.date
-    ? new Date(request.date).toLocaleDateString("en-GB", {
+    ? new Date(request.date).toLocaleDateString("da-DK", {
         weekday: "long",
         day: "numeric",
         month: "long",
         year: "numeric",
       })
-    : "Not set";
+    : "Ikke angivet";
 
   return (
     <div className="space-y-2">
       <Row
         label="Event"
-        value={eventType?.label ?? "Not set"}
+        value={eventType?.label ?? "Ikke angivet"}
         onEdit={() => onEditStep(2)}
       />
-      <Row label="When" value={dateFormatted} onEdit={() => onEditStep(3)} />
-      <Row label="Where" value={cityLabel} onEdit={() => onEditStep(3)} />
+      <Row label="Hvornår" value={dateFormatted} onEdit={() => onEditStep(3)} />
+      <Row label="Hvor" value={cityLabel} onEdit={() => onEditStep(3)} />
       <Row
-        label="Guests"
-        value={guestBucket ? `${guestBucket.label} · ${guestBucket.range}` : "Not set"}
+        label="Gæster"
+        value={guestBucket ? `${guestBucket.label} · ${guestBucket.range}` : "Ikke angivet"}
         onEdit={() => onEditStep(4)}
       />
       <Row
-        label="Setup"
+        label="Opsætning"
         value={
           request.setupSize ? (
             <span className="inline-flex items-center gap-2">
@@ -84,16 +84,16 @@ export function ReviewStep({
               {SETUP_LABEL[request.setupSize]}
             </span>
           ) : (
-            "Any setup"
+            "Enhver opsætning"
           )
         }
         onEdit={() => onEditStep(4)}
       />
       <Row
-        label="Music"
+        label="Musik"
         value={
           request.genres.length === 0
-            ? "Open to suggestions"
+            ? "Åben for forslag"
             : request.genres
                 .map((id) => GENRE_OPTIONS.find((g) => g.id === id)?.label)
                 .filter(Boolean)
@@ -102,10 +102,10 @@ export function ReviewStep({
         onEdit={() => onEditStep(5)}
       />
       <Row
-        label="Extras"
+        label="Ekstra"
         value={
           request.extras.length === 0
-            ? "None"
+            ? "Ingen"
             : request.extras
                 .map((id) => EXTRA_OPTIONS.find((x) => x.id === id)?.label)
                 .filter(Boolean)
@@ -115,11 +115,11 @@ export function ReviewStep({
       />
       <Row
         label="Budget"
-        value={budget ? `${budget.label} · ${budget.range}` : "Not set"}
+        value={budget ? `${budget.label} · ${budget.range}` : "Ikke angivet"}
         onEdit={() => onEditStep(7)}
       />
       <Row
-        label="Contact"
+        label="Kontakt"
         value={
           <div className="space-y-0.5">
             <p>{request.contact.name || "—"}</p>

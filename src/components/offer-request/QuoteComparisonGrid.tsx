@@ -155,7 +155,7 @@ function QuoteCard({
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {[
               eventLabel,
-              dj.events_performed ? `${dj.events_performed} events` : null,
+              dj.events_performed ? `${dj.events_performed} events udført` : null,
               dj.profile.city,
             ]
               .filter(Boolean)
@@ -257,7 +257,7 @@ function PendingPlaceholder({ index }: { index: number }) {
       aria-label={`Tilbudsplads ${index + 1} afventer`}
     >
       <p className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/80">
-        Slot {index + 1}
+        Plads {index + 1}
       </p>
       <p className="mt-1 text-foreground/70">Afventer næste tilbud</p>
       <p className="mt-1 text-xs text-muted-foreground">

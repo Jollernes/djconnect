@@ -96,18 +96,18 @@ export function BrowseDJsGate({ open, onOpenChange, initial }: Props) {
       <DialogContent className="max-w-xl">
         <DialogHeader>
           <DialogTitle className="text-xl sm:text-2xl">
-            Find DJs for your event
+            Find DJs til dit event
           </DialogTitle>
           <DialogDescription>
-            Tell us a little about the event — we'll show you only DJs available for the right
-            kind of event in your area.
+            Fortæl os lidt om eventet — vi viser kun DJs, der er ledige til den rette
+            slags event i dit område.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5">
           <div>
             <Label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Event type
+              Eventtype
               <span className="ml-1 normal-case tracking-normal text-rose-600">*</span>
             </Label>
             <EventTypeGrid
@@ -117,7 +117,7 @@ export function BrowseDJsGate({ open, onOpenChange, initial }: Props) {
               className="mt-2"
             />
             {submitted && !eventTypeId && (
-              <p className="mt-1 text-xs text-rose-600">Pick an event type to continue.</p>
+              <p className="mt-1 text-xs text-rose-600">Vælg en eventtype for at fortsætte.</p>
             )}
           </div>
 
@@ -127,14 +127,14 @@ export function BrowseDJsGate({ open, onOpenChange, initial }: Props) {
                 htmlFor="browse-gate-city"
                 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
               >
-                City
+                By
                 <span className="ml-1 normal-case tracking-normal text-rose-600">*</span>
               </Label>
               <div className="relative mt-2">
                 <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   id="browse-gate-city"
-                  placeholder="e.g. Copenhagen, Aarhus, Odense"
+                  placeholder="f.eks. København, Aarhus, Odense"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="pl-9"
@@ -143,7 +143,7 @@ export function BrowseDJsGate({ open, onOpenChange, initial }: Props) {
               </div>
               {submitted && cityTrimmed.length < 2 && (
                 <p className="mt-1 text-xs text-rose-600">
-                  Enter the city or area where the event is.
+                  Angiv byen eller området, hvor eventet afholdes.
                 </p>
               )}
             </div>
@@ -153,7 +153,7 @@ export function BrowseDJsGate({ open, onOpenChange, initial }: Props) {
                 htmlFor="browse-gate-date"
                 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
               >
-                Date <span className="ml-1 text-muted-foreground/70">(optional)</span>
+                Dato <span className="ml-1 text-muted-foreground/70">(valgfrit)</span>
               </Label>
               <div className="relative mt-2">
                 <Calendar className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -166,7 +166,7 @@ export function BrowseDJsGate({ open, onOpenChange, initial }: Props) {
                 />
               </div>
               <p className="mt-1 text-[11px] text-muted-foreground">
-                Adding a date filters out DJs already booked that night.
+                Tilføj en dato for at filtrere DJs fra, der allerede er booket den aften.
               </p>
             </div>
           </div>
@@ -174,14 +174,14 @@ export function BrowseDJsGate({ open, onOpenChange, initial }: Props) {
 
         <div className="mt-4 flex items-center justify-between gap-3">
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-            Cancel
+            Annullér
           </Button>
           <Button
             onClick={handleContinue}
             disabled={!canContinue}
             className="rounded-full"
           >
-            <Search className="h-4 w-4" /> Browse DJs
+            <Search className="h-4 w-4" /> Find DJs
           </Button>
         </div>
       </DialogContent>

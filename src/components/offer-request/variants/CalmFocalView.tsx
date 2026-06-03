@@ -37,10 +37,10 @@ type StageState = "done" | "current" | "todo";
 
 const STAGE_ORDER: StageId[] = ["sent", "reviewing", "quoting", "choose"];
 const STAGE_LABEL: Record<StageId, string> = {
-  sent: "Sent",
-  reviewing: "Reviewing",
-  quoting: "Quoting",
-  choose: "Choose",
+  sent: "Sendt",
+  reviewing: "Gennemgår",
+  quoting: "Tilbud",
+  choose: "Vælg",
 };
 
 export function CalmFocalView({
@@ -99,26 +99,26 @@ export function CalmFocalView({
         <div className="mx-auto flex max-w-xl flex-col items-center text-center">
           {/* Deadline line */}
           <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-            Your offers are on the way
+            Dine tilbud er på vej
           </p>
           <h1 className="mt-3 text-2xl font-medium tracking-tight md:text-[26px]">
             {allDeclined
-              ? "All matched DJs have responded \u2014 none were available this date"
+              ? "Alle matchede DJs har svaret \u2014 ingen var ledige denne dato"
               : allDone
-                ? "Your 3 personal quotes are ready"
+                ? "Dine 3 personlige tilbud er klar"
                 : eta
-                  ? `Quotes expected by ${eta}`
-                  : "Quotes are coming in"}
+                  ? `Tilbud forventes ${eta}`
+                  : "Tilbud er på vej ind"}
           </h1>
           {!allDone && !allDeclined && (
             <p className="mt-2 text-sm text-muted-foreground">
-              Up to 3 personal quotes within 24 hours.
+              Op til 3 personlige tilbud inden for 24 timer.
             </p>
           )}
           {allDeclined && (
             <p className="mt-2 text-sm text-muted-foreground">
-              Try a different date, broaden your filters, or browse DJs
-              directly to keep your options open.
+              Prøv en anden dato, udvid dine filtre, eller se DJs
+              direkte for at holde dine muligheder åbne.
             </p>
           )}
 
@@ -127,7 +127,7 @@ export function CalmFocalView({
             <PulsingFocal active={focalActive} />
             <div className="relative z-10 text-center">
               <p className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-                Quotes ready
+                Tilbud klar
               </p>
               <p className="mt-1 text-5xl font-light tabular-nums leading-none text-foreground">
                 {Math.min(agg.quotesReady, 3)}
@@ -161,7 +161,7 @@ export function CalmFocalView({
           {!allDone && !allDeclined && (
             <p className="mt-8 inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/60 px-4 py-2 text-xs text-muted-foreground">
               <Mail className="h-3.5 w-3.5" />
-              Feel free to close this page — we'll email you when each quote arrives
+              Du må gerne lukke denne side — vi sender dig en e-mail, når hvert tilbud kommer
             </p>
           )}
         </div>
@@ -191,29 +191,29 @@ function WhatHappensNow({ agg }: { agg: ReturnType<typeof aggregateOf> }) {
   const steps: { icon: typeof FileText; title: string; body: string }[] = [
     {
       icon: FileText,
-      title: "Your brief is sent",
+      title: "Din brief er sendt",
       body:
         agg.total > 0
-          ? `We've forwarded your details to ${agg.total} matched DJ${agg.total === 1 ? "" : "s"} who fit your event, date and budget.`
-          : "We've forwarded your details to the DJs who fit your event, date and budget.",
+          ? `Vi har videresendt dine oplysninger til ${agg.total} matchede DJ${agg.total === 1 ? "" : "s"}, der passer til dit event, dato og budget.`
+          : "Vi har videresendt dine oplysninger til de DJs, der passer til dit event, dato og budget.",
     },
     {
       icon: Users,
-      title: "DJs review and respond",
+      title: "DJs gennemgår og svarer",
       body:
-        "Each DJ checks availability and either prepares a personal quote or lets us know they're not available. Most reply within a few hours.",
+        "Hver DJ tjekker tilgængelighed og forbereder enten et personligt tilbud eller giver os besked, hvis de ikke er ledige. De fleste svarer inden for få timer.",
     },
     {
       icon: MessageSquareText,
-      title: "Up to 3 personal quotes arrive",
+      title: "Op til 3 personlige tilbud ankommer",
       body:
-        "You'll get up to 3 quotes within 24 hours — by email and on this page. No need to refresh; new quotes appear automatically.",
+        "Du får op til 3 tilbud inden for 24 timer — via e-mail og på denne side. Du behøver ikke opdatere; nye tilbud vises automatisk.",
     },
     {
       icon: CreditCard,
-      title: "Compare and book with escrow",
+      title: "Sammenlign og book med escrow",
       body:
-        "Compare prices and personal messages, ask the DJs questions, and book your favourite. The deposit is held in secure escrow until after your event.",
+        "Sammenlign priser og personlige beskeder, stil DJs spørgsmål, og book din favorit. Depositummet holdes i sikker escrow indtil efter dit event.",
     },
   ];
 
@@ -227,10 +227,10 @@ function WhatHappensNow({ agg }: { agg: ReturnType<typeof aggregateOf> }) {
       >
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.12em] text-muted-foreground">
-            While you wait
+            Mens du venter
           </p>
           <p className="mt-0.5 truncate text-sm font-medium text-foreground">
-            What happens now?
+            Hvad sker der nu?
           </p>
         </div>
         <ChevronDown
@@ -301,21 +301,21 @@ function buildTickerLines(
   // haven't fired in a while.
   if (seen > 0 && agg.quotesReady < 3) {
     lines.push(
-      `${seen} of ${agg.total} matched DJ${agg.total === 1 ? "" : "s"} have seen your request`,
+      `${seen} af ${agg.total} matchede DJ${agg.total === 1 ? "" : "s"} har set din forespørgsel`,
     );
   }
   if (agg.quotesReady > 0 && agg.quotesReady < 3) {
     lines.push(
-      `${agg.quotesReady} quote${agg.quotesReady === 1 ? " is" : "s are"} ready below`,
+      `${agg.quotesReady} tilbud er klar nedenfor`,
     );
   }
 
   // Final reassurance line
   if (agg.quotesReady < 3) {
-    lines.push("You don't need to stay on this page.");
+    lines.push("Du behøver ikke blive på denne side.");
   }
 
-  return lines.length > 0 ? lines : ["Matching DJs to your event…"];
+  return lines.length > 0 ? lines : ["Matcher DJs til dit event…"];
 }
 
 function PulsingFocal({ active }: { active: boolean }) {
@@ -361,7 +361,7 @@ function MicroStepper({
 }) {
   return (
     <ol
-      aria-label="Request progress"
+      aria-label="Forespørgselsforløb"
       className="mt-8 flex w-full max-w-xs items-center"
     >
       {stages.map((s, idx) => (

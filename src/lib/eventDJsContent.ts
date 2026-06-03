@@ -437,7 +437,7 @@ export function eventTypeForSlug(slug: string): string | undefined {
 
 /** Tiny icon list used in the value-prop strip on the People-also-need block. */
 export const sharedTrustChips = [
-  { Icon: Users, label: "100% verified" },
-  { Icon: Shield, label: "Stripe-protected" },
-  { Icon: CheckCircle2, label: "Free cancellation up to 14 days" },
+  { Icon: Users, label: "100% verificeret" },
+  { Icon: Shield, label: "Stripe-beskyttet" },
+  { Icon: CheckCircle2, label: "Gratis afbestilling op til 14 dage" },
 ];

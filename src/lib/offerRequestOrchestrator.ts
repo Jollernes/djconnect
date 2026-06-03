@@ -466,9 +466,9 @@ function notifyDJ({
   ts: number;
   requestId: string;
 }): NotificationLogEntry[] {
-  const summary = `${formatDanishDate(brief.date)} · ${brief.city ?? brief.customCity ?? "Denmark"} · ${brief.guestBucket ?? "guests"} guests`;
-  const subject = `New ${brief.eventType ?? "event"} request — respond within 24h`;
-  const body = `Hi ${dj.stage_name}, ${brief.contact.name} just sent a brief: ${summary}. Open the deep link to send a personal quote: /dj/quote-requests/${requestId}/${dj.id}`;
+  const summary = `${formatDanishDate(brief.date)} · ${brief.city ?? brief.customCity ?? "Danmark"} · ${brief.guestBucket ?? "gæster"} gæster`;
+  const subject = `Ny forespørgsel om ${brief.eventType ?? "event"} — svar inden for 24t`;
+  const body = `Hej ${dj.stage_name}, ${brief.contact.name} har lige sendt en brief: ${summary}. Åbn linket for at sende et personligt tilbud: /dj/quote-requests/${requestId}/${dj.id}`;
   const channels: Array<{ ch: "email" | "sms" | "push"; to: string }> = [
     { ch: "email", to: dj.profile.email ?? `${dj.username}@dj.local` },
   ];
@@ -500,8 +500,8 @@ function notifyCustomerCreated({
     channel: "email",
     to: brief.contact.email,
     audience: "customer",
-    subject: "We're contacting DJs for your event now",
-    body: `Hi ${brief.contact.name?.split(" ")[0] ?? "there"}, we sent your brief to a first batch of DJs and you'll see live progress here: /my-requests/${requestId}. Expect up to 3 personal quotes within 24 hours.`,
+    subject: "Vi kontakter DJs til dit event nu",
+    body: `Hej ${brief.contact.name?.split(" ")[0] ?? "der"}, vi har sendt din brief til en første gruppe DJs, og du kan følge live status her: /my-requests/${requestId}. Forvent op til 3 personlige tilbud inden for 24 timer.`,
   };
 }
 
@@ -522,8 +522,8 @@ function notifyCustomerExpansion({
     channel: "email",
     to: brief.contact.email,
     audience: "customer",
-    subject: "We've expanded your shortlist",
-    body: `Hi ${brief.contact.name?.split(" ")[0] ?? "there"}, we just contacted ${extraCount} more matched DJs to make sure you get 3 strong offers. Live progress: /my-requests/${requestId}.`,
+    subject: "Vi har udvidet din liste",
+    body: `Hej ${brief.contact.name?.split(" ")[0] ?? "der"}, vi har lige kontaktet ${extraCount} flere matchede DJs for at sikre, at du får 3 stærke tilbud. Live status: /my-requests/${requestId}.`,
   };
 }
 
@@ -544,8 +544,8 @@ function notifyCustomerLowQuoteAlert({
     channel: "email",
     to: brief.contact.email,
     audience: "customer",
-    subject: `${quoteCount} quote${quoteCount === 1 ? "" : "s"} ready — review now or wait for more?`,
-    body: `Hi ${brief.contact.name?.split(" ")[0] ?? "there"}, we have ${quoteCount} quote${quoteCount === 1 ? "" : "s"} ready. You can review now or wait — we'll keep matching: /my-requests/${requestId}.`,
+    subject: `${quoteCount} tilbud klar — gennemse nu eller vent på flere?`,
+    body: `Hej ${brief.contact.name?.split(" ")[0] ?? "der"}, vi har ${quoteCount} tilbud klar. Du kan gennemse nu eller vente — vi fortsætter med at matche: /my-requests/${requestId}.`,
   };
 }
 
@@ -568,8 +568,8 @@ function notificationForTransition({
       channel: "email",
       to: record.brief.contact.email,
       audience: "customer",
-      subject: "New quote received",
-      body: `A new quote has arrived from ${slot.username}. Open /my-requests/${record.id} to review.`,
+      subject: "Nyt tilbud modtaget",
+      body: `Et nyt tilbud er kommet fra ${slot.username}. Åbn /my-requests/${record.id} for at gennemse.`,
     };
   }
   return null;
@@ -578,7 +578,7 @@ function notificationForTransition({
 // ---------- Helpers ----------
 
 function formatDanishDate(d?: string | null): string {
-  if (!d) return "your event date";
+  if (!d) return "din eventdato";
   try {
     return new Date(d).toLocaleDateString("da-DK", {
       day: "numeric",

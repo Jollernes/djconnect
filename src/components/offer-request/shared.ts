@@ -35,13 +35,13 @@ export function deriveActivityEvents(
     kind: "brief_sent",
     text:
       initialCount > 0
-        ? `Brief sent. We matched ${initialCount} DJ${initialCount === 1 ? "" : "s"} to your event and contacted them.`
-        : "Brief sent. We're matching DJs to your event…",
+        ? `Brief sendt. Vi matchede ${initialCount} DJ${initialCount === 1 ? "" : "s"} til dit event og kontaktede dem.`
+        : "Brief sendt. Vi matcher DJs til dit event…",
   });
 
   for (const slot of record.slots) {
     const dj = djCatalog.find((d) => d.id === slot.djId);
-    const name = dj?.stage_name ?? "A DJ";
+    const name = dj?.stage_name ?? "En DJ";
     const avatar = dj?.profile?.avatar_url ?? null;
 
     if (slot.cohort === "expansion") {
@@ -53,7 +53,7 @@ export function deriveActivityEvents(
       id: `${slot.djId}-notified`,
       ts: slot.notifiedAtMs,
       kind: "dj_notified",
-      text: `${name} received your request`,
+      text: `${name} modtog din forespørgsel`,
       djName: name,
       djAvatar: avatar,
     });
@@ -63,7 +63,7 @@ export function deriveActivityEvents(
         id: `${slot.djId}-preparing`,
         ts: slot.preparingAtMs,
         kind: "dj_preparing",
-        text: `${name} is preparing a quote`,
+        text: `${name} forbereder et tilbud`,
         djName: name,
         djAvatar: avatar,
       });
@@ -75,22 +75,22 @@ export function deriveActivityEvents(
           id: `${slot.djId}-quote`,
           ts: slot.respondedAtMs,
           kind: "quote_arrived",
-          text: `${name}'s quote is in`,
+          text: `${name}s tilbud er klar`,
           djName: name,
           djAvatar: avatar,
         });
       } else if (slot.status === "declined") {
         const reason =
           slot.declineReason === "fully_booked"
-            ? "fully booked that date"
+            ? "fuldt booket den dato"
             : slot.declineReason === "out_of_coverage"
-              ? "outside the area"
-              : "not available that date";
+              ? "uden for området"
+              : "ikke ledig den dato";
         events.push({
           id: `${slot.djId}-declined`,
           ts: slot.respondedAtMs,
           kind: "dj_declined",
-          text: `${name} can't take this one — ${reason}`,
+          text: `${name} kan ikke tage denne — ${reason}`,
           djName: name,
           djAvatar: avatar,
         });
@@ -105,7 +105,7 @@ export function deriveActivityEvents(
         id: `expansion`,
         ts: Math.min(...expansionSlots.map((s) => s.notifiedAtMs)) - 1,
         kind: "expansion",
-        text: `We added ${expansionSlots.length} more matched DJ${expansionSlots.length === 1 ? "" : "s"} to be sure you have options.`,
+        text: `Vi tilføjede ${expansionSlots.length} flere matchede DJ${expansionSlots.length === 1 ? "" : "s"}, så du er sikker på at have valgmuligheder.`,
       });
     }
   }
@@ -117,7 +117,7 @@ export function deriveActivityEvents(
         (36 / record.compressionFactor) * 60 * 60 * 1000,
       kind: "alert_36h",
       text:
-        "It's taking longer than usual. You can review what's already in or wait a little longer.",
+        "Det tager længere tid end normalt. Du kan gennemse det, der allerede er kommet ind, eller vente lidt længere.",
     });
   }
 
@@ -133,7 +133,7 @@ export function tickerLineFor(
   djCatalog: DJProfileWithRelations[],
 ): string {
   const events = deriveActivityEvents(record, djCatalog);
-  if (events.length === 0) return "Matching DJs to your event…";
+  if (events.length === 0) return "Matcher DJs til dit event…";
   const last = events[events.length - 1];
   return last.text;
 }
@@ -172,18 +172,18 @@ export function formatExpected(target: Date): string {
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const isTomorrow = target.toDateString() === tomorrow.toDateString();
-  const time = target.toLocaleTimeString("en-GB", {
+  const time = target.toLocaleTimeString("da-DK", {
     hour: "2-digit",
     minute: "2-digit",
   });
-  if (sameDay) return `today at ${time}`;
-  if (isTomorrow) return `tomorrow at ${time}`;
-  const weekday = target.toLocaleDateString("en-GB", { weekday: "long" });
-  return `${weekday} at ${time}`;
+  if (sameDay) return `i dag kl. ${time}`;
+  if (isTomorrow) return `i morgen kl. ${time}`;
+  const weekday = target.toLocaleDateString("da-DK", { weekday: "long" });
+  return `${weekday} kl. ${time}`;
 }
 
 export function formatClock(ts: number): string {
-  return new Date(ts).toLocaleTimeString("en-GB", {
+  return new Date(ts).toLocaleTimeString("da-DK", {
     hour: "2-digit",
     minute: "2-digit",
   });

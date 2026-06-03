@@ -166,8 +166,8 @@ export function EventDJsListingPage({
             </div>
           ) : availableDJs.length === 0 && unavailableDJs.length === 0 ? (
             <EmptyState
-              title="No DJs match your filters"
-              description="Try loosening some filters or expanding your location."
+              title="Ingen DJs matcher dine filtre"
+              description="Prøv at løsne nogle filtre eller udvide dit område."
               action={<Button onClick={clearAllFilters}>Clear filters</Button>}
             />
           ) : (

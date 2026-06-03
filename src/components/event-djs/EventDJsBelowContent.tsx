@@ -86,18 +86,18 @@ export function EventDJsBelowContent({ config }: Props) {
                   variant="outline"
                   className={cn("rounded-full", theme.accentBorder, theme.accentBg, theme.accentText)}
                 >
-                  <Heart className="h-3 w-3 fill-current" /> Sample run-of-show
+                  <Heart className="h-3 w-3 fill-current" /> Eksempel på aftenplan
                 </Badge>
                 <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                  A wedding night, hour by hour.
+                  En bryllupsaften, time for time.
                 </h2>
                 <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-                  The rhythm most DJConnect couples follow. Once booked, your DJ builds your
-                  exact run-of-show with you in the dashboard — editable right up to the day.
+                  Den rytme de fleste DJConnect-par følger. Når du har booket, bygger din DJ din
+                  præcise aftenplan sammen med dig i dashboardet — redigerbar helt frem til dagen.
                 </p>
                 <Button asChild variant="link" className={cn("-ml-3 mt-2", theme.accentText)}>
                   <Link to="/how-it-works">
-                    See the planning flow <ChevronRight className="h-3.5 w-3.5" />
+                    Se planlægningsforløbet <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
                 </Button>
               </div>
@@ -140,14 +140,14 @@ export function EventDJsBelowContent({ config }: Props) {
                     theme.accentText,
                   )}
                 >
-                  <Music4 className="h-3 w-3" /> Energy curve
+                  <Music4 className="h-3 w-3" /> Energikurve
                 </Badge>
                 <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                  How a wedding DJ builds the night.
+                  Sådan bygger en bryllups-DJ aftenen op.
                 </h2>
                 <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-                  The arc most wedding DJs work to — soft start, room-warming, peak, then a closer
-                  everyone sings.
+                  Den kurve de fleste bryllups-DJs arbejder efter — blød start, opvarmning, peak og til sidst en afslutning,
+                  alle synger med på.
                 </p>
               </div>
 
@@ -201,32 +201,32 @@ export function EventDJsBelowContent({ config }: Props) {
                     theme.accentText,
                   )}
                 >
-                  <Sparkles className="h-3 w-3" /> What's included
+                  <Sparkles className="h-3 w-3" /> Hvad er inkluderet
                 </Badge>
                 <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                  The full mobile disco — all in.
+                  Det fulde mobile diskotek — alt inklusive.
                 </h2>
                 <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-                  No hidden hire fees, no surprise add-ons. The price you see covers PA, lighting,
-                  mic, and travel within the DJ's region.
+                  Ingen skjulte lejegebyrer, ingen overraskelser. Prisen, du ser, dækker PA, lys,
+                  mikrofon og transport inden for DJ'ens region.
                 </p>
                 {pricing && (
                   <div className="mt-5 rounded-2xl border bg-card p-5">
                     <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                      Wedding DJ pricing in Denmark
+                      Priser for bryllups-DJs i Danmark
                     </div>
                     <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <span className="text-2xl font-semibold tabular-nums sm:text-3xl">
                         {formatCurrency(pricing.min, "DKK")}
                       </span>
-                      <span className="text-muted-foreground">to</span>
+                      <span className="text-muted-foreground">til</span>
                       <span className="text-xl font-semibold tabular-nums sm:text-2xl">
                         {formatCurrency(pricing.max, "DKK")}
                       </span>
                     </div>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Average around {formatCurrency(pricing.avg, "DKK")} for a full evening including
-                      PA, lighting, mic, and travel.
+                      I gennemsnit omkring {formatCurrency(pricing.avg, "DKK")} for en hel aften inkl.
+                      PA, lys, mikrofon og transport.
                     </p>
                   </div>
                 )}
@@ -261,10 +261,10 @@ export function EventDJsBelowContent({ config }: Props) {
                   theme.accentText,
                 )}
               >
-                <Star className="h-3 w-3 fill-current" /> Real wedding reviews
+                <Star className="h-3 w-3 fill-current" /> Rigtige bryllupsanmeldelser
               </Badge>
               <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                What couples say after their wedding.
+Hvad par siger efter deres bryllup.
               </h2>
             </div>
             <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -289,7 +289,7 @@ export function EventDJsBelowContent({ config }: Props) {
                       {dj && (
                         <div className="mt-4 flex items-center justify-between gap-3 border-t pt-3 text-sm">
                           <span className="text-muted-foreground">
-                            Booked{" "}
+                            Bookede{" "}
                             <Link
                               to={`/djs/${dj.username}?eventType=wedding`}
                               className="font-semibold text-foreground underline-offset-4 hover:underline"
@@ -298,7 +298,7 @@ export function EventDJsBelowContent({ config }: Props) {
                             </Link>
                           </span>
                           <Badge variant="secondary" className="rounded-full">
-                            <Heart className="h-3 w-3 fill-rose-500 text-rose-500" /> Wedding
+                            <Heart className="h-3 w-3 fill-rose-500 text-rose-500" /> Bryllup
                           </Badge>
                         </div>
                       )}
@@ -316,20 +316,20 @@ export function EventDJsBelowContent({ config }: Props) {
           <div className="container py-12 sm:py-14">
             <div className="mx-auto max-w-3xl rounded-2xl border bg-card p-6 sm:p-8">
               <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {label} DJ pricing in Denmark
+Priser for {label}-DJs i Danmark
               </div>
               <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="text-2xl font-semibold tabular-nums sm:text-3xl">
                   {formatCurrency(pricing.min, "DKK")}
                 </span>
-                <span className="text-muted-foreground">to</span>
+                <span className="text-muted-foreground">til</span>
                 <span className="text-xl font-semibold tabular-nums sm:text-2xl">
                   {formatCurrency(pricing.max, "DKK")}
                 </span>
               </div>
               <p className="mt-1 text-sm text-muted-foreground">
-                Average around {formatCurrency(pricing.avg, "DKK")} for a 4–6 hour event including PA,
-                lighting, mic, and travel within the DJ's region.
+                I gennemsnit omkring {formatCurrency(pricing.avg, "DKK")} for et 4–6 timers event inkl. PA,
+                lys, mikrofon og transport inden for DJ'ens region.
               </p>
             </div>
           </div>
@@ -354,11 +354,11 @@ export function EventDJsBelowContent({ config }: Props) {
               FAQ
             </Badge>
             <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              {isWedding ? "Wedding DJ questions, answered." : `${label} DJ questions, answered.`}
+              {isWedding ? "Spørgsmål om bryllups-DJs, besvaret." : `Spørgsmål om ${label}-DJs, besvaret.`}
             </h2>
             <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-              Still wondering? Drop a message in the booking thread once you've shortlisted a DJ —
-              every DJ replies within 2 hours.
+              Stadig i tvivl? Skriv en besked i bookingtråden, når du har udvalgt en DJ —
+              hver DJ svarer inden for 2 timer.
             </p>
           </div>
           <Accordion type="single" collapsible className="rounded-2xl border bg-card px-5">
@@ -393,17 +393,17 @@ export function EventDJsBelowContent({ config }: Props) {
               <p className="mt-1.5 max-w-xl text-pretty text-sm text-white/80 sm:text-base">
                 {total > 0
                   ? config.finalCta.body(total)
-                  : `Compare profiles, message any of them, book with escrow and a written contract.`}
+                  : `Sammenlign profiler, skriv til hvem som helst, og book med escrow og en skriftlig kontrakt.`}
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-white/70">
                 <span className="inline-flex items-center gap-1.5">
-                  <Users className="h-3.5 w-3.5" /> 100% verified
+                  <Users className="h-3.5 w-3.5" /> 100% verificeret
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Shield className="h-3.5 w-3.5" /> Stripe-protected
+                  <Shield className="h-3.5 w-3.5" /> Stripe-beskyttet
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Free cancellation up to 14 days
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Gratis afbestilling op til 14 dage
                 </span>
               </div>
             </div>

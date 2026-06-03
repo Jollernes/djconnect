@@ -185,12 +185,12 @@ export function useDJProfileEditor() {
 
   function handleSaveAll() {
     writeDemoDJProfile(buildPersistedProfile(readDemoDJProfile()));
-    toast.success("Profile saved");
+    toast.success("Profil gemt");
   }
 
   function handleSaveSubProfile(current: DemoDJSubProfileKey) {
     if (!isSubProfileTextComplete(subProfiles[current])) {
-      toast.error("Please fill in all text fields for this sub-profile");
+      toast.error("Udfyld alle tekstfelter for denne underprofil");
       return;
     }
     writeDemoDJProfile(buildPersistedProfile(readDemoDJProfile()));
@@ -198,10 +198,10 @@ export function useDJProfileEditor() {
     if (next) {
       const fromLabel = SUB_PROFILE_META[current].label;
       const nextLabel = SUB_PROFILE_META[next].label;
-      toast.success(`${fromLabel} saved · continuing to ${nextLabel}`);
+      toast.success(`${fromLabel} gemt · fortsætter til ${nextLabel}`);
       setActiveKey(next);
     } else {
-      toast.success("All four sub-profiles complete — looking great!");
+      toast.success("Alle fire underprofiler er udfyldt — det ser flot ud!");
     }
   }
 

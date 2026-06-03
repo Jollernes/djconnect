@@ -18,7 +18,7 @@ export function SizeStep({
     <div className="space-y-8">
       <div>
         <p className="flex items-center gap-2 text-sm font-semibold">
-          <Users className="h-4 w-4 text-rose-500" /> How many guests?
+          <Users className="h-4 w-4 text-rose-500" /> Hvor mange gæster?
         </p>
         <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-5">
           {GUEST_BUCKETS.map((b) => {
@@ -65,9 +65,9 @@ export function SizeStep({
       </div>
 
       <div>
-        <p className="text-sm font-semibold">Sound &amp; lighting setup</p>
+        <p className="text-sm font-semibold">Lyd &amp; lys-opsætning</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Pick the rig that matches your venue — DJs will recommend if you're unsure.
+          Vælg det udstyr, der passer til dit lokale — DJs anbefaler, hvis du er i tvivl.
         </p>
         <div className="mt-3">
           <SetupSizePicker value={setupSize ?? null} onChange={onSetupChange} />

@@ -67,8 +67,8 @@ export function EventDJsListingHero({ config }: { config: EventListingConfig }) 
           if (id !== config.id) navigate(`/${slugForEventType(id)}${carriedParams()}`);
         }}
         onBrowseAll={() => navigate(`/${config.slug}${carriedParams()}`)}
-        title="Switch event"
-        description="Browsing for a different event will change the DJ profiles you see."
+        title="Skift event"
+        description="Hvis du browser efter et andet event, ændres de DJ-profiler, du ser."
       />
     </>
   );

@@ -19,9 +19,9 @@ export function MyRequestPage() {
   const { record, loading, elapsedHours, remainingHours } = useOfferRequestRecord(requestId);
 
   useDocumentHead({
-    title: "Your DJ offers · DJConnect",
+    title: "Dine DJ-tilbud · DJConnect",
     description:
-      "Track your matched DJs and incoming personal quotes — quietly, in real time.",
+      "Følg dine matchede DJs og indkomne personlige tilbud — roligt, i realtid.",
   });
 
   // Logged-in customers see this inside the dashboard layout instead.
@@ -65,7 +65,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 function Loading() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 text-sm text-muted-foreground md:px-6">
-      Loading your request…
+      Indlæser din forespørgsel…
     </div>
   );
 }
@@ -74,14 +74,14 @@ function NotFound() {
   return (
     <div className="mx-auto max-w-2xl px-4 py-20 text-center md:px-6">
       <h1 className="text-2xl font-semibold tracking-tight">
-        We couldn't find that request
+        Vi kunne ikke finde den forespørgsel
       </h1>
       <p className="mt-3 text-sm text-muted-foreground">
-        The link may have expired, or you opened it on a different device. Start a
-        new brief — it takes about two minutes.
+        Linket er måske udløbet, eller du åbnede det på en anden enhed. Start en
+        ny brief — det tager omkring to minutter.
       </p>
       <Button asChild className="mt-6">
-        <Link to="/get-offers">Send a new brief</Link>
+        <Link to="/get-offers">Send en ny brief</Link>
       </Button>
     </div>
   );

@@ -59,9 +59,9 @@ export function GetOffersPage() {
   const step = Number.isFinite(stepParam) && stepParam >= 0 && stepParam <= 8 ? stepParam : 0;
 
   useDocumentHead({
-    title: "Get 3 personal DJ offers in 24 hours · DJConnect",
+    title: "Få 3 personlige DJ-tilbud på 24 timer · DJConnect",
     description:
-      "Tell us about your event in ~2 minutes and we'll match you with 3 verified Danish DJs. Compare personal offers, pay through escrow, no spam.",
+      "Fortæl os om dit event på ~2 minutter, så matcher vi dig med 3 verificerede danske DJs. Sammenlign personlige tilbud, betal via escrow, ingen spam.",
     canonical: "/get-offers",
   });
 
@@ -122,22 +122,22 @@ export function GetOffersPage() {
       case 0:
         return {
           stepNumber: 0,
-          title: "Get 3 personal DJ offers in 24 hours.",
+          title: "Få 3 personlige DJ-tilbud på 24 timer.",
           subtitle:
-            "Tell us about your event — we'll match you with 3 verified Danish DJs. Each one sends a personal offer, no spam, no fees.",
+            "Fortæl os om dit event — vi matcher dig med 3 verificerede danske DJs. Hver af dem sender et personligt tilbud, ingen spam, ingen gebyrer.",
           illustration: <WelcomeIllustration size="lg" />,
           content: <WelcomeStep />,
           hideBack: true,
           showProgress: false,
-          nextLabel: "Start — it's ~2 min",
+          nextLabel: "Start — tager ~2 min",
           onNext: () => setStep(1),
           onBack: undefined,
         };
       case 1:
         return {
           stepNumber: 1,
-          title: "What kind of event are you planning?",
-          subtitle: "We'll tailor the brief and match DJs who specialise in this kind of event.",
+          title: "Hvilken slags event planlægger du?",
+          subtitle: "Vi tilpasser briefen og matcher DJs, der har specialiseret sig i netop denne slags event.",
           illustration: (
             <FloatingIcon>
               <Heart className="h-12 w-12 text-rose-500" />
@@ -159,8 +159,8 @@ export function GetOffersPage() {
       case 2:
         return {
           stepNumber: 2,
-          title: "When and where?",
-          subtitle: "DJs need the date and city to confirm availability.",
+          title: "Hvornår og hvor?",
+          subtitle: "DJs skal bruge dato og by for at bekræfte tilgængelighed.",
           illustration: (
             <div className="flex items-center gap-4">
               <CalendarIllustration size="sm" />
@@ -183,8 +183,8 @@ export function GetOffersPage() {
       case 3:
         return {
           stepNumber: 3,
-          title: "How big is your event?",
-          subtitle: "Used to match DJs with the right rig and crowd-reading experience.",
+          title: "Hvor stort er dit event?",
+          subtitle: "Bruges til at matche DJs med det rette udstyr og erfaring i at læse en menneskemængde.",
           illustration: <GuestsIllustration size="md" />,
           content: (
             <SizeStep
@@ -200,35 +200,35 @@ export function GetOffersPage() {
       case 4:
         return {
           stepNumber: 4,
-          title: "What's the vibe?",
-          subtitle: "Tell us roughly — DJs build the actual playlist with you later.",
+          title: "Hvad er stemningen?",
+          subtitle: "Fortæl os det groft — DJs bygger den faktiske playliste sammen med dig senere.",
           illustration: <VibeIllustration size="md" />,
           content: (
             <VibeStep genres={request.genres} onToggle={(id) => toggleArrayValue("genres", id)} />
           ),
           onNext: () => setStep(5),
           onBack: () => setStep(3),
-          nextLabel: request.genres.length === 0 ? "Skip" : "Continue",
+          nextLabel: request.genres.length === 0 ? "Spring over" : "Fortsæt",
         };
       case 5:
         return {
           stepNumber: 5,
-          title: "Anything extra?",
-          subtitle: "Mics, photo booths, branded booth — let us know what to ask for.",
+          title: "Noget ekstra?",
+          subtitle: "Mikrofoner, fotobokse, brandet DJ-pult — fortæl os, hvad vi skal spørge om.",
           illustration: <ExtrasIllustration size="md" />,
           content: (
             <ExtrasStep extras={request.extras} onToggle={(id) => toggleArrayValue("extras", id)} />
           ),
           onNext: () => setStep(6),
           onBack: () => setStep(4),
-          nextLabel: request.extras.length === 0 ? "Skip" : "Continue",
+          nextLabel: request.extras.length === 0 ? "Spring over" : "Fortsæt",
         };
       case 6:
         return {
           stepNumber: 6,
-          title: "What's the budget?",
+          title: "Hvad er budgettet?",
           subtitle:
-            "Just a sanity check so we match the right DJs. The actual quote will be inside this range.",
+            "Bare en rettesnor, så vi matcher de rette DJs. Det faktiske tilbud ligger inden for dette interval.",
           illustration: null,
           content: (
             <BudgetStep value={request.budget} onChange={(id) => update({ budget: id })} />
@@ -239,8 +239,8 @@ export function GetOffersPage() {
       case 7:
         return {
           stepNumber: 7,
-          title: "How can the DJs reach you?",
-          subtitle: "We'll send you a copy of the brief and forward each DJ's offer when they reply.",
+          title: "Hvordan kan DJs nå dig?",
+          subtitle: "Vi sender dig en kopi af briefen og videresender hver DJ's tilbud, når de svarer.",
           illustration: <ContactIllustration size="md" />,
           content: (
             <ContactStep
@@ -256,9 +256,9 @@ export function GetOffersPage() {
       case 8:
         return {
           stepNumber: 8,
-          title: "Quick check before we send.",
+          title: "Hurtigt tjek, før vi sender.",
           subtitle:
-            "Tap any line to edit it. When it looks right, we'll contact up to 6 DJs who match — your live progress page opens immediately.",
+            "Tryk på en linje for at redigere den. Når det ser rigtigt ud, kontakter vi op til 6 DJs, der matcher — din live statusside åbner med det samme.",
           illustration: null,
           content: (
             <ReviewStep
@@ -268,12 +268,12 @@ export function GetOffersPage() {
           ),
           onNext: handleSubmit,
           onBack: () => setStep(7),
-          nextLabel: submitting ? "Contacting DJs…" : "Send brief & track live",
+          nextLabel: submitting ? "Kontakter DJs…" : "Send brief & følg live",
         };
       default:
         return {
           stepNumber: 0,
-          title: "Get 3 personal DJ offers in 24 hours.",
+          title: "Få 3 personlige DJ-tilbud på 24 timer.",
           subtitle: "",
           illustration: <WelcomeIllustration />,
           content: <WelcomeStep />,
@@ -310,7 +310,7 @@ export function GetOffersPage() {
             onClick={() => {
               if (
                 window.confirm(
-                  "Reset the wizard? Your saved answers will be cleared and you'll start fresh.",
+                  "Nulstil guiden? Dine gemte svar bliver ryddet, og du starter forfra.",
                 )
               ) {
                 handleStartOver();
@@ -320,16 +320,16 @@ export function GetOffersPage() {
             }}
             className="text-xs text-muted-foreground underline-offset-4 hover:underline"
           >
-            {hasAnyAnswer(request) ? "Pick up where I left off · or start over" : ""}
+            {hasAnyAnswer(request) ? "Fortsæt hvor jeg slap · eller start forfra" : ""}
           </button>
           <p className="text-xs text-muted-foreground">
-            Want to browse instead?{" "}
+            Vil du hellere browse?{" "}
             <button
               type="button"
               onClick={() => navigate("/search")}
               className="text-rose-700 underline-offset-2 hover:underline"
             >
-              Browse all DJs →
+              Se alle DJs →
             </button>
           </p>
         </div>

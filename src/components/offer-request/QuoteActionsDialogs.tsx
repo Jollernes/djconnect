@@ -278,7 +278,7 @@ export function EscrowBookingDialog({
             Book {dj.stage_name} med escrow
           </DialogTitle>
           <DialogDescription>
-            Vi holder depøsittet, indtil eventet er bekræftet. Efter eventet frigives restbeløbet
+            Vi holder depositummet, indtil eventet er bekræftet. Efter eventet frigives restbeløbet
             til DJ'en. Du kan stadig skrive til dem på platformen når som helst.
           </DialogDescription>
         </DialogHeader>
@@ -289,7 +289,7 @@ export function EscrowBookingDialog({
               <span className="font-semibold">{price} kr</span>
             </div>
             <div className="mt-1 flex items-center justify-between">
-              <span className="text-muted-foreground">Depøsitum i dag (30%)</span>
+              <span className="text-muted-foreground">Depositum i dag (30%)</span>
               <span className="font-semibold text-rose-700">
                 {deposit.toLocaleString("da-DK")} kr
               </span>
@@ -320,7 +320,7 @@ export function EscrowBookingDialog({
             Annullér
           </Button>
           <Button onClick={handleConfirm}>
-            Betal {deposit.toLocaleString("da-DK")} kr depøsitum
+            Betal {deposit.toLocaleString("da-DK")} kr depositum
           </Button>
         </DialogFooter>
       </DialogContent>
