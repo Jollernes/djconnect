@@ -8,7 +8,7 @@ import { EyeOff } from "lucide-react";
 export function AdminReviewsPage() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Reviews moderation</h1>
+      <h1 className="text-2xl font-semibold">Moderation af anmeldelser</h1>
       <div className="space-y-3">
         {mockReviews.map((r) => {
           const dj = mockDJs.find((d) => d.id === r.dj_profile_id);
@@ -23,7 +23,7 @@ export function AdminReviewsPage() {
                   </div>
                   <p className="mt-2 text-sm">{r.body}</p>
                 </div>
-                <Button variant="outline" size="sm"><EyeOff className="h-4 w-4" /> Hide</Button>
+                <Button variant="outline" size="sm"><EyeOff className="h-4 w-4" /> Skjul</Button>
               </CardContent>
             </Card>
           );

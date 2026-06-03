@@ -27,16 +27,16 @@ export function AdminUsersPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Users</h1>
+      <h1 className="text-2xl font-semibold">Brugere</h1>
       <div className="flex flex-col gap-2 sm:flex-row">
-        <Input placeholder="Search by name or email" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <Input placeholder="Søg efter navn eller e-mail" value={query} onChange={(e) => setQuery(e.target.value)} />
         <Select value={roleFilter} onValueChange={setRoleFilter}>
           <SelectTrigger className="sm:w-40"><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All roles</SelectItem>
-            <SelectItem value="customer">Customers</SelectItem>
+            <SelectItem value="all">Alle roller</SelectItem>
+            <SelectItem value="customer">Kunder</SelectItem>
             <SelectItem value="dj">DJs</SelectItem>
-            <SelectItem value="admin">Admins</SelectItem>
+            <SelectItem value="admin">Administratorer</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -45,10 +45,10 @@ export function AdminUsersPage() {
           <table className="w-full text-sm">
             <thead className="bg-muted/50">
               <tr className="text-left">
-                <th className="p-3 font-medium">Name</th>
-                <th className="p-3 font-medium">Email</th>
-                <th className="p-3 font-medium">Role</th>
-                <th className="p-3 font-medium">Joined</th>
+                <th className="p-3 font-medium">Navn</th>
+                <th className="p-3 font-medium">E-mail</th>
+                <th className="p-3 font-medium">Rolle</th>
+                <th className="p-3 font-medium">Tilmeldt</th>
                 <th className="p-3" />
               </tr>
             </thead>
@@ -61,7 +61,7 @@ export function AdminUsersPage() {
                     <Badge variant={u.role === "dj" ? "accent" : u.role === "admin" ? "destructive" : "secondary"}>{u.role}</Badge>
                   </td>
                   <td className="p-3 text-muted-foreground">{formatDate(u.created_at)}</td>
-                  <td className="p-3 text-right"><Button variant="ghost" size="sm">Manage</Button></td>
+                  <td className="p-3 text-right"><Button variant="ghost" size="sm">Administrer</Button></td>
                 </tr>
               ))}
             </tbody>

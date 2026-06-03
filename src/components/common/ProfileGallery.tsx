@@ -110,7 +110,7 @@ export function ProfileGallery({ images, className }: Props) {
           className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-foreground shadow-lg ring-1 ring-black/5 transition hover:bg-white/95 hover:shadow-xl"
         >
           <Grid2X2 className="h-4 w-4" />
-          Show all {images.length} photos
+          Se alle {images.length} billeder
         </button>
       )}
 
@@ -160,7 +160,7 @@ export function ProfileGallery({ images, className }: Props) {
       <Dialog open={allOpen} onOpenChange={setAllOpen}>
         <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto p-0 sm:rounded-3xl">
           <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4">
-            <h3 className="text-base font-semibold">All photos</h3>
+            <h3 className="text-base font-semibold">Alle billeder</h3>
             <button
               type="button"
               onClick={() => setAllOpen(false)}

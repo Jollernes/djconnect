@@ -74,8 +74,8 @@ export function BookingRequestPage() {
     return { price, fee, total, payout };
   }, [dj]);
 
-  if (loading) return <div className="container py-12">Loading…</div>;
-  if (!dj) return <div className="container py-12">DJ not found.</div>;
+  if (loading) return <div className="container py-12">Indlæser…</div>;
+  if (!dj) return <div className="container py-12">DJ ikke fundet.</div>;
 
   async function handleContinueFromDetails() {
     const ok = await form.trigger();
@@ -125,10 +125,10 @@ export function BookingRequestPage() {
       // Tiny delay so the button shows its loading state and feels deliberate.
       await new Promise((r) => setTimeout(r, 400));
       setSubmittedRef(id);
-      toast.success(`Booking request sent to ${dj.stage_name}`);
+      toast.success(`Bookingforespørgsel sendt til ${dj.stage_name}`);
       setStep(2);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not send request");
+      toast.error(err instanceof Error ? err.message : "Kunne ikke sende forespørgsel");
     } finally {
       setSubmitting(false);
     }
@@ -138,7 +138,7 @@ export function BookingRequestPage() {
     <div className="container max-w-3xl py-8">
       {step < 2 && (
         <Button variant="ghost" onClick={() => (step > 0 ? setStep(step - 1) : navigate(-1))} className="mb-4">
-          <ChevronLeft className="h-4 w-4" /> Back
+          <ChevronLeft className="h-4 w-4" /> Tilbage
         </Button>
       )}
 
@@ -146,7 +146,7 @@ export function BookingRequestPage() {
         <img src={dj.equipment_photos[0]?.url ?? dj.profile.avatar_url ?? ""} alt="" className="h-14 w-14 rounded-md object-cover" />
         <div>
           <h1 className="text-2xl font-semibold">Book {dj.stage_name}</h1>
-          <p className="text-sm text-muted-foreground">{dj.base_location} · Travels up to {dj.travel_radius_km}km</p>
+          <p className="text-sm text-muted-foreground">{dj.base_location} · Rejser op til {dj.travel_radius_km}km</p>
         </div>
       </div>
 
@@ -155,10 +155,10 @@ export function BookingRequestPage() {
       {step === 0 && (
         <Card>
           <CardContent className="space-y-4 p-6">
-            <h2 className="text-lg font-semibold">Step 1 · Event details</h2>
+            <h2 className="text-lg font-semibold">Trin 1 · Eventdetaljer</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label>Event type</Label>
+                <Label>Eventtype</Label>
                 <div
                   className={cn(
                     "mt-1 flex items-center justify-between gap-3 rounded-md border bg-muted/30 px-3 py-2.5",
@@ -178,13 +178,13 @@ export function BookingRequestPage() {
                         </span>
                         <div className="min-w-0">
                           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                            Booking for
+                            Booking til
                           </div>
                           <div className="truncate text-sm font-semibold">{selectedOption.label}</div>
                         </div>
                       </>
                     ) : (
-                      <span className="text-sm text-muted-foreground">No event selected yet</span>
+                      <span className="text-sm text-muted-foreground">Intet event valgt endnu</span>
                     )}
                   </div>
                   <Button
@@ -195,45 +195,45 @@ export function BookingRequestPage() {
                     className="rounded-full"
                   >
                     <Pencil className="h-3.5 w-3.5" />
-                    {selectedOption ? "Change" : "Choose event"}
+                    {selectedOption ? "Ændr" : "Vælg event"}
                   </Button>
                 </div>
                 {form.formState.errors.eventTypeId && <p className="mt-1 text-xs text-destructive">{form.formState.errors.eventTypeId.message}</p>}
                 <p className="mt-1.5 text-xs text-muted-foreground">
-                  Set on the homepage. Switching events may change the DJ's pricing or what they bring.
+                  Angivet på forsiden. At skifte event kan ændre DJ'ens pris eller hvad de medbringer.
                 </p>
               </div>
               <div>
-                <Label htmlFor="eventDate">Event date</Label>
+                <Label htmlFor="eventDate">Eventdato</Label>
                 <Input id="eventDate" type="date" {...form.register("eventDate")} />
               </div>
               <div>
-                <Label htmlFor="startTime">Start time</Label>
+                <Label htmlFor="startTime">Starttidspunkt</Label>
                 <Input id="startTime" type="time" {...form.register("startTime")} />
               </div>
               <div>
-                <Label htmlFor="endTime">Estimated end time</Label>
+                <Label htmlFor="endTime">Forventet sluttidspunkt</Label>
                 <Input id="endTime" type="time" {...form.register("endTime")} />
               </div>
               <div>
-                <Label htmlFor="estimatedGuests">Estimated guests</Label>
+                <Label htmlFor="estimatedGuests">Forventet antal gæster</Label>
                 <Input id="estimatedGuests" type="number" min={1} {...form.register("estimatedGuests", { valueAsNumber: true })} />
               </div>
               <div className="sm:col-span-2">
-                <Label htmlFor="venueName">Venue name</Label>
+                <Label htmlFor="venueName">Lokationens navn</Label>
                 <Input id="venueName" {...form.register("venueName")} />
               </div>
               <div className="sm:col-span-2">
-                <Label htmlFor="venueAddress">Venue address</Label>
+                <Label htmlFor="venueAddress">Lokationens adresse</Label>
                 <Input id="venueAddress" {...form.register("venueAddress")} />
               </div>
               <div className="sm:col-span-2">
-                <Label htmlFor="notes">Special requests / notes (optional)</Label>
+                <Label htmlFor="notes">Særlige ønsker / noter (valgfrit)</Label>
                 <Textarea id="notes" rows={3} {...form.register("notes")} />
               </div>
             </div>
             <Button onClick={handleContinueFromDetails} variant="accent" className="w-full">
-              Continue <ChevronRight className="h-4 w-4" />
+              Fortsæt <ChevronRight className="h-4 w-4" />
             </Button>
           </CardContent>
         </Card>
@@ -242,42 +242,42 @@ export function BookingRequestPage() {
       {step === 1 && (
         <Card>
           <CardContent className="space-y-5 p-6">
-            <h2 className="text-lg font-semibold">Step 2 · Review and send request</h2>
+            <h2 className="text-lg font-semibold">Trin 2 · Gennemse og send forespørgsel</h2>
             <ReviewRow label="DJ" value={dj.stage_name} />
-            <ReviewRow label="Event type" value={EVENT_TYPES.find((e) => e.id === form.getValues("eventTypeId"))?.label ?? ""} />
-            <ReviewRow label="Event date" value={formatDate(form.getValues("eventDate"))} />
+            <ReviewRow label="Eventtype" value={EVENT_TYPES.find((e) => e.id === form.getValues("eventTypeId"))?.label ?? ""} />
+            <ReviewRow label="Eventdato" value={formatDate(form.getValues("eventDate"))} />
             <ReviewRow
-              label="Time"
+              label="Tidspunkt"
               value={`${form.getValues("startTime")}${form.getValues("endTime") ? ` – ${form.getValues("endTime")}` : ""}`}
             />
-            <ReviewRow label="Venue" value={`${form.getValues("venueName")} · ${form.getValues("venueAddress")}`} />
-            {form.getValues("estimatedGuests") && <ReviewRow label="Estimated guests" value={String(form.getValues("estimatedGuests"))} />}
-            {form.getValues("notes") && <ReviewRow label="Notes" value={form.getValues("notes") ?? ""} />}
+            <ReviewRow label="Lokation" value={`${form.getValues("venueName")} · ${form.getValues("venueAddress")}`} />
+            {form.getValues("estimatedGuests") && <ReviewRow label="Forventet antal gæster" value={String(form.getValues("estimatedGuests"))} />}
+            {form.getValues("notes") && <ReviewRow label="Noter" value={form.getValues("notes") ?? ""} />}
 
             <Separator />
 
             {dj.price_on_request ? (
               <div className="rounded-md bg-muted/40 p-4 text-sm">
-                <Badge variant="warning" className="mb-2">Price on request</Badge>
+                <Badge variant="warning" className="mb-2">Pris efter forespørgsel</Badge>
                 <p>
-                  You won't be charged yet. Your request will go to {dj.stage_name}, who will reply with a quote. Once you accept, you'll be asked to pay the deposit into escrow.
+                  Du bliver ikke opkrævet endnu. Din forespørgsel sendes til {dj.stage_name}, som svarer med et tilbud. Når du accepterer, bliver du bedt om at betale depositum til escrow.
                 </p>
               </div>
             ) : totals ? (
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">DJ price</span><span>{formatCurrency(totals.price, dj.currency)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Platform service fee ({PLATFORM_FEE_PERCENT}%)</span><span>{formatCurrency(totals.fee, dj.currency)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">DJ-pris</span><span>{formatCurrency(totals.price, dj.currency)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Platformsgebyr ({PLATFORM_FEE_PERCENT}%)</span><span>{formatCurrency(totals.fee, dj.currency)}</span></div>
                 <Separator />
-                <div className="flex justify-between text-base font-semibold"><span>Estimated total</span><span>{formatCurrency(totals.total, dj.currency)}</span></div>
+                <div className="flex justify-between text-base font-semibold"><span>Forventet total</span><span>{formatCurrency(totals.total, dj.currency)}</span></div>
                 <p className="text-xs text-muted-foreground">
-                  <strong className="font-semibold text-foreground">You won't be charged yet.</strong>{" "}
-                  We'll only ask for the deposit once {dj.stage_name} confirms availability. Funds are then held securely in escrow and released to the DJ 24 hours after the event.
+                  <strong className="font-semibold text-foreground">Du bliver ikke opkrævet endnu.</strong>{" "}
+                  Vi beder først om depositum, når {dj.stage_name} bekræfter tilgængelighed. Beløbet holdes derefter sikkert i escrow og udbetales til DJ'en 24 timer efter eventet.
                 </p>
               </div>
             ) : null}
 
             <div className="rounded-md border p-3 text-xs">
-              <div className="font-medium">Cancellation policy</div>
+              <div className="font-medium">Afbestillingspolitik</div>
               <ul className="mt-1 space-y-0.5 text-muted-foreground">
                 {CANCELLATION_POLICY.map((c) => <li key={c.label}>• {c.label}</li>)}
               </ul>
@@ -285,10 +285,10 @@ export function BookingRequestPage() {
 
             <Button variant="accent" className="w-full" onClick={handleSendRequest} disabled={submitting}>
               <Send className="h-4 w-4" />
-              {submitting ? "Sending request…" : "Send booking request"}
+              {submitting ? "Sender forespørgsel…" : "Send bookingforespørgsel"}
             </Button>
             <p className="text-center text-xs text-muted-foreground">
-              No payment now. {dj.stage_name} typically responds within a few hours.
+              Ingen betaling nu. {dj.stage_name} svarer typisk inden for få timer.
             </p>
           </CardContent>
         </Card>
@@ -302,8 +302,8 @@ export function BookingRequestPage() {
           form.setValue("eventTypeId", id, { shouldValidate: true });
           setEventType(id);
         }}
-        title="Change the event you're booking"
-        description="Switching events may change the DJ's pricing or what they bring."
+        title="Ændr det event, du booker til"
+        description="At skifte event kan ændre DJ'ens pris eller hvad de medbringer."
       />
 
       {step === 2 && (
@@ -312,9 +312,9 @@ export function BookingRequestPage() {
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success/20 text-success">
               <CheckCircle2 className="h-6 w-6" />
             </div>
-            <h2 className="text-xl font-semibold">Request sent to {dj.stage_name}</h2>
+            <h2 className="text-xl font-semibold">Forespørgsel sendt til {dj.stage_name}</h2>
             <p className="max-w-md text-sm text-muted-foreground">
-              {dj.stage_name} will review your event details and respond shortly. As soon as they accept, we'll email you a payment link to hold the date with a deposit in escrow.
+              {dj.stage_name} gennemgår dine eventdetaljer og svarer hurtigst muligt. Så snart de accepterer, sender vi dig et betalingslink på e-mail, så du kan reservere datoen med et depositum i escrow.
             </p>
             <div className="rounded-md bg-muted/40 px-4 py-2 text-sm">
               Reference: <span className="font-mono font-semibold">{submittedRef ?? "—"}</span>
@@ -322,11 +322,11 @@ export function BookingRequestPage() {
             <div className="flex flex-wrap justify-center gap-2">
               {profile?.role === "customer" && (
                 <Button asChild variant="outline">
-                  <a href="/dashboard/requests">View my requests</a>
+                  <a href="/dashboard/requests">Se mine forespørgsler</a>
                 </Button>
               )}
               <Button asChild variant="accent">
-                <a href="/search">Browse more DJs</a>
+                <a href="/search">Find flere DJs</a>
               </Button>
             </div>
           </CardContent>
