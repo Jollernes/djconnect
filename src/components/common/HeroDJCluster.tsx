@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { MapPin, Shield, Star } from "lucide-react";
+import { MapPin, Shield } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { StarRating } from "./StarRating";
@@ -130,17 +130,6 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
 
   return (
     <div className={cn("relative mx-auto aspect-square w-full max-w-md", className)}>
-      {/* Floating social-proof chip */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.6, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="pointer-events-none absolute left-2 top-0 z-40 flex items-center gap-1.5 rounded-full bg-background/95 px-3 py-1.5 text-xs font-semibold text-foreground shadow-xl ring-1 ring-black/5 backdrop-blur"
-      >
-        <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-        Verificerede DJs · elsket af kunderne
-      </motion.div>
-
       {cards.map((dj, i) => {
         const slot = (i - active + n) % n;
         const pos = SLOTS[slot] ?? SLOTS[SLOTS.length - 1];
