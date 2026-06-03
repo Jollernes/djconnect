@@ -8,6 +8,7 @@ import { ViewportPreview } from "@/components/dev/ViewportPreview";
 import { RoleSwitcher } from "@/components/dev/RoleSwitcher";
 
 import { HomePage } from "@/pages/public/HomePage";
+import { FrontPageMockups } from "@/pages/public/FrontPageMockups";
 import { SearchPage } from "@/pages/public/SearchPage";
 import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
 import { StackedWeddingDJsPage } from "@/pages/public/StackedWeddingDJsPage";
@@ -74,6 +75,7 @@ function App() {
         <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/forside-mockups" element={<FrontPageMockups />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/wedding-djs" element={<WeddingDJsPage />} />
             <Route path="/wedding-djs-stacked-a" element={<StackedWeddingDJsPage variant="a" />} />

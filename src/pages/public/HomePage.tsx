@@ -291,7 +291,7 @@ const EVENT_TYPE_OPTIONS: EventTypeOption[] = [
   { id: "other", label: "Andet", Icon: Sparkles, tint: "from-pink-500/15 to-pink-500/5 text-pink-600", description: "Alt muligt andet" },
 ];
 
-function EventTypePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+export function EventTypePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const selected = EVENT_TYPE_OPTIONS.find((o) => o.id === value);
