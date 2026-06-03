@@ -4,14 +4,13 @@ import { Star } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
-import { eventCountValue } from "@/components/event-djs/stacked/eventCountLabel";
 
 /**
  * Hero social-proof element: a smaller rotating video card with a stacked deck
- * of DJ cards fanned behind it, and one unified info bar docked underneath.
- * The main card autoplays a short muted clip and, when it ends, advances to the
- * next clip/event-type caption — cycling and looping. The deck and the info bar
- * follow the rotation so they always reflect the currently featured DJ.
+ * of DJ cards fanned behind it, and a translucent info strip rendered inside the
+ * video card. The main card autoplays a short muted clip and, when it ends,
+ * advances to the next clip/event-type caption — cycling and looping. The deck
+ * and the info strip follow the rotation so they always reflect the featured DJ.
  */
 
 // Royalty-free clips (Mixkit free license), served from public/. Each clip
@@ -82,43 +81,37 @@ function Avatar({ dj, className }: { dj: DJProfileWithRelations; className?: str
   );
 }
 
-// --- Unified info bar ------------------------------------------------------
+// --- Translucent info strip (rendered inside the video card) ---------------
 
-function InfoBar({ dj }: { dj: DJProfileWithRelations }) {
+function InfoStrip({ dj }: { dj: DJProfileWithRelations }) {
   return (
-    <Link
-      to={`/djs/${dj.username}`}
-      className="block rounded-2xl bg-background/95 p-3 shadow-xl ring-1 ring-black/5 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
-    >
-      <div className="flex items-center gap-2.5">
-        <Avatar dj={dj} className="h-10 w-10 shrink-0" />
+    <div className="rounded-2xl bg-black/35 px-2.5 py-2 ring-1 ring-white/15 backdrop-blur-md">
+      <div className="flex items-center gap-2">
+        <Avatar dj={dj} className="h-8 w-8 shrink-0 ring-2 ring-white/30" />
         <div className="min-w-0 flex-1">
           <span className="flex items-center gap-1.5">
-            <span className="truncate text-sm font-semibold text-foreground">{dj.stage_name}</span>
-            <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" />
+            <span className="truncate text-xs font-semibold text-white">{dj.stage_name}</span>
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" />
           </span>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Star className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />
+          <span className="flex items-center gap-1 text-[10px] text-white/75">
+            <Star className="h-2.5 w-2.5 shrink-0 fill-amber-300 text-amber-300" />
             {dj.rating_average.toFixed(1)}
-            <span className="truncate">· {eventCountValue(dj.events_performed)} events · {dj.base_location}</span>
+            <span className="truncate">· {dj.base_location}</span>
           </span>
         </div>
-      </div>
-      <div className="mt-2.5 grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-muted/60 px-2.5 py-1.5">
-          <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Pris fra</span>
-          <span className="block text-sm font-bold text-foreground">{compactPrice(dj)}</span>
-        </div>
-        <div className="rounded-xl bg-muted/60 px-2.5 py-1.5">
-          <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Svartid</span>
-          <span className="block text-sm font-bold text-foreground">{responseTime(dj.id)}</span>
-        </div>
-        <div className="rounded-xl bg-emerald-500/15 px-2.5 py-1.5">
-          <span className="block text-[10px] font-semibold uppercase tracking-wide text-emerald-700/80">Ledig</span>
-          <span className="block truncate text-sm font-bold text-emerald-700">{availabilityDate(dj.id)}</span>
+        <div className="shrink-0 text-right">
+          <span className="block text-[9px] font-medium uppercase tracking-wide text-white/60">Fra</span>
+          <span className="block text-xs font-bold text-white">{compactPrice(dj)}</span>
         </div>
       </div>
-    </Link>
+      <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-medium">
+        <span className="rounded-md bg-white/15 px-1.5 py-0.5 text-white/90">Svar {responseTime(dj.id)}</span>
+        <span className="flex items-center gap-1 rounded-md bg-emerald-400/20 px-1.5 py-0.5 text-emerald-200">
+          <span className="h-1 w-1 rounded-full bg-emerald-300" />
+          Ledig {availabilityDate(dj.id)}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -238,25 +231,22 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
                   />
                 ))}
               </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={featured.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-3"
+                >
+                  <InfoStrip dj={featured} />
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
         </Link>
       </motion.div>
-      </div>
-
-      {/* Unified info bar docked under the video — updates with the rotation */}
-      <div className="relative z-20 mt-3">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={featured.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <InfoBar dj={featured} />
-          </motion.div>
-        </AnimatePresence>
       </div>
     </div>
   );
