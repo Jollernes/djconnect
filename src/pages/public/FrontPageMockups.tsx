@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Search, MapPin, Calendar as CalendarIcon, Shield, CalendarCheck2, Sparkles } from "lucide-react";
+import { Search, MapPin, Calendar as CalendarIcon, Shield, CalendarCheck2, Sparkles, Star, ArrowRight, BarChart3 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -301,12 +301,162 @@ function VariantE({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state
   );
 }
 
+/* --------------------------- Variant F: Lys split + flydende kort --------------------------- */
+
+function fCompactPrice(dj: DJProfileWithRelations): string {
+  if (dj.price_on_request || dj.price_from_minor == null) return "Forespørg";
+  const kr = Math.round(dj.price_from_minor / 100);
+  if (kr >= 1000) {
+    const k = kr / 1000;
+    return `${Number.isInteger(k) ? k : k.toFixed(1)}k kr.`;
+  }
+  return `${kr} kr.`;
+}
+
+function fHash(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function fResponseTime(id: string): string {
+  return ["~30 min", "~1 t", "~2 t", "~3 t"][fHash(id) % 4];
+}
+
+function fAvailability(id: string): string {
+  const d = new Date();
+  d.setDate(d.getDate() + ((fHash(id) % 28) + 5));
+  return new Intl.DateTimeFormat("da-DK", { day: "numeric", month: "long" }).format(d);
+}
+
+function FAvatar({ dj, className }: { dj: DJProfileWithRelations; className?: string }) {
+  const src = dj.profile.avatar_url ?? dj.equipment_photos[0]?.url ?? undefined;
+  return src ? (
+    <img src={src} alt={dj.stage_name} loading="lazy" className={cn("rounded-full object-cover", className)} />
+  ) : (
+    <span className={cn("flex items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground", className)}>
+      {dj.stage_name.charAt(0)}
+    </span>
+  );
+}
+
+function VariantF({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state: SearchState }) {
+  const navigate = useNavigate();
+  const cardTop = heroDJs[1] ?? heroDJs[0];
+  const cardBottom = heroDJs[2] ?? heroDJs[0];
+  const avatars = heroDJs.slice(0, 4);
+
+  return (
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fafc_0%,#f1f5f9_100%)] py-16 text-foreground">
+      <div aria-hidden className="pointer-events-none absolute -right-32 top-0 h-[28rem] w-[28rem] rounded-full bg-accent/5 blur-3xl" />
+      <div className="container relative">
+        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* Left column */}
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 shadow-sm ring-1 ring-slate-200">
+              <div className="flex -space-x-2">
+                {avatars.map((dj) => (
+                  <FAvatar key={dj.id} dj={dj} className="h-6 w-6 ring-2 ring-white" />
+                ))}
+              </div>
+              <span className="text-xs font-medium text-slate-600">Brugt af 240+ par &amp; firmaer i 2026</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            </div>
+
+            <h1 className="mt-6 text-5xl font-bold leading-[1.02] tracking-tight text-slate-900 sm:text-6xl">
+              {HEADLINE_LEAD}
+              <br />
+              <span className="text-accent">{HEADLINE_HIGHLIGHT}</span>
+            </h1>
+            <p className="mt-5 max-w-md text-lg text-slate-600">{SUBTITLE}</p>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Button variant="accent" size="lg" className="glow-accent" onClick={() => navigate("/get-offers")}>
+                Få 3 tilbud på 24 timer <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="lg" className="bg-white" onClick={() => navigate("/wedding-djs")}>
+                <BarChart3 className="h-4 w-4" /> Browse alle DJs
+              </Button>
+            </div>
+
+            <TrustBadges tone="dark" className="mt-7" />
+          </motion.div>
+
+          {/* Right column: video + floating cards */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+            className="relative mx-auto w-full max-w-[340px]"
+          >
+            <HeroDJCluster djs={heroDJs} />
+
+            {/* Floating card — top left */}
+            <div className="absolute -left-6 top-6 z-20 w-52 rounded-2xl bg-white/95 p-3 shadow-xl ring-1 ring-slate-200 backdrop-blur sm:-left-12">
+              <div className="flex items-center gap-2.5">
+                <FAvatar dj={cardTop} className="h-9 w-9" />
+                <div className="min-w-0">
+                  <span className="flex items-center gap-1.5">
+                    <span className="truncate text-sm font-semibold text-slate-900">{cardTop.stage_name}</span>
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-slate-500">
+                    {cardTop.base_location}
+                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                    {cardTop.rating_average.toFixed(1)}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-2.5 grid grid-cols-2 gap-2">
+                <div className="rounded-lg bg-slate-100 px-2 py-1.5">
+                  <span className="block text-[9px] font-semibold uppercase tracking-wide text-slate-400">Fra</span>
+                  <span className="block text-sm font-bold text-slate-900">{fCompactPrice(cardTop)}</span>
+                </div>
+                <div className="rounded-lg bg-slate-100 px-2 py-1.5">
+                  <span className="block text-[9px] font-semibold uppercase tracking-wide text-slate-400">Svar</span>
+                  <span className="block text-sm font-bold text-slate-900">{fResponseTime(cardTop.id)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating card — bottom right */}
+            <div className="absolute -right-4 bottom-8 z-20 w-56 rounded-2xl bg-white/95 p-3 shadow-xl ring-1 ring-slate-200 backdrop-blur sm:-right-10">
+              <div className="flex items-center gap-2.5">
+                <FAvatar dj={cardBottom} className="h-9 w-9" />
+                <div className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-slate-900">{cardBottom.stage_name}</span>
+                  <span className="block truncate text-xs text-slate-500">
+                    {cardBottom.base_location} · {cardBottom.events_performed} events
+                  </span>
+                </div>
+              </div>
+              <div className="mt-2.5 flex items-center justify-between rounded-lg bg-slate-100 px-2.5 py-1.5">
+                <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">Status</span>
+                <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  Ledig {fAvailability(cardBottom.id)}
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Full-width search bar */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="mt-12">
+          <SearchForm state={state} className="border border-slate-200 ring-slate-200/60" />
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 const VARIANTS = [
   { id: "a", label: "A · Centreret spotlight" },
   { id: "b", label: "B · Split / video venstre" },
   { id: "c", label: "C · Søg-først solnedgang" },
   { id: "d", label: "D · Lys split" },
   { id: "e", label: "E · Blød off-white" },
+  { id: "f", label: "F · Lys split + flydende kort" },
 ] as const;
 
 type VariantId = (typeof VARIANTS)[number]["id"];
@@ -378,6 +528,7 @@ export function FrontPageMockups() {
       {variant === "c" && <VariantC heroDJs={heroDJs} state={state} />}
       {variant === "d" && <VariantD heroDJs={heroDJs} state={state} />}
       {variant === "e" && <VariantE heroDJs={heroDJs} state={state} />}
+      {variant === "f" && <VariantF heroDJs={heroDJs} state={state} />}
     </div>
   );
 }
