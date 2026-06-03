@@ -197,14 +197,14 @@ export function GuidedSectionsMockup() {
         <div className="flex items-center justify-between gap-2 border-b border-border/60 px-3 py-2">
           {previewOpen && (
             <p className="flex-1 truncate text-xs font-semibold">
-              Live preview · {meta.tabLabel}
+              Live forhåndsvisning · {meta.tabLabel}
             </p>
           )}
           <button
             type="button"
             onClick={() => setPreviewOpen((p) => !p)}
             className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
-            aria-label={previewOpen ? "Skjul preview" : "Vis preview"}
+            aria-label={previewOpen ? "Skjul forhåndsvisning" : "Vis forhåndsvisning"}
           >
             {previewOpen ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
           </button>
@@ -445,10 +445,7 @@ function GuidedHeader({
   return (
     <div className="flex flex-wrap items-end justify-between gap-3">
       <div className="space-y-0.5">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Mockup 2
-        </p>
-        <h1 className="text-2xl font-semibold">Guided Sections</h1>
+        <h1 className="text-2xl font-semibold">Rediger profil</h1>
         <p className="text-sm text-muted-foreground">
           Arbejd dig igennem hver sektion én efter én. Pinbar preview til højre.
         </p>

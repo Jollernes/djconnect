@@ -21,16 +21,16 @@ export function SubProfileTextFields({
   return (
     <div className={compact ? "space-y-3" : "space-y-4"}>
       <div>
-        <Label htmlFor={`tagline-${eventLabel}`}>Tagline</Label>
+        <Label htmlFor={`tagline-${eventLabel}`}>Slogan</Label>
         <Input
           id={`tagline-${eventLabel}`}
           maxLength={80}
-          placeholder={`e.g. "${eventLabel} DJ — modern, warm, dancefloor-first"`}
+          placeholder={`f.eks. "${eventLabel}-DJ — moderne, varm, dansegulvet i fokus"`}
           value={value.tagline}
           onChange={(e) => onChange("tagline", e.target.value)}
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          {value.tagline.length}/80 — shown right under your name.
+          {value.tagline.length}/80 — vises lige under dit navn.
         </p>
       </div>
 
@@ -39,30 +39,30 @@ export function SubProfileTextFields({
         <Textarea
           id={`bio-${eventLabel}`}
           rows={compact ? 3 : 5}
-          placeholder={`Tell customers what makes you the right ${eventLabel.toLowerCase()} DJ. Cover your style, experience, and what you do during the event.`}
+          placeholder={`Fortæl kunderne, hvad der gør dig til den rette ${eventLabel.toLowerCase()}-DJ. Beskriv din stil, erfaring, og hvad du gør under eventet.`}
           value={value.bio}
           onChange={(e) => onChange("bio", e.target.value)}
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          {value.bio.length} characters {value.bio.length < 80 ? `(${80 - value.bio.length} more needed)` : "✓"}
+          {value.bio.length} tegn {value.bio.length < 80 ? `(${80 - value.bio.length} mere nødvendige)` : "✓"}
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor={`musicStyle-${eventLabel}`}>Music style</Label>
+          <Label htmlFor={`musicStyle-${eventLabel}`}>Musikstil</Label>
           <Input
             id={`musicStyle-${eventLabel}`}
-            placeholder="e.g. House, disco, funk — high-energy peaks"
+            placeholder="f.eks. House, disco, funk — høj energi i toppene"
             value={value.musicStyle}
             onChange={(e) => onChange("musicStyle", e.target.value)}
           />
         </div>
         <div>
-          <Label htmlFor={`signature-${eventLabel}`}>Signature tracks</Label>
+          <Label htmlFor={`signature-${eventLabel}`}>Signatur-numre</Label>
           <Input
             id={`signature-${eventLabel}`}
-            placeholder="3–5 tracks customers might recognise"
+            placeholder="3–5 numre, kunder måske genkender"
             value={value.signatureTracks}
             onChange={(e) => onChange("signatureTracks", e.target.value)}
           />
@@ -70,23 +70,23 @@ export function SubProfileTextFields({
       </div>
 
       <div>
-        <Label htmlFor={`approach-${eventLabel}`}>Your approach</Label>
+        <Label htmlFor={`approach-${eventLabel}`}>Din tilgang</Label>
         <Textarea
           id={`approach-${eventLabel}`}
           rows={compact ? 2 : 3}
-          placeholder={`How do you run a ${eventLabel.toLowerCase()}? E.g. when you arrive, how you handle requests, what the typical flow looks like.`}
+          placeholder={`Hvordan afvikler du et ${eventLabel.toLowerCase()}? F.eks. hvornår du ankommer, hvordan du håndterer ønsker, og hvordan det typiske flow ser ud.`}
           value={value.approach}
           onChange={(e) => onChange("approach", e.target.value)}
         />
       </div>
 
       <div>
-        <Label htmlFor={`price-${eventLabel}`}>Starting price for this event type (DKK)</Label>
+        <Label htmlFor={`price-${eventLabel}`}>Startpris for denne eventtype (kr.)</Label>
         <Input
           id={`price-${eventLabel}`}
           type="number"
           min={0}
-          placeholder="Optional — leave at 0 to use your default"
+          placeholder="Valgfrit — lad stå på 0 for at bruge din standard"
           value={value.priceFromMajor || ""}
           onChange={(e) => onChange("priceFromMajor", Number(e.target.value) || 0)}
         />

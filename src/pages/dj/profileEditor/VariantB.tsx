@@ -37,13 +37,13 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold">Edit your profile</h1>
+          <h1 className="text-2xl font-semibold">Rediger din profil</h1>
           <p className="text-sm text-muted-foreground">
-            Pick an event type below — the right-hand panel previews how customers see you for that search.
+            Vælg en eventtype nedenfor — panelet til højre viser, hvordan kunder ser dig for den søgning.
           </p>
         </div>
         <div className="text-right text-sm">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Sub-profiles complete</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Underprofiler færdige</p>
           <p className="text-base font-semibold tabular-nums">
             {completedCount} / {SUB_PROFILE_KEYS.length} <span className="text-muted-foreground">· {completionPct}%</span>
           </p>
@@ -99,7 +99,7 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
                   <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                     {meta.eyebrow}
                   </p>
-                  <h2 className="mt-1 text-lg font-semibold">{meta.label} profile</h2>
+                  <h2 className="mt-1 text-lg font-semibold">{meta.label}-profil</h2>
                   <p className="mt-2 text-sm text-muted-foreground">{meta.helper}</p>
                 </div>
                 <span className="rounded-full bg-background px-2.5 py-1 text-xs font-semibold tabular-nums">
@@ -110,7 +110,7 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
 
             <div className="space-y-2">
               <p className="flex items-center gap-1.5 text-sm font-semibold">
-                <Sparkles className="h-3.5 w-3.5" /> Featured photo
+                <Sparkles className="h-3.5 w-3.5" /> Fremhævet billede
               </p>
               <FeaturedPhotoSlot
                 value={sub.featuredPhotoDataUrl}
@@ -121,7 +121,7 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-semibold">Gallery — photos & videos</p>
+              <p className="text-sm font-semibold">Galleri — fotos & videoer</p>
               <GalleryRow
                 items={sub.gallery}
                 onAppend={(items) => appendGalleryItems(activeKey, items)}
@@ -140,18 +140,18 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
               <p className="text-xs text-muted-foreground">
                 {c.complete ? (
                   <span className="inline-flex items-center gap-1.5 font-medium text-emerald-700">
-                    <Check className="h-3.5 w-3.5" /> Ready to save
+                    <Check className="h-3.5 w-3.5" /> Klar til at gemme
                   </span>
                 ) : !c.textComplete ? (
-                  <span>Tagline + bio (80+) + music style + signature + approach required.</span>
+                  <span>Slogan + bio (80+) + musikstil + signatur + tilgang påkrævet.</span>
                 ) : !c.mediaComplete ? (
-                  <span>Add a featured photo and at least 3 gallery items.</span>
+                  <span>Tilføj et fremhævet billede og mindst 3 gallerielementer.</span>
                 ) : (
-                  <span>All set — save to lock it in.</span>
+                  <span>Alt er klar — gem for at låse det fast.</span>
                 )}
               </p>
               <Button onClick={() => handleSaveSubProfile(activeKey)} className="gap-1.5">
-                Save & continue
+                Gem & fortsæt
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
@@ -168,7 +168,7 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
 
       <div className="flex flex-wrap items-center gap-2">
         <Button onClick={handleSaveAll} disabled={!allComplete && completedCount === 0}>
-          Save all changes
+          Gem alle ændringer
         </Button>
         <a
           href={`/djs/${seed.username}`}
@@ -176,7 +176,7 @@ export function VariantB({ state }: { state: DJProfileEditorState }) {
           rel="noreferrer"
           className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          Open full public profile in new tab
+          Åbn fuld offentlig profil i ny fane
         </a>
       </div>
     </div>
@@ -217,18 +217,18 @@ export function CustomerCardPreview({
           <img src={featuredPhoto} alt={stageName} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
-            Featured photo placeholder
+            Pladsholder for fremhævet billede
           </div>
         )}
         <Badge variant="success" className="absolute right-3 top-3 gap-1">
-          <Shield className="h-3 w-3" /> Verified
+          <Shield className="h-3 w-3" /> Verificeret
         </Badge>
       </div>
       <div className="space-y-2 p-4">
         <div>
           <h3 className="line-clamp-1 text-base font-semibold">{stageName}</h3>
           <p className="line-clamp-1 text-sm text-muted-foreground">
-            {tagline || `Your ${eventLabel.toLowerCase()} tagline appears here`}
+            {tagline || `Dit ${eventLabel.toLowerCase()}-slogan vises her`}
           </p>
         </div>
         <div className="flex items-center gap-1.5 text-xs">
@@ -245,9 +245,9 @@ export function CustomerCardPreview({
           </span>
           <span className="font-semibold">
             {priceOnRequest
-              ? "Price on request"
+              ? "Pris på forespørgsel"
               : priceFromMajor
-              ? `From ${formatCurrency(priceFromMajor * 100, currency)}`
+              ? `Fra ${formatCurrency(priceFromMajor * 100, currency)}`
               : "—"}
           </span>
         </div>
@@ -270,7 +270,7 @@ export function CustomerProfilePreview({
   return (
     <div className="space-y-3 rounded-2xl border bg-card p-4">
       <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-        Public profile preview
+        Forhåndsvisning af offentlig profil
       </p>
       <div className="flex items-start gap-3">
         {profilePhoto ? (
@@ -285,7 +285,7 @@ export function CustomerProfilePreview({
         <div className="min-w-0">
           <h3 className="truncate text-base font-semibold">{stageName}</h3>
           <p className="line-clamp-2 text-xs text-muted-foreground">
-            {sub.tagline || `${eventLabel} tagline shown here.`}
+            {sub.tagline || `${eventLabel}-slogan vises her.`}
           </p>
         </div>
       </div>
@@ -303,22 +303,22 @@ export function CustomerProfilePreview({
         </div>
       )}
       <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">About for {eventLabel.toLowerCase()}s</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Om til {eventLabel.toLowerCase()}</p>
         <p className="line-clamp-4 text-xs text-foreground/80">
-          {sub.bio || "Your event-specific bio shows up here. Customers see this when they search for this kind of event."}
+          {sub.bio || "Din event-specifikke bio vises her. Kunder ser dette, når de søger efter denne slags event."}
         </p>
       </div>
       {(sub.musicStyle || sub.signatureTracks) && (
         <div className="space-y-1 rounded-md bg-muted/40 p-2 text-xs">
           {sub.musicStyle && (
             <p>
-              <span className="font-semibold">Music style:</span>{" "}
+              <span className="font-semibold">Musikstil:</span>{" "}
               <span className="text-muted-foreground">{sub.musicStyle}</span>
             </p>
           )}
           {sub.signatureTracks && (
             <p>
-              <span className="font-semibold">Signature:</span>{" "}
+              <span className="font-semibold">Signatur:</span>{" "}
               <span className="text-muted-foreground">{sub.signatureTracks}</span>
             </p>
           )}

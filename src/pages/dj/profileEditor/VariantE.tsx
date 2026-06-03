@@ -109,13 +109,13 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold">Edit your profile</h1>
+          <h1 className="text-2xl font-semibold">Rediger din profil</h1>
           <p className="text-sm text-muted-foreground">
-            Pick an event type below — the right-hand panel previews how customers see you for that search.
+            Vælg en eventtype nedenfor — panelet til højre viser, hvordan kunder ser dig for den søgning.
           </p>
         </div>
         <div className="text-right text-sm">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Sub-profiles complete</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Underprofiler færdige</p>
           <p className="text-base font-semibold tabular-nums">
             {completedCount} / {SUB_PROFILE_KEYS.length}{" "}
             <span className="text-muted-foreground">· {completionPct}%</span>
@@ -139,14 +139,14 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
               </span>
               {celebrate === "all" ? (
                 <span>
-                  <span className="font-semibold">All four sub-profiles ready.</span>{" "}
-                  <span className="text-muted-foreground">You're now fully discoverable.</span>
+                  <span className="font-semibold">Alle fire underprofiler er klar.</span>{" "}
+                  <span className="text-muted-foreground">Du er nu fuldt synlig.</span>
                 </span>
               ) : (
                 <span>
-                  <span className="font-semibold">{SUB_PROFILE_META[celebrate].label} ready.</span>{" "}
+                  <span className="font-semibold">{SUB_PROFILE_META[celebrate].label} klar.</span>{" "}
                   <span className="text-muted-foreground">
-                    {completedCount} of {SUB_PROFILE_KEYS.length} done — keep going.
+                    {completedCount} af {SUB_PROFILE_KEYS.length} færdige — fortsæt.
                   </span>
                 </span>
               )}
@@ -155,7 +155,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
               type="button"
               onClick={() => setCelebrate(null)}
               className="grid h-6 w-6 place-items-center rounded-full text-muted-foreground hover:bg-emerald-100"
-              aria-label="Dismiss"
+              aria-label="Afvis"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -212,7 +212,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
                 {meta.eyebrow}
               </p>
               <div className="flex items-baseline justify-between gap-3">
-                <h2 className="text-lg font-semibold">{meta.label} profile</h2>
+                <h2 className="text-lg font-semibold">{meta.label}-profil</h2>
                 <span className="text-xs font-semibold tabular-nums text-muted-foreground">
                   {Math.round(c.ratio * 100)}%
                 </span>
@@ -233,7 +233,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
             <section ref={showRef} className="space-y-4 scroll-mt-24">
               <SectionHeader
                 icon={<Sparkles className="h-3.5 w-3.5" />}
-                label="Show your work"
+                label="Vis dit arbejde"
                 tip={PEER_BENCHMARKS[activeKey].show}
                 inheritEnabled={!isGeneral && generalHas.show}
                 onInherit={() => copyFromGeneral("show")}
@@ -260,7 +260,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
             <section ref={tellRef} className="space-y-4 scroll-mt-24">
               <SectionHeader
                 icon={<ImageIcon className="h-3.5 w-3.5" />}
-                label="Tell your story"
+                label="Fortæl din historie"
                 tip={PEER_BENCHMARKS[activeKey].tell}
                 inheritEnabled={!isGeneral && generalHas.tell}
                 onInherit={() => copyFromGeneral("tell")}
@@ -273,7 +273,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
             <section ref={vibeRef} className="space-y-4 scroll-mt-24">
               <SectionHeader
                 icon={<Wand2 className="h-3.5 w-3.5" />}
-                label="Set the vibe"
+                label="Sæt stemningen"
                 tip={PEER_BENCHMARKS[activeKey].vibe}
                 inheritEnabled={!isGeneral && generalHas.vibe}
                 onInherit={() => copyFromGeneral("vibe")}
@@ -288,18 +288,18 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
               <p className="text-xs text-muted-foreground">
                 {c.complete ? (
                   <span className="inline-flex items-center gap-1.5 font-medium text-emerald-700">
-                    <Check className="h-3.5 w-3.5" /> Ready to save
+                    <Check className="h-3.5 w-3.5" /> Klar til at gemme
                   </span>
                 ) : !c.textComplete ? (
-                  <span>Tagline + bio (80+) + music style + signature + approach required.</span>
+                  <span>Slogan + bio (80+) + musikstil + signatur + tilgang påkrævet.</span>
                 ) : !c.mediaComplete ? (
-                  <span>Add a featured photo and at least 3 gallery items.</span>
+                  <span>Tilføj et fremhævet billede og mindst 3 gallerielementer.</span>
                 ) : (
-                  <span>All set — save to lock it in.</span>
+                  <span>Alt er klar — gem for at låse det fast.</span>
                 )}
               </p>
               <Button onClick={() => handleSaveSubProfile(activeKey)} className="gap-1.5">
-                Save & continue
+                Gem & fortsæt
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </div>
@@ -316,7 +316,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
 
       <div className="flex flex-wrap items-center gap-3">
         <Button onClick={handleSaveAll} disabled={!allComplete && completedCount === 0}>
-          Save all changes
+          Gem alle ændringer
         </Button>
         <a
           href={`/djs/${seed.username}`}
@@ -324,7 +324,7 @@ export function VariantE({ state }: { state: DJProfileEditorState }) {
           rel="noreferrer"
           className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          Open full public profile in new tab
+          Åbn fuld offentlig profil i ny fane
         </a>
       </div>
     </div>
@@ -360,9 +360,9 @@ function SectionHeader({
             type="button"
             onClick={onInherit}
             className="text-[11px] font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-            title="Copy this section's values from your General profile"
+            title="Kopiér denne sektions værdier fra din Generel-profil"
           >
-            Copy from General
+            Kopiér fra Generel
           </button>
         )}
       </div>
@@ -383,9 +383,9 @@ function ChapterRibbon({
   onJump: (ch: "show" | "tell" | "vibe") => void;
 }) {
   const items: Array<{ key: "show" | "tell" | "vibe"; label: string }> = [
-    { key: "show", label: "Show" },
-    { key: "tell", label: "Tell" },
-    { key: "vibe", label: "Vibe" },
+    { key: "show", label: "Vis" },
+    { key: "tell", label: "Fortæl" },
+    { key: "vibe", label: "Stemning" },
   ];
   return (
     <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -433,19 +433,19 @@ function SubProfileTellFields({
     <div className="space-y-3">
       <div>
         <label htmlFor={`e-tagline-${subKey}`} className="text-sm font-medium">
-          Tagline
+          Slogan
         </label>
         <input
           id={`e-tagline-${subKey}`}
           type="text"
           maxLength={80}
-          placeholder={`e.g. "${meta.label} DJ — modern, warm, dancefloor-first"`}
+          placeholder={`f.eks. "${meta.label}-DJ — moderne, varm, dansegulvet i fokus"`}
           value={sub.tagline}
           onChange={(e) => updateSubProfile(subKey, "tagline", e.target.value)}
           className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          {sub.tagline.length}/80 — shown right under your name.
+          {sub.tagline.length}/80 — vises lige under dit navn.
         </p>
       </div>
       <div>
@@ -455,14 +455,14 @@ function SubProfileTellFields({
         <textarea
           id={`e-bio-${subKey}`}
           rows={4}
-          placeholder={`Tell customers what makes you the right ${meta.label.toLowerCase()} DJ. Cover your style, experience, and what you do during the event.`}
+          placeholder={`Fortæl kunderne, hvad der gør dig til den rette ${meta.label.toLowerCase()}-DJ. Beskriv din stil, erfaring, og hvad du gør under eventet.`}
           value={sub.bio}
           onChange={(e) => updateSubProfile(subKey, "bio", e.target.value)}
           className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          {sub.bio.length} characters{" "}
-          {sub.bio.length < 80 ? `(${80 - sub.bio.length} more needed)` : "✓"}
+          {sub.bio.length} tegn{" "}
+          {sub.bio.length < 80 ? `(${80 - sub.bio.length} mere nødvendige)` : "✓"}
         </p>
       </div>
     </div>
@@ -491,12 +491,12 @@ function SubProfileVibeFields({
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor={`e-music-${subKey}`} className="text-sm font-medium">
-            Music style
+            Musikstil
           </label>
           <input
             id={`e-music-${subKey}`}
             type="text"
-            placeholder="e.g. House, disco, funk — high-energy peaks"
+            placeholder="f.eks. House, disco, funk — høj energi i toppene"
             value={sub.musicStyle}
             onChange={(e) => updateSubProfile(subKey, "musicStyle", e.target.value)}
             className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -504,12 +504,12 @@ function SubProfileVibeFields({
         </div>
         <div>
           <label htmlFor={`e-sig-${subKey}`} className="text-sm font-medium">
-            Signature tracks
+            Signatur-numre
           </label>
           <input
             id={`e-sig-${subKey}`}
             type="text"
-            placeholder="3–5 tracks customers might recognise"
+            placeholder="3-5 numre, kunder måske genkender"
             value={sub.signatureTracks}
             onChange={(e) => updateSubProfile(subKey, "signatureTracks", e.target.value)}
             className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -518,12 +518,12 @@ function SubProfileVibeFields({
       </div>
       <div>
         <label htmlFor={`e-approach-${subKey}`} className="text-sm font-medium">
-          Your approach
+          Din tilgang
         </label>
         <textarea
           id={`e-approach-${subKey}`}
           rows={3}
-          placeholder={`How do you run a ${meta.label.toLowerCase()}? E.g. when you arrive, how you handle requests, what the typical flow looks like.`}
+          placeholder={`Hvordan afvikler du et ${meta.label.toLowerCase()}? F.eks. hvornår du ankommer, hvordan du håndterer ønsker, og hvordan det typiske flow ser ud.`}
           value={sub.approach}
           onChange={(e) => updateSubProfile(subKey, "approach", e.target.value)}
           className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -531,13 +531,13 @@ function SubProfileVibeFields({
       </div>
       <div>
         <label htmlFor={`e-price-${subKey}`} className="text-sm font-medium">
-          Starting price for this event type (DKK) — optional
+          Startpris for denne eventtype (kr.) — valgfrit
         </label>
         <input
           id={`e-price-${subKey}`}
           type="number"
           min={0}
-          placeholder="Leave blank to use your default"
+          placeholder="Lad stå tomt for at bruge din standard"
           value={sub.priceFromMajor || ""}
           onChange={(e) =>
             updateSubProfile(subKey, "priceFromMajor", Number(e.target.value) || 0)
@@ -555,23 +555,23 @@ function SubProfileVibeFields({
 
 const PEER_BENCHMARKS: Record<DemoDJSubProfileKey, { show: string; tell: string; vibe: string }> = {
   general: {
-    show: "Top DJs lead with 1 strong featured photo + 5–8 gallery items mixing crowd, gear and venue.",
-    tell: "Most-booked profiles use a 5–10 word tagline and an 80–150 word bio.",
-    vibe: "DJs listing 4–6 signature tracks get ~30% more profile views.",
+    show: "Top-DJs fører med 1 stærkt fremhævet billede + 5-8 gallerielementer med en blanding af publikum, udstyr og lokale.",
+    tell: "De mest bookede profiler bruger et slogan på 5-10 ord og en bio på 80-150 ord.",
+    vibe: "DJs, der angiver 4-6 signatur-numre, får ca. 30% flere profilvisninger.",
   },
   wedding: {
-    show: "Wedding DJs typically post 8+ photos: first-dance moments, ceremony setups, dancefloor crowds. 1–2 short clips perform really well.",
-    tell: "Couples scan for ceremony / dinner / dancefloor experience and how you read multi-generational rooms.",
-    vibe: "Wedding sets average ~5 hours — show you can flow from dinner to peak-hour anthems.",
+    show: "Bryllups-DJs poster typisk 8+ billeder: bryllupsdans-øjeblikke, ceremoniopsætninger, fyldte dansegulve. 1-2 korte klip klarer sig rigtig godt.",
+    tell: "Par scanner efter erfaring med ceremoni / middag / dansegulv, og hvordan du aflæser rum på tværs af generationer.",
+    vibe: "Bryllupssæt varer i gennemsnit ca. 5 timer — vis, at du kan glide fra middag til hits i højdepunktet.",
   },
   birthday: {
-    show: "Birthday gallery sweet spot: 6–10 photos with crowd energy; bonus points for milestone-party shots.",
-    tell: "Birthday hosts want a DJ who reads a less-formal room. Talk energy and crowd-pleasers, not contracts.",
-    vibe: "List at least 6 signature tracks across genres — guests will request, and you want to look ready.",
+    show: "Det optimale fødselsdagsgalleri: 6-10 billeder med publikumsenergi; bonuspoint for billeder fra runde fødselsdage.",
+    tell: "Fødselsdagsværter vil have en DJ, der aflæser et mindre formelt rum. Tal om energi og fællessange, ikke kontrakter.",
+    vibe: "Angiv mindst 6 signatur-numre på tværs af genrer — gæster vil ønske numre, og du vil fremstå klar.",
   },
   corporate: {
-    show: "Corporate clients trust polished setups: 5–8 photos including conference rooms, branded booths and tasteful uplighting.",
-    tell: "Companies want professionalism. Reference brand-name clients, AV experience and tasteful volume control.",
-    vibe: "Corporate gigs are ~60% awareness, 40% peak — show you understand the brand-appropriate balance.",
+    show: "Erhvervskunder stoler på polerede opsætninger: 5-8 billeder med bl.a. konferencelokaler, brandede stande og smagfuld belysning.",
+    tell: "Virksomheder vil have professionalisme. Henvis til kendte kunder, AV-erfaring og smagfuld lydstyrkekontrol.",
+    vibe: "Firmaarrangementer er ca. 60% baggrund, 40% højdepunkt — vis, at du forstår den brand-passende balance.",
   },
 };

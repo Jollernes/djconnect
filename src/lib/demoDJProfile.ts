@@ -61,28 +61,28 @@ export const SUB_PROFILE_META: Record<
   { label: string; eyebrow: string; helper: string }
 > = {
   general: {
-    label: "General",
-    eyebrow: "Shown to customers searching for any other event",
+    label: "Generel",
+    eyebrow: "Vises til kunder, der søger efter ethvert andet event",
     helper:
-      "This is the fallback profile used whenever a customer isn't searching for a wedding, birthday or corporate event. Keep it broad and confident.",
+      "Dette er standardprofilen, der bruges, når en kunde ikke søger efter et bryllup, en fødselsdag eller et firmaevent. Hold den bred og selvsikker.",
   },
   wedding: {
-    label: "Wedding",
-    eyebrow: "Shown to couples searching for wedding DJs",
+    label: "Bryllup",
+    eyebrow: "Vises til par, der søger efter bryllups-DJs",
     helper:
-      "Couples want a DJ who reads multi-generational rooms. Talk about ceremony / dinner / dancefloor flow, requests, and how you handle key moments.",
+      "Par vil have en DJ, der kan aflæse rum med flere generationer. Fortæl om flowet mellem ceremoni / middag / dansegulv, ønsker, og hvordan du håndterer de vigtige øjeblikke.",
   },
   birthday: {
-    label: "Birthday",
-    eyebrow: "Shown to customers booking a birthday party",
+    label: "Fødselsdag",
+    eyebrow: "Vises til kunder, der booker en fødselsdagsfest",
     helper:
-      "Birthday hosts want energy. Highlight crowd-pleasers, milestone parties (30th, 40th, 50th), and how you keep the dancefloor moving.",
+      "Fødselsdagsværter vil have energi. Fremhæv crowd-pleasers, mærkedagsfester (30-, 40-, 50-års) og hvordan du holder dansegulvet i gang.",
   },
   corporate: {
-    label: "Corporate Event",
-    eyebrow: "Shown to companies booking corporate events & parties",
+    label: "Firmaevent",
+    eyebrow: "Vises til virksomheder, der booker firmaevents & fester",
     helper:
-      "Corporate clients want professionalism. Talk about brand-appropriate music, tasteful volume control, and your experience with company parties.",
+      "Erhvervskunder vil have professionalisme. Fortæl om brand-passende musik, smagfuld lydstyrkekontrol og din erfaring med firmafester.",
   },
 };
 

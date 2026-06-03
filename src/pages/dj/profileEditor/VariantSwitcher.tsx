@@ -4,11 +4,11 @@ import { cn } from "@/lib/utils";
 export type EditorVariant = "A" | "B" | "C" | "D" | "E";
 
 const VARIANT_META: Record<EditorVariant, { label: string; helper: string }> = {
-  A: { label: "A · Tabs", helper: "Inline tabs with media + text per event" },
-  B: { label: "B · Live preview", helper: "Editor on the left, customer preview on the right" },
-  C: { label: "C · Card canvas", helper: "Pinterest-style cards open into a fullscreen editor" },
-  D: { label: "D · Guided wizard", helper: "Step-by-step journey with inheritance + benchmarks" },
-  E: { label: "E · B + quiet guidance", helper: "Variant B base with discrete chapter ribbon, inline tips, copy-from-General links and small celebration banner" },
+  A: { label: "A · Faner", helper: "Indlejrede faner med medier + tekst pr. event" },
+  B: { label: "B · Live forhåndsvisning", helper: "Editor til venstre, kundeforhåndsvisning til højre" },
+  C: { label: "C · Kortlærred", helper: "Pinterest-lignende kort åbner i en fuldskærms-editor" },
+  D: { label: "D · Guidet wizard", helper: "Trin-for-trin rejse med nedarvning + benchmarks" },
+  E: { label: "E · B + stille vejledning", helper: "Variant B-base med diskret kapitelbånd, indlejrede tips, kopiér-fra-Generel-links og lille fejringsbanner" },
 };
 
 export function useEditorVariant(): [EditorVariant, (next: EditorVariant) => void] {
@@ -40,7 +40,7 @@ export function VariantSwitcher({
     <div className="pointer-events-none fixed bottom-4 left-1/2 z-30 -translate-x-1/2">
       <div className="pointer-events-auto flex items-center gap-1 rounded-full border bg-background/95 p-1 shadow-lg backdrop-blur">
         <span className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Demo variant
+          Demo-variant
         </span>
         {(["A", "B", "C", "D", "E"] as const).map((v) => (
           <button

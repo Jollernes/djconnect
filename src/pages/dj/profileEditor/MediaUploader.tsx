@@ -55,13 +55,13 @@ export function FeaturedPhotoSlot({
               onClick={() => inputRef.current?.click()}
               className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-foreground shadow-sm"
             >
-              Replace
+              Erstat
             </button>
             <button
               type="button"
               onClick={() => onChange(undefined)}
               className="grid h-8 w-8 place-items-center rounded-full bg-white text-foreground shadow-sm"
-              aria-label="Remove featured photo"
+              aria-label="Fjern fremhævet billede"
             >
               <X className="h-4 w-4" />
             </button>
@@ -75,10 +75,10 @@ export function FeaturedPhotoSlot({
         >
           <ImageIcon className="h-7 w-7 text-muted-foreground" />
           <p className="text-sm font-semibold text-foreground">
-            Upload featured photo for {eventLabel}
+            Upload fremhævet billede til {eventLabel}
           </p>
           <p className="text-xs text-muted-foreground">
-            This is the photo customers see on your DJ card when they search for {eventLabel.toLowerCase()}s.
+            Dette er det foto, kunder ser på dit DJ-kort, når de søger efter {eventLabel.toLowerCase()}.
           </p>
         </button>
       )}
@@ -157,15 +157,15 @@ export function GalleryRow({
           className="flex h-32 w-32 shrink-0 flex-col items-center justify-center gap-1 rounded-lg border border-dashed bg-muted/30 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
         >
           <Plus className="h-5 w-5" />
-          Add photo / video
+          Tilføj foto / video
         </button>
       </div>
       <p className="text-xs text-muted-foreground">
         {items.length === 0
-          ? `Add at least 3 ${eventLabel.toLowerCase()} photos or short clips. Customers scroll through these on your public profile.`
+          ? `Tilføj mindst 3 ${eventLabel.toLowerCase()}-fotos eller korte klip. Kunder bladrer igennem disse på din offentlige profil.`
           : items.length < 3
-          ? `${3 - items.length} more recommended for a complete ${eventLabel.toLowerCase()} gallery.`
-          : `${items.length} item${items.length === 1 ? "" : "s"} · gallery looks complete.`}
+          ? `${3 - items.length} mere anbefales for et komplet ${eventLabel.toLowerCase()}-galleri.`
+          : `${items.length} element${items.length === 1 ? "" : "er"} · galleriet ser komplet ud.`}
       </p>
     </div>
   );
@@ -196,14 +196,14 @@ function GalleryThumb({
         type="button"
         onClick={onRemove}
         className="absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full bg-white text-foreground opacity-0 shadow-sm transition-opacity group-hover:opacity-100"
-        aria-label="Remove media"
+        aria-label="Fjern medie"
       >
         <X className="h-3.5 w-3.5" />
       </button>
       {onCaption && (
         <input
           value={item.caption ?? ""}
-          placeholder="Caption (optional)"
+          placeholder="Billedtekst (valgfrit)"
           onChange={(e) => onCaption(e.target.value)}
           className="absolute inset-x-1 bottom-1 rounded bg-black/60 px-2 py-1 text-[11px] text-white placeholder:text-white/60 outline-none"
         />

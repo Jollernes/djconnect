@@ -20,12 +20,12 @@ type Stage = {
 };
 
 const STAGES: Stage[] = [
-  { id: "request", icon: Mail, title: "Booking request", body: "Customer sends you event details. You get an email + dashboard notification. You have 24h to respond.", party: "customer" },
-  { id: "quote", icon: FileText, title: "Quote / Accept", body: "You either accept at your listed price or respond with a custom quote. The customer reviews it.", party: "dj" },
-  { id: "payment", icon: CreditCard, title: "Payment in escrow", body: "Customer pays the full amount via Stripe. Funds are held in escrow — not yet yours.", party: "customer" },
-  { id: "confirmed", icon: Calendar, title: "Confirmed", body: "The booking appears in both dashboards. Use in-platform messaging to coordinate logistics.", party: "platform" },
-  { id: "event", icon: PartyPopper, title: "Event day", body: "You show up, deliver a great set, customer marks event as completed (or we auto-complete).", party: "dj" },
-  { id: "payout", icon: Banknote, title: "Payout released", body: "24h after the event, Stripe pays out 90% to your connected bank account. DJConnect takes a 10% fee.", party: "platform" },
+  { id: "request", icon: Mail, title: "Bookingforespørgsel", body: "Kunden sender dig eventdetaljer. Du får en e-mail + dashboard-notifikation. Du har 24 timer til at svare.", party: "customer" },
+  { id: "quote", icon: FileText, title: "Tilbud / Accept", body: "Du accepterer enten til din angivne pris eller svarer med et skræddersyet tilbud. Kunden gennemgår det.", party: "dj" },
+  { id: "payment", icon: CreditCard, title: "Betaling i escrow", body: "Kunden betaler hele beløbet via Stripe. Pengene holdes i escrow — endnu ikke dine.", party: "customer" },
+  { id: "confirmed", icon: Calendar, title: "Bekræftet", body: "Bookingen vises i begge dashboards. Brug beskeder på platformen til at koordinere logistik.", party: "platform" },
+  { id: "event", icon: PartyPopper, title: "Eventdag", body: "Du møder op, leverer et godt sæt, og kunden markerer eventet som gennemført (eller vi gør det automatisk).", party: "dj" },
+  { id: "payout", icon: Banknote, title: "Udbetaling frigivet", body: "24 timer efter eventet udbetaler Stripe 90% til din tilknyttede bankkonto. DJConnect tager et gebyr på 10%.", party: "platform" },
 ];
 
 const partyStyles = {
@@ -95,7 +95,7 @@ export function BookingFlowDemo() {
       >
         <div className="flex items-center gap-2">
           <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide", partyStyles[stage.party])}>
-            {stage.party === "dj" ? "Your action" : stage.party === "customer" ? "Customer action" : "Platform"}
+            {stage.party === "dj" ? "Din handling" : stage.party === "customer" ? "Kundens handling" : "Platform"}
           </span>
           <span className="text-sm font-semibold">{stage.title}</span>
         </div>
@@ -109,7 +109,7 @@ export function BookingFlowDemo() {
           onClick={() => setActive((a) => Math.max(a - 1, 0))}
           disabled={active === 0}
         >
-          ← Previous stage
+          ← Forrige trin
         </button>
         <button
           type="button"
@@ -117,7 +117,7 @@ export function BookingFlowDemo() {
           onClick={() => setActive((a) => Math.min(a + 1, STAGES.length - 1))}
           disabled={active === STAGES.length - 1}
         >
-          Next stage →
+          Næste trin →
         </button>
       </div>
     </div>

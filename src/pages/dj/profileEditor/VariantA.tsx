@@ -32,10 +32,10 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_480px] xl:items-start">
       <div className="min-w-0 space-y-6">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">Edit your profile</h1>
+        <h1 className="text-2xl font-semibold">Rediger din profil</h1>
         <p className="text-sm text-muted-foreground">
-          Customers see a different version of your profile depending on the kind of event they're booking.
-          For each event type, upload a featured photo, a small photo / video gallery, and tailor the text.
+          Kunder ser en forskellig version af din profil afhængigt af den type event, de booker.
+          For hver eventtype skal du uploade et fremhævet billede, et lille foto-/videogalleri og tilpasse teksten.
         </p>
       </header>
 
@@ -44,10 +44,10 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Sub-profile completion
+              Underprofil-færdiggørelse
             </p>
             <p className="mt-1 text-base font-semibold">
-              {completedCount} of {SUB_PROFILE_KEYS.length} fully complete
+              {completedCount} af {SUB_PROFILE_KEYS.length} fuldt udfyldt
             </p>
           </div>
           <span className="text-sm font-semibold tabular-nums">{completionPct}%</span>
@@ -64,9 +64,9 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
           <p className="mt-3 flex items-start gap-2 text-xs text-muted-foreground">
             <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <span>
-              For each event type: <span className="font-medium text-foreground">1 featured photo</span> +{" "}
-              <span className="font-medium text-foreground">3 gallery items</span> + the text fields.
-              Start with <span className="font-medium text-foreground">General</span>.
+              For hver eventtype: <span className="font-medium text-foreground">1 fremhævet billede</span> +{" "}
+              <span className="font-medium text-foreground">3 gallerielementer</span> + tekstfelterne.
+              Begynd med <span className="font-medium text-foreground">Generel</span>.
             </span>
           </p>
         )}
@@ -107,7 +107,7 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
                         <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
                           {meta.eyebrow}
                         </p>
-                        <h2 className="mt-1 text-lg font-semibold">{meta.label} profile</h2>
+                        <h2 className="mt-1 text-lg font-semibold">{meta.label}-profil</h2>
                         <p className="mt-2 text-sm text-muted-foreground">{meta.helper}</p>
                       </div>
                       <span className="rounded-full bg-background px-2.5 py-1 text-xs font-semibold tabular-nums">
@@ -128,7 +128,7 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
                   <div className="grid gap-4 lg:grid-cols-[260px,1fr] lg:gap-6">
                     <div className="space-y-2">
                       <p className="flex items-center gap-1.5 text-sm font-semibold">
-                        <Sparkles className="h-3.5 w-3.5" /> Featured photo
+                        <Sparkles className="h-3.5 w-3.5" /> Fremhævet billede
                       </p>
                       <FeaturedPhotoSlot
                         value={sub.featuredPhotoDataUrl}
@@ -138,7 +138,7 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
                     </div>
                     <div className="space-y-2">
                       <p className="flex items-center gap-1.5 text-sm font-semibold">
-                        <ImageIcon className="h-3.5 w-3.5" /> Gallery — photos & videos
+                        <ImageIcon className="h-3.5 w-3.5" /> Galleri — fotos & videoer
                       </p>
                       <GalleryRow
                         items={sub.gallery}
@@ -160,17 +160,17 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
                     <p className="text-xs text-muted-foreground">
                       {c.complete ? (
                         <span className="inline-flex items-center gap-1.5 font-medium text-emerald-700">
-                          <Check className="h-3.5 w-3.5" /> Featured photo, gallery and text are all set
+                          <Check className="h-3.5 w-3.5" /> Fremhævet billede, galleri og tekst er alle udfyldt
                         </span>
                       ) : (
                         <span>
-                          {c.textComplete ? "Text ready · " : "Tagline / bio (80+) / music style / signature / approach + "}
-                          {c.mediaComplete ? "media ready" : "featured photo + 3 gallery items remaining"}
+                          {c.textComplete ? "Tekst klar · " : "Slogan / bio (80+) / musikstil / signatur / tilgang + "}
+                          {c.mediaComplete ? "medier klar" : "fremhævet billede + 3 gallerielementer mangler"}
                         </span>
                       )}
                     </p>
                     <Button onClick={() => handleSaveSubProfile(k)} className="gap-1.5">
-                      Save & continue
+                      Gem & fortsæt
                       <ArrowRight className="h-4 w-4" />
                     </Button>
                   </div>
@@ -184,7 +184,7 @@ export function VariantA({ state }: { state: DJProfileEditorState }) {
       <AccountWideSection state={state} />
 
       <div className="flex flex-wrap items-center gap-2">
-        <Button onClick={handleSaveAll}>Save all changes</Button>
+        <Button onClick={handleSaveAll}>Gem alle ændringer</Button>
       </div>
 
       </div>

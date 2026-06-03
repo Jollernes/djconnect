@@ -42,11 +42,11 @@ export function AccountWideSection({ state }: { state: DJProfileEditorState }) {
         >
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
-              Shared across all sub-profiles
+              Deles på tværs af alle underprofiler
             </p>
-            <h2 className="mt-1 text-lg font-semibold">Account-wide details</h2>
+            <h2 className="mt-1 text-lg font-semibold">Kontoomfattende detaljer</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Stage name, photo, equipment, pricing and travel — these stay the same regardless of event type.
+              Kunstnernavn, foto, udstyr, prissætning og rejse — disse forbliver de samme uanset eventtype.
             </p>
           </div>
           <ChevronDown
@@ -75,21 +75,21 @@ export function AccountWideSection({ state }: { state: DJProfileEditorState }) {
                       className="h-16 w-16 rounded-full object-cover ring-1 ring-border"
                     />
                     <p className="text-xs text-muted-foreground">
-                      This is the photo customers see in search and on every sub-profile.
+                      Dette er det foto, kunder ser i søgningen og på hver underprofil.
                     </p>
                   </div>
                 )}
 
                 <div>
-                  <Label htmlFor="stageName">Stage name</Label>
+                  <Label htmlFor="stageName">Kunstnernavn</Label>
                   <Input id="stageName" value={stageName} onChange={(e) => setStageName(e.target.value)} />
                 </div>
 
                 <div>
-                  <Label htmlFor="generalBio">Default bio</Label>
+                  <Label htmlFor="generalBio">Standardbio</Label>
                   <Textarea id="generalBio" rows={4} value={bio} onChange={(e) => setBio(e.target.value)} />
                   <p className="mt-1 text-xs text-muted-foreground">
-                    A short generic bio. Each sub-profile has its own bio that customers see for that event type.
+                    En kort generisk bio. Hver underprofil har sin egen bio, som kunder ser for den eventtype.
                   </p>
                 </div>
 
@@ -106,11 +106,11 @@ export function AccountWideSection({ state }: { state: DJProfileEditorState }) {
                   </div>
                 )}
                 <div>
-                  <Label htmlFor="equipment">Equipment description</Label>
+                  <Label htmlFor="equipment">Udstyrsbeskrivelse</Label>
                   <Textarea id="equipment" rows={4} value={equipment} onChange={(e) => setEquipment(e.target.value)} />
                 </div>
                 <div>
-                  <Label>Setup size</Label>
+                  <Label>Opsætningsstørrelse</Label>
                   <Select value={setupSize} onValueChange={(v) => setSetupSize(v as typeof setupSize)}>
                     <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -123,7 +123,7 @@ export function AccountWideSection({ state }: { state: DJProfileEditorState }) {
                   </Select>
                 </div>
                 <div>
-                  <Label>Event types you accept</Label>
+                  <Label>Eventtyper du accepterer</Label>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
                     {EVENT_TYPES.map((et) => (
                       <label key={et.id} className="flex items-center gap-2 rounded-md border p-2 text-sm">
@@ -140,12 +140,12 @@ export function AccountWideSection({ state }: { state: DJProfileEditorState }) {
                 <div className="flex flex-col gap-3 border-t border-border/60 pt-4 sm:flex-row sm:items-end">
                   <div className="flex-1">
                     <label className="flex items-center justify-between gap-3">
-                      <span className="text-sm">Price on request</span>
+                      <span className="text-sm">Pris på forespørgsel</span>
                       <Switch checked={priceOnRequest} onCheckedChange={setPriceOnRequest} />
                     </label>
                     {!priceOnRequest && (
                       <div className="mt-3">
-                        <Label htmlFor="priceFrom">Default starting price (DKK)</Label>
+                        <Label htmlFor="priceFrom">Standard startpris (kr.)</Label>
                         <Input
                           id="priceFrom"
                           type="number"
@@ -157,7 +157,7 @@ export function AccountWideSection({ state }: { state: DJProfileEditorState }) {
                     )}
                   </div>
                   <div className="flex-1">
-                    <Label htmlFor="travelRadius">Travel radius (km)</Label>
+                    <Label htmlFor="travelRadius">Rejseradius (km)</Label>
                     <Input
                       id="travelRadius"
                       type="number"

@@ -69,10 +69,10 @@ export function VariantD({ state }: { state: DJProfileEditorState }) {
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold">Edit your profile</h1>
+        <h1 className="text-2xl font-semibold">Rediger din profil</h1>
         <p className="text-sm text-muted-foreground">
-          Walk through your 4 sub-profiles one chapter at a time. Inherit from General to skip
-          repeats; only customise what's actually different per event type.
+          Gennemgå dine 4 underprofiler ét kapitel ad gangen. Nedarv fra Generel for at springe
+          gentagelser over; tilpas kun det, der reelt er anderledes pr. eventtype.
         </p>
       </header>
 
@@ -147,45 +147,45 @@ function buildSteps(): WizardStep[] {
 
 const CHAPTER_META: Record<Chapter, { label: string; eyebrow: string; helper: string }> = {
   show: {
-    label: "Show your work",
-    eyebrow: "Chapter 1 of 3",
+    label: "Vis dit arbejde",
+    eyebrow: "Kapitel 1 af 3",
     helper:
-      "Customers decide who to message in seconds, almost always based on a photo. Pick the one that best represents this kind of event.",
+      "Kunder beslutter på sekunder, hvem de skriver til — næsten altid ud fra et billede. Vælg det, der bedst repræsenterer denne slags event.",
   },
   tell: {
-    label: "Tell your story",
-    eyebrow: "Chapter 2 of 3",
+    label: "Fortæl din historie",
+    eyebrow: "Kapitel 2 af 3",
     helper:
-      "A short tagline + a focused bio. Speak directly to people booking this kind of event — what makes you the right call?",
+      "Et kort slogan + en fokuseret bio. Tal direkte til dem, der booker denne slags event — hvad gør dig til det rette valg?",
   },
   vibe: {
-    label: "Set the vibe",
-    eyebrow: "Chapter 3 of 3",
+    label: "Sæt stemningen",
+    eyebrow: "Kapitel 3 af 3",
     helper:
-      "Music style, signature tracks and how you actually run the night. This is what separates you from a Spotify playlist.",
+      "Musikstil, signatur-numre og hvordan du rent faktisk styrer aftenen. Det er det, der adskiller dig fra en Spotify-playliste.",
   },
 };
 
 const PEER_BENCHMARKS: Record<DemoDJSubProfileKey, Record<Chapter, string>> = {
   general: {
-    show: "Top DJs in Denmark lead with 1 strong featured photo + 5–8 gallery items mixing crowd shots, gear and venue.",
-    tell: "Most-booked profiles have a tagline 5–10 words long and a bio of 80–150 words.",
-    vibe: "DJs who list 4–6 signature tracks get ~30% more profile views than those with none.",
+    show: "Top-DJs i Danmark fører med 1 stærkt fremhævet billede + 5-8 gallerielementer med en blanding af publikum, udstyr og lokale.",
+    tell: "De mest bookede profiler har et slogan på 5-10 ord og en bio på 80-150 ord.",
+    vibe: "DJs, der angiver 4-6 signatur-numre, får ca. 30% flere profilvisninger end dem uden.",
   },
   wedding: {
-    show: "Wedding DJs typically post 8+ photos: first-dance moments, ceremony setups, dancefloor crowds. 1–2 short clips perform really well.",
-    tell: "Couples scan for ceremony / dinner / dancefloor experience. Mention how you read multi-generational rooms.",
-    vibe: "Wedding playlists average 5 hours. Show you can flow from quiet dinner sets to peak-hour anthems.",
+    show: "Bryllups-DJs poster typisk 8+ billeder: bryllupsdans-øjeblikke, ceremoniopsætninger, fyldte dansegulve. 1-2 korte klip klarer sig rigtig godt.",
+    tell: "Par scanner efter erfaring med ceremoni / middag / dansegulv. Nævn, hvordan du aflæser rum på tværs af generationer.",
+    vibe: "Bryllupsplaylister varer i gennemsnit 5 timer. Vis, at du kan glide fra stille middagssæt til hits i højdepunktet.",
   },
   birthday: {
-    show: "Birthday-party gallery sweet spot: 6–10 photos, lots of crowd energy, bonus points for milestone party shots (30th, 40th, 50th).",
-    tell: "Birthday hosts want a DJ who can read a less-formal room. Talk about energy and crowd-pleasers, not contracts.",
-    vibe: "Top birthday DJs list at least 6 signature tracks across genres — guests will request, and you want to look ready.",
+    show: "Det optimale fødselsdagsgalleri: 6-10 billeder, masser af publikumsenergi, bonuspoint for billeder fra runde fødselsdage (30, 40, 50 år).",
+    tell: "Fødselsdagsværter vil have en DJ, der kan aflæse et mindre formelt rum. Tal om energi og fællessange, ikke kontrakter.",
+    vibe: "Top-fødselsdags-DJs angiver mindst 6 signatur-numre på tværs af genrer — gæster vil ønske numre, og du vil fremstå klar.",
   },
   corporate: {
-    show: "Corporate clients trust polished setups: 5–8 photos including conference rooms, branded booths and tasteful uplighting.",
-    tell: "Companies want professionalism. Reference any brand-name clients, AV experience and your approach to volume control.",
-    vibe: "Corporate gigs are 60% awareness music, 40% peak. Show you understand the brand-appropriate balance.",
+    show: "Erhvervskunder stoler på polerede opsætninger: 5-8 billeder med bl.a. konferencelokaler, brandede stande og smagfuld belysning.",
+    tell: "Virksomheder vil have professionalisme. Henvis til kendte kunder, AV-erfaring og din tilgang til lydstyrkekontrol.",
+    vibe: "Firmaarrangementer er 60% baggrundsmusik, 40% højdepunkt. Vis, at du forstår den brand-passende balance.",
   },
 };
 
@@ -217,13 +217,13 @@ function JourneyProgress({
         <div className="text-xs">
           {currentChapterIdx >= 0 ? (
             <span className="font-semibold tabular-nums">
-              Step {currentChapterIdx + 1}
-              <span className="text-muted-foreground"> of {chapterSteps.length}</span>
+              Trin {currentChapterIdx + 1}
+              <span className="text-muted-foreground"> af {chapterSteps.length}</span>
             </span>
           ) : currentChapter?.kind === "intro" ? (
-            <span className="font-semibold">Welcome — let's set up your 4 sub-profiles</span>
+            <span className="font-semibold">Velkommen — lad os opsætte dine 4 underprofiler</span>
           ) : (
-            <span className="font-semibold">All sub-profiles complete</span>
+            <span className="font-semibold">Alle underprofiler er færdige</span>
           )}
         </div>
         {currentChapter?.kind === "chapter" && (
@@ -232,7 +232,7 @@ function JourneyProgress({
             onClick={onSkip}
             className="text-xs font-medium text-muted-foreground underline-offset-2 hover:underline"
           >
-            Skip for now
+            Spring over for nu
           </button>
         )}
       </div>
@@ -312,37 +312,37 @@ function IntroScreen({
       <div className="grid gap-6 md:grid-cols-[1fr,320px] md:items-start">
         <div className="space-y-4">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-foreground/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-foreground/70">
-            <Wand2 className="h-3 w-3" /> Guided setup
+            <Wand2 className="h-3 w-3" /> Guidet opsætning
           </span>
           <h2 className="text-3xl font-semibold leading-tight">
-            One profile, four versions — built in about 10 minutes.
+            Én profil, fire versioner — bygget på cirka 10 minutter.
           </h2>
           <p className="text-sm text-muted-foreground">
-            Customers see a different version of your profile depending on whether they're booking
-            a wedding, a birthday, a corporate event, or something else. Filling in all four boosts
-            how often you show up in each kind of search by ~3–5×.
+            Kunder ser en forskellig version af din profil afhængigt af, om de booker et bryllup,
+            en fødselsdag, et firmaevent eller noget andet. At udfylde alle fire øger, hvor ofte
+            du dukker op i hver slags søgning, med ca. 3-5×.
           </p>
           <div className="space-y-2 text-sm">
             <Bullet>
-              <strong>Start with General.</strong> It's the master template — Wedding, Birthday and
-              Corporate inherit from it by default. You only change what's different.
+              <strong>Begynd med Generel.</strong> Det er hovedskabelonen — Bryllup, Fødselsdag og
+              Firmaevent nedarver fra den som standard. Du ændrer kun det, der er anderledes.
             </Bullet>
             <Bullet>
-              <strong>Three short chapters per sub-profile:</strong> Show your work · Tell your
-              story · Set the vibe.
+              <strong>Tre korte kapitler pr. underprofil:</strong> Vis dit arbejde · Fortæl din
+              historie · Sæt stemningen.
             </Bullet>
             <Bullet>
-              <strong>Skip anything anytime.</strong> A "Skip for now" link is always at the top,
-              and you can jump between sub-profiles using the strip above.
+              <strong>Spring hvad som helst over når som helst.</strong> Et "Spring over for nu"-link
+              er altid øverst, og du kan hoppe mellem underprofiler via panelet ovenfor.
             </Bullet>
           </div>
           <div className="flex flex-wrap gap-2 pt-2">
             <Button onClick={onStart} className="gap-1.5">
-              Start with General <ArrowRight className="h-4 w-4" />
+              Begynd med Generel <ArrowRight className="h-4 w-4" />
             </Button>
             {completedCount > 0 && (
               <Button variant="outline" onClick={() => onJumpSubProfile("wedding")}>
-                Skip to next incomplete
+                Spring til næste ufærdige
               </Button>
             )}
           </div>
@@ -350,7 +350,7 @@ function IntroScreen({
 
         <ul className="space-y-2 rounded-xl border bg-muted/30 p-4 text-xs">
           <li className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Your sub-profiles
+            Dine underprofiler
           </li>
           {SUB_PROFILE_KEYS.map((k) => {
             const c = completion.find((x) => x.key === k)!;
@@ -499,11 +499,11 @@ function ChapterScreen({
                 <div className="flex items-start gap-2.5">
                   <Copy className="mt-0.5 h-4 w-4 shrink-0 text-foreground/70" />
                   <div className="min-w-0">
-                    <p className="font-semibold">Use my General profile for this chapter</p>
+                    <p className="font-semibold">Brug min Generel-profil til dette kapitel</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       {inheritsAlready
-                        ? "This chapter is currently identical to your General profile. Edit any field below to customise it."
-                        : `Copy your General ${chapter === "show" ? "photo + gallery" : chapter === "tell" ? "tagline + bio" : "music details"} into the ${meta.label.toLowerCase()} sub-profile, then tweak only what's actually different.`}
+                        ? "Dette kapitel er i øjeblikket identisk med din Generel-profil. Rediger et felt nedenfor for at tilpasse det."
+                        : `Kopiér din Generel-${chapter === "show" ? "foto + galleri" : chapter === "tell" ? "slogan + bio" : "musikdetaljer"} ind i ${meta.label.toLowerCase()}-underprofilen, og juster kun det, der reelt er anderledes.`}
                     </p>
                   </div>
                 </div>
@@ -515,12 +515,12 @@ function ChapterScreen({
                       if (checked) inheritFromGeneral();
                     }}
                   />
-                  <span className="text-xs font-medium">{inheritsAlready ? "Inherited" : "Inherit"}</span>
+                  <span className="text-xs font-medium">{inheritsAlready ? "Nedarvet" : "Nedarv"}</span>
                 </div>
               </div>
               {inheritDisabled && !isGeneral && (
                 <p className="mt-2 text-[11px] text-muted-foreground">
-                  Fill in your General {chapter === "show" ? "photos" : chapter === "tell" ? "story" : "music details"} first to enable inheritance here.
+                  Udfyld først din Generel-{chapter === "show" ? "fotos" : chapter === "tell" ? "historie" : "musikdetaljer"} for at aktivere nedarvning her.
                 </p>
               )}
             </div>
@@ -560,7 +560,7 @@ function ChapterScreen({
             <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-amber-700">
-                Peer benchmark
+                Branchemåling
               </p>
               <p className="mt-0.5">{PEER_BENCHMARKS[subKey][chapter]}</p>
             </div>
@@ -571,14 +571,14 @@ function ChapterScreen({
         <div className="flex flex-wrap items-center justify-between gap-3">
           {onBack ? (
             <Button variant="ghost" onClick={onBack} className="gap-1.5">
-              <ArrowLeft className="h-4 w-4" /> Back
+              <ArrowLeft className="h-4 w-4" /> Tilbage
             </Button>
           ) : (
             <div />
           )}
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground tabular-nums">
-              Step {stepNumber} of {totalSteps}
+              Trin {stepNumber} af {totalSteps}
             </span>
             <Button
               onClick={() => {
@@ -587,7 +587,7 @@ function ChapterScreen({
               }}
               className="gap-1.5"
             >
-              Continue <ArrowRight className="h-4 w-4" />
+              Fortsæt <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -622,7 +622,7 @@ function ChapterShow({
     <div className="space-y-6">
       <div className="space-y-2">
         <p className="flex items-center gap-1.5 text-sm font-semibold">
-          <Sparkles className="h-3.5 w-3.5" /> Featured photo
+          <Sparkles className="h-3.5 w-3.5" /> Fremhævet billede
         </p>
         <FeaturedPhotoSlot
           value={sub.featuredPhotoDataUrl}
@@ -631,12 +631,12 @@ function ChapterShow({
           size="md"
         />
         <p className="text-xs text-muted-foreground">
-          This is the single photo customers see on your DJ card when they search for {eventLabel.toLowerCase()}s. Pick one image — high-energy crowd shots and confident close-ups out-perform stage-only photos.
+          Dette er det ene billede, kunder ser på dit DJ-kort, når de søger efter {eventLabel.toLowerCase()}. Vælg ét billede — energiske publikumsbilleder og selvsikre nærbilleder klarer sig bedre end rene scenebilleder.
         </p>
       </div>
       <div className="space-y-2">
         <p className="flex items-center gap-1.5 text-sm font-semibold">
-          <ImageIcon className="h-3.5 w-3.5" /> Gallery
+          <ImageIcon className="h-3.5 w-3.5" /> Galleri
         </p>
         <GalleryRow
           items={sub.gallery}
@@ -645,7 +645,7 @@ function ChapterShow({
           eventLabel={eventLabel}
         />
         <p className="text-xs text-muted-foreground">
-          Add at least 3 supporting photos or short videos. Customers scroll through this on your full profile.
+          Tilføj mindst 3 supplerende fotos eller korte videoer. Kunder bladrer igennem dem på din fulde profil.
         </p>
       </div>
     </div>
@@ -664,24 +664,24 @@ function ChapterTell({
   return (
     <div className="space-y-5">
       <div>
-        <Label htmlFor={`d-tagline-${eventLabel}`}>One-line tagline</Label>
+        <Label htmlFor={`d-tagline-${eventLabel}`}>Slogan på én linje</Label>
         <Input
           id={`d-tagline-${eventLabel}`}
           maxLength={80}
-          placeholder={`e.g. "${eventLabel} DJ — modern, warm, dancefloor-first"`}
+          placeholder={`f.eks. "${eventLabel}-DJ — moderne, varm, dansegulvet i fokus"`}
           value={sub.tagline}
           onChange={(e) => onChange("tagline", e.target.value)}
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          {sub.tagline.length}/80 — shown right under your name on the DJ card.
+          {sub.tagline.length}/80 — vises lige under dit navn på DJ-kortet.
         </p>
       </div>
       <div>
-        <Label htmlFor={`d-bio-${eventLabel}`}>Bio for {eventLabel.toLowerCase()}s</Label>
+        <Label htmlFor={`d-bio-${eventLabel}`}>Bio til {eventLabel.toLowerCase()}</Label>
         <Textarea
           id={`d-bio-${eventLabel}`}
           rows={6}
-          placeholder={`What makes you the right ${eventLabel.toLowerCase()} DJ? Cover style, experience and what you actually do during the event.`}
+          placeholder={`Hvad gør dig til den rette ${eventLabel.toLowerCase()}-DJ? Beskriv stil, erfaring og hvad du rent faktisk gør under eventet.`}
           value={sub.bio}
           onChange={(e) => onChange("bio", e.target.value)}
         />
@@ -692,11 +692,11 @@ function ChapterTell({
               sub.bio.length >= 80 ? "text-emerald-700" : "text-muted-foreground",
             )}
           >
-            {sub.bio.length} characters
+            {sub.bio.length} tegn
           </span>
           {sub.bio.length < 80 && (
             <span className="text-muted-foreground">
-              · {80 - sub.bio.length} more recommended for a complete profile
+              · {80 - sub.bio.length} mere anbefales for en komplet profil
             </span>
           )}
         </div>
@@ -718,46 +718,46 @@ function ChapterVibe({
     <div className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor={`d-music-${eventLabel}`}>Music style</Label>
+          <Label htmlFor={`d-music-${eventLabel}`}>Musikstil</Label>
           <Input
             id={`d-music-${eventLabel}`}
-            placeholder="e.g. House, disco, funk — high-energy peaks"
+            placeholder="f.eks. House, disco, funk — høj energi i toppene"
             value={sub.musicStyle}
             onChange={(e) => onChange("musicStyle", e.target.value)}
           />
         </div>
         <div>
-          <Label htmlFor={`d-signature-${eventLabel}`}>Signature tracks</Label>
+          <Label htmlFor={`d-signature-${eventLabel}`}>Signatur-numre</Label>
           <Input
             id={`d-signature-${eventLabel}`}
-            placeholder="3–5 tracks customers might recognise"
+            placeholder="3-5 numre, kunder måske genkender"
             value={sub.signatureTracks}
             onChange={(e) => onChange("signatureTracks", e.target.value)}
           />
         </div>
       </div>
       <div>
-        <Label htmlFor={`d-approach-${eventLabel}`}>How you actually run a {eventLabel.toLowerCase()}</Label>
+        <Label htmlFor={`d-approach-${eventLabel}`}>Hvordan du rent faktisk afvikler et {eventLabel.toLowerCase()}</Label>
         <Textarea
           id={`d-approach-${eventLabel}`}
           rows={4}
-          placeholder={`E.g. when you arrive, how you handle requests, how the typical flow looks.`}
+          placeholder={`F.eks. hvornår du ankommer, hvordan du håndterer ønsker, og hvordan det typiske flow ser ud.`}
           value={sub.approach}
           onChange={(e) => onChange("approach", e.target.value)}
         />
       </div>
       <div>
-        <Label htmlFor={`d-price-${eventLabel}`}>Starting price (DKK) — optional</Label>
+        <Label htmlFor={`d-price-${eventLabel}`}>Startpris (kr.) — valgfrit</Label>
         <Input
           id={`d-price-${eventLabel}`}
           type="number"
           min={0}
-          placeholder="Leave blank to use your default"
+          placeholder="Lad stå tomt for at bruge din standard"
           value={sub.priceFromMajor || ""}
           onChange={(e) => onChange("priceFromMajor", Number(e.target.value) || 0)}
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          You can charge differently for {eventLabel.toLowerCase()}s. Blank = use your account default.
+          Du kan tage en anden pris for {eventLabel.toLowerCase()}. Tomt = brug din kontostandard.
         </p>
       </div>
     </div>
@@ -784,13 +784,13 @@ function FinalScreen({
         </span>
         <h2 className="text-2xl font-semibold">
           {allComplete
-            ? "All four sub-profiles ready — you're discoverable for every event type."
-            : `${completedCount} of 4 sub-profiles ready — keep going to unlock more searches.`}
+            ? "Alle fire underprofiler er klar — du er synlig for alle eventtyper."
+            : `${completedCount} af 4 underprofiler er klar — fortsæt for at låse op for flere søgninger.`}
         </h2>
         <p className="mx-auto max-w-lg text-sm text-muted-foreground">
           {allComplete
-            ? "Customers will now see the right version of you for whatever event they're searching, instead of one generic page."
-            : "Each completed sub-profile makes you appear in that kind of search. Wedding-only profiles, for example, won't show up to customers booking corporate events."}
+            ? "Kunder ser nu den rette version af dig for det event, de søger efter, i stedet for én generisk side."
+            : "Hver færdig underprofil får dig til at dukke op i den slags søgning. Profiler kun til bryllupper dukker f.eks. ikke op for kunder, der booker firmaevents."}
         </p>
       </div>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -812,7 +812,7 @@ function FinalScreen({
               </div>
               {c.complete ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                  <Check className="h-3 w-3" /> Done
+                  <Check className="h-3 w-3" /> Færdig
                 </span>
               ) : (
                 <span className="text-xs font-semibold tabular-nums">
@@ -824,14 +824,14 @@ function FinalScreen({
         })}
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        <Button onClick={handleSaveAll}>Save all changes</Button>
+        <Button onClick={handleSaveAll}>Gem alle ændringer</Button>
         <a
           href={`/djs/${seed.username}`}
           target="_blank"
           rel="noreferrer"
           className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          Open full public profile in new tab
+          Åbn fuld offentlig profil i ny fane
         </a>
       </div>
     </div>

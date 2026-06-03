@@ -53,7 +53,7 @@ export function LiveProfilePreview({
       <div className="flex items-center justify-between gap-2 px-1">
         <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
           <LivePulse />
-          Live preview · {meta.label}
+          Live forhåndsvisning · {meta.label}
         </p>
         <a
           href={`/djs/${seed.username}`}
@@ -61,7 +61,7 @@ export function LiveProfilePreview({
           rel="noreferrer"
           className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          Open in new tab
+          Åbn i ny fane
           <ExternalLink className="h-3 w-3" />
         </a>
       </div>
@@ -78,8 +78,8 @@ export function LiveProfilePreview({
       </div>
 
       <p className="px-1 text-[11px] leading-relaxed text-muted-foreground">
-        Switch event types above to preview each version. Edits appear here
-        instantly — no save needed.
+        Skift eventtype ovenfor for at forhåndsvise hver version. Ændringer vises her
+        med det samme — ingen gemning nødvendig.
       </p>
     </div>
   );
