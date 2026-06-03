@@ -33,16 +33,16 @@ import { WeddingDJScene } from "@/components/common/WeddingDJScene";
 import { useDJs } from "@/hooks/useDJs";
 
 const marqueeItems = [
-  "Weddings",
-  "Birthday parties",
-  "Corporate events",
-  "Private parties",
-  "Product launches",
-  "Brand activations",
-  "Summer parties",
-  "Club nights",
-  "Festivals",
-  "Galas",
+  "Bryllupper",
+  "Fødselsdagsfester",
+  "Firmaarrangementer",
+  "Private fester",
+  "Produktlanceringer",
+  "Brandaktiveringer",
+  "Sommerfester",
+  "Klubaftener",
+  "Festivaler",
+  "Galaer",
 ];
 
 const fadeUp = {
@@ -90,10 +90,10 @@ export function HomePage() {
       {featured.length > 0 && (
         <section className="container py-20">
           <RevealHeader
-            eyebrow="Featured"
-            title="Top-rated DJs this month"
-            subtitle="Hand-picked, verified, and loved by their clients."
-            cta={{ href: "/search", label: "Browse all DJs →" }}
+            eyebrow="Fremhævet"
+            title="Månedens bedst bedømte DJs"
+            subtitle="Håndplukkede, verificerede og elsket af deres kunder."
+            cta={{ href: "/search", label: "Se alle DJs →" }}
           />
           <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {featured.map((dj, i) => (
@@ -146,7 +146,7 @@ function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit 
           <div>
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/70">
               <Equalizer bars={4} className="h-3.5" barClassName="bg-accent" />
-              Verified DJs · Mobile disco · Paid via Stripe
+              Verificerede DJs · Mobilt diskotek · Betalt via Stripe
             </motion.div>
 
             <motion.h1
@@ -156,9 +156,9 @@ function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit 
               custom={0.1}
               className="mt-6 text-5xl font-semibold text-balance leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.25rem]"
             >
-              Every great night{" "}
+              Hver god aften{" "}
               <span className="relative whitespace-nowrap">
-                <span className="bg-gradient-to-r from-accent via-orange-300 to-pink-300 bg-clip-text text-transparent">starts with a DJ.</span>
+                <span className="bg-gradient-to-r from-accent via-orange-300 to-pink-300 bg-clip-text text-transparent">starter med en DJ.</span>
                 <motion.span
                   aria-hidden
                   className="absolute -bottom-2 left-0 h-1 w-full origin-left rounded-full bg-accent/70"
@@ -176,8 +176,8 @@ function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit 
               custom={0.25}
               className="mt-6 max-w-xl text-lg text-primary-foreground/80 sm:text-xl"
             >
-              Book interviewed, equipment-verified DJs for weddings, birthdays, and corporate events.
-              They bring the sound, lights, and energy — you bring the guests.
+              Book interviewede, udstyrsverificerede DJs til bryllupper, fødselsdage og firmaarrangementer.
+              De medbringer lyd, lys og energi — du tager dig af gæsterne.
             </motion.p>
           </div>
 
@@ -221,23 +221,23 @@ function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit 
           className="mt-10 hidden gap-3 rounded-2xl border border-white/10 bg-background p-4 text-foreground shadow-2xl ring-1 ring-accent/10 md:grid md:grid-cols-[1fr_1fr_1fr_auto]"
         >
           <div className="min-w-0">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Event type</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Begivenhedstype</label>
             <EventTypePicker value={eventType} onChange={setEventType} />
           </div>
           <div className="min-w-0">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Location</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Lokation</label>
             <div className="relative">
               <MapPin className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 className="pl-8"
-                placeholder="City"
+                placeholder="By"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
             </div>
           </div>
           <div className="min-w-0">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Date</label>
+            <label className="mb-1 block text-xs font-medium text-muted-foreground">Dato</label>
             <div className="relative">
               <CalendarIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -250,7 +250,7 @@ function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit 
           </div>
           <div className="flex items-end">
             <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
-              <Search className="h-4 w-4" /> Search
+              <Search className="h-4 w-4" /> Søg
             </Button>
           </div>
         </motion.form>
@@ -262,9 +262,9 @@ function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit 
           custom={0.55}
           className="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-primary-foreground/80"
         >
-          <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-accent" /> Every DJ interviewed &amp; verified</span>
-          <span className="flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-accent" /> Real-time availability</span>
-          <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" /> Secure Stripe escrow payments</span>
+          <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-accent" /> Alle DJs interviewet &amp; verificeret</span>
+          <span className="flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-accent" /> Tilgængelighed i realtid</span>
+          <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" /> Sikre Stripe-deponeringsbetalinger</span>
         </motion.div>
       </div>
 
@@ -278,12 +278,12 @@ function Hero({ eventType, setEventType, city, setCity, date, setDate, onSubmit 
 type EventTypeOption = { id: string; label: string; Icon: LucideIcon; tint: string; description: string };
 
 const EVENT_TYPE_OPTIONS: EventTypeOption[] = [
-  { id: "wedding", label: "Wedding", Icon: Heart, tint: "from-rose-500/15 to-rose-500/5 text-rose-600", description: "Ceremony & reception" },
-  { id: "birthday", label: "Birthday", Icon: Cake, tint: "from-amber-500/15 to-amber-500/5 text-amber-600", description: "Milestone parties" },
-  { id: "corporate_event", label: "Corporate", Icon: Briefcase, tint: "from-sky-500/15 to-sky-500/5 text-sky-600", description: "Conferences & launches" },
-  { id: "corporate_party", label: "Office Party", Icon: PartyPopper, tint: "from-violet-500/15 to-violet-500/5 text-violet-600", description: "Summer & holiday" },
-  { id: "private_party", label: "Private", Icon: Users, tint: "from-emerald-500/15 to-emerald-500/5 text-emerald-600", description: "Anniversaries & more" },
-  { id: "other", label: "Other", Icon: Sparkles, tint: "from-pink-500/15 to-pink-500/5 text-pink-600", description: "Anything else" },
+  { id: "wedding", label: "Bryllup", Icon: Heart, tint: "from-rose-500/15 to-rose-500/5 text-rose-600", description: "Ceremoni & reception" },
+  { id: "birthday", label: "Fødselsdag", Icon: Cake, tint: "from-amber-500/15 to-amber-500/5 text-amber-600", description: "Mærkedagsfester" },
+  { id: "corporate_event", label: "Firma", Icon: Briefcase, tint: "from-sky-500/15 to-sky-500/5 text-sky-600", description: "Konferencer & lanceringer" },
+  { id: "corporate_party", label: "Firmafest", Icon: PartyPopper, tint: "from-violet-500/15 to-violet-500/5 text-violet-600", description: "Sommer & jul" },
+  { id: "private_party", label: "Privat", Icon: Users, tint: "from-emerald-500/15 to-emerald-500/5 text-emerald-600", description: "Jubilæer & mere" },
+  { id: "other", label: "Andet", Icon: Sparkles, tint: "from-pink-500/15 to-pink-500/5 text-pink-600", description: "Alt muligt andet" },
 ];
 
 function EventTypePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -331,7 +331,7 @@ function EventTypePicker({ value, onChange }: { value: string; onChange: (v: str
               <span className="truncate font-medium">{selected.label}</span>
             </>
           ) : (
-            <span className="truncate text-muted-foreground">Any event type</span>
+            <span className="truncate text-muted-foreground">Alle begivenhedstyper</span>
           )}
         </span>
         <span className="flex shrink-0 items-center gap-1">
@@ -351,7 +351,7 @@ function EventTypePicker({ value, onChange }: { value: string; onChange: (v: str
                 }
               }}
               className="grid h-5 w-5 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-              aria-label="Clear event type"
+              aria-label="Ryd begivenhedstype"
             >
               <X className="h-3.5 w-3.5" />
             </span>
@@ -371,14 +371,14 @@ function EventTypePicker({ value, onChange }: { value: string; onChange: (v: str
             role="listbox"
           >
             <div className="mb-1.5 flex items-center justify-between px-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-              <span>Choose your event</span>
+              <span>Vælg din begivenhed</span>
               {selected && (
                 <button
                   type="button"
                   onClick={() => onChange("")}
                   className="text-[10px] font-medium text-foreground hover:text-accent"
                 >
-                  Clear
+                  Ryd
                 </button>
               )}
             </div>
@@ -475,10 +475,10 @@ function MobileSearchPill({ eventType, setEventType, city, setCity, date, setDat
         <Search className="h-4 w-4 shrink-0 text-foreground" />
         <span className="flex min-w-0 flex-1 flex-col leading-tight">
           <span className="truncate text-sm font-semibold">
-            {hasFilters ? summary.join(" · ") : "Find your DJ"}
+            {hasFilters ? summary.join(" · ") : "Find din DJ"}
           </span>
           <span className="truncate text-xs text-muted-foreground">
-            {hasFilters ? "Tap to refine" : "Any event · anywhere · any date"}
+            {hasFilters ? "Tryk for at justere" : "Enhver begivenhed · hvor som helst · enhver dato"}
           </span>
         </span>
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground shadow-md transition group-active:scale-95">
@@ -507,17 +507,17 @@ function MobileSearchPill({ eventType, setEventType, city, setCity, date, setDat
               transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               role="dialog"
               aria-modal="true"
-              aria-label="Search DJs"
+              aria-label="Søg DJs"
               className="fixed inset-x-0 bottom-0 z-50 flex max-h-[92vh] flex-col rounded-t-3xl bg-background text-foreground shadow-2xl"
             >
               <div className="mx-auto mt-3 h-1.5 w-10 rounded-full bg-muted-foreground/25" aria-hidden />
               <div className="flex items-center justify-between px-5 pb-3 pt-2">
-                <h2 className="text-base font-semibold">Find your DJ</h2>
+                <h2 className="text-base font-semibold">Find din DJ</h2>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted"
-                  aria-label="Close search"
+                  aria-label="Luk søgning"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -529,7 +529,7 @@ function MobileSearchPill({ eventType, setEventType, city, setCity, date, setDat
               >
                 <div>
                   <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    What's the occasion?
+                    Hvad er anledningen?
                   </h3>
                   <div className="grid grid-cols-2 gap-2.5">
                     {EVENT_TYPE_OPTIONS.map((option) => {
@@ -563,13 +563,13 @@ function MobileSearchPill({ eventType, setEventType, city, setCity, date, setDat
 
                 <div>
                   <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Where?
+                    Hvor?
                   </h3>
                   <div className="relative">
                     <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                       className="h-12 rounded-xl pl-10 text-base"
-                      placeholder="City or region"
+                      placeholder="By eller region"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       autoFocus={!eventType && !city && !date}
@@ -579,7 +579,7 @@ function MobileSearchPill({ eventType, setEventType, city, setCity, date, setDat
 
                 <div>
                   <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    When?
+                    Hvornår?
                   </h3>
                   <div className="relative">
                     <CalendarIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -603,7 +603,7 @@ function MobileSearchPill({ eventType, setEventType, city, setCity, date, setDat
                   }}
                   className="text-sm font-medium underline-offset-4 hover:underline"
                 >
-                  Clear all
+                  Ryd alt
                 </button>
                 <Button
                   type="button"
@@ -612,7 +612,7 @@ function MobileSearchPill({ eventType, setEventType, city, setCity, date, setDat
                   onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
                   className="h-12 flex-1 rounded-xl glow-accent"
                 >
-                  <Search className="h-4 w-4" /> Search DJs
+                  <Search className="h-4 w-4" /> Søg DJs
                 </Button>
               </div>
             </motion.div>
@@ -704,25 +704,25 @@ function HowItWorks() {
   const steps = [
     {
       icon: Search,
-      title: "Search",
-      body: "Filter by event type, city, date, budget, and setup size. See every verified DJ that fits.",
+      title: "Søg",
+      body: "Filtrér efter begivenhedstype, by, dato, budget og opsætningsstørrelse. Se alle verificerede DJs, der passer.",
     },
     {
       icon: CalendarCheck2,
       title: "Book",
-      body: "Pay securely through Stripe. Funds sit in escrow until 24h after the event, then release to your DJ.",
+      body: "Betal sikkert via Stripe. Pengene står i depot indtil 24 timer efter begivenheden og frigives derefter til din DJ.",
     },
     {
       icon: Sparkles,
-      title: "Celebrate",
-      body: "Your DJ arrives with a full mobile disco setup. You get the night. We handle the rest.",
+      title: "Fejr",
+      body: "Din DJ ankommer med et komplet mobilt diskotek. Du får aftenen. Vi klarer resten.",
     },
   ];
   return (
     <section className="relative overflow-hidden bg-muted/50 py-24">
       <div aria-hidden className="absolute inset-0 opacity-40" style={{ background: "radial-gradient(ellipse at top, hsla(21,90%,53%,0.12), transparent 60%)" }} />
       <div className="container relative">
-        <RevealHeader eyebrow="How it works" title="Three steps from browsing to the dancefloor" />
+        <RevealHeader eyebrow="Sådan fungerer det" title="Tre trin fra søgning til dansegulvet" />
         <div className="mt-12 grid gap-6 md:grid-cols-3">
           {steps.map(({ icon: Icon, title, body }, i) => (
             <motion.div
@@ -770,10 +770,10 @@ function CountUp({ to, suffix = "" }: { to: number; suffix?: string }) {
 
 function Stats() {
   const items = [
-    { label: "Verified DJs", to: 124, suffix: "+" },
-    { label: "Events booked", to: 3400, suffix: "+" },
-    { label: "Avg rating", to: 48, suffix: "/50" },
-    { label: "Cities covered", to: 42, suffix: "" },
+    { label: "Verificerede DJs", to: 124, suffix: "+" },
+    { label: "Bookede begivenheder", to: 3400, suffix: "+" },
+    { label: "Gns. bedømmelse", to: 48, suffix: "/50" },
+    { label: "Dækkede byer", to: 42, suffix: "" },
   ];
   return (
     <section className="container py-24">
@@ -802,27 +802,27 @@ function Testimonials() {
   const quotes = [
     {
       quote:
-        "Booked Alex for our wedding — the whole dancefloor was packed all night. Setup looked incredibly professional and the booking was seamless.",
+        "Vi bookede Alex til vores bryllup — hele dansegulvet var fyldt hele aftenen. Opsætningen så utrolig professionel ud, og bookingen var problemfri.",
       author: "Sara",
-      role: "Wedding, Copenhagen",
+      role: "Bryllup, København",
     },
     {
       quote:
-        "Organising the annual corporate party used to be a nightmare. DJConnect made it 5 minutes of work and the DJ was incredible.",
+        "At arrangere den årlige firmafest plejede at være et mareridt. DJConnect gjorde det til 5 minutters arbejde, og DJ'en var fantastisk.",
       author: "Tom",
       role: "CFO, Acme A/S",
     },
     {
       quote:
-        "As a DJ, this is the first platform that treats us like professionals. Clean bookings, fair fees, fast payouts.",
+        "Som DJ er dette den første platform, der behandler os som professionelle. Rene bookinger, fair gebyrer, hurtige udbetalinger.",
       author: "Mia",
-      role: "DJ, Copenhagen",
+      role: "DJ, København",
     },
   ];
   return (
     <section className="bg-muted/40 py-24">
       <div className="container">
-        <RevealHeader eyebrow="What people are saying" title="Loved by hosts &amp; DJs alike" />
+        <RevealHeader eyebrow="Hvad folk siger" title="Elsket af både værter &amp; DJs" />
         <div className="mt-10 grid gap-6 md:grid-cols-3">
           {quotes.map((t, i) => (
             <motion.figure
@@ -868,19 +868,19 @@ function DJCta() {
           <span className="flex h-14 w-14 items-center justify-center rounded-full bg-accent/20 text-accent ring-4 ring-accent/10">
             <Users className="h-7 w-7" />
           </span>
-          <h2 className="mt-6 text-4xl font-semibold sm:text-5xl">Are you a professional DJ?</h2>
+          <h2 className="mt-6 text-4xl font-semibold sm:text-5xl">Er du professionel DJ?</h2>
           <p className="mt-4 text-lg text-primary-foreground/80">
-            Join verified DJs earning steady income from bookings. We handle payments, contracts, and marketing — you focus on the music.
+Bliv en del af de verificerede DJs, der tjener en stabil indkomst på bookinger. Vi håndterer betalinger, kontrakter og markedsføring — du fokuserer på musikken.
           </p>
           <Button asChild variant="accent" size="lg" className="mt-8 glow-accent">
-            <Link to="/signup/dj">Become a DJ →</Link>
+            <Link to="/signup/dj">Bliv DJ →</Link>
           </Button>
           <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm text-primary-foreground/70">
-            <span>10% platform fee</span>
+            <span>10% platformsgebyr</span>
             <span>·</span>
-            <span>Payouts 24h after event</span>
+            <span>Udbetaling 24 timer efter begivenhed</span>
             <span>·</span>
-            <span>No exclusivity</span>
+            <span>Ingen eksklusivitet</span>
           </div>
         </motion.div>
       </div>

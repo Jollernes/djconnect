@@ -1,33 +1,33 @@
 export const PLATFORM_NAME = "DJConnect";
-export const PLATFORM_TAGLINE = "Book verified DJs with full mobile disco setups";
+export const PLATFORM_TAGLINE = "Book verificerede DJs med komplet mobilt diskotek";
 export const PLATFORM_SUPPORT_EMAIL = "support@djconnect.example";
 
 export const PLATFORM_FEE_PERCENT = 10;
 
 export const EVENT_TYPES = [
-  { id: "wedding", label: "Wedding" },
-  { id: "birthday", label: "Birthday Party" },
-  { id: "corporate_event", label: "Corporate Event" },
-  { id: "corporate_party", label: "Corporate Party" },
-  { id: "private_party", label: "Private Party" },
-  { id: "other", label: "Other" },
+  { id: "wedding", label: "Bryllup" },
+  { id: "birthday", label: "Fødselsdagsfest" },
+  { id: "corporate_event", label: "Firmaarrangement" },
+  { id: "corporate_party", label: "Firmafest" },
+  { id: "private_party", label: "Privatfest" },
+  { id: "other", label: "Andet" },
 ] as const;
 
 export type EventTypeId = (typeof EVENT_TYPES)[number]["id"];
 
 export const SETUP_SIZES = [
-  { id: "small", label: "Small", description: "Apartment / small room" },
-  { id: "medium", label: "Medium", description: "100–200 guests" },
-  { id: "large", label: "Large", description: "200+ guests / outdoor" },
+  { id: "small", label: "Lille", description: "Lejlighed / lille lokale" },
+  { id: "medium", label: "Mellem", description: "100–200 gæster" },
+  { id: "large", label: "Stor", description: "200+ gæster / udendørs" },
 ] as const;
 
 export type SetupSizeId = (typeof SETUP_SIZES)[number]["id"];
 
 export const EXPERIENCE_YEARS = [
-  { id: "1-2", label: "1–2 years" },
-  { id: "3-5", label: "3–5 years" },
-  { id: "5-10", label: "5–10 years" },
-  { id: "10+", label: "10+ years" },
+  { id: "1-2", label: "1–2 år" },
+  { id: "3-5", label: "3–5 år" },
+  { id: "5-10", label: "5–10 år" },
+  { id: "10+", label: "10+ år" },
 ] as const;
 
 export const EVENTS_PERFORMED = [
@@ -38,31 +38,31 @@ export const EVENTS_PERFORMED = [
 ] as const;
 
 export const BOOKING_STATUSES = {
-  pending: { label: "Pending", color: "warning" },
-  quoted: { label: "Quote sent", color: "warning" },
-  awaiting_payment: { label: "Awaiting payment", color: "warning" },
-  confirmed: { label: "Confirmed", color: "success" },
-  completed: { label: "Completed", color: "muted" },
-  cancelled: { label: "Cancelled", color: "destructive" },
-  declined: { label: "Declined", color: "destructive" },
-  refunded: { label: "Refunded", color: "muted" },
+  pending: { label: "Afventer", color: "warning" },
+  quoted: { label: "Tilbud sendt", color: "warning" },
+  awaiting_payment: { label: "Afventer betaling", color: "warning" },
+  confirmed: { label: "Bekræftet", color: "success" },
+  completed: { label: "Gennemført", color: "muted" },
+  cancelled: { label: "Annulleret", color: "destructive" },
+  declined: { label: "Afvist", color: "destructive" },
+  refunded: { label: "Refunderet", color: "muted" },
 } as const;
 
 export type BookingStatus = keyof typeof BOOKING_STATUSES;
 
 export const VERIFICATION_STATUSES = {
-  draft: { label: "Draft" },
-  pending: { label: "Pending review" },
-  approved: { label: "Approved" },
-  rejected: { label: "Rejected" },
+  draft: { label: "Kladde" },
+  pending: { label: "Afventer gennemgang" },
+  approved: { label: "Godkendt" },
+  rejected: { label: "Afvist" },
 } as const;
 
 export type VerificationStatus = keyof typeof VERIFICATION_STATUSES;
 
 export const CANCELLATION_POLICY = [
-  { windowDays: 14, refundPercent: 100, label: "More than 14 days before event: 100% refund" },
-  { windowDays: 7, refundPercent: 50, label: "7–14 days before event: 50% refund" },
-  { windowDays: 0, refundPercent: 0, label: "Less than 7 days before event: no refund" },
+  { windowDays: 14, refundPercent: 100, label: "Mere end 14 dage før begivenheden: 100% refundering" },
+  { windowDays: 7, refundPercent: 50, label: "7–14 dage før begivenheden: 50% refundering" },
+  { windowDays: 0, refundPercent: 0, label: "Mindre end 7 dage før begivenheden: ingen refundering" },
 ];
 
 export function computeRefundPercent(eventDate: Date, now = new Date()): number {

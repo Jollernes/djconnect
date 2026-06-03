@@ -44,10 +44,10 @@ type NavLinkSpec = {
 };
 
 const STATIC_LINKS: NavLinkSpec[] = [
-  { to: "/get-offers", label: "Get 3 offers", highlight: "primary" },
+  { to: "/get-offers", label: "Få 3 tilbud", highlight: "primary" },
   { to: "/personal-advice", label: "Personlig Rådgivning", highlight: "secondary" },
-  { to: "/how-it-works", label: "How it works" },
-  { to: "/about", label: "About" },
+  { to: "/how-it-works", label: "Sådan fungerer det" },
+  { to: "/about", label: "Om os" },
   { to: "/faq", label: "FAQ" },
 ];
 
@@ -62,7 +62,7 @@ export function Header() {
   // with the current event-context, which may have just changed.
   const navLinks = useMemo<NavLinkSpec[]>(
     () => [
-      { to: browseDJsPath(), label: "Browse DJs", opensBrowseGate: true },
+      { to: browseDJsPath(), label: "Find DJs", opensBrowseGate: true },
       ...STATIC_LINKS,
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,7 +147,7 @@ export function Header() {
             variant="ghost"
             size="icon"
             className="hidden sm:inline-flex"
-            aria-label="Search DJs"
+            aria-label="Søg DJs"
             onClick={() => openGate()}
           >
             <Search className="h-5 w-5" />
@@ -180,11 +180,11 @@ export function Header() {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate(dashboardPath)}>
-                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                  <LayoutDashboard className="h-4 w-4" /> Oversigt
                 </DropdownMenuItem>
                 {profile.role === "dj" && (
                   <DropdownMenuItem onClick={() => navigate("/dj/profile")}>
-                    <User className="h-4 w-4" /> Edit profile
+                    <User className="h-4 w-4" /> Rediger profil
                   </DropdownMenuItem>
                 )}
                 {profile.role === "admin" && (
@@ -193,7 +193,7 @@ export function Header() {
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
-                  <Settings className="h-4 w-4" /> Settings
+                  <Settings className="h-4 w-4" /> Indstillinger
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -202,17 +202,17 @@ export function Header() {
                     navigate("/");
                   }}
                 >
-                  <LogOut className="h-4 w-4" /> Log out
+                  <LogOut className="h-4 w-4" /> Log ud
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <div className="hidden gap-2 sm:flex">
               <Button asChild variant="ghost">
-                <Link to="/login">Log in</Link>
+                <Link to="/login">Log ind</Link>
               </Button>
               <Button asChild variant="accent">
-                <Link to="/signup">Sign up</Link>
+                <Link to="/signup">Opret konto</Link>
               </Button>
             </div>
           )}
@@ -242,12 +242,12 @@ export function Header() {
               <div className="mt-2 flex gap-2">
                 <Button asChild variant="outline" className="flex-1">
                   <Link to="/login" onClick={() => setMobileOpen(false)}>
-                    Log in
+                    Log ind
                   </Link>
                 </Button>
                 <Button asChild variant="accent" className="flex-1">
                   <Link to="/signup" onClick={() => setMobileOpen(false)}>
-                    Sign up
+                    Opret konto
                   </Link>
                 </Button>
               </div>
