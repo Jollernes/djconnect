@@ -9,23 +9,26 @@ import type { DJProfileWithRelations } from "@/types/domain";
 /**
  * Hero social-proof element: a small rotating stack of overlapping DJ cards.
  * The front card autoplays a short muted clip; when it ends the next card
- * animates to the front and starts its own clip, cycling through all three
- * and looping — for dynamic social proof of verified DJs.
+ * animates to the front and starts its own clip, cycling through all the
+ * cards and looping — for dynamic social proof of verified DJs.
  */
 
-// Royalty-free clips (Mixkit free license), served from public/.
+// Royalty-free clips (Mixkit free license), served from public/. Each clip
+// carries the event-type caption shown on its card.
 const MEDIA = [
-  { src: "/hero-dj.mp4", poster: "/hero-dj-poster.jpg" },
-  { src: "/hero-dj-42422.mp4", poster: "/hero-dj-42422-poster.jpg" },
-  { src: "/hero-dj-45437.mp4", poster: "/hero-dj-45437-poster.jpg" },
+  { src: "/hero-dj.mp4", poster: "/hero-dj-poster.jpg", caption: "DJ til ethvert event" },
+  { src: "/hero-dj-42422.mp4", poster: "/hero-dj-42422-poster.jpg", caption: "DJ til bryllupsfesten" },
+  { src: "/hero-dj-45437.mp4", poster: "/hero-dj-45437-poster.jpg", caption: "DJ til firmafesten" },
+  { src: "/hero-dj-830.mp4", poster: "/hero-dj-830-poster.jpg", caption: "DJ til din fødselsdagsfest" },
 ];
 
 // Transform per visual slot (slot 0 = front). Cards share a base box and
 // translate by a fraction of their own size, so this stays responsive.
 const SLOTS = [
-  { x: "0%", y: "14%", scale: 1, rotate: -3, zIndex: 30 },
-  { x: "60%", y: "0%", scale: 0.8, rotate: 7, zIndex: 20 },
-  { x: "44%", y: "30%", scale: 0.78, rotate: -6, zIndex: 10 },
+  { x: "0%", y: "18%", scale: 1, rotate: -3, zIndex: 40 },
+  { x: "56%", y: "0%", scale: 0.78, rotate: 6, zIndex: 30 },
+  { x: "64%", y: "28%", scale: 0.74, rotate: -5, zIndex: 20 },
+  { x: "26%", y: "36%", scale: 0.7, rotate: 8, zIndex: 10 },
 ];
 
 // Safety net: advance even if a clip's `ended` event never fires.
@@ -38,7 +41,7 @@ function StackCard({
   onAdvance,
 }: {
   dj: DJProfileWithRelations;
-  media: { src: string; poster: string };
+  media: { src: string; poster: string; caption: string };
   active: boolean;
   onAdvance: () => void;
 }) {
@@ -99,6 +102,9 @@ function StackCard({
           <Shield className="h-3 w-3" />
           Verificeret
         </span>
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent px-3 pb-2 pt-8">
+          <span className="block text-sm font-bold leading-tight text-white drop-shadow">{media.caption}</span>
+        </div>
       </div>
       <div className="space-y-1.5 p-4">
         <h3 className="truncate text-base font-semibold leading-tight">{dj.stage_name}</h3>
@@ -113,7 +119,7 @@ function StackCard({
 }
 
 export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[]; className?: string }) {
-  const cards = djs.slice(0, 3);
+  const cards = djs.slice(0, 4);
   const n = cards.length;
   const [active, setActive] = useState(0);
   const advance = useCallback(() => {

@@ -60,8 +60,8 @@ export function HomePage() {
   const { djs } = useDJs({ sortBy: "relevance" });
   const featured = djs.filter((d) => d.is_featured).slice(0, 3);
   // Hero cluster: prefer featured DJs, then top up with the rest so we
-  // always have up to 3 cards for social proof.
-  const heroDJs = [...featured, ...djs.filter((d) => !d.is_featured)].slice(0, 3);
+  // always have up to 4 cards for social proof.
+  const heroDJs = [...featured, ...djs.filter((d) => !d.is_featured)].slice(0, 4);
 
   const [eventType, setEventType] = useState<string>("");
   const [city, setCity] = useState("");
