@@ -39,8 +39,8 @@ import { formatCurrency } from "@/lib/utils";
  */
 export function CustomerRequestsListPage() {
   useDocumentHead({
-    title: "My requests · DJConnect",
-    description: "All your offer and booking requests in one place.",
+    title: "Mine forespørgsler · DJConnect",
+    description: "Alle dine tilbuds- og bookingforespørgsler ét sted.",
   });
 
   const { profile } = useAuth();
@@ -80,18 +80,18 @@ export function CustomerRequestsListPage() {
   if (isEmpty) {
     return (
       <EmptyState
-        title="No requests yet"
-        description="Send a brief and we'll match you with up to 3 DJs in 24 hours, or browse DJs and request one directly."
+        title="Ingen forespørgsler endnu"
+        description="Send en brief, så matcher vi dig med op til 3 DJs inden for 24 timer, eller find DJs og forespørg en direkte."
         action={
           <div className="flex flex-wrap justify-center gap-2">
             <Button asChild>
-              <Link to="/get-offers">Get 3 offers</Link>
+              <Link to="/get-offers">Få 3 tilbud</Link>
             </Button>
             <Button asChild variant="outline">
               <Link to="/personal-advice">Personlig rådgivning</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link to="/search">Browse DJs</Link>
+              <Link to="/search">Find DJs</Link>
             </Button>
           </div>
         }
@@ -103,10 +103,10 @@ export function CustomerRequestsListPage() {
     <div className="mx-auto max-w-3xl space-y-10">
       <header>
         <h1 className="text-[26px] font-semibold leading-tight tracking-tight md:text-[30px]">
-          My requests
+          Mine forespørgsler
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Track every brief you've sent and every DJ you've requested directly.
+          Følg hver brief, du har sendt, og hver DJ, du har forespørgt direkte.
         </p>
       </header>
 
@@ -128,9 +128,9 @@ export function CustomerRequestsListPage() {
       {bookingRecords.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
-            title="Booking requests"
+            title="Bookingforespørgsler"
             count={bookingRecords.length}
-            description="Direct requests to a specific DJ. You'll be asked to pay only after the DJ accepts."
+            description="Direkte forespørgsler til en bestemt DJ. Du bliver først bedt om at betale, når DJ'en accepterer."
           />
           <ul className="divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/40">
             {bookingRecords.map((r) => (
@@ -143,9 +143,9 @@ export function CustomerRequestsListPage() {
       {offerRecords.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
-            title="Offer requests"
+            title="Tilbudsforespørgsler"
             count={offerRecords.length}
-            description="Briefs sent to up to 3 matched DJs. Open one to see live progress."
+            description="Briefs sendt til op til 3 matchede DJs. Åbn en for at se live-status."
           />
           <ul className="divide-y divide-border/60 rounded-2xl border border-border/60 bg-card/40">
             {offerRecords.map((r) => (
@@ -157,10 +157,10 @@ export function CustomerRequestsListPage() {
 
       <div className="flex flex-wrap justify-end gap-2">
         <Button asChild variant="outline">
-          <Link to="/search">Browse DJs</Link>
+          <Link to="/search">Find DJs</Link>
         </Button>
         <Button asChild>
-          <Link to="/get-offers">New offer request</Link>
+          <Link to="/get-offers">Ny tilbudsforespørgsel</Link>
         </Button>
       </div>
     </div>
@@ -194,21 +194,21 @@ function OfferRequestRow({ record }: { record: OfferRequestRecord }) {
   );
   const cityLabel = record.brief.city
     ? CITY_OPTIONS.find((c) => c.id === record.brief.city)?.label ?? record.brief.city
-    : record.brief.customCity ?? "Denmark";
+    : record.brief.customCity ?? "Danmark";
   const dateLabel = record.brief.date
-    ? new Date(record.brief.date).toLocaleDateString("en-GB", {
+    ? new Date(record.brief.date).toLocaleDateString("da-DK", {
         day: "numeric",
         month: "short",
         year: "numeric",
       })
-    : "Date TBD";
+    : "Dato ikke fastlagt";
 
   const status =
     agg.quotesReady >= 3
-      ? "All quotes ready"
+      ? "Alle tilbud klar"
       : agg.quotesReady > 0
-        ? `${agg.quotesReady} of 3 quotes ready`
-        : "Awaiting quotes";
+        ? `${agg.quotesReady} af 3 tilbud klar`
+        : "Afventer tilbud";
 
   const statusTone =
     agg.quotesReady >= 3
@@ -228,7 +228,7 @@ function OfferRequestRow({ record }: { record: OfferRequestRecord }) {
             {eventType?.label ?? "Event"} · {cityLabel}
           </p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {dateLabel} · sent {timeSince(record.createdAtMs)}
+            {dateLabel} · sendt {timeSince(record.createdAtMs)}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -242,19 +242,19 @@ function OfferRequestRow({ record }: { record: OfferRequestRecord }) {
 
 function BookingRequestRow({ record }: { record: BookingRequest }) {
   const dateLabel = record.event.eventDate
-    ? new Date(record.event.eventDate).toLocaleDateString("en-GB", {
+    ? new Date(record.event.eventDate).toLocaleDateString("da-DK", {
         day: "numeric",
         month: "short",
         year: "numeric",
       })
-    : "Date TBD";
+    : "Dato ikke fastlagt";
 
   const status = statusLabel(record.status);
   const statusTone = statusToneClass(record.status);
 
   const priceLabel = record.pricing
     ? formatCurrency(record.pricing.totalMinor, record.djCurrency)
-    : "On request";
+    : "På forespørgsel";
 
   return (
     <li>
@@ -284,7 +284,7 @@ function BookingRequestRow({ record }: { record: BookingRequest }) {
             </p>
             <p className="mt-0.5 flex items-center gap-1.5 truncate text-xs text-muted-foreground">
               <Clock className="h-3 w-3 shrink-0" />
-              {dateLabel} · {priceLabel} · sent {timeSince(record.createdAtMs)}
+              {dateLabel} · {priceLabel} · sendt {timeSince(record.createdAtMs)}
             </p>
           </div>
         </div>
@@ -367,15 +367,15 @@ function AdvisoryRequestRow({ record }: { record: PersonalAdviceRecord }) {
 function statusLabel(status: BookingRequestStatus): string {
   switch (status) {
     case "pending_dj":
-      return "Awaiting DJ response";
+      return "Afventer DJ-svar";
     case "accepted":
-      return "Accepted — pay deposit";
+      return "Accepteret — betal depositum";
     case "declined":
-      return "Declined";
+      return "Afslået";
     case "expired":
-      return "Expired";
+      return "Udløbet";
     case "paid":
-      return "Booked";
+      return "Booket";
   }
 }
 
@@ -395,11 +395,11 @@ function statusToneClass(status: BookingRequestStatus): string {
 
 function timeSince(ms: number): string {
   const sec = Math.max(0, Math.floor((Date.now() - ms) / 1000));
-  if (sec < 60) return "just now";
+  if (sec < 60) return "lige nu";
   const min = Math.floor(sec / 60);
-  if (min < 60) return `${min} min ago`;
+  if (min < 60) return `${min} min siden`;
   const hr = Math.floor(min / 60);
-  if (hr < 24) return `${hr}h ago`;
+  if (hr < 24) return `${hr} t siden`;
   const d = Math.floor(hr / 24);
-  return `${d}d ago`;
+  return `${d} d siden`;
 }
