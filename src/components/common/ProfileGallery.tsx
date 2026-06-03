@@ -37,19 +37,21 @@ export function ProfileGallery({ images, className }: Props) {
 
   const hero = images[0];
   const grid = images.slice(1, 5);
-  const extra = images.slice(5, 7);
   const placeholders = Math.max(0, 4 - grid.length);
-  const extraPlaceholders = Math.max(0, 2 - extra.length);
+
+  // Rounded outer corners for each 2×2 grid slot (top-right, bottom-right).
+  const gridCorner = (i: number) =>
+    cn(i === 1 && "rounded-tr-2xl", i === 3 && "rounded-br-2xl");
 
   return (
     <div className={cn("relative", className)}>
-      {/* Desktop: hero + 4 grid (original 960px proportions) + 2 extra to fill width */}
-      <div className="relative hidden h-[320px] w-full md:block">
-        <div className="grid h-full grid-cols-[2fr_3fr_1.5fr] gap-2 lg:gap-3">
+      {/* Desktop: Airbnb-style collage — hero 50% left + 2×2 grid right */}
+      <div className="relative hidden h-[320px] w-full overflow-hidden rounded-2xl md:block lg:h-[420px]">
+        <div className="grid h-full grid-cols-4 grid-rows-2 gap-2">
           <button
             type="button"
             onClick={() => setOpenIdx(0)}
-            className="group relative h-full overflow-hidden rounded-l-3xl bg-muted"
+            className="group relative col-span-2 row-span-2 h-full overflow-hidden bg-muted"
           >
             <img
               src={hero.url}
@@ -58,74 +60,37 @@ export function ProfileGallery({ images, className }: Props) {
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
           </button>
-          <div className="grid h-full grid-cols-2 grid-rows-2 gap-2 lg:gap-3">
-            {grid.map((img, i) => (
-              <button
-                key={img.id}
-                type="button"
-                onClick={() => setOpenIdx(i + 1)}
-                className={cn(
-                  "group relative h-full overflow-hidden bg-muted",
-                  i === 1 && "rounded-tr-none",
-                  i === 3 && "rounded-br-none",
-                )}
-              >
-                <img
-                  src={img.url}
-                  alt={img.alt ?? ""}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-              </button>
-            ))}
-            {Array.from({ length: placeholders }).map((_, i) => (
-              <div
-                key={`ph-${i}`}
-                className={cn(
-                  "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
-                )}
-              >
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
-                  DJConnect
-                </div>
+          {grid.map((img, i) => (
+            <button
+              key={img.id}
+              type="button"
+              onClick={() => setOpenIdx(i + 1)}
+              className={cn(
+                "group relative h-full overflow-hidden bg-muted",
+                gridCorner(i),
+              )}
+            >
+              <img
+                src={img.url}
+                alt={img.alt ?? ""}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+            </button>
+          ))}
+          {Array.from({ length: placeholders }).map((_, i) => (
+            <div
+              key={`ph-${i}`}
+              className={cn(
+                "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
+                gridCorner(grid.length + i),
+              )}
+            >
+              <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
+                DJConnect
               </div>
-            ))}
-          </div>
-          <div className="grid h-full grid-rows-2 gap-2 lg:gap-3">
-            {extra.map((img, i) => (
-              <button
-                key={img.id}
-                type="button"
-                onClick={() => setOpenIdx(i + 5)}
-                className={cn(
-                  "group relative h-full overflow-hidden bg-muted",
-                  i === 0 && "rounded-tr-3xl",
-                  i === 1 && "rounded-br-3xl",
-                )}
-              >
-                <img
-                  src={img.url}
-                  alt={img.alt ?? ""}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-              </button>
-            ))}
-            {Array.from({ length: extraPlaceholders }).map((_, i) => (
-              <div
-                key={`eph-${i}`}
-                className={cn(
-                  "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
-                  extra.length + i === 0 && "rounded-tr-3xl",
-                  extra.length + i === 1 && "rounded-br-3xl",
-                )}
-              >
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
-                  DJConnect
-                </div>
-              </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
