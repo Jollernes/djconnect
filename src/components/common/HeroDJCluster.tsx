@@ -88,33 +88,30 @@ function FeaturedCard({ dj }: { dj: DJProfileWithRelations }) {
   return (
     <Link
       to={`/djs/${dj.username}`}
-      className="block rounded-2xl bg-background/95 p-3 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-transform duration-300 hover:-translate-y-0.5"
+      className="block w-[148px] rounded-xl bg-background/85 p-2 shadow-lg ring-1 ring-white/40 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
     >
-      <div className="flex items-center gap-2.5">
-        <Avatar dj={dj} className="h-9 w-9 shrink-0" />
-        <div className="min-w-0">
-          <span className="flex items-center gap-1.5">
-            <span className="truncate text-sm font-semibold text-foreground">{dj.stage_name}</span>
-            <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500 ring-2 ring-emerald-500/20" />
+      <div className="flex items-center gap-2">
+        <Avatar dj={dj} className="h-7 w-7 shrink-0" />
+        <div className="min-w-0 flex-1">
+          <span className="flex items-center gap-1">
+            <span className="truncate text-xs font-semibold text-foreground">{dj.stage_name}</span>
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
           </span>
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span className="truncate">{dj.base_location}</span>
-            <span className="inline-flex items-center gap-0.5">
-              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-              {dj.rating_average.toFixed(1)}
-            </span>
+          <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+            <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+            {dj.rating_average.toFixed(1)}
+            <span className="truncate">· {dj.base_location}</span>
           </span>
         </div>
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-muted/60 px-2.5 py-1.5">
-          <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Fra</span>
-          <span className="block text-sm font-bold text-foreground">{compactPrice(dj)}</span>
-        </div>
-        <div className="rounded-xl bg-muted/60 px-2.5 py-1.5">
-          <span className="block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Svar</span>
-          <span className="block text-sm font-bold text-foreground">{responseTime(dj.id)}</span>
-        </div>
+      <div className="mt-2 flex items-center gap-1">
+        <span className="flex-1 rounded-lg bg-muted/70 px-2 py-1 text-[10px] font-semibold text-foreground">
+          <span className="text-muted-foreground">Fra </span>
+          {compactPrice(dj)}
+        </span>
+        <span className="rounded-lg bg-muted/70 px-2 py-1 text-[10px] font-semibold text-foreground">
+          {responseTime(dj.id)}
+        </span>
       </div>
     </Link>
   );
@@ -124,23 +121,20 @@ function AvailabilityCard({ dj }: { dj: DJProfileWithRelations }) {
   return (
     <Link
       to={`/djs/${dj.username}`}
-      className="block rounded-2xl bg-background/95 p-3 shadow-2xl ring-1 ring-black/5 backdrop-blur transition-transform duration-300 hover:-translate-y-0.5"
+      className="block w-[156px] rounded-xl bg-background/85 p-2 shadow-lg ring-1 ring-white/40 backdrop-blur-md transition-transform duration-300 hover:-translate-y-0.5"
     >
-      <div className="flex items-center gap-2.5">
-        <Avatar dj={dj} className="h-9 w-9 shrink-0" />
-        <div className="min-w-0">
-          <span className="truncate text-sm font-semibold text-foreground">{dj.stage_name}</span>
-          <span className="block truncate text-xs text-muted-foreground">
-            {dj.base_location} · {eventCountValue(dj.events_performed)} events
+      <div className="flex items-center gap-2">
+        <Avatar dj={dj} className="h-7 w-7 shrink-0" />
+        <div className="min-w-0 flex-1">
+          <span className="block truncate text-xs font-semibold text-foreground">{dj.stage_name}</span>
+          <span className="block truncate text-[10px] text-muted-foreground">
+            {eventCountValue(dj.events_performed)} events · {dj.base_location}
           </span>
         </div>
       </div>
-      <div className="mt-3 flex items-center justify-between rounded-xl bg-muted/60 px-2.5 py-1.5">
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Status</span>
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-foreground">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          Ledig {availabilityDate(dj.id)}
-        </span>
+      <div className="mt-2 flex items-center gap-1.5 rounded-lg bg-emerald-500/15 px-2 py-1 text-[10px] font-semibold text-emerald-700">
+        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+        Ledig {availabilityDate(dj.id)}
       </div>
     </Link>
   );
@@ -176,7 +170,38 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
   const secondary = cards[(active + 1) % n];
 
   return (
-    <div className={cn("relative mx-auto w-full max-w-[360px]", className)}>
+    <div className={cn("relative mx-auto w-full max-w-[300px]", className)}>
+      {/* Stacked deck behind the main card — shifts as the video rotates */}
+      {Array.from({ length: Math.max(0, n - 1) }).map((_, d) => {
+        const depth = d + 1;
+        const deckDj = cards[(active + depth) % n];
+        const deckSrc = avatarOf(deckDj);
+        return (
+          <motion.div
+            key={deckDj.id}
+            aria-hidden
+            className="absolute inset-0 overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/10"
+            initial={false}
+            animate={{
+              x: depth * 15,
+              y: depth * 7,
+              rotate: 2 + depth * 3.5,
+              scale: 1 - depth * 0.05,
+              opacity: 1 - depth * 0.16,
+            }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            style={{ zIndex: 5 - depth }}
+          >
+            {deckSrc ? (
+              <img src={deckSrc} alt="" loading="lazy" className="h-full w-full object-cover" />
+            ) : (
+              <div className="h-full w-full bg-muted" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-black/10" />
+          </motion.div>
+        );
+      })}
+
       {/* Main rotating video card (defines the cluster size) */}
       <motion.div
         className="relative z-10"
@@ -214,7 +239,7 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-0.5 block max-w-[48%] text-base font-bold leading-snug text-white drop-shadow"
+                  className="mt-0.5 block max-w-[52%] text-sm font-bold leading-snug text-white drop-shadow"
                 >
                   {media.caption}
                 </motion.span>
@@ -237,7 +262,7 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
 
       {/* Floating featured-DJ card — hugs the video's upper-left corner */}
       <motion.div
-        className="absolute -left-[7%] top-[15%] z-30 w-[66%]"
+        className="absolute -left-[12%] top-[12%] z-30"
         initial={{ opacity: 0, x: -16 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.25, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -257,7 +282,7 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
 
       {/* Floating availability card — hugs the video's lower-right corner */}
       <motion.div
-        className="absolute -bottom-[6%] -right-[6%] z-30 w-[60%]"
+        className="absolute -bottom-[4%] -right-[9%] z-30"
         initial={{ opacity: 0, x: 16 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
