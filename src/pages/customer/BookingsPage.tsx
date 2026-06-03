@@ -21,26 +21,26 @@ export function CustomerBookingsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">My bookings</h1>
-        <Button asChild variant="accent"><Link to="/search">Book a new DJ</Link></Button>
+        <h1 className="text-2xl font-semibold">Mine bookinger</h1>
+        <Button asChild variant="accent"><Link to="/search">Book en ny DJ</Link></Button>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
-          <TabsTrigger value="upcoming">Upcoming ({upcoming.length})</TabsTrigger>
-          <TabsTrigger value="past">Past ({past.length})</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled ({cancelled.length})</TabsTrigger>
+          <TabsTrigger value="upcoming">Kommende ({upcoming.length})</TabsTrigger>
+          <TabsTrigger value="past">Tidligere ({past.length})</TabsTrigger>
+          <TabsTrigger value="cancelled">Annulleret ({cancelled.length})</TabsTrigger>
         </TabsList>
-        <TabsContent value="upcoming"><List items={upcoming} loading={loading} empty="No upcoming bookings" /></TabsContent>
-        <TabsContent value="past"><List items={past} loading={loading} empty="No past bookings yet" /></TabsContent>
-        <TabsContent value="cancelled"><List items={cancelled} loading={loading} empty="No cancelled bookings" /></TabsContent>
+        <TabsContent value="upcoming"><List items={upcoming} loading={loading} empty="Ingen kommende bookinger" /></TabsContent>
+        <TabsContent value="past"><List items={past} loading={loading} empty="Ingen tidligere bookinger endnu" /></TabsContent>
+        <TabsContent value="cancelled"><List items={cancelled} loading={loading} empty="Ingen annullerede bookinger" /></TabsContent>
       </Tabs>
     </div>
   );
 }
 
 function List({ items, loading, empty }: { items: ReturnType<typeof useBookings>["bookings"]; loading: boolean; empty: string }) {
-  if (loading) return <div className="py-6 text-sm text-muted-foreground">Loading…</div>;
+  if (loading) return <div className="py-6 text-sm text-muted-foreground">Indlæser…</div>;
   if (items.length === 0) return <EmptyState title={empty} className="mt-4" />;
   return (
     <div className="mt-4 space-y-3">
@@ -58,7 +58,7 @@ function List({ items, loading, empty }: { items: ReturnType<typeof useBookings>
             </Link>
             <div className="flex items-center gap-2">
               <BookingStatusBadge status={b.status} />
-              <Button asChild variant="outline" size="sm"><Link to={`/dashboard/bookings/${b.id}`}>Open</Link></Button>
+              <Button asChild variant="outline" size="sm"><Link to={`/dashboard/bookings/${b.id}`}>Åbn</Link></Button>
             </div>
           </CardContent>
         </Card>

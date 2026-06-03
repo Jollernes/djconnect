@@ -14,10 +14,10 @@ function diffParts(target: Date, now: Date) {
   const ms = target.getTime() - now.getTime();
   const totalSec = Math.max(0, Math.floor(ms / 1000));
   return {
-    days: Math.floor(totalSec / 86400),
-    hours: Math.floor((totalSec % 86400) / 3600),
-    minutes: Math.floor((totalSec % 3600) / 60),
-    seconds: totalSec % 60,
+    dage: Math.floor(totalSec / 86400),
+    timer: Math.floor((totalSec % 86400) / 3600),
+    min: Math.floor((totalSec % 3600) / 60),
+    sek: totalSec % 60,
   };
 }
 
@@ -44,7 +44,7 @@ export function CustomerDashboardPage() {
 
   if (customerType === "private") {
     if (loading) {
-      return <div className="text-sm text-muted-foreground">Loading…</div>;
+      return <div className="text-sm text-muted-foreground">Indlæser…</div>;
     }
     const featured = upcoming[0] ?? bookings[0];
     if (featured) {
@@ -53,11 +53,11 @@ export function CustomerDashboardPage() {
     return (
       <EmptyState
         icon={<Music className="h-8 w-8" />}
-        title="No event planned yet"
-        description="Browse verified mobile-disco DJs and book the one who fits your night."
+        title="Intet event planlagt endnu"
+        description="Find verificerede mobildisko-DJs og book den, der passer til din aften."
         action={
           <Button asChild variant="accent">
-            <Link to="/search">Browse DJs</Link>
+            <Link to="/search">Find DJs</Link>
           </Button>
         }
       />
@@ -69,17 +69,17 @@ export function CustomerDashboardPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">
-            Welcome back, {profile?.full_name.split(" ")[0]} 👋
+            Velkommen tilbage, {profile?.full_name.split(" ")[0]} 👋
           </h1>
           <p className="text-sm text-muted-foreground">
             {profile?.company_name
-              ? `${profile.company_name} · here's what's coming up across your team's events.`
-              : "Here's what's coming up."}
+              ? `${profile.company_name} · her er, hvad der venter på tværs af dit teams events.`
+              : "Her er, hvad der venter."}
           </p>
         </div>
         {profile?.company_name && (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
-            <Sparkles className="h-3 w-3" /> Corporate workspace
+            <Sparkles className="h-3 w-3" /> Erhvervsarbejdsområde
           </span>
         )}
       </div>
@@ -96,7 +96,7 @@ export function CustomerDashboardPage() {
               <div className="flex flex-col gap-4">
                 <div className="flex items-center gap-2 text-xs">
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span className="uppercase tracking-[0.2em] text-white/65">Your next event</span>
+                  <span className="uppercase tracking-[0.2em] text-white/65">Dit næste event</span>
                 </div>
                 <div className="flex items-center gap-4">
                   <img
@@ -114,14 +114,14 @@ export function CustomerDashboardPage() {
                 <div className="flex items-center gap-3 text-sm">
                   <BookingStatusBadge status={nextBooking.status} />
                   <span className="text-white/65">
-                    {daysUntil(nextBooking.event_date)} days away
+                    {daysUntil(nextBooking.event_date)} dage til
                   </span>
                 </div>
               </div>
 
               <div className="rounded-2xl border border-white/15 bg-white/5 p-3 backdrop-blur-sm">
                 <div className="text-center text-[10px] uppercase tracking-wider text-white/55">
-                  Showtime in
+                  Showtime om
                 </div>
                 <div className="mt-2 grid grid-cols-4 gap-1.5 text-center">
                   {Object.entries(diffParts(targetDate, now)).map(([label, value]) => (
@@ -136,7 +136,7 @@ export function CustomerDashboardPage() {
                   ))}
                 </div>
                 <div className="mt-3 text-center text-xs text-white/70 transition-colors group-hover:text-white">
-                  Open booking dashboard →
+                  Åbn booking-oversigt →
                 </div>
               </div>
             </div>
@@ -146,11 +146,11 @@ export function CustomerDashboardPage() {
         !loading && (
           <EmptyState
             icon={<Calendar className="h-8 w-8" />}
-            title="No upcoming bookings"
-            description="Browse verified DJs and book your next event."
+            title="Ingen kommende bookinger"
+            description="Find verificerede DJs og book dit næste event."
             action={
               <Button asChild variant="accent">
-                <Link to="/search">Browse DJs</Link>
+                <Link to="/search">Find DJs</Link>
               </Button>
             }
           />
@@ -160,19 +160,19 @@ export function CustomerDashboardPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <QuickLinkCard
           icon={<Calendar />}
-          label="Bookings"
+          label="Bookinger"
           href="/dashboard/bookings"
           value={bookings.length}
         />
         <QuickLinkCard
           icon={<Heart />}
-          label="Favourites"
+          label="Favoritter"
           href="/dashboard/favourites"
           value={0}
         />
         <QuickLinkCard
           icon={<MessageSquare />}
-          label="Messages"
+          label="Beskeder"
           href={
             nextBooking ? `/dashboard/bookings/${nextBooking.id}#messages` : "/dashboard/bookings"
           }
@@ -180,7 +180,7 @@ export function CustomerDashboardPage() {
         />
         <QuickLinkCard
           icon={<Music />}
-          label="Past events"
+          label="Tidligere events"
           href="/dashboard/bookings"
           value={completedCount}
         />
@@ -188,17 +188,17 @@ export function CustomerDashboardPage() {
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Recent bookings</h2>
+          <h2 className="text-lg font-semibold">Seneste bookinger</h2>
           <Button asChild variant="link" size="sm">
             <Link to="/search">
-              <Search className="h-3.5 w-3.5" /> Find a new DJ
+              <Search className="h-3.5 w-3.5" /> Find en ny DJ
             </Link>
           </Button>
         </div>
         {loading ? (
-          <div className="text-sm text-muted-foreground">Loading…</div>
+          <div className="text-sm text-muted-foreground">Indlæser…</div>
         ) : bookings.length === 0 ? (
-          <EmptyState title="No bookings yet" />
+          <EmptyState title="Ingen bookinger endnu" />
         ) : (
           <div className="divide-y rounded-xl border bg-card">
             {bookings.slice(0, 5).map((b) => (
