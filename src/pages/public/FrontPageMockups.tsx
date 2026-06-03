@@ -226,10 +226,87 @@ function VariantC({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state
   );
 }
 
+/* --------------------------- Variant D: Lys split (hvid) --------------------------- */
+
+function VariantD({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state: SearchState }) {
+  return (
+    <section className="relative overflow-hidden bg-white py-20 text-foreground">
+      <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
+      <div className="container relative">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+          <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+            <Eyebrow className="text-accent" />
+            <h1 className="mt-5 text-5xl font-semibold leading-[1.04] tracking-tight text-slate-900 sm:text-6xl">
+              {HEADLINE_LEAD}{" "}
+              <span className="bg-gradient-to-r from-accent to-pink-500 bg-clip-text text-transparent">{HEADLINE_HIGHLIGHT}</span>
+            </h1>
+            <p className="mt-5 max-w-lg text-lg text-slate-600">{SUBTITLE}</p>
+            <TrustBadges tone="dark" className="mt-7" />
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.1, duration: 0.6 }}
+            className="flex justify-center"
+          >
+            <HeroDJCluster djs={heroDJs} />
+          </motion.div>
+        </div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.6 }} className="mt-12">
+          <SearchForm state={state} className="border border-slate-200 ring-slate-200/60" />
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------- Variant E: Blød off-white centreret --------------------------- */
+
+function VariantE({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state: SearchState }) {
+  return (
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_55%,#fdf2f8_100%)] py-20 text-foreground">
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-8 h-72 w-72 -translate-x-1/2 rounded-full bg-pink-200/30 blur-3xl" />
+      <div className="container relative mx-auto max-w-3xl text-center">
+        <Eyebrow className="text-slate-500" />
+        <motion.h1
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="mx-auto mt-5 max-w-2xl text-5xl font-semibold leading-[1.04] tracking-tight text-slate-900 sm:text-6xl"
+        >
+          {HEADLINE_LEAD}{" "}
+          <span className="bg-gradient-to-r from-rose-500 via-fuchsia-500 to-violet-500 bg-clip-text text-transparent">
+            {HEADLINE_HIGHLIGHT}
+          </span>
+        </motion.h1>
+        <p className="mx-auto mt-5 max-w-xl text-lg text-slate-600">{SUBTITLE}</p>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.15, duration: 0.6 }}
+          className="mt-12 flex justify-center"
+        >
+          <HeroDJCluster djs={heroDJs} />
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.6 }} className="mx-auto mt-12 max-w-2xl">
+          <SearchForm state={state} className="border border-slate-200/80 ring-pink-200/40" />
+          <TrustBadges tone="dark" className="mt-6 justify-center" />
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 const VARIANTS = [
   { id: "a", label: "A · Centreret spotlight" },
   { id: "b", label: "B · Split / video venstre" },
   { id: "c", label: "C · Søg-først solnedgang" },
+  { id: "d", label: "D · Lys split" },
+  { id: "e", label: "E · Blød off-white" },
 ] as const;
 
 type VariantId = (typeof VARIANTS)[number]["id"];
@@ -299,6 +376,8 @@ export function FrontPageMockups() {
       {variant === "a" && <VariantA heroDJs={heroDJs} state={state} />}
       {variant === "b" && <VariantB heroDJs={heroDJs} state={state} />}
       {variant === "c" && <VariantC heroDJs={heroDJs} state={state} />}
+      {variant === "d" && <VariantD heroDJs={heroDJs} state={state} />}
+      {variant === "e" && <VariantE heroDJs={heroDJs} state={state} />}
     </div>
   );
 }
