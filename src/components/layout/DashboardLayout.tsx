@@ -23,36 +23,36 @@ import { getCustomerType } from "@/lib/customerType";
 import type { Profile, UserRole } from "@/types/domain";
 
 const corporateCustomerNav = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/dashboard/requests", label: "My requests", icon: Inbox },
-  { to: "/dashboard/bookings", label: "Bookings", icon: Calendar },
-  { to: "/dashboard/favourites", label: "Favourites", icon: Heart },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
+  { to: "/dashboard", label: "Oversigt", icon: LayoutDashboard, end: true },
+  { to: "/dashboard/requests", label: "Mine forespørgsler", icon: Inbox },
+  { to: "/dashboard/bookings", label: "Bookinger", icon: Calendar },
+  { to: "/dashboard/favourites", label: "Favoritter", icon: Heart },
+  { to: "/dashboard/settings", label: "Indstillinger", icon: Settings },
 ];
 
 const privateCustomerNav = [
-  { to: "/dashboard", label: "My event", icon: PartyPopper, end: true },
-  { to: "/dashboard/requests", label: "My requests", icon: Inbox },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
+  { to: "/dashboard", label: "Mit event", icon: PartyPopper, end: true },
+  { to: "/dashboard/requests", label: "Mine forespørgsler", icon: Inbox },
+  { to: "/dashboard/settings", label: "Indstillinger", icon: Settings },
 ];
 
 const djNav = [
-  { to: "/dj/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/dj/bookings", label: "Bookings", icon: Calendar },
-  { to: "/dj/messages", label: "Messages", icon: MessageSquare },
-  { to: "/dj/availability", label: "Availability", icon: Calendar },
-  { to: "/dj/earnings", label: "Earnings", icon: BarChart3 },
-  { to: "/dj/profile", label: "Edit profile", icon: User },
+  { to: "/dj/dashboard", label: "Oversigt", icon: LayoutDashboard, end: true },
+  { to: "/dj/bookings", label: "Bookinger", icon: Calendar },
+  { to: "/dj/messages", label: "Beskeder", icon: MessageSquare },
+  { to: "/dj/availability", label: "Tilgængelighed", icon: Calendar },
+  { to: "/dj/earnings", label: "Indtjening", icon: BarChart3 },
+  { to: "/dj/profile", label: "Rediger profil", icon: User },
 ];
 
 const adminNav = [
-  { to: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/admin/verification", label: "Verification queue", icon: ShieldCheck },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/bookings", label: "Bookings", icon: Calendar },
-  { to: "/admin/financials", label: "Financials", icon: DollarSign },
-  { to: "/admin/reviews", label: "Reviews", icon: Star },
-  { to: "/admin/featured", label: "Featured DJs", icon: Clapperboard },
+  { to: "/admin", label: "Oversigt", icon: LayoutDashboard, end: true },
+  { to: "/admin/verification", label: "Verificeringskø", icon: ShieldCheck },
+  { to: "/admin/users", label: "Brugere", icon: Users },
+  { to: "/admin/bookings", label: "Bookinger", icon: Calendar },
+  { to: "/admin/financials", label: "Økonomi", icon: DollarSign },
+  { to: "/admin/reviews", label: "Anmeldelser", icon: Star },
+  { to: "/admin/featured", label: "Fremhævede DJs", icon: Clapperboard },
 ];
 
 function navFor(role: UserRole, profile: Profile) {

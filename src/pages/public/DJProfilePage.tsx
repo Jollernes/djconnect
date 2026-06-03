@@ -39,11 +39,11 @@ export function DJProfilePage() {
     return (
       <div className="container py-16">
         <EmptyState
-          title="DJ not found"
-          description="This profile may have been removed or is pending verification."
+          title="DJ ikke fundet"
+          description="Denne profil er måske blevet fjernet eller afventer verificering."
           action={
             <Button asChild>
-              <Link to="/search">Browse other DJs</Link>
+              <Link to="/search">Se andre DJs</Link>
             </Button>
           }
         />
