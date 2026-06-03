@@ -11,14 +11,19 @@ import type { DJProfileWithRelations } from "@/types/domain";
  * visitors immediately see real, verified DJs.
  */
 
+const HERO_VIDEO_SRC = "/hero-dj.mp4";
+const HERO_VIDEO_POSTER = "/hero-dj-poster.jpg";
+
 function MiniCard({
   dj,
   size,
+  video,
   className,
   style,
 }: {
   dj: DJProfileWithRelations;
   size: "sm" | "lg";
+  video?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -34,7 +39,19 @@ function MiniCard({
       )}
     >
       <div className={cn("relative overflow-hidden bg-muted", large ? "aspect-[4/3]" : "aspect-[5/4]")}>
-        {image ? (
+        {video ? (
+          <video
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            src={HERO_VIDEO_SRC}
+            poster={HERO_VIDEO_POSTER}
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            aria-label={`${dj.stage_name} spiller live`}
+          />
+        ) : image ? (
           <img
             src={image}
             alt={dj.stage_name}
@@ -43,6 +60,15 @@ function MiniCard({
           />
         ) : (
           <div className="flex h-full items-center justify-center text-xs text-muted-foreground">Intet foto</div>
+        )}
+        {video && (
+          <span className="absolute left-2 top-2 inline-flex items-center gap-1.5 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white backdrop-blur">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-400 opacity-75" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-rose-500" />
+            </span>
+            Live
+          </span>
         )}
         <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-500/95 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white shadow">
           <Shield className="h-3 w-3" />
@@ -106,7 +132,7 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
         transition={{ delay: 0.25, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         className="absolute bottom-0 left-0 z-20 w-[58%]"
       >
-        <MiniCard dj={lead} size="lg" className="-rotate-[3deg]" />
+        <MiniCard dj={lead} size="lg" video className="-rotate-[3deg]" />
       </motion.div>
 
       {/* Floating social-proof chip */}
