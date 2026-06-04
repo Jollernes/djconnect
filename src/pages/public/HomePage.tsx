@@ -143,7 +143,7 @@ type HeroProps = {
 
 function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, onSubmit }: HeroProps) {
   return (
-    <section className="relative isolate overflow-hidden bg-background md:bg-transparent md:text-primary-foreground md:hero-gradient">
+    <section className="relative isolate overflow-visible md:overflow-hidden bg-background md:bg-transparent md:text-primary-foreground md:hero-gradient">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-40 hidden md:block" />
       <div aria-hidden className="absolute inset-0 noise-overlay hidden md:block" />
 
@@ -291,15 +291,15 @@ function MobileHeroContent({
   const topDJs = featured.length > 0 ? featured : heroDJs.slice(0, 3);
 
   return (
-    <div className="relative bg-background md:hidden">
-      {/* Social proof badge — overlaps video above */}
-      <div className="flex justify-center -mt-5 relative z-20">
+    <div className="relative md:hidden">
+      {/* Social proof badge — overlaps half video, half white section */}
+      <div className="flex justify-center -mt-[18px] relative z-20">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={0.2}
-          className="inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2 shadow-lg ring-1 ring-black/5"
+          className="inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2.5 shadow-lg ring-1 ring-black/5"
         >
           <div className="flex -space-x-2">
             {avatars.map((a, i) => (
@@ -318,8 +318,8 @@ function MobileHeroContent({
         </motion.div>
       </div>
 
-      {/* Main content */}
-      <div className="px-5 pt-7 pb-2">
+      {/* Headline + subtitle — white bg */}
+      <div className="bg-background px-5 pt-6 pb-2">
         <motion.h1
           initial="hidden"
           animate="visible"
@@ -345,13 +345,15 @@ function MobileHeroContent({
           du tager dig af gæsterne.
         </motion.p>
 
-        {/* Vælg din fest */}
+      </div>
+
+      {/* Vælg din fest — light gray bg for visual separation */}
+      <div className="bg-gray-50 px-5 py-6">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={0.3}
-          className="mt-7"
         >
           <div className="flex items-baseline justify-between">
             <h2 className="text-base font-semibold text-foreground">Vælg din fest</h2>
@@ -376,14 +378,16 @@ function MobileHeroContent({
           </div>
         </motion.div>
 
-        {/* Top-vurderede DJs */}
-        {topDJs.length > 0 && (
+      </div>
+
+      {/* Top-vurderede DJs — white bg */}
+      {topDJs.length > 0 && (
+        <div className="bg-background px-5 pt-6 pb-4">
           <motion.div
             initial="hidden"
             animate="visible"
             variants={fadeUp}
             custom={0.4}
-            className="mt-7"
           >
             <div className="flex items-baseline justify-between">
               <h2 className="text-base font-semibold text-foreground">Top-vurderede DJs</h2>
@@ -445,8 +449,8 @@ function MobileHeroContent({
               })}
             </div>
           </motion.div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
