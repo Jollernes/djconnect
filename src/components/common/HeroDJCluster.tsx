@@ -115,6 +115,23 @@ function InfoStrip({ dj }: { dj: DJProfileWithRelations }) {
   );
 }
 
+// Compact mini-card for mobileHero: smaller, bottom-left positioned
+function CompactInfoCard({ dj }: { dj: DJProfileWithRelations }) {
+  return (
+    <div className="inline-flex items-center gap-1.5 rounded-xl bg-black/40 px-2 py-1.5 ring-1 ring-white/10 backdrop-blur-md">
+      <Avatar dj={dj} className="h-6 w-6 shrink-0 ring-1 ring-white/30" />
+      <div className="min-w-0">
+        <span className="flex items-center gap-1">
+          <span className="truncate text-[10px] font-semibold text-white">{dj.stage_name}</span>
+          <Star className="h-2 w-2 shrink-0 fill-amber-300 text-amber-300" />
+          <span className="text-[10px] text-white/80">{dj.rating_average.toFixed(1)}</span>
+        </span>
+      </div>
+      <span className="shrink-0 text-[10px] font-bold text-white">{compactPrice(dj)}</span>
+    </div>
+  );
+}
+
 // --- Main component --------------------------------------------------------
 
 export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWithRelations[]; className?: string; mobileHero?: boolean }) {
@@ -197,7 +214,7 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
         >
           <div className={cn(
             "relative aspect-[3/4] overflow-hidden bg-muted",
-            mobileHero && "aspect-[4/3] md:aspect-[3/4]",
+            mobileHero && "aspect-[5/3] md:aspect-[3/4]",
           )}>
             <video
               key={active}
@@ -232,7 +249,10 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
                 </motion.span>
               </AnimatePresence>
             </div>
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-4 pb-4 pt-14">
+            <div className={cn(
+              "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-4 pb-4",
+              mobileHero ? "pt-8 md:pt-14" : "pt-14",
+            )}>
               <div className="flex items-center justify-center gap-1.5">
                 {Array.from({ length: n }).map((_, i) => (
                   <span
@@ -251,9 +271,20 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-3"
+                  className="mt-2"
                 >
-                  <InfoStrip dj={featured} />
+                  {mobileHero ? (
+                    <>
+                      <div className="md:hidden">
+                        <CompactInfoCard dj={featured} />
+                      </div>
+                      <div className="hidden md:block">
+                        <InfoStrip dj={featured} />
+                      </div>
+                    </>
+                  ) : (
+                    <InfoStrip dj={featured} />
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>
