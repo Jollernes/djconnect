@@ -146,10 +146,23 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
 
       <FloatingIcons />
 
-      <div className="container relative py-16 md:py-24">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
-          <div>
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/70">
+      <div className="container relative py-8 md:py-24">
+        <div className="grid items-center gap-6 md:gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+          {/* Video cluster — first on mobile (order-first), normal position on lg */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.94, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="relative -order-1 -mx-4 sm:-mx-6 md:mx-0 lg:order-none"
+          >
+            <div aria-hidden className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl hidden md:block" />
+            <HeroDJCluster djs={heroDJs} className="relative mx-auto md:max-w-[300px] max-w-[280px]" />
+          </motion.div>
+
+          {/* Text column — centered on mobile, left-aligned on desktop */}
+          <div className="text-center md:text-left">
+            {/* Eyebrow: badge-pill on mobile, inline on desktop */}
+            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/80 backdrop-blur-sm md:rounded-none md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none">
               <Equalizer bars={4} className="h-3.5" barClassName="bg-accent" />
               Verificerede DJs · Mobilt diskotek · Betalt via Stripe
             </motion.div>
@@ -159,7 +172,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
               animate="visible"
               variants={fadeUp}
               custom={0.1}
-              className="mt-6 text-5xl font-semibold text-balance leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.25rem]"
+              className="mt-5 text-3xl font-semibold text-balance leading-[1.08] tracking-tight sm:text-5xl md:mt-6 lg:text-[4.25rem]"
             >
               Hver god aften{" "}
               <span className="relative whitespace-nowrap">
@@ -179,22 +192,12 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
               animate="visible"
               variants={fadeUp}
               custom={0.25}
-              className="mt-6 max-w-xl text-lg text-primary-foreground/80 sm:text-xl"
+              className="mx-auto mt-4 max-w-sm text-base text-primary-foreground/80 sm:text-xl md:mx-0 md:mt-6 md:max-w-xl"
             >
               Book interviewede, udstyrsverificerede DJs til bryllupper, fødselsdage og firmaarrangementer.
               De medbringer lyd, lys og energi — du tager dig af gæsterne.
             </motion.p>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative"
-          >
-            <div aria-hidden className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl" />
-            <HeroDJCluster djs={heroDJs} className="relative" />
-          </motion.div>
         </div>
 
         {/* Mobile: compact search pill */}
@@ -265,7 +268,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
           animate="visible"
           variants={fadeUp}
           custom={0.55}
-          className="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-primary-foreground/80"
+          className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-primary-foreground/80 md:mt-8 md:justify-start"
         >
           <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-accent" /> Alle DJs interviewet &amp; verificeret</span>
           <span className="flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-accent" /> Tilgængelighed i realtid</span>
