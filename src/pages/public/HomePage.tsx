@@ -153,7 +153,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
             initial={{ opacity: 0, scale: 0.94, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative -order-1 -mx-4 sm:-mx-6 md:mx-0 lg:order-none"
+            className="relative -order-1 -mx-4 sm:-mx-6 md:mx-0 lg:order-1"
           >
             <div aria-hidden className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl hidden md:block" />
             <HeroDJCluster djs={heroDJs} className="relative mx-auto md:max-w-[300px] max-w-[280px]" />
