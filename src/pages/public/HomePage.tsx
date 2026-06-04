@@ -141,13 +141,13 @@ type HeroProps = {
 function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, onSubmit }: HeroProps) {
   return (
     <section className="relative isolate overflow-hidden text-primary-foreground hero-gradient">
-      <div aria-hidden className="absolute inset-0 bg-grid opacity-40" />
-      <div aria-hidden className="absolute inset-0 noise-overlay" />
+      <div aria-hidden className="absolute inset-0 bg-grid opacity-40 hidden md:block" />
+      <div aria-hidden className="absolute inset-0 noise-overlay hidden md:block" />
 
       <FloatingIcons />
 
-      <div className="container relative py-8 md:py-24">
-        <div className="grid items-center gap-6 md:gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+      <div className="container relative py-0 md:py-24">
+        <div className="grid items-center gap-0 md:gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
           {/* Video cluster — first on mobile (full-width hero), card on desktop */}
           <motion.div
             initial={{ opacity: 0, scale: 0.98, y: 10 }}
@@ -173,7 +173,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
           </motion.div>
 
           {/* Text column — centered on mobile, left-aligned on desktop */}
-          <div className="text-center md:text-left">
+          <div className="px-4 pt-6 text-center md:px-0 md:pt-0 md:text-left">
             {/* Eyebrow: hidden on mobile (shown as overlapping badge above), inline on desktop */}
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="hidden items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/70 md:inline-flex">
               <Equalizer bars={4} className="h-3.5" barClassName="bg-accent" />
@@ -185,7 +185,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
               animate="visible"
               variants={fadeUp}
               custom={0.1}
-              className="mt-5 text-3xl font-semibold text-balance leading-[1.08] tracking-tight sm:text-5xl md:mt-6 lg:text-[4.25rem]"
+              className="mt-4 text-2xl font-semibold text-balance leading-[1.12] tracking-tight sm:text-5xl md:mt-6 lg:text-[4.25rem]"
             >
               Hver god aften{" "}
               <span className="relative whitespace-nowrap">
@@ -205,7 +205,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
               animate="visible"
               variants={fadeUp}
               custom={0.25}
-              className="mx-auto mt-4 max-w-sm text-base text-primary-foreground/80 sm:text-xl md:mx-0 md:mt-6 md:max-w-xl"
+              className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-primary-foreground/75 sm:text-xl md:mx-0 md:mt-6 md:max-w-xl md:text-base"
             >
               Book interviewede, udstyrsverificerede DJs til bryllupper, fødselsdage og firmaarrangementer.
               De medbringer lyd, lys og energi — du tager dig af gæsterne.
@@ -219,7 +219,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
           animate="visible"
           variants={fadeUp}
           custom={0.4}
-          className="mt-8 md:hidden"
+          className="mt-6 px-4 md:hidden"
         >
           <MobileSearchPill
             eventType={eventType}
@@ -281,7 +281,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
           animate="visible"
           variants={fadeUp}
           custom={0.55}
-          className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-primary-foreground/80 md:mt-8 md:justify-start"
+          className="mt-8 hidden flex-wrap justify-start gap-x-8 gap-y-2 text-sm text-primary-foreground/80 md:flex"
         >
           <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-accent" /> Alle DJs interviewet &amp; verificeret</span>
           <span className="flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-accent" /> Tilgængelighed i realtid</span>
@@ -289,7 +289,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
         </motion.div>
       </div>
 
-      <svg aria-hidden viewBox="0 0 1440 80" className="block w-full text-background" preserveAspectRatio="none">
+      <svg aria-hidden viewBox="0 0 1440 80" className="hidden w-full text-background md:block" preserveAspectRatio="none">
         <path d="M0 32 C 240 80 480 0 720 32 C 960 64 1200 8 1440 40 L 1440 80 L 0 80 Z" fill="currentColor" />
       </svg>
     </section>
