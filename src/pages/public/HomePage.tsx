@@ -284,37 +284,88 @@ function MobileHeroContent({
   featured: DJProfileWithRelations[];
   navigate: ReturnType<typeof useNavigate>;
 }) {
+  const [mobileEventType, setMobileEventType] = useState("");
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const pickerRef = useRef<HTMLDivElement>(null);
   const avatars = heroDJs
     .slice(0, 3)
     .map((dj) => ({ url: dj.profile.avatar_url, name: dj.stage_name }));
 
   const topDJs = featured.length > 0 ? featured : heroDJs.slice(0, 3);
 
+  const selectedEvent = MOBILE_EVENT_TYPES.find((e) => e.id === mobileEventType);
+
+  useEffect(() => {
+    if (!pickerOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setPickerOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [pickerOpen]);
+
+  function handleMobileSearch() {
+    const params = new URLSearchParams();
+    if (mobileEventType) params.set("eventType", mobileEventType);
+    navigate(`/search?${params.toString()}`);
+  }
+
   return (
     <div className="relative md:hidden">
-      {/* Social proof badge — overlaps half video, half white section */}
-      <div className="flex justify-center -mt-[18px] relative z-20">
+      {/* Search bar — overlaps half video, half white section */}
+      <div className="px-5 -mt-[22px] relative z-20">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={0.2}
-          className="inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2.5 shadow-lg ring-1 ring-black/5"
+          className="flex items-center gap-2 rounded-full bg-white py-1.5 pl-4 pr-1.5 shadow-lg ring-1 ring-black/5"
         >
-          <div className="flex -space-x-2">
-            {avatars.map((a, i) => (
-              <img
-                key={i}
-                src={a.url ?? undefined}
-                alt={a.name}
-                className="h-7 w-7 rounded-full border-2 border-white object-cover"
-              />
-            ))}
+          <div className="relative min-w-0 flex-1" ref={pickerRef}>
+            <span className="text-[9px] font-bold uppercase tracking-widest text-accent">
+              Festtype
+            </span>
+            <button
+              type="button"
+              onClick={() => setPickerOpen((o) => !o)}
+              className="block w-full truncate text-left text-sm text-foreground/80"
+            >
+              {selectedEvent ? selectedEvent.label : "Vælg festtype"}
+            </button>
+            {pickerOpen && (
+              <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-xl border bg-white p-2 shadow-xl">
+                {MOBILE_EVENT_TYPES.map(({ id, label, Icon }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => {
+                      setMobileEventType(id);
+                      setPickerOpen(false);
+                    }}
+                    className={cn(
+                      "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
+                      mobileEventType === id
+                        ? "bg-accent/10 font-semibold text-accent"
+                        : "text-foreground hover:bg-gray-50",
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <span className="text-xs font-medium text-gray-700">
-            Brugt af 240+ par &amp; firmaer i 2026
-          </span>
-          <span className="h-2 w-2 rounded-full bg-green-500" />
+          <button
+            type="button"
+            onClick={handleMobileSearch}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-white shadow-md transition active:scale-95"
+            aria-label="Søg"
+          >
+            <Search className="h-4 w-4" />
+          </button>
         </motion.div>
       </div>
 
@@ -345,6 +396,29 @@ function MobileHeroContent({
           du tager dig af gæsterne.
         </motion.p>
 
+        {/* Social proof — relocated below subtitle */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.25}
+          className="mt-4 inline-flex items-center gap-2"
+        >
+          <div className="flex -space-x-1.5">
+            {avatars.map((a, i) => (
+              <img
+                key={i}
+                src={a.url ?? undefined}
+                alt={a.name}
+                className="h-5 w-5 rounded-full border-[1.5px] border-white object-cover"
+              />
+            ))}
+          </div>
+          <span className="text-[11px] font-medium text-muted-foreground">
+            Brugt af 240+ par &amp; firmaer i 2026
+          </span>
+          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+        </motion.div>
       </div>
 
       {/* Vælg din fest — light gray bg for visual separation */}
