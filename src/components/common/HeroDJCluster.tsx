@@ -115,22 +115,7 @@ function InfoStrip({ dj }: { dj: DJProfileWithRelations }) {
   );
 }
 
-// Compact mini-card for mobileHero: smaller, bottom-left positioned
-function CompactInfoCard({ dj }: { dj: DJProfileWithRelations }) {
-  return (
-    <div className="inline-flex items-center gap-1.5 rounded-xl bg-black/40 px-2 py-1.5 ring-1 ring-white/10 backdrop-blur-md">
-      <Avatar dj={dj} className="h-6 w-6 shrink-0 ring-1 ring-white/30" />
-      <div className="min-w-0">
-        <span className="flex items-center gap-1">
-          <span className="truncate text-[10px] font-semibold text-white">{dj.stage_name}</span>
-          <Star className="h-2 w-2 shrink-0 fill-amber-300 text-amber-300" />
-          <span className="text-[10px] text-white/80">{dj.rating_average.toFixed(1)}</span>
-        </span>
-      </div>
-      <span className="shrink-0 text-[10px] font-bold text-white">{compactPrice(dj)}</span>
-    </div>
-  );
-}
+
 
 // --- Main component --------------------------------------------------------
 
@@ -264,29 +249,34 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
                   />
                 ))}
               </div>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={featured.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-2"
-                >
-                  {mobileHero ? (
-                    <>
-                      <div className="md:hidden">
-                        <CompactInfoCard dj={featured} />
-                      </div>
-                      <div className="hidden md:block">
-                        <InfoStrip dj={featured} />
-                      </div>
-                    </>
-                  ) : (
+              {/* Info strip: hidden on mobile when mobileHero, shown on desktop */}
+              {mobileHero ? (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={featured.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="mt-2 hidden md:block"
+                  >
                     <InfoStrip dj={featured} />
-                  )}
-                </motion.div>
-              </AnimatePresence>
+                  </motion.div>
+                </AnimatePresence>
+              ) : (
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={featured.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                    className="mt-2"
+                  >
+                    <InfoStrip dj={featured} />
+                  </motion.div>
+                </AnimatePresence>
+              )}
             </div>
           </div>
         </Link>

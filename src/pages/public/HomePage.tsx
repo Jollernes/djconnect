@@ -157,12 +157,25 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
           >
             <div aria-hidden className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl hidden md:block" />
             <HeroDJCluster djs={heroDJs} mobileHero className="relative" />
+            {/* Mobile overlapping trust badge — sits half on video, half below (like GigSalad stars) */}
+            <div className="absolute -bottom-4 left-1/2 z-20 -translate-x-1/2 md:hidden">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                custom={0.3}
+                className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-white shadow-lg"
+              >
+                <Shield className="h-3.5 w-3.5" />
+                Verificerede DJs · Mobilt diskotek · Stripe
+              </motion.div>
+            </div>
           </motion.div>
 
           {/* Text column — centered on mobile, left-aligned on desktop */}
           <div className="text-center md:text-left">
-            {/* Eyebrow: badge-pill on mobile, inline on desktop */}
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/80 backdrop-blur-sm md:rounded-none md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none">
+            {/* Eyebrow: hidden on mobile (shown as overlapping badge above), inline on desktop */}
+            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="hidden items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/70 md:inline-flex">
               <Equalizer bars={4} className="h-3.5" barClassName="bg-accent" />
               Verificerede DJs · Mobilt diskotek · Betalt via Stripe
             </motion.div>
