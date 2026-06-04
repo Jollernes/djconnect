@@ -117,7 +117,7 @@ function InfoStrip({ dj }: { dj: DJProfileWithRelations }) {
 
 // --- Main component --------------------------------------------------------
 
-export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[]; className?: string }) {
+export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWithRelations[]; className?: string; mobileHero?: boolean }) {
   const cards = djs.slice(0, 4);
   const n = Math.min(cards.length, MEDIA.length);
   const [active, setActive] = useState(0);
@@ -144,7 +144,7 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
   const featured = cards[active];
 
   return (
-    <div className={cn("relative mx-auto w-full max-w-[300px]", className)}>
+    <div className={cn("relative mx-auto w-full max-w-[300px]", mobileHero && "max-w-none md:max-w-[300px]", className)}>
       {/* Video card + deck stage (sized by the video card) */}
       <div className="relative">
       {/* Stacked deck behind the main card — shifts as the video rotates */}
@@ -156,7 +156,10 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
           <motion.div
             key={deckDj.id}
             aria-hidden
-            className="absolute inset-0 overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/10"
+            className={cn(
+              "absolute inset-0 overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/10",
+              mobileHero && "hidden md:block",
+            )}
             initial={false}
             animate={{
               x: depth * 15,
@@ -181,15 +184,21 @@ export function HeroDJCluster({ djs, className }: { djs: DJProfileWithRelations[
       {/* Main rotating video card (defines the cluster size) */}
       <motion.div
         className="relative z-10"
-        initial={{ opacity: 0, y: 12, rotate: 3 }}
-        animate={{ opacity: 1, y: 0, rotate: 2 }}
+        initial={{ opacity: 0, y: 12, rotate: mobileHero ? 0 : 3 }}
+        animate={{ opacity: 1, y: 0, rotate: mobileHero ? 0 : 2 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       >
         <Link
           to={`/djs/${featured.username}`}
-          className="group block overflow-hidden rounded-3xl shadow-2xl ring-1 ring-black/10"
+          className={cn(
+            "group block overflow-hidden rounded-3xl shadow-2xl ring-1 ring-black/10",
+            mobileHero && "rounded-none shadow-none ring-0 md:rounded-3xl md:shadow-2xl md:ring-1 md:ring-black/10",
+          )}
         >
-          <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+          <div className={cn(
+            "relative aspect-[3/4] overflow-hidden bg-muted",
+            mobileHero && "aspect-[4/3] md:aspect-[3/4]",
+          )}>
             <video
               key={active}
               ref={videoRef}

@@ -148,15 +148,15 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
 
       <div className="container relative py-8 md:py-24">
         <div className="grid items-center gap-6 md:gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
-          {/* Video cluster — first on mobile (order-first), normal position on lg */}
+          {/* Video cluster — first on mobile (full-width hero), card on desktop */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.94, y: 20 }}
+            initial={{ opacity: 0, scale: 0.98, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative -order-1 -mx-4 sm:-mx-6 md:mx-0 lg:order-1"
+            transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="relative -order-1 -mx-4 -mt-8 sm:-mx-6 md:mx-0 md:mt-0 lg:order-1"
           >
             <div aria-hidden className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl hidden md:block" />
-            <HeroDJCluster djs={heroDJs} className="relative mx-auto md:max-w-[300px] max-w-[280px]" />
+            <HeroDJCluster djs={heroDJs} mobileHero className="relative" />
           </motion.div>
 
           {/* Text column — centered on mobile, left-aligned on desktop */}
