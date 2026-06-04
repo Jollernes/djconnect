@@ -89,6 +89,9 @@ export function HomePage() {
     <>
       <Hero heroDJs={heroDJs} eventType={eventType} setEventType={setEventType} city={city} setCity={setCity} date={date} setDate={setDate} onSubmit={submit} />
 
+      {/* Mobile-only: white-background content below video hero */}
+      <MobileHeroContent heroDJs={heroDJs} featured={featured} navigate={navigate} />
+
       <Marquee />
 
       {featured.length > 0 && (
@@ -140,7 +143,7 @@ type HeroProps = {
 
 function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, onSubmit }: HeroProps) {
   return (
-    <section className="relative isolate overflow-hidden text-primary-foreground hero-gradient">
+    <section className="relative isolate overflow-hidden bg-background md:bg-transparent md:text-primary-foreground md:hero-gradient">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-40 hidden md:block" />
       <div aria-hidden className="absolute inset-0 noise-overlay hidden md:block" />
 
@@ -153,29 +156,15 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
             initial={{ opacity: 0, scale: 0.98, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative -order-1 -mx-4 -mt-8 sm:-mx-6 md:mx-0 md:mt-0 lg:order-1"
+            className="relative -order-1 -mx-4 sm:-mx-6 md:mx-0 lg:order-1"
           >
             <div aria-hidden className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl hidden md:block" />
             <HeroDJCluster djs={heroDJs} mobileHero className="relative" />
-            {/* Mobile overlapping trust badge — sits half on video, half below (like GigSalad stars) */}
-            <div className="absolute -bottom-4 left-1/2 z-20 -translate-x-1/2 md:hidden">
-              <motion.div
-                initial="hidden"
-                animate="visible"
-                variants={fadeUp}
-                custom={0.3}
-                className="inline-flex items-center gap-2 whitespace-nowrap rounded-full bg-accent px-4 py-2 text-[11px] font-semibold uppercase tracking-wide text-white shadow-lg"
-              >
-                <Shield className="h-3.5 w-3.5" />
-                Verificerede DJs · Mobilt diskotek · Stripe
-              </motion.div>
-            </div>
           </motion.div>
 
-          {/* Text column — centered on mobile, left-aligned on desktop */}
-          <div className="px-4 pt-6 text-center md:px-0 md:pt-0 md:text-left">
-            {/* Eyebrow: hidden on mobile (shown as overlapping badge above), inline on desktop */}
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="hidden items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/70 md:inline-flex">
+          {/* Desktop text column — hidden on mobile */}
+          <div className="hidden md:block md:text-left">
+            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/70">
               <Equalizer bars={4} className="h-3.5" barClassName="bg-accent" />
               Verificerede DJs · Mobilt diskotek · Betalt via Stripe
             </motion.div>
@@ -185,7 +174,7 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
               animate="visible"
               variants={fadeUp}
               custom={0.1}
-              className="mt-4 text-2xl font-semibold text-balance leading-[1.12] tracking-tight sm:text-5xl md:mt-6 lg:text-[4.25rem]"
+              className="mt-6 text-5xl font-semibold text-balance leading-[1.05] tracking-tight lg:text-[4.25rem]"
             >
               Hver god aften{" "}
               <span className="relative whitespace-nowrap">
@@ -205,32 +194,13 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
               animate="visible"
               variants={fadeUp}
               custom={0.25}
-              className="mx-auto mt-3 max-w-xs text-sm leading-relaxed text-primary-foreground/75 sm:text-xl md:mx-0 md:mt-6 md:max-w-xl md:text-base"
+              className="mt-6 max-w-xl text-lg text-primary-foreground/80 sm:text-xl"
             >
               Book interviewede, udstyrsverificerede DJs til bryllupper, fødselsdage og firmaarrangementer.
               De medbringer lyd, lys og energi — du tager dig af gæsterne.
             </motion.p>
           </div>
         </div>
-
-        {/* Mobile: compact search pill */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.4}
-          className="mt-6 px-4 md:hidden"
-        >
-          <MobileSearchPill
-            eventType={eventType}
-            setEventType={setEventType}
-            city={city}
-            setCity={setCity}
-            date={date}
-            setDate={setDate}
-            onSubmit={onSubmit}
-          />
-        </motion.div>
 
         {/* Desktop: inline 4-col form */}
         <motion.form
@@ -293,6 +263,191 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
         <path d="M0 32 C 240 80 480 0 720 32 C 960 64 1200 8 1440 40 L 1440 80 L 0 80 Z" fill="currentColor" />
       </svg>
     </section>
+  );
+}
+
+/* ---------- Mobile-only hero content (white background below video) ---------- */
+
+const MOBILE_EVENT_TYPES = [
+  { id: "wedding", label: "Bryllup", Icon: Heart },
+  { id: "birthday", label: "Fødselsdag", Icon: Cake },
+  { id: "corporate_party", label: "Firmafest", Icon: Briefcase },
+  { id: "other", label: "Anden fest", Icon: PartyPopper },
+];
+
+function MobileHeroContent({
+  heroDJs,
+  featured,
+  navigate,
+}: {
+  heroDJs: DJProfileWithRelations[];
+  featured: DJProfileWithRelations[];
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  const avatars = heroDJs
+    .slice(0, 3)
+    .map((dj) => ({ url: dj.profile.avatar_url, name: dj.stage_name }));
+
+  const topDJs = featured.length > 0 ? featured : heroDJs.slice(0, 3);
+
+  return (
+    <div className="relative bg-background md:hidden">
+      {/* Social proof badge — overlaps video above */}
+      <div className="flex justify-center -mt-5 relative z-20">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.2}
+          className="inline-flex items-center gap-2.5 rounded-full bg-white px-4 py-2 shadow-lg ring-1 ring-black/5"
+        >
+          <div className="flex -space-x-2">
+            {avatars.map((a, i) => (
+              <img
+                key={i}
+                src={a.url ?? undefined}
+                alt={a.name}
+                className="h-7 w-7 rounded-full border-2 border-white object-cover"
+              />
+            ))}
+          </div>
+          <span className="text-xs font-medium text-gray-700">
+            Brugt af 240+ par &amp; firmaer i 2026
+          </span>
+          <span className="h-2 w-2 rounded-full bg-green-500" />
+        </motion.div>
+      </div>
+
+      {/* Main content */}
+      <div className="px-5 pt-7 pb-2">
+        <motion.h1
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.1}
+          className="text-[1.75rem] font-bold leading-[1.15] tracking-tight text-foreground"
+        >
+          Hver god aften{" "}
+          <span className="bg-gradient-to-r from-accent to-orange-500 bg-clip-text text-transparent">
+            starter med en DJ.
+          </span>
+        </motion.h1>
+
+        <motion.p
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.2}
+          className="mt-3 text-sm leading-relaxed text-muted-foreground"
+        >
+          Book interviewede, udstyrs-verificerede DJs til bryllupper,
+          fødselsdage og firmaevents. De medbringer lyd, lys og energi —
+          du tager dig af gæsterne.
+        </motion.p>
+
+        {/* Vælg din fest */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.3}
+          className="mt-7"
+        >
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-base font-semibold text-foreground">Vælg din fest</h2>
+            <Link
+              to="/get-offers"
+              className="text-xs font-semibold uppercase tracking-wide text-accent hover:underline"
+            >
+              Kom i gang
+            </Link>
+          </div>
+          <div className="mt-3 grid grid-cols-4 gap-2.5">
+            {MOBILE_EVENT_TYPES.map(({ id, label, Icon }) => (
+              <button
+                key={id}
+                onClick={() => navigate(`/search?eventType=${id}`)}
+                className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 bg-white py-3 transition-colors hover:border-accent/40 hover:bg-accent/5 active:bg-accent/10"
+              >
+                <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
+                <span className="text-[11px] font-medium text-gray-700">{label}</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Top-vurderede DJs */}
+        {topDJs.length > 0 && (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.4}
+            className="mt-7"
+          >
+            <div className="flex items-baseline justify-between">
+              <h2 className="text-base font-semibold text-foreground">Top-vurderede DJs</h2>
+              <Link
+                to="/search"
+                className="text-xs font-semibold text-accent hover:underline"
+              >
+                Se alle →
+              </Link>
+            </div>
+            <div className="-mx-5 mt-3 flex gap-3 overflow-x-auto px-5 pb-4 scrollbar-hide">
+              {topDJs.map((dj) => {
+                const heroImage = dj.equipment_photos[0]?.url ?? dj.profile.avatar_url;
+                const reviews = dj.reviews ?? [];
+                const avgRating = reviews.length > 0
+                  ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(2)
+                  : null;
+                const eventLabel = dj.event_types[0]?.label
+                  ? `${dj.event_types[0].label.toUpperCase()}-DJ`
+                  : "DJ";
+                return (
+                  <Link
+                    key={dj.id}
+                    to={`/djs/${dj.username}`}
+                    className="group relative w-[70vw] max-w-[280px] flex-shrink-0 overflow-hidden rounded-2xl"
+                  >
+                    <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+                      {heroImage ? (
+                        <img
+                          src={heroImage}
+                          alt={dj.stage_name}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-muted-foreground">
+                          Intet foto
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <div className="absolute left-3 top-3 flex items-center gap-2">
+                        <span className="rounded-md bg-gray-900/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                          {eventLabel}
+                        </span>
+                      </div>
+                      {avgRating && (
+                        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-gray-900/70 px-2 py-0.5">
+                          <Sparkles className="h-3 w-3 text-amber-400" />
+                          <span className="text-[11px] font-semibold text-white">{avgRating}</span>
+                        </div>
+                      )}
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <p className="text-sm font-semibold text-white">{dj.stage_name}</p>
+                        <p className="text-xs text-white/70">{dj.profile.city ?? "Danmark"}</p>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -445,202 +600,6 @@ export function EventTypePicker({ value, onChange }: { value: string; onChange: 
         )}
       </AnimatePresence>
     </div>
-  );
-}
-
-type MobileSearchProps = {
-  eventType: string;
-  setEventType: (v: string) => void;
-  city: string;
-  setCity: (v: string) => void;
-  date: string;
-  setDate: (v: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-};
-
-function MobileSearchPill({ eventType, setEventType, city, setCity, date, setDate, onSubmit }: MobileSearchProps) {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [open]);
-
-  const selected = EVENT_TYPE_OPTIONS.find((o) => o.id === eventType);
-  const hasFilters = Boolean(eventType || city || date);
-  const summary: string[] = [];
-  if (selected) summary.push(selected.label);
-  if (city) summary.push(city);
-  if (date) {
-    const d = new Date(date + "T00:00:00");
-    summary.push(d.toLocaleDateString(undefined, { month: "short", day: "numeric" }));
-  }
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setOpen(false);
-    onSubmit(e);
-  }
-
-  return (
-    <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="group flex w-full items-center gap-3 rounded-full bg-white p-2 pl-5 text-left text-foreground shadow-2xl ring-1 ring-black/5 transition active:scale-[0.99]"
-      >
-        <Search className="h-4 w-4 shrink-0 text-foreground" />
-        <span className="flex min-w-0 flex-1 flex-col leading-tight">
-          <span className="truncate text-sm font-semibold">
-            {hasFilters ? summary.join(" · ") : "Find din DJ"}
-          </span>
-          <span className="truncate text-xs text-muted-foreground">
-            {hasFilters ? "Tryk for at justere" : "Enhver begivenhed · hvor som helst · enhver dato"}
-          </span>
-        </span>
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground shadow-md transition group-active:scale-95">
-          <Search className="h-4 w-4" />
-        </span>
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <>
-            <motion.div
-              key="backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              onClick={() => setOpen(false)}
-              className="fixed inset-0 z-40 bg-black/55 backdrop-blur-sm"
-              aria-hidden
-            />
-            <motion.div
-              key="sheet"
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-              role="dialog"
-              aria-modal="true"
-              aria-label="Søg DJs"
-              className="fixed inset-x-0 bottom-0 z-50 flex max-h-[92vh] flex-col rounded-t-3xl bg-background text-foreground shadow-2xl"
-            >
-              <div className="mx-auto mt-3 h-1.5 w-10 rounded-full bg-muted-foreground/25" aria-hidden />
-              <div className="flex items-center justify-between px-5 pb-3 pt-2">
-                <h2 className="text-base font-semibold">Find din DJ</h2>
-                <button
-                  type="button"
-                  onClick={() => setOpen(false)}
-                  className="grid h-9 w-9 place-items-center rounded-full hover:bg-muted"
-                  aria-label="Luk søgning"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-
-              <form
-                onSubmit={handleSubmit}
-                className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-5 pb-32 pt-2"
-              >
-                <div>
-                  <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Hvad er anledningen?
-                  </h3>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {EVENT_TYPE_OPTIONS.map((option) => {
-                      const isSelected = option.id === eventType;
-                      return (
-                        <button
-                          key={option.id}
-                          type="button"
-                          onClick={() => setEventType(isSelected ? "" : option.id)}
-                          className={cn(
-                            "relative flex items-center gap-2.5 rounded-xl border bg-background px-3 py-2.5 text-left transition active:scale-[0.98]",
-                            isSelected
-                              ? "border-accent ring-2 ring-accent/40 shadow-sm"
-                              : "border-border hover:border-foreground/20",
-                          )}
-                        >
-                          <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-gradient-to-br", option.tint)}>
-                            <option.Icon className="h-3.5 w-3.5" />
-                          </span>
-                          <span className="text-[13px] font-semibold leading-tight">{option.label}</span>
-                          {isSelected && (
-                            <span className="absolute right-2 top-1/2 grid h-4 w-4 -translate-y-1/2 place-items-center rounded-full bg-accent text-accent-foreground">
-                              <Check className="h-2.5 w-2.5" />
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Hvor?
-                  </h3>
-                  <div className="relative">
-                    <MapPin className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      className="h-12 rounded-xl pl-10 text-base"
-                      placeholder="By eller region"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      autoFocus={!eventType && !city && !date}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Hvornår?
-                  </h3>
-                  <div className="relative">
-                    <CalendarIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      className="h-12 rounded-xl pl-10 text-base"
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </form>
-
-              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-3 border-t bg-background px-5 py-4 pb-[max(env(safe-area-inset-bottom),1rem)]">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEventType("");
-                    setCity("");
-                    setDate("");
-                  }}
-                  className="text-sm font-medium underline-offset-4 hover:underline"
-                >
-                  Ryd alt
-                </button>
-                <Button
-                  type="button"
-                  variant="accent"
-                  size="lg"
-                  onClick={(e) => handleSubmit(e as unknown as React.FormEvent)}
-                  className="h-12 flex-1 rounded-xl glow-accent"
-                >
-                  <Search className="h-4 w-4" /> Søg DJs
-                </Button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </>
   );
 }
 
