@@ -421,39 +421,6 @@ function MobileHeroContent({
         </motion.div>
       </div>
 
-      {/* Vælg din fest — light gray bg for visual separation */}
-      <div className="bg-gray-50 px-5 py-6">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.3}
-        >
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-base font-semibold text-foreground">Vælg din fest</h2>
-            <Link
-              to="/get-offers"
-              className="text-xs font-semibold uppercase tracking-wide text-accent hover:underline"
-            >
-              Kom i gang
-            </Link>
-          </div>
-          <div className="mt-3 grid grid-cols-4 gap-2.5">
-            {MOBILE_EVENT_TYPES.map(({ id, label, Icon }) => (
-              <button
-                key={id}
-                onClick={() => navigate(`/search?eventType=${id}`)}
-                className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-200 bg-white py-3 transition-colors hover:border-accent/40 hover:bg-accent/5 active:bg-accent/10"
-              >
-                <Icon className="h-5 w-5 text-accent" strokeWidth={1.8} />
-                <span className="text-[11px] font-medium text-gray-700">{label}</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-      </div>
-
       {/* Top-vurderede DJs — white bg */}
       {topDJs.length > 0 && (
         <div className="bg-background px-5 pt-6 pb-4">
