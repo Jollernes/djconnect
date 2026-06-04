@@ -450,6 +450,132 @@ function VariantF({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state
   );
 }
 
+/* ===================== Mobil-først varianter (M1–M3) =====================
+ * Disse tre varianter er bygget mobil-først: én kolonne, indhold stablet i
+ * prioriteret rækkefølge, store touch-targets, og video-cluster + søgning der
+ * skalerer rent til skærmbredden. Teksten er uændret — kun designet skifter.
+ */
+
+/* --------------------------- M1: Stacked clean (lys) --------------------------- */
+
+function VariantM1({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state: SearchState }) {
+  return (
+    <section className="relative overflow-hidden bg-white py-12 text-foreground sm:py-16">
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-accent/5 blur-3xl" />
+      <div className="container relative mx-auto max-w-md text-center">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <Eyebrow className="text-accent" />
+          <h1 className="mt-4 text-4xl font-bold leading-[1.05] tracking-tight text-slate-900 sm:text-5xl">
+            {HEADLINE_LEAD}{" "}
+            <span className="bg-gradient-to-r from-accent to-pink-500 bg-clip-text text-transparent">{HEADLINE_HIGHLIGHT}</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-sm text-base text-slate-600 sm:text-lg">{SUBTITLE}</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.12, duration: 0.6 }}
+          className="mt-9 flex justify-center"
+        >
+          <HeroDJCluster djs={heroDJs} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22, duration: 0.6 }}
+          className="mt-9"
+        >
+          <SearchForm state={state} className="border border-slate-200 ring-slate-200/60" />
+          <TrustBadges tone="dark" className="mt-6 justify-center" />
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------- M2: Søg-først kort (mørk) --------------------------- */
+
+function VariantM2({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state: SearchState }) {
+  return (
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#0c1030_0%,#141a44_45%,#0c1030_100%)] py-12 text-white sm:py-16">
+      <div aria-hidden className="pointer-events-none absolute left-1/2 top-6 h-64 w-64 -translate-x-1/2 rounded-full bg-cyan-500/20 blur-3xl" />
+      <div className="container relative mx-auto max-w-md text-center">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <Eyebrow className="text-cyan-300/80" />
+          <h1 className="mt-4 text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">
+            {HEADLINE_LEAD}{" "}
+            <span className="bg-gradient-to-r from-cyan-300 via-sky-300 to-emerald-300 bg-clip-text text-transparent">
+              {HEADLINE_HIGHLIGHT}
+            </span>
+          </h1>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.55 }}
+          className="mt-7 rounded-3xl bg-white/10 p-3 ring-1 ring-white/15 backdrop-blur"
+        >
+          <SearchForm state={state} className="ring-cyan-400/20" />
+        </motion.div>
+        <p className="mx-auto mt-4 max-w-sm text-sm text-white/75">{SUBTITLE}</p>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.6 }}
+          className="mt-10 flex justify-center"
+        >
+          <HeroDJCluster djs={heroDJs} />
+        </motion.div>
+
+        <TrustBadges tone="light" className="mt-8 justify-center" />
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------- M3: Bold gradient (glas-kort) --------------------------- */
+
+function VariantM3({ heroDJs, state }: { heroDJs: DJProfileWithRelations[]; state: SearchState }) {
+  return (
+    <section className="relative overflow-hidden bg-[linear-gradient(160deg,#7c3aed_0%,#db2777_52%,#f97316_100%)] py-12 text-white sm:py-16">
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-black/10" />
+      <div className="container relative mx-auto max-w-md text-center">
+        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <Eyebrow className="text-white/85" />
+          <h1 className="mt-4 text-4xl font-extrabold leading-[1.02] tracking-tight sm:text-6xl">
+            {HEADLINE_LEAD} {HEADLINE_HIGHLIGHT}
+          </h1>
+          <p className="mx-auto mt-4 max-w-sm text-base text-white/90">{SUBTITLE}</p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.12, duration: 0.6 }}
+          className="mt-9 flex justify-center"
+        >
+          <HeroDJCluster djs={heroDJs} />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.22, duration: 0.6 }}
+          className="mt-9 rounded-3xl bg-white/15 p-3 ring-1 ring-white/25 backdrop-blur-md"
+        >
+          <SearchForm state={state} />
+        </motion.div>
+
+        <TrustBadges tone="light" className="mt-8 justify-center" />
+      </div>
+    </section>
+  );
+}
+
 const VARIANTS = [
   { id: "a", label: "A · Centreret spotlight" },
   { id: "b", label: "B · Split / video venstre" },
@@ -457,6 +583,9 @@ const VARIANTS = [
   { id: "d", label: "D · Lys split" },
   { id: "e", label: "E · Blød off-white" },
   { id: "f", label: "F · Lys split + flydende kort" },
+  { id: "m1", label: "M1 · Mobil: stacked clean" },
+  { id: "m2", label: "M2 · Mobil: søg-først" },
+  { id: "m3", label: "M3 · Mobil: bold gradient" },
 ] as const;
 
 type VariantId = (typeof VARIANTS)[number]["id"];
@@ -495,7 +624,7 @@ export function FrontPageMockups() {
         <div className="container flex flex-wrap items-center justify-between gap-3 py-3">
           <div className="flex items-center gap-2">
             <span className="text-sm font-semibold">Forside-mockups</span>
-            <span className="hidden text-xs text-muted-foreground sm:inline">— samme videoer, tekst &amp; søgning, tre layouts</span>
+            <span className="hidden text-xs text-muted-foreground sm:inline">— samme videoer, tekst &amp; søgning · A–F desktop, M1–M3 mobil-først</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {VARIANTS.map((v) => (
@@ -529,6 +658,9 @@ export function FrontPageMockups() {
       {variant === "d" && <VariantD heroDJs={heroDJs} state={state} />}
       {variant === "e" && <VariantE heroDJs={heroDJs} state={state} />}
       {variant === "f" && <VariantF heroDJs={heroDJs} state={state} />}
+      {variant === "m1" && <VariantM1 heroDJs={heroDJs} state={state} />}
+      {variant === "m2" && <VariantM2 heroDJs={heroDJs} state={state} />}
+      {variant === "m3" && <VariantM3 heroDJs={heroDJs} state={state} />}
     </div>
   );
 }
