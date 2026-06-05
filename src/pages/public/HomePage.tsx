@@ -370,7 +370,7 @@ function MobileHeroContent({
       </div>
 
       {/* Headline + subtitle — white bg */}
-      <div className="bg-background px-5 pt-6 pb-2">
+      <div className="bg-background px-5 pt-6 pb-2 text-center">
         <motion.h1
           initial="hidden"
           animate="visible"
