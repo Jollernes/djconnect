@@ -376,11 +376,20 @@ function MobileHeroContent({
           animate="visible"
           variants={fadeUp}
           custom={0.1}
-          className="text-[1.75rem] font-bold leading-[1.15] tracking-tight text-foreground"
+          className="text-[2rem] font-bold leading-[1.15] tracking-tight text-foreground"
         >
           Den letteste måde at{" "}
-          <span className="bg-gradient-to-r from-accent to-orange-500 bg-clip-text text-transparent">
-            booke en DJ.
+          <span className="relative whitespace-nowrap">
+            <span className="bg-gradient-to-r from-accent to-orange-500 bg-clip-text text-transparent">
+              booke en DJ.
+            </span>
+            <motion.span
+              aria-hidden
+              className="absolute -bottom-1 left-0 h-[3px] w-full origin-left rounded-full bg-accent/70"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ delay: 0.9, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            />
           </span>
         </motion.h1>
 
