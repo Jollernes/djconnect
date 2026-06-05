@@ -10,8 +10,8 @@ import { EventTypePicker } from "@/pages/public/HomePage";
 import { useDJs } from "@/hooks/useDJs";
 import type { DJProfileWithRelations } from "@/types/domain";
 
-const HEADLINE_LEAD = "Hver god aften";
-const HEADLINE_HIGHLIGHT = "starter med en DJ.";
+const HEADLINE_LEAD = "Den letteste måde at";
+const HEADLINE_HIGHLIGHT = "booke en DJ.";
 const SUBTITLE =
   "Book interviewede, udstyrsverificerede DJs til bryllupper, fødselsdage og firmaarrangementer. De medbringer lyd, lys og energi — du tager dig af gæsterne.";
 
