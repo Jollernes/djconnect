@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Star } from "lucide-react";
+import { ChevronDown, Star } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -16,10 +16,10 @@ import type { DJProfileWithRelations } from "@/types/domain";
 // Royalty-free clips (Mixkit free license), served from public/. Each clip
 // carries the event-type caption shown on the card.
 const MEDIA = [
-  { src: "/hero-dj.mp4", poster: "/hero-dj-poster.jpg", caption: "DJ til ethvert event" },
-  { src: "/hero-dj-42422.mp4", poster: "/hero-dj-42422-poster.jpg", caption: "DJ til bryllupsfesten" },
-  { src: "/hero-dj-45437.mp4", poster: "/hero-dj-45437-poster.jpg", caption: "DJ til firmafesten" },
-  { src: "/hero-dj-830.mp4", poster: "/hero-dj-830-poster.jpg", caption: "DJ til din fødselsdagsfest" },
+  { src: "/hero-dj.mp4", poster: "/hero-dj-poster.jpg", caption: "DJ til ethvert event", deskCaption: "ethvert event" },
+  { src: "/hero-dj-42422.mp4", poster: "/hero-dj-42422-poster.jpg", caption: "DJ til bryllupsfesten", deskCaption: "bryllupsfest" },
+  { src: "/hero-dj-45437.mp4", poster: "/hero-dj-45437-poster.jpg", caption: "DJ til firmafesten", deskCaption: "firmafest" },
+  { src: "/hero-dj-830.mp4", poster: "/hero-dj-830-poster.jpg", caption: "DJ til din fødselsdagsfest", deskCaption: "fødselsdagsfest" },
 ];
 
 // Safety net: advance even if a clip's `ended` event never fires.
@@ -146,7 +146,7 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
   const featured = cards[active];
 
   return (
-    <div className={cn("relative mx-auto w-full max-w-[300px]", mobileHero && "max-w-none md:max-w-[300px]", className)}>
+    <div className={cn("relative mx-auto w-full max-w-[300px]", mobileHero && "max-w-none", className)}>
       {/* Video card + deck stage (sized by the video card) */}
       <div className="relative">
       {/* Stacked deck behind the main card — shifts as the video rotates */}
@@ -160,7 +160,7 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
             aria-hidden
             className={cn(
               "absolute inset-0 overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/10",
-              mobileHero && "hidden md:block",
+              mobileHero && "hidden",
             )}
             initial={false}
             animate={{
@@ -194,12 +194,12 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
           to={`/djs/${featured.username}`}
           className={cn(
             "group block overflow-hidden rounded-3xl shadow-2xl ring-1 ring-black/10",
-            mobileHero && "rounded-none shadow-none ring-0 md:rounded-3xl md:shadow-2xl md:ring-1 md:ring-black/10",
+            mobileHero && "rounded-none shadow-none ring-0",
           )}
         >
           <div className={cn(
             "relative aspect-[3/4] overflow-hidden bg-muted",
-            mobileHero && "aspect-[5/3] md:aspect-[3/4]",
+            mobileHero && "aspect-[5/3] md:aspect-[2/1]",
           )}>
             <video
               key={active}
@@ -217,7 +217,11 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
             />
             {/* Centered event caption — the prominent headline on the clip */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/55" />
-            <div className="pointer-events-none absolute inset-x-0 top-0 bottom-24 flex flex-col items-center justify-center px-4 text-center">
+            {/* Mobile overlay */}
+            <div className={cn(
+              "pointer-events-none absolute inset-x-0 top-0 bottom-24 flex flex-col items-center justify-center px-4 text-center",
+              mobileHero && "md:hidden",
+            )}>
               <span className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/80 drop-shadow">
                 DJConnect
               </span>
@@ -234,10 +238,39 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
                 </motion.span>
               </AnimatePresence>
             </div>
+            {/* Desktop overlay — mockup format */}
+            {mobileHero && (
+              <div className="pointer-events-none absolute inset-x-0 top-0 bottom-24 hidden flex-col items-center justify-center px-4 text-center md:flex">
+                <span className="mb-3 text-sm font-semibold uppercase tracking-[0.22em] text-white/80 drop-shadow-lg">
+                  Book en DJ til din
+                </span>
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={`desk-${active}`}
+                    initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.96 }}
+                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    className="block text-5xl font-extrabold italic leading-tight text-white [text-shadow:0_2px_14px_rgba(0,0,0,0.65)] lg:text-6xl"
+                  >
+                    {media.deskCaption}<span className="text-accent">.</span>
+                  </motion.span>
+                </AnimatePresence>
+              </div>
+            )}
             <div className={cn(
               "absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent px-4 pb-4",
               mobileHero ? "pt-8 md:pt-14" : "pt-14",
             )}>
+              {/* "Find ledige DJs" CTA — desktop only when mobileHero */}
+              {mobileHero && (
+                <div className="hidden md:flex flex-col items-center gap-1 mb-4">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/90 drop-shadow">
+                    Find ledige DJs til dit event
+                  </span>
+                  <ChevronDown className="h-4 w-4 text-white/70 animate-bounce" />
+                </div>
+              )}
               <div className="flex items-center justify-center gap-1.5">
                 {Array.from({ length: n }).map((_, i) => (
                   <span
@@ -258,7 +291,7 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                    className="mt-2 hidden md:block"
+                    className="mt-2 hidden"
                   >
                     <InfoStrip dj={featured} />
                   </motion.div>

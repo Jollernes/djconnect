@@ -28,7 +28,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { DJCard } from "@/components/common/DJCard";
-import { Equalizer } from "@/components/common/Equalizer";
 import { HeroDJCluster } from "@/components/common/HeroDJCluster";
 import { useDJs } from "@/hooks/useDJs";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -87,7 +86,10 @@ export function HomePage() {
 
   return (
     <>
-      <Hero heroDJs={heroDJs} eventType={eventType} setEventType={setEventType} city={city} setCity={setCity} date={date} setDate={setDate} onSubmit={submit} />
+      <Hero heroDJs={heroDJs} />
+
+      {/* Desktop-only: search form + content below video hero */}
+      <DesktopBelowHero heroDJs={heroDJs} eventType={eventType} setEventType={setEventType} city={city} setCity={setCity} date={date} setDate={setDate} onSubmit={submit} />
 
       {/* Mobile-only: white-background content below video hero */}
       <MobileHeroContent heroDJs={heroDJs} featured={featured} navigate={navigate} />
@@ -130,7 +132,39 @@ export function HomePage() {
   );
 }
 
-type HeroProps = {
+function Hero({ heroDJs }: { heroDJs: DJProfileWithRelations[] }) {
+  return (
+    <section className="relative isolate overflow-visible bg-background md:bg-transparent md:text-primary-foreground md:hero-gradient">
+      <div aria-hidden className="absolute inset-0 bg-grid opacity-40 hidden md:block" />
+      <div aria-hidden className="absolute inset-0 noise-overlay hidden md:block" />
+
+      <FloatingIcons />
+
+      {/* Video — full-width on all breakpoints */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="relative"
+      >
+        <HeroDJCluster djs={heroDJs} mobileHero className="relative" />
+      </motion.div>
+    </section>
+  );
+}
+
+/* ---------- Desktop-only below-hero content ---------- */
+
+function DesktopBelowHero({
+  heroDJs,
+  eventType,
+  setEventType,
+  city,
+  setCity,
+  date,
+  setDate,
+  onSubmit,
+}: {
   heroDJs: DJProfileWithRelations[];
   eventType: string;
   setEventType: (v: string) => void;
@@ -139,104 +173,39 @@ type HeroProps = {
   date: string;
   setDate: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
-};
+}) {
+  const avatars = heroDJs
+    .slice(0, 3)
+    .map((dj) => ({ url: dj.profile.avatar_url, name: dj.stage_name }));
 
-function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, onSubmit }: HeroProps) {
   return (
-    <section className="relative isolate overflow-visible md:overflow-hidden bg-background md:bg-transparent md:text-primary-foreground md:hero-gradient">
-      <div aria-hidden className="absolute inset-0 bg-grid opacity-40 hidden md:block" />
-      <div aria-hidden className="absolute inset-0 noise-overlay hidden md:block" />
-
-      <FloatingIcons />
-
-      <div className="container relative py-0 md:py-24">
-        <div className="grid items-center gap-0 md:gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
-          {/* Video cluster — first on mobile (full-width hero), card on desktop */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative -order-1 -mx-4 sm:-mx-6 md:mx-0 lg:order-1"
-          >
-            <div aria-hidden className="absolute -inset-4 rounded-3xl bg-accent/20 blur-2xl hidden md:block" />
-            <HeroDJCluster djs={heroDJs} mobileHero className="relative" />
-          </motion.div>
-
-          {/* Desktop text column — hidden on mobile */}
-          <div className="hidden md:block md:text-left">
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.22em] text-primary-foreground/70">
-              <Equalizer bars={4} className="h-3.5" barClassName="bg-accent" />
-              Verificerede DJs · Mobilt diskotek · Betalt via Stripe
-            </motion.div>
-
-            <motion.h1
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0.1}
-              className="mt-6 text-5xl font-semibold text-balance leading-[1.05] tracking-tight lg:text-[4.25rem]"
-            >
-              Den letteste måde at{" "}
-              <span className="relative whitespace-nowrap">
-                <span className="bg-gradient-to-r from-accent via-orange-300 to-pink-300 bg-clip-text text-transparent">booke en DJ.</span>
-                <motion.span
-                  aria-hidden
-                  className="absolute -bottom-2 left-0 h-1 w-full origin-left rounded-full bg-accent/70"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.9, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                />
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-              custom={0.25}
-              className="mt-6 max-w-xl text-lg text-primary-foreground/80 sm:text-xl"
-            >
-              Book interviewede, udstyrsverificerede DJs til bryllupper, fødselsdage og firmaarrangementer.
-              De medbringer lyd, lys og energi — du tager dig af gæsterne.
-            </motion.p>
-          </div>
-        </div>
-
-        {/* Desktop: inline 4-col form */}
+    <div className="hidden md:block">
+      {/* Search form — overlapping hero bottom */}
+      <div className="relative z-20 -mt-8 mx-auto max-w-5xl px-6">
         <motion.form
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={0.4}
           onSubmit={onSubmit}
-          className="mt-10 hidden gap-3 rounded-2xl border border-white/10 bg-background p-4 text-foreground shadow-2xl ring-1 ring-accent/10 md:grid md:grid-cols-[1fr_1fr_1fr_auto]"
+          className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 rounded-2xl bg-background p-5 text-foreground shadow-2xl ring-1 ring-black/5"
         >
           <div className="min-w-0">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Begivenhedstype</label>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-muted-foreground">Event-type</label>
             <EventTypePicker value={eventType} onChange={setEventType} />
           </div>
           <div className="min-w-0">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Lokation</label>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-muted-foreground">By</label>
             <div className="relative">
               <MapPin className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                className="pl-8"
-                placeholder="By"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
+              <Input className="pl-8" placeholder="København" value={city} onChange={(e) => setCity(e.target.value)} />
             </div>
           </div>
           <div className="min-w-0">
-            <label className="mb-1 block text-xs font-medium text-muted-foreground">Dato</label>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-muted-foreground">Dato</label>
             <div className="relative">
               <CalendarIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                className="pl-8"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
+              <Input className="pl-8" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
             </div>
           </div>
           <div className="flex items-end">
@@ -245,24 +214,83 @@ function Hero({ heroDJs, eventType, setEventType, city, setCity, date, setDate, 
             </Button>
           </div>
         </motion.form>
-
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.55}
-          className="mt-8 hidden flex-wrap justify-start gap-x-8 gap-y-2 text-sm text-primary-foreground/80 md:flex"
-        >
-          <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-accent" /> Alle DJs interviewet &amp; verificeret</span>
-          <span className="flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-accent" /> Tilgængelighed i realtid</span>
-          <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" /> Sikre Stripe-deponeringsbetalinger</span>
-        </motion.div>
       </div>
 
-      <svg aria-hidden viewBox="0 0 1440 80" className="hidden w-full text-background md:block" preserveAspectRatio="none">
-        <path d="M0 32 C 240 80 480 0 720 32 C 960 64 1200 8 1440 40 L 1440 80 L 0 80 Z" fill="currentColor" />
-      </svg>
-    </section>
+      {/* Content below — white bg */}
+      <div className="bg-background py-12 text-center">
+        <div className="mx-auto max-w-3xl px-4">
+          {/* Social proof */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.5}
+            className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-white px-4 py-2 shadow-sm"
+          >
+            <div className="flex -space-x-1.5">
+              {avatars.map((a, i) => (
+                <img
+                  key={i}
+                  src={a.url ?? undefined}
+                  alt={a.name}
+                  className="h-6 w-6 rounded-full border-2 border-white object-cover"
+                />
+              ))}
+            </div>
+            <span className="text-sm font-medium text-muted-foreground">
+              Brugt af 240+ par &amp; firmaer i 2026
+            </span>
+            <span className="h-2 w-2 rounded-full bg-green-500" />
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.6}
+            className="mt-8 text-5xl font-semibold leading-[1.1] tracking-tight text-foreground lg:text-6xl"
+          >
+            Den letteste måde at{" "}
+            <span className="relative whitespace-nowrap">
+              <span className="bg-gradient-to-r from-accent to-orange-500 bg-clip-text text-transparent">booke en DJ.</span>
+              <motion.span
+                aria-hidden
+                className="absolute -bottom-2 left-0 h-1 w-full origin-left rounded-full bg-accent/70"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 1.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.7}
+            className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground"
+          >
+            Book interviewede, udstyrsverificerede DJs til bryllupper, fødselsdage og firmaarrangementer.
+            De medbringer lyd, lys og energi — du tager dig af gæsterne.
+          </motion.p>
+
+          {/* Trust badges */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.8}
+            className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground"
+          >
+            <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-accent" /> Interviewet &amp; verificeret</span>
+            <span className="flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-accent" /> Real-time tilgængelighed</span>
+            <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" /> Stripe escrow</span>
+          </motion.div>
+        </div>
+      </div>
+    </div>
   );
 }
 
