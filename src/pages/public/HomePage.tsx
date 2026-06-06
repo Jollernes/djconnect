@@ -253,7 +253,7 @@ function DesktopBelowHero({
           >
             Den letteste måde at{" "}
             <span className="relative whitespace-nowrap">
-              <span className="bg-gradient-to-r from-accent to-orange-500 bg-clip-text text-transparent">booke en DJ.</span>
+              <span className="bg-gradient-to-r from-accent via-orange-300 to-pink-300 bg-clip-text text-transparent">booke en DJ.</span>
               <motion.span
                 aria-hidden
                 className="absolute -bottom-2 left-0 h-1 w-full origin-left rounded-full bg-accent/70"
