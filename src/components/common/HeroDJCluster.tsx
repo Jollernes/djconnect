@@ -199,7 +199,7 @@ export function HeroDJCluster({ djs, className, mobileHero }: { djs: DJProfileWi
         >
           <div className={cn(
             "relative aspect-[3/4] overflow-hidden bg-muted",
-            mobileHero && "aspect-[5/3] md:aspect-[5/2] md:max-h-[50vh]",
+            mobileHero && "aspect-[5/3] md:aspect-auto md:h-[55vh]",
           )}>
             <video
               key={active}
