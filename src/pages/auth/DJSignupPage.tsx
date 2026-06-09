@@ -80,6 +80,7 @@ type Draft = {
   lastName: string;
   email: string;
   password: string;
+  confirmPassword: string;
   phone: string;
   city: string;
   // Step 3 — DJ Erfaring & Mobildiskotek
@@ -108,6 +109,7 @@ const EMPTY_DRAFT: Draft = {
   lastName: "",
   email: "",
   password: "",
+  confirmPassword: "",
   phone: "",
   city: "",
   yearsExperience: "",
@@ -219,6 +221,7 @@ export function DJSignupPage() {
     "idle" | "checking" | "available" | "taken"
   >("idle");
   const [direction, setDirection] = useState<1 | -1>(1);
+  const [accountSubStep, setAccountSubStep] = useState<0 | 1>(0);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -305,6 +308,31 @@ export function DJSignupPage() {
   }
 
   function advance() {
+    // Handle sub-steps within step 0 (account)
+    if (step === 0 && accountSubStep === 0) {
+      // Validate sub-step 1a: Fornavn, Efternavn, DJ Navn, By
+      if (draft.firstName.trim().length < 2) {
+        toast.error("Fornavn er påkrævet");
+        return;
+      }
+      if (draft.lastName.trim().length < 2) {
+        toast.error("Efternavn er påkrævet");
+        return;
+      }
+      if (!draft.stageName.trim()) {
+        toast.error("DJ-navn er påkrævet");
+        return;
+      }
+      if (!draft.city.trim()) {
+        toast.error("By er påkrævet");
+        return;
+      }
+      setAccountSubStep(1);
+      if (typeof window !== "undefined")
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     if (!passesStep.ok) {
       toast.error(passesStep.reason ?? "Udfyld venligst dette trin");
       return;
@@ -482,6 +510,8 @@ export function DJSignupPage() {
                         showPassword={showPassword}
                         setShowPassword={setShowPassword}
                         pwStrength={pwStrength}
+                        subStep={accountSubStep}
+                        stageNameState={stageNameState}
                       />
                     )}
                     {step === 1 && <StepHowItWorks />}
@@ -520,9 +550,13 @@ export function DJSignupPage() {
                   type="button"
                   variant="ghost"
                   onClick={() => {
-                    if (step > 0) goTo(step - 1);
+                    if (step === 0 && accountSubStep === 1) {
+                      setAccountSubStep(0);
+                    } else if (step > 0) {
+                      goTo(step - 1);
+                    }
                   }}
-                  disabled={step === 0 || loading}
+                  disabled={step === 0 && accountSubStep === 0}
                 >
                   <ChevronLeft className="h-4 w-4" /> Tilbage
                 </Button>
@@ -652,6 +686,8 @@ type AccountProps = {
   showPassword: boolean;
   setShowPassword: (v: boolean) => void;
   pwStrength: { score: number; label: string; color: string };
+  subStep: 0 | 1;
+  stageNameState: "idle" | "checking" | "available" | "taken";
 };
 
 function StepAccount({
@@ -660,31 +696,82 @@ function StepAccount({
   showPassword,
   setShowPassword,
   pwStrength,
+  subStep,
+  stageNameState,
 }: AccountProps) {
+  if (subStep === 0) {
+    return (
+      <div className="space-y-6">
+        <Header
+          icon={User2}
+          eyebrow="Trin 1a"
+          title="Om dig"
+          subtitle="Fortæl os lidt om dig selv, så kunder kan finde dig."
+        />
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Fornavn" hint="Dit fornavn">
+            <Input
+              value={draft.firstName}
+              onChange={(e) => update("firstName", e.target.value)}
+              placeholder="fx Alex"
+            />
+          </Field>
+          <Field label="Efternavn" hint="Dit efternavn">
+            <Input
+              value={draft.lastName}
+              onChange={(e) => update("lastName", e.target.value)}
+              placeholder="fx Morgan"
+            />
+          </Field>
+          <Field label="DJ-navn" hint="Dit kunstnernavn som DJ">
+            <div className="relative">
+              <Input
+                value={draft.stageName}
+                onChange={(e) => update("stageName", e.target.value)}
+                placeholder="fx DJ Flash"
+                className={cn(
+                  stageNameState === "taken" && "border-destructive",
+                  stageNameState === "available" && "border-green-500",
+                )}
+              />
+              {stageNameState === "checking" && (
+                <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-muted-foreground" />
+              )}
+              {stageNameState === "available" && (
+                <Check className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-green-500" />
+              )}
+              {stageNameState === "taken" && (
+                <X className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-destructive" />
+              )}
+            </div>
+            {stageNameState === "taken" && (
+              <p className="text-xs text-destructive">Navnet er allerede taget</p>
+            )}
+          </Field>
+          <Field label="By" hint="Hvilken by bor du i?">
+            <Input
+              value={draft.city}
+              onChange={(e) => update("city", e.target.value)}
+              placeholder="København"
+            />
+          </Field>
+        </div>
+      </div>
+    );
+  }
+
+  // subStep === 1
   return (
     <div className="space-y-6">
       <Header
         icon={User2}
-        eyebrow="Trin 1"
-        title="Opret konto"
-        subtitle="Vi bruger oplysningerne til at logge dig ind og kontakte dig om bookinger. Du kan redigere alt senere."
+        eyebrow="Trin 1b"
+        title="Login & kontakt"
+        subtitle="Vi bruger oplysningerne til at logge dig ind og kontakte dig om bookinger."
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Fornavn" hint="Dit fornavn">
-          <Input
-            value={draft.firstName}
-            onChange={(e) => update("firstName", e.target.value)}
-            placeholder="fx Alex"
-          />
-        </Field>
-        <Field label="Efternavn" hint="Dit efternavn">
-          <Input
-            value={draft.lastName}
-            onChange={(e) => update("lastName", e.target.value)}
-            placeholder="fx Morgan"
-          />
-        </Field>
         <Field label="Email" hint="Vi sender et bekræftelseslink">
           <Input
             type="email"
@@ -692,6 +779,15 @@ function StepAccount({
             value={draft.email}
             onChange={(e) => update("email", e.target.value)}
             placeholder="dig@domæne.dk"
+          />
+        </Field>
+
+        <Field label="Telefon" hint="Kun til akut kontakt på eventdagen">
+          <Input
+            type="tel"
+            value={draft.phone}
+            onChange={(e) => update("phone", e.target.value)}
+            placeholder="+45 …"
           />
         </Field>
 
@@ -744,21 +840,21 @@ function StepAccount({
           )}
         </Field>
 
-        <Field label="Telefon" hint="Kun til akut kontakt på eventdagen">
+        <Field label="Gentag adgangskode" hint="Bekræft din adgangskode">
           <Input
-            type="tel"
-            value={draft.phone}
-            onChange={(e) => update("phone", e.target.value)}
-            placeholder="+45 …"
+            type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            value={draft.confirmPassword}
+            onChange={(e) => update("confirmPassword", e.target.value)}
+            className={cn(
+              draft.confirmPassword &&
+                draft.confirmPassword !== draft.password &&
+                "border-destructive",
+            )}
           />
-        </Field>
-
-        <Field label="By" hint="Hvilken by bor du i?">
-          <Input
-            value={draft.city}
-            onChange={(e) => update("city", e.target.value)}
-            placeholder="København"
-          />
+          {draft.confirmPassword && draft.confirmPassword !== draft.password && (
+            <p className="text-xs text-destructive">Adgangskoderne matcher ikke</p>
+          )}
         </Field>
       </div>
     </div>
@@ -1637,18 +1733,23 @@ function validateStep(
 ): { ok: boolean; reason?: string } {
   switch (step) {
     case 0:
+      // Sub-step 1b validation (1a is validated in advance())
       if (draft.firstName.trim().length < 2)
         return { ok: false, reason: "Fornavn er påkrævet" };
       if (draft.lastName.trim().length < 2)
         return { ok: false, reason: "Efternavn er påkrævet" };
+      if (!draft.stageName.trim())
+        return { ok: false, reason: "DJ-navn er påkrævet" };
+      if (!draft.city.trim())
+        return { ok: false, reason: "By er påkrævet" };
       if (!/^\S+@\S+\.\S+$/.test(draft.email))
         return { ok: false, reason: "Indtast en gyldig email" };
       if (draft.password.length < 8)
         return { ok: false, reason: "Adgangskoden skal være mindst 8 tegn" };
+      if (draft.confirmPassword !== draft.password)
+        return { ok: false, reason: "Adgangskoderne matcher ikke" };
       if (!draft.phone.trim())
         return { ok: false, reason: "Telefonnummer er påkrævet" };
-      if (!draft.city.trim())
-        return { ok: false, reason: "By er påkrævet" };
       return { ok: true };
     case 1:
       // Sådan fungerer det — purely informational
