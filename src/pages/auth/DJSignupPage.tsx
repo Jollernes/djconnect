@@ -995,6 +995,13 @@ function StepHowItWorks() {
 /* Step 3 — DJ Erfaring & Mobildiskotek                                */
 /* ------------------------------------------------------------------ */
 
+const EVENT_COUNT_OPTIONS = [
+  { id: "0-5", label: "0–5" },
+  { id: "5-15", label: "5–15" },
+  { id: "15-30", label: "15–30" },
+  { id: "30+", label: "30+" },
+];
+
 const CAPACITY_OPTIONS = [
   { id: "small", label: "Op til 50" },
   { id: "medium", label: "50–100" },
@@ -1038,43 +1045,46 @@ function StepExperience({
 
           <SectionDivider icon={Trophy} label="Antal events spillet pr. kategori" />
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Bryllupper" hint="Antal bryllupper du har spillet til">
-              <Input
-                type="number"
-                min="0"
+          <div className="space-y-4">
+            <div>
+              <div className="mb-2 text-sm font-medium">Bryllupper</div>
+              <OptionCards
+                options={EVENT_COUNT_OPTIONS}
                 value={draft.eventsWeddings}
-                onChange={(e) => update("eventsWeddings", e.target.value)}
-                placeholder="0"
+                onChange={(v) => update("eventsWeddings", v as string)}
+                columns={4}
               />
-            </Field>
-            <Field label="Privat voksen fester" hint="Fødselsdage, jubilæumer etc.">
-              <Input
-                type="number"
-                min="0"
+            </div>
+            <div>
+              <div className="mb-2 text-sm font-medium">Privat voksen fester</div>
+              <p className="mb-2 text-xs text-muted-foreground">Fødselsdage, jubilæumer etc.</p>
+              <OptionCards
+                options={EVENT_COUNT_OPTIONS}
                 value={draft.eventsPrivateAdult}
-                onChange={(e) => update("eventsPrivateAdult", e.target.value)}
-                placeholder="0"
+                onChange={(v) => update("eventsPrivateAdult", v as string)}
+                columns={4}
               />
-            </Field>
-            <Field label="Firmafester" hint="Firma-events, julefrokoster etc.">
-              <Input
-                type="number"
-                min="0"
+            </div>
+            <div>
+              <div className="mb-2 text-sm font-medium">Firmafester</div>
+              <p className="mb-2 text-xs text-muted-foreground">Firma-events, julefrokoster etc.</p>
+              <OptionCards
+                options={EVENT_COUNT_OPTIONS}
                 value={draft.eventsCorporate}
-                onChange={(e) => update("eventsCorporate", e.target.value)}
-                placeholder="0"
+                onChange={(v) => update("eventsCorporate", v as string)}
+                columns={4}
               />
-            </Field>
-            <Field label="Ungdomsfester" hint="Konfirmationer, studenterfester etc.">
-              <Input
-                type="number"
-                min="0"
+            </div>
+            <div>
+              <div className="mb-2 text-sm font-medium">Ungdomsfester</div>
+              <p className="mb-2 text-xs text-muted-foreground">Konfirmationer, studenterfester etc.</p>
+              <OptionCards
+                options={EVENT_COUNT_OPTIONS}
                 value={draft.eventsYouth}
-                onChange={(e) => update("eventsYouth", e.target.value)}
-                placeholder="0"
+                onChange={(v) => update("eventsYouth", v as string)}
+                columns={4}
               />
-            </Field>
+            </div>
           </div>
         </section>
       </div>
