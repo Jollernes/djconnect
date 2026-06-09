@@ -76,12 +76,12 @@ import { fileToDataUrl, writeDemoDJProfile } from "@/lib/demoDJProfile";
 
 type Draft = {
   // Step 1 — Opret konto
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   phone: string;
   city: string;
-  country: string;
   // Step 3 — DJ Erfaring & Mobildiskotek
   yearsExperience: string;
   eventsPerformed: string;
@@ -104,12 +104,12 @@ type Draft = {
 };
 
 const EMPTY_DRAFT: Draft = {
-  fullName: "",
+  firstName: "",
+  lastName: "",
   email: "",
   password: "",
   phone: "",
   city: "",
-  country: "Denmark",
   yearsExperience: "",
   eventsPerformed: "",
   notableClients: "",
@@ -322,7 +322,7 @@ export function DJSignupPage() {
     try {
       if (isConfigured) {
         await signUpWithPassword({
-          fullName: draft.fullName,
+          fullName: `${draft.firstName} ${draft.lastName}`.trim(),
           email: draft.email,
           password: draft.password,
           role: "dj",
@@ -338,11 +338,11 @@ export function DJSignupPage() {
 
       writeDemoDJProfile({
         createdAt: new Date().toISOString(),
-        fullName: draft.fullName,
+        fullName: `${draft.firstName} ${draft.lastName}`.trim(),
         email: draft.email,
         phone: draft.phone || undefined,
         city: draft.city,
-        country: draft.country,
+        country: "Denmark",
         stageName: draft.stageName,
         bio: draft.bio,
         yearsExperience: draft.yearsExperience,
@@ -595,7 +595,7 @@ export function DJSignupPage() {
               <LivePreview
                 stageName={draft.stageName}
                 city={draft.city}
-                country={draft.country}
+                country="Denmark"
                 bio={draft.bio}
                 yearsExperience={draft.yearsExperience}
                 eventTypes={draft.eventTypes}
@@ -671,11 +671,18 @@ function StepAccount({
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Fulde navn" hint="Som det står på dit ID">
+        <Field label="Fornavn" hint="Dit fornavn">
           <Input
-            value={draft.fullName}
-            onChange={(e) => update("fullName", e.target.value)}
-            placeholder="fx Alex Morgan"
+            value={draft.firstName}
+            onChange={(e) => update("firstName", e.target.value)}
+            placeholder="fx Alex"
+          />
+        </Field>
+        <Field label="Efternavn" hint="Dit efternavn">
+          <Input
+            value={draft.lastName}
+            onChange={(e) => update("lastName", e.target.value)}
+            placeholder="fx Morgan"
           />
         </Field>
         <Field label="Email" hint="Vi sender et bekræftelseslink">
@@ -746,17 +753,11 @@ function StepAccount({
           />
         </Field>
 
-        <Field label="By / region" hint="Hvor er du baseret?">
+        <Field label="By" hint="Hvilken by bor du i?">
           <Input
             value={draft.city}
             onChange={(e) => update("city", e.target.value)}
             placeholder="København"
-          />
-        </Field>
-        <Field label="Land">
-          <Input
-            value={draft.country}
-            onChange={(e) => update("country", e.target.value)}
           />
         </Field>
       </div>
@@ -1636,16 +1637,18 @@ function validateStep(
 ): { ok: boolean; reason?: string } {
   switch (step) {
     case 0:
-      if (draft.fullName.trim().length < 2)
-        return { ok: false, reason: "Fulde navn er påkrævet" };
+      if (draft.firstName.trim().length < 2)
+        return { ok: false, reason: "Fornavn er påkrævet" };
+      if (draft.lastName.trim().length < 2)
+        return { ok: false, reason: "Efternavn er påkrævet" };
       if (!/^\S+@\S+\.\S+$/.test(draft.email))
         return { ok: false, reason: "Indtast en gyldig email" };
       if (draft.password.length < 8)
         return { ok: false, reason: "Adgangskoden skal være mindst 8 tegn" };
       if (!draft.phone.trim())
         return { ok: false, reason: "Telefonnummer er påkrævet" };
-      if (!draft.city.trim() || !draft.country.trim())
-        return { ok: false, reason: "By og land er påkrævet" };
+      if (!draft.city.trim())
+        return { ok: false, reason: "By er påkrævet" };
       return { ok: true };
     case 1:
       // Sådan fungerer det — purely informational
