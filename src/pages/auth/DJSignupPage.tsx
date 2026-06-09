@@ -43,7 +43,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
-import { EXPERIENCE_YEARS, EVENTS_PERFORMED, SETUP_SIZES } from "@/lib/constants";
+import { EXPERIENCE_YEARS } from "@/lib/constants";
 import { FilePicker, type FileWithPreview } from "@/components/dj-signup/FilePicker";
 import { OptionCards } from "@/components/dj-signup/OptionCards";
 import { LivePreview } from "@/components/dj-signup/LivePreview";
@@ -87,7 +87,13 @@ type Draft = {
   yearsExperience: string;
   eventsPerformed: string;
   notableClients: string;
+  eventsWeddings: string;
+  eventsPrivateAdult: string;
+  eventsCorporate: string;
+  eventsYouth: string;
   equipmentOwned: boolean;
+  equipmentTransport: boolean;
+  equipmentCapacity: string;
   equipmentPresets: string[];
   equipmentDescription: string;
   setupSize: string;
@@ -115,7 +121,13 @@ const EMPTY_DRAFT: Draft = {
   yearsExperience: "",
   eventsPerformed: "",
   notableClients: "",
+  eventsWeddings: "",
+  eventsPrivateAdult: "",
+  eventsCorporate: "",
+  eventsYouth: "",
   equipmentOwned: false,
+  equipmentTransport: false,
+  equipmentCapacity: "",
   equipmentPresets: [],
   equipmentDescription: "",
   setupSize: "",
@@ -169,24 +181,7 @@ const EVENT_TYPE_CARDS = [
   { id: "other", label: "Andet", description: "Klubber, festivaler…", icon: Sparkles },
 ];
 
-const EQUIPMENT_PRESETS = [
-  "Pioneer CDJ-2000",
-  "Pioneer CDJ-3000",
-  "Pioneer DJM-900",
-  "Pioneer DDJ-FLX6",
-  "Allen & Heath Xone",
-  "Denon Prime 4",
-  "QSC K12.2 højtalere",
-  "JBL EON højtalere",
-  "RCF subwoofere",
-  "Shure SM58 mikrofon",
-  "Sennheiser trådløs mik.",
-  "Chauvet LED wash",
-  "Røgmaskine",
-  "Moving heads",
-  "Konfetti-kanon",
-  "DMX-controller",
-];
+
 
 const ADDON_PRESETS = [
   "Ekstra time",
@@ -211,8 +206,7 @@ export function DJSignupPage() {
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [profilePhoto, setProfilePhoto] = useState<FileWithPreview[]>([]);
   const [galleryPhotos, setGalleryPhotos] = useState<FileWithPreview[]>([]);
-  const [equipmentPhotos, setEquipmentPhotos] = useState<FileWithPreview[]>([]);
-  const [credentials, setCredentials] = useState<FileWithPreview[]>([]);
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
@@ -222,6 +216,7 @@ export function DJSignupPage() {
   >("idle");
   const [direction, setDirection] = useState<1 | -1>(1);
   const [accountSubStep, setAccountSubStep] = useState<0 | 1>(0);
+  const [experienceSubStep, setExperienceSubStep] = useState<0 | 1>(0);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -290,10 +285,10 @@ export function DJSignupPage() {
         step,
         draft,
         profilePhoto,
-        equipmentPhotos,
+        [],
         stageNameState,
       ),
-    [step, draft, profilePhoto, equipmentPhotos, stageNameState],
+    [step, draft, profilePhoto, stageNameState],
   );
 
   function update<K extends keyof Draft>(key: K, value: Draft[K]) {
@@ -310,7 +305,6 @@ export function DJSignupPage() {
   function advance() {
     // Handle sub-steps within step 0 (account)
     if (step === 0 && accountSubStep === 0) {
-      // Validate sub-step 1a: Fornavn, Efternavn, DJ Navn, By
       if (draft.firstName.trim().length < 2) {
         toast.error("Fornavn er påkrævet");
         return;
@@ -328,6 +322,18 @@ export function DJSignupPage() {
         return;
       }
       setAccountSubStep(1);
+      if (typeof window !== "undefined")
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    // Handle sub-steps within step 2 (experience)
+    if (step === 2 && experienceSubStep === 0) {
+      if (!draft.yearsExperience) {
+        toast.error("Vælg antal års erfaring");
+        return;
+      }
+      setExperienceSubStep(1);
       if (typeof window !== "undefined")
         window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -360,9 +366,7 @@ export function DJSignupPage() {
       const profilePhotoDataUrl = profilePhoto[0]
         ? ((await fileToDataUrl(profilePhoto[0])) ?? undefined)
         : undefined;
-      const equipmentPhotoDataUrls = (
-        await Promise.all(equipmentPhotos.map((p) => fileToDataUrl(p)))
-      ).filter((u): u is string => typeof u === "string");
+      const equipmentPhotoDataUrls: string[] = [];
 
       writeDemoDJProfile({
         createdAt: new Date().toISOString(),
@@ -519,10 +523,7 @@ export function DJSignupPage() {
                       <StepExperience
                         draft={draft}
                         update={update}
-                        equipmentPhotos={equipmentPhotos}
-                        setEquipmentPhotos={setEquipmentPhotos}
-                        credentials={credentials}
-                        setCredentials={setCredentials}
+                        subStep={experienceSubStep}
                       />
                     )}
                     {step === 3 && (
@@ -552,6 +553,8 @@ export function DJSignupPage() {
                   onClick={() => {
                     if (step === 0 && accountSubStep === 1) {
                       setAccountSubStep(0);
+                    } else if (step === 2 && experienceSubStep === 1) {
+                      setExperienceSubStep(0);
                     } else if (step > 0) {
                       goTo(step - 1);
                     }
@@ -992,91 +995,103 @@ function StepHowItWorks() {
 /* Step 3 — DJ Erfaring & Mobildiskotek                                */
 /* ------------------------------------------------------------------ */
 
+const CAPACITY_OPTIONS = [
+  { id: "small", label: "Op til 50" },
+  { id: "medium", label: "50–100" },
+  { id: "large", label: "100–200" },
+  { id: "xlarge", label: "200+" },
+];
+
 type ExperienceProps = {
   draft: Draft;
   update: <K extends keyof Draft>(k: K, v: Draft[K]) => void;
-  equipmentPhotos: FileWithPreview[];
-  setEquipmentPhotos: (f: FileWithPreview[]) => void;
-  credentials: FileWithPreview[];
-  setCredentials: (f: FileWithPreview[]) => void;
+  subStep: 0 | 1;
 };
 
 function StepExperience({
   draft,
   update,
-  equipmentPhotos,
-  setEquipmentPhotos,
-  credentials,
-  setCredentials,
+  subStep,
 }: ExperienceProps) {
-  function togglePreset(id: string) {
-    const next = draft.equipmentPresets.includes(id)
-      ? draft.equipmentPresets.filter((p) => p !== id)
-      : [...draft.equipmentPresets, id];
-    update("equipmentPresets", next);
+  if (subStep === 0) {
+    return (
+      <div className="space-y-8">
+        <Header
+          icon={Speaker}
+          eyebrow="Trin 3a"
+          title="DJ Erfaring"
+          subtitle="Fortæl os om din erfaring som DJ, så vi kan matche dig med de rette kunder."
+        />
+
+        <section className="space-y-5">
+          <div>
+            <div className="mb-2 text-sm font-medium">
+              Antal år som DJ
+            </div>
+            <OptionCards
+              options={EXPERIENCE_YEARS.map((y) => ({ id: y.id, label: y.label }))}
+              value={draft.yearsExperience}
+              onChange={(v) => update("yearsExperience", v as string)}
+              columns={4}
+            />
+          </div>
+
+          <SectionDivider icon={Trophy} label="Antal events spillet pr. kategori" />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Bryllupper" hint="Antal bryllupper du har spillet til">
+              <Input
+                type="number"
+                min="0"
+                value={draft.eventsWeddings}
+                onChange={(e) => update("eventsWeddings", e.target.value)}
+                placeholder="0"
+              />
+            </Field>
+            <Field label="Privat voksen fester" hint="Fødselsdage, jubilæumer etc.">
+              <Input
+                type="number"
+                min="0"
+                value={draft.eventsPrivateAdult}
+                onChange={(e) => update("eventsPrivateAdult", e.target.value)}
+                placeholder="0"
+              />
+            </Field>
+            <Field label="Firmafester" hint="Firma-events, julefrokoster etc.">
+              <Input
+                type="number"
+                min="0"
+                value={draft.eventsCorporate}
+                onChange={(e) => update("eventsCorporate", e.target.value)}
+                placeholder="0"
+              />
+            </Field>
+            <Field label="Ungdomsfester" hint="Konfirmationer, studenterfester etc.">
+              <Input
+                type="number"
+                min="0"
+                value={draft.eventsYouth}
+                onChange={(e) => update("eventsYouth", e.target.value)}
+                placeholder="0"
+              />
+            </Field>
+          </div>
+        </section>
+      </div>
+    );
   }
+
+  // subStep === 1 — Mobildiskotek
   return (
     <div className="space-y-8">
       <Header
         icon={Speaker}
-        eyebrow="Trin 3"
-        title="DJ Erfaring & Mobildiskotek"
-        subtitle="Vi verificerer hver DJ's track record og udstyr, så kunder ved præcis hvad de booker. Jo flere detaljer, jo bedre match."
+        eyebrow="Trin 3b"
+        title="Mobildiskotek"
+        subtitle="Bekræft dit udstyr og dine ydelser som mobildiskotek-DJ."
       />
 
-      {/* --- Erfaring --- */}
       <section className="space-y-5">
-        <SectionDivider icon={Trophy} label="Din erfaring" />
-
-        <div>
-          <div className="mb-2 text-sm font-medium">
-            Års professionel erfaring
-          </div>
-          <OptionCards
-            options={EXPERIENCE_YEARS.map((y) => ({ id: y.id, label: y.label }))}
-            value={draft.yearsExperience}
-            onChange={(v) => update("yearsExperience", v as string)}
-            columns={4}
-          />
-        </div>
-
-        <div>
-          <div className="mb-2 text-sm font-medium">Antal events spillet</div>
-          <OptionCards
-            options={EVENTS_PERFORMED.map((e) => ({ id: e.id, label: e.label }))}
-            value={draft.eventsPerformed}
-            onChange={(v) => update("eventsPerformed", v as string)}
-            columns={4}
-          />
-        </div>
-
-        <Field
-          label="Bemærkelsesværdige kunder eller events (valgfri)"
-          hint="Venues, bureauer, festivaler, firmakunder"
-        >
-          <Textarea
-            rows={3}
-            value={draft.notableClients}
-            onChange={(e) => update("notableClients", e.target.value)}
-            placeholder="Tivoli sommer-serien, Acme A/S kickoff, Operaen julefest…"
-          />
-        </Field>
-
-        <FilePicker
-          label="Referencer eller certifikater (valgfri)"
-          hint="PDF eller billeder af anbefalinger, certifikater, awards"
-          accept="application/pdf,image/*"
-          max={3}
-          value={credentials}
-          onChange={setCredentials}
-          variant="document"
-        />
-      </section>
-
-      {/* --- Mobildiskotek --- */}
-      <section className="space-y-5">
-        <SectionDivider icon={Speaker} label="Dit mobildiskotek" />
-
         <div
           className={cn(
             "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
@@ -1094,85 +1109,48 @@ function StepExperience({
           />
           <div>
             <div className="text-sm font-medium">
-              Jeg ejer og driver et komplet mobildiskotek
+              Jeg ejer eller har adgang til eget mobildiskotek
             </div>
             <div className="text-xs text-muted-foreground">
-              Decks, mixer, højtalere, kabler, basis-lys — alt det der skal til
-              for at køre et event.
+              Decks, mixer, højtalere, kabler, basis-lys — alt der skal til for at køre et event.
             </div>
           </div>
         </div>
 
-        <div>
-          <div className="mb-2 flex items-center justify-between">
-            <div className="text-sm font-medium">Quick-pick dit udstyr</div>
-            <div className="text-xs text-muted-foreground">
-              {draft.equipmentPresets.length} valgt
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {EQUIPMENT_PRESETS.map((preset) => {
-              const selected = draft.equipmentPresets.includes(preset);
-              return (
-                <motion.button
-                  key={preset}
-                  type="button"
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => togglePreset(preset)}
-                  className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                    selected
-                      ? "border-accent bg-accent text-accent-foreground"
-                      : "border-border bg-background hover:border-accent/40",
-                  )}
-                >
-                  {selected ? (
-                    <Check className="h-3 w-3" />
-                  ) : (
-                    <Plus className="h-3 w-3" />
-                  )}
-                  {preset}
-                </motion.button>
-              );
-            })}
-          </div>
-        </div>
-
-        <Field
-          label="Beskriv noget unikt (min. 50 tegn)"
-          hint="Lyssætning, custom DMX, fotobooth-tillæg etc."
+        <div
+          className={cn(
+            "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
+            draft.equipmentTransport
+              ? "border-accent bg-accent/5"
+              : "border-border hover:border-accent/40",
+          )}
+          onClick={() => update("equipmentTransport", !draft.equipmentTransport)}
         >
-          <Textarea
-            rows={4}
-            value={draft.equipmentDescription}
-            onChange={(e) => update("equipmentDescription", e.target.value)}
-            placeholder="Komplet bryllups-pakke med uplighters, trådløs mik, moving heads og en 15 kW sub-rig…"
+          <Checkbox
+            checked={draft.equipmentTransport}
+            onCheckedChange={(v) => update("equipmentTransport", !!v)}
+            className="mt-0.5"
+            onClick={(e) => e.stopPropagation()}
           />
-          <div className="mt-1 text-xs text-muted-foreground">
-            {draft.equipmentDescription.length} / 50
+          <div>
+            <div className="text-sm font-medium">
+              Jeg ankommer med mobildiskoteket, sætter det op og tager det ned
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Fuld service: transport, opsætning, afvikling og nedpakning.
+            </div>
           </div>
-        </Field>
-
-        <FilePicker
-          label="Billeder af dit rig"
-          hint="1-5 klare billeder. Det første bruges som cover."
-          accept="image/*"
-          max={5}
-          value={equipmentPhotos}
-          onChange={setEquipmentPhotos}
-        />
+        </div>
 
         <div>
-          <div className="mb-2 text-sm font-medium">Setup-størrelse</div>
+          <div className="mb-2 text-sm font-medium">
+            Hvor mange mennesker kan dit mobildiskotek håndtere?
+          </div>
           <OptionCards
-            options={SETUP_SIZES.map((s) => ({
-              id: s.id,
-              label: s.label,
-              description: s.description,
-            }))}
-            value={draft.setupSize}
-            onChange={(v) => update("setupSize", v as string)}
-            columns={3}
+            options={CAPACITY_OPTIONS}
+            value={draft.equipmentCapacity}
+            onChange={(v) => update("equipmentCapacity", v as string)}
+            columns={4}
           />
         </div>
       </section>
@@ -1728,7 +1706,7 @@ function validateStep(
   step: number,
   draft: Draft,
   profilePhoto: FileWithPreview[],
-  equipmentPhotos: FileWithPreview[],
+  _equipmentPhotos: FileWithPreview[],
   stageNameState: "idle" | "checking" | "available" | "taken",
 ): { ok: boolean; reason?: string } {
   switch (step) {
@@ -1757,22 +1735,18 @@ function validateStep(
     case 2:
       if (!draft.yearsExperience)
         return { ok: false, reason: "Vælg års erfaring" };
-      if (!draft.eventsPerformed)
-        return { ok: false, reason: "Vælg antal events spillet" };
       if (!draft.equipmentOwned)
         return {
           ok: false,
-          reason: "Bekræft at du ejer et komplet mobildiskotek",
+          reason: "Bekræft at du ejer eller har adgang til mobildiskotek",
         };
-      if (draft.equipmentDescription.length < 50)
+      if (!draft.equipmentTransport)
         return {
           ok: false,
-          reason: "Beskrivelse af udstyr skal være mindst 50 tegn",
+          reason: "Bekræft at du ankommer med mobildiskoteket og sætter det op",
         };
-      if (equipmentPhotos.length < 1)
-        return { ok: false, reason: "Upload mindst 1 billede af dit rig" };
-      if (!draft.setupSize)
-        return { ok: false, reason: "Vælg en setup-størrelse" };
+      if (!draft.equipmentCapacity)
+        return { ok: false, reason: "Vælg kapacitet for dit mobildiskotek" };
       return { ok: true };
     case 3:
       if (!draft.pricingMode)
