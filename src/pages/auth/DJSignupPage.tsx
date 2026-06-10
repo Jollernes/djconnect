@@ -91,6 +91,14 @@ type Draft = {
   eventsPrivateAdult: string;
   eventsCorporate: string;
   eventsYouth: string;
+  // Step 3b — Links
+  linkInstagram: string;
+  linkFacebook: string;
+  linkWebsite: string;
+  linkEventzonen: string;
+  linkTrustpilot: string;
+  linkGoogle: string;
+  // Step 3c — Mobildiskotek
   equipmentOwned: boolean;
   equipmentTransport: boolean;
   equipmentCapacity: string;
@@ -125,6 +133,12 @@ const EMPTY_DRAFT: Draft = {
   eventsPrivateAdult: "",
   eventsCorporate: "",
   eventsYouth: "",
+  linkInstagram: "",
+  linkFacebook: "",
+  linkWebsite: "",
+  linkEventzonen: "",
+  linkTrustpilot: "",
+  linkGoogle: "",
   equipmentOwned: false,
   equipmentTransport: false,
   equipmentCapacity: "",
@@ -216,7 +230,7 @@ export function DJSignupPage() {
   >("idle");
   const [direction, setDirection] = useState<1 | -1>(1);
   const [accountSubStep, setAccountSubStep] = useState<0 | 1>(0);
-  const [experienceSubStep, setExperienceSubStep] = useState<0 | 1>(0);
+  const [experienceSubStep, setExperienceSubStep] = useState<0 | 1 | 2>(0);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -334,6 +348,13 @@ export function DJSignupPage() {
         return;
       }
       setExperienceSubStep(1);
+      if (typeof window !== "undefined")
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    if (step === 2 && experienceSubStep === 1) {
+      // Links sub-step — no mandatory fields, just advance
+      setExperienceSubStep(2);
       if (typeof window !== "undefined")
         window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -553,8 +574,8 @@ export function DJSignupPage() {
                   onClick={() => {
                     if (step === 0 && accountSubStep === 1) {
                       setAccountSubStep(0);
-                    } else if (step === 2 && experienceSubStep === 1) {
-                      setExperienceSubStep(0);
+                    } else if (step === 2 && experienceSubStep > 0) {
+                      setExperienceSubStep((experienceSubStep - 1) as 0 | 1 | 2);
                     } else if (step > 0) {
                       goTo(step - 1);
                     }
@@ -1012,7 +1033,7 @@ const CAPACITY_OPTIONS = [
 type ExperienceProps = {
   draft: Draft;
   update: <K extends keyof Draft>(k: K, v: Draft[K]) => void;
-  subStep: 0 | 1;
+  subStep: 0 | 1 | 2;
 };
 
 function StepExperience({
@@ -1091,12 +1112,81 @@ function StepExperience({
     );
   }
 
-  // subStep === 1 — Mobildiskotek
+  if (subStep === 1) {
+    return (
+      <div className="space-y-8">
+        <Header
+          icon={Speaker}
+          eyebrow="Trin 3b"
+          title="Hvor kan vi se dit DJ arbejde?"
+          subtitle="Tilføj links til dine profiler så kunder kan se dit arbejde. Alle felter er valgfrie."
+        />
+
+        <section className="space-y-5">
+          <SectionDivider icon={Speaker} label="Sociale medier" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Instagram" hint="Link til din Instagram-profil">
+              <Input
+                value={draft.linkInstagram}
+                onChange={(e) => update("linkInstagram", e.target.value)}
+                placeholder="https://instagram.com/dit-dj-navn"
+              />
+            </Field>
+            <Field label="Facebook Page" hint="Link til din Facebook-side">
+              <Input
+                value={draft.linkFacebook}
+                onChange={(e) => update("linkFacebook", e.target.value)}
+                placeholder="https://facebook.com/dit-dj-navn"
+              />
+            </Field>
+          </div>
+
+          <SectionDivider icon={Speaker} label="Hjemmesider & platforme" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Hjemmeside" hint="Din egen hjemmeside">
+              <Input
+                value={draft.linkWebsite}
+                onChange={(e) => update("linkWebsite", e.target.value)}
+                placeholder="https://dit-dj-navn.dk"
+              />
+            </Field>
+            <Field label="Eventzonen" hint="Din Eventzonen-profil">
+              <Input
+                value={draft.linkEventzonen}
+                onChange={(e) => update("linkEventzonen", e.target.value)}
+                placeholder="https://eventzonen.dk/dit-dj-navn"
+              />
+            </Field>
+          </div>
+
+          <SectionDivider icon={Star} label="Reviews" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Trustpilot" hint="Din Trustpilot-side">
+              <Input
+                value={draft.linkTrustpilot}
+                onChange={(e) => update("linkTrustpilot", e.target.value)}
+                placeholder="https://trustpilot.com/review/dit-firma"
+              />
+            </Field>
+            <Field label="Google Reviews" hint="Link til dine Google-anmeldelser">
+              <Input
+                value={draft.linkGoogle}
+                onChange={(e) => update("linkGoogle", e.target.value)}
+                placeholder="https://g.page/dit-dj-navn"
+              />
+            </Field>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // subStep === 2 — Mobildiskotek
   return (
     <div className="space-y-8">
       <Header
         icon={Speaker}
-        eyebrow="Trin 3b"
+        eyebrow="Trin 3c"
         title="Mobildiskotek"
         subtitle="Bekræft dit udstyr og dine ydelser som mobildiskotek-DJ."
       />
