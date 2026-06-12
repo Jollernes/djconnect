@@ -61,6 +61,8 @@ export function HomePage() {
   // Hero cluster: prefer featured DJs, then top up with the rest so we
   // always have up to 4 cards for social proof.
   const heroDJs = [...featured, ...djs.filter((d) => !d.is_featured)].slice(0, 4);
+  // Desktop hero grid: 5 DJ cards shown between the search bar and headline.
+  const heroGridDJs = [...featured, ...djs.filter((d) => !d.is_featured)].slice(0, 5);
 
   const [eventType, setEventType] = useState<string>("");
   const [city, setCity] = useState("");
@@ -89,7 +91,7 @@ export function HomePage() {
       <Hero heroDJs={heroDJs} />
 
       {/* Desktop-only: search form + content below video hero */}
-      <DesktopBelowHero heroDJs={heroDJs} eventType={eventType} setEventType={setEventType} city={city} setCity={setCity} date={date} setDate={setDate} onSubmit={submit} />
+      <DesktopBelowHero heroDJs={heroDJs} gridDJs={heroGridDJs} eventType={eventType} setEventType={setEventType} city={city} setCity={setCity} date={date} setDate={setDate} onSubmit={submit} />
 
       {/* Mobile-only: white-background content below video hero */}
       <MobileHeroContent heroDJs={heroDJs} featured={featured} navigate={navigate} />
@@ -157,6 +159,7 @@ function Hero({ heroDJs }: { heroDJs: DJProfileWithRelations[] }) {
 
 function DesktopBelowHero({
   heroDJs,
+  gridDJs,
   eventType,
   setEventType,
   city,
@@ -166,6 +169,7 @@ function DesktopBelowHero({
   onSubmit,
 }: {
   heroDJs: DJProfileWithRelations[];
+  gridDJs: DJProfileWithRelations[];
   eventType: string;
   setEventType: (v: string) => void;
   city: string;
@@ -215,6 +219,25 @@ function DesktopBelowHero({
           </div>
         </motion.form>
       </div>
+
+      {/* DJ grid — 5 cards between search bar and headline */}
+      {gridDJs.length >= 5 && (
+        <div className="mx-auto mt-12 max-w-7xl px-6">
+          <div className="grid grid-cols-5 gap-5">
+            {gridDJs.map((dj, i) => (
+              <motion.div
+                key={dj.id}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 + i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -6 }}
+              >
+                <DJCard dj={dj} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Content below — white bg */}
       <div className="bg-background py-12 text-center">
