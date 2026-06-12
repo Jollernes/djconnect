@@ -412,12 +412,16 @@ export function DJProfileView({
           <aside className="hidden lg:block">
             <div className="sticky top-24">
               <div className="relative">
-                <Avatar className="absolute left-1/2 top-0 z-10 h-20 w-20 -translate-x-1/2 -translate-y-1/2 shadow-lg ring-4 ring-white">
-                  <AvatarImage src={dj.profile.avatar_url ?? undefined} alt={dj.stage_name} />
-                  <AvatarFallback>{dj.stage_name.slice(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
+                <div className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-br from-gray-200 via-gray-400 to-gray-200 p-[3px] shadow-xl">
+                  <div className="rounded-full bg-white p-1">
+                    <Avatar className="h-28 w-28">
+                      <AvatarImage src={dj.profile.avatar_url ?? undefined} alt={dj.stage_name} />
+                      <AvatarFallback>{dj.stage_name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                </div>
                 <Card className="rounded-2xl shadow-xl ring-1 ring-black/5">
-                <CardContent className="space-y-5 p-6 pt-14">
+                <CardContent className="space-y-5 p-6 pt-20">
                   <div className="flex items-baseline justify-between gap-2">
                     <div>
                       <span className="text-2xl font-semibold">
