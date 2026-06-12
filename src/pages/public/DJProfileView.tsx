@@ -411,8 +411,13 @@ export function DJProfileView({
         {!preview && (
           <aside className="hidden lg:block">
             <div className="sticky top-24">
-              <Card className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/5">
-                <CardContent className="space-y-5 p-6">
+              <div className="relative">
+                <Avatar className="absolute left-1/2 top-0 z-10 h-20 w-20 -translate-x-1/2 -translate-y-1/2 shadow-lg ring-4 ring-white">
+                  <AvatarImage src={dj.profile.avatar_url ?? undefined} alt={dj.stage_name} />
+                  <AvatarFallback>{dj.stage_name.slice(0, 2).toUpperCase()}</AvatarFallback>
+                </Avatar>
+                <Card className="rounded-2xl shadow-xl ring-1 ring-black/5">
+                <CardContent className="space-y-5 p-6 pt-14">
                   <div className="flex items-baseline justify-between gap-2">
                     <div>
                       <span className="text-2xl font-semibold">
@@ -476,7 +481,8 @@ export function DJProfileView({
                     </li>
                   </ul>
                 </CardContent>
-              </Card>
+                </Card>
+              </div>
 
               {eventTypeId && onEventTypeChange && (
                 <div className="mt-3 inline-flex items-center px-2">
