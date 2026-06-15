@@ -1290,21 +1290,6 @@ type PricingProps = {
   subStep: 0 | 1;
 };
 
-const PACKAGE_TIERS = [
-  {
-    title: "Lille mobildiskotek",
-    guests: "Normalt passende til op til 75 gæster",
-  },
-  {
-    title: "Mellem mobildiskotek",
-    guests: "Normalt passende til omkring 75–125 gæster",
-  },
-  {
-    title: "Stort mobildiskotek",
-    guests: "Normalt passende til 100–200 gæster",
-  },
-];
-
 function StepPricing({ draft, update, subStep }: PricingProps) {
   function toggleAddOn(id: string) {
     const next = draft.addOns.includes(id)
@@ -1324,26 +1309,28 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
         />
 
         <section className="space-y-4">
-          <SectionDivider icon={Speaker} label="Tre standard-pakkeløsninger" />
+          <SectionDivider icon={Speaker} label="Dine egne pakkeløsninger" />
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Som udgangspunkt vælger kunden mellem tre pakkeløsninger. Du
-            specificerer selv hvor mange gæster hvert af dine mobildiskotek-setups
-            passer til:
+            Du specificerer selv dine mobildiskotek-pakkeløsninger — du kan
+            oprette op til 3. Hver pakkeløsning skal altid defineres ud fra hvor
+            mange gæster den passer til.
           </p>
 
           <div className="space-y-3">
-            {PACKAGE_TIERS.map((tier, i) => (
+            {[1, 2, 3].map((n) => (
               <div
-                key={tier.title}
-                className="flex items-start gap-3 rounded-xl border border-border p-4"
+                key={n}
+                className="flex items-start gap-3 rounded-xl border border-dashed border-border p-4"
               >
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 text-sm font-semibold text-accent">
-                  {i + 1}
+                  {n}
                 </div>
                 <div>
-                  <div className="text-sm font-medium">{tier.title}</div>
+                  <div className="text-sm font-medium">
+                    Pakkeløsning {n}
+                  </div>
                   <div className="text-xs text-muted-foreground">
-                    {tier.guests}
+                    Defineres ud fra antal gæster
                   </div>
                 </div>
               </div>
@@ -1352,15 +1339,15 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
         </section>
 
         <section className="space-y-3">
-          <SectionDivider icon={Sparkles} label="Eller ét samlet setup" />
+          <SectionDivider icon={Sparkles} label="Event-specifikke pakker" />
           <div className="rounded-xl border border-accent/40 bg-accent/5 p-4">
             <div className="text-sm font-medium">
-              Ét setup til alle events (20–200 gæster)
+              Pakker målrettet bestemte events
             </div>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-              Du kan også vælge kun at have ét setup, der passer til 20–200
-              gæster. Det fås så til én fast pris — uanset om der er 20 eller 200
-              gæster.
+              Udover dine generelle pakkeløsninger kan du også lave specifikke
+              mobildiskotek-pakker til bestemte events — fx bryllupper — og andre
+              specifikke event-typer.
             </p>
           </div>
         </section>
@@ -1368,9 +1355,8 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
         <div className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 p-4">
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
           <p className="text-xs leading-relaxed text-foreground/80">
-            <b className="text-foreground">Vigtigt:</b> Du angiver selv antal
-            gæster for hvert af dine mobildiskotek-setups — lille, mellem, stort
-            eller ét samlet setup for alle.
+            <b className="text-foreground">Vigtigt:</b> Alle pakkeløsninger skal
+            altid angives i forhold til antal gæster.
           </p>
         </div>
       </div>
