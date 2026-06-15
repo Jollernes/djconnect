@@ -231,6 +231,7 @@ export function DJSignupPage() {
   const [direction, setDirection] = useState<1 | -1>(1);
   const [accountSubStep, setAccountSubStep] = useState<0 | 1>(0);
   const [experienceSubStep, setExperienceSubStep] = useState<0 | 1 | 2>(0);
+  const [pricingSubStep, setPricingSubStep] = useState<0 | 1>(0);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -355,6 +356,15 @@ export function DJSignupPage() {
     if (step === 2 && experienceSubStep === 1) {
       // Links sub-step — no mandatory fields, just advance
       setExperienceSubStep(2);
+      if (typeof window !== "undefined")
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    // Handle sub-steps within step 3 (pricing)
+    if (step === 3 && pricingSubStep === 0) {
+      // Explainer sub-step — no mandatory fields, just advance
+      setPricingSubStep(1);
       if (typeof window !== "undefined")
         window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -548,7 +558,11 @@ export function DJSignupPage() {
                       />
                     )}
                     {step === 3 && (
-                      <StepPricing draft={draft} update={update} />
+                      <StepPricing
+                        draft={draft}
+                        update={update}
+                        subStep={pricingSubStep}
+                      />
                     )}
                     {step === 4 && (
                       <StepProfile
@@ -576,6 +590,8 @@ export function DJSignupPage() {
                       setAccountSubStep(0);
                     } else if (step === 2 && experienceSubStep > 0) {
                       setExperienceSubStep((experienceSubStep - 1) as 0 | 1 | 2);
+                    } else if (step === 3 && pricingSubStep === 1) {
+                      setPricingSubStep(0);
                     } else if (step > 0) {
                       goTo(step - 1);
                     }
@@ -1271,15 +1287,96 @@ function StepExperience({
 type PricingProps = {
   draft: Draft;
   update: <K extends keyof Draft>(k: K, v: Draft[K]) => void;
+  subStep: 0 | 1;
 };
 
-function StepPricing({ draft, update }: PricingProps) {
+const PACKAGE_TIERS = [
+  {
+    title: "Lille mobildiskotek",
+    guests: "Normalt passende til op til 75 gæster",
+  },
+  {
+    title: "Mellem mobildiskotek",
+    guests: "Normalt passende til omkring 75–125 gæster",
+  },
+  {
+    title: "Stort mobildiskotek",
+    guests: "Normalt passende til 100–200 gæster",
+  },
+];
+
+function StepPricing({ draft, update, subStep }: PricingProps) {
   function toggleAddOn(id: string) {
     const next = draft.addOns.includes(id)
       ? draft.addOns.filter((a) => a !== id)
       : [...draft.addOns, id];
     update("addOns", next);
   }
+
+  if (subStep === 0) {
+    return (
+      <div className="space-y-8">
+        <Header
+          icon={Coins}
+          eyebrow="Trin 4"
+          title="Pris & ydelser"
+          subtitle="Sådan fungerer pakke-modellen på DJConnect. Læs den igennem — på næste side sætter du din pris og vælger dine tilkøb."
+        />
+
+        <section className="space-y-4">
+          <SectionDivider icon={Speaker} label="Tre standard-pakkeløsninger" />
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            Som udgangspunkt vælger kunden mellem tre pakkeløsninger. Du
+            specificerer selv hvor mange gæster hvert af dine mobildiskotek-setups
+            passer til:
+          </p>
+
+          <div className="space-y-3">
+            {PACKAGE_TIERS.map((tier, i) => (
+              <div
+                key={tier.title}
+                className="flex items-start gap-3 rounded-xl border border-border p-4"
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 text-sm font-semibold text-accent">
+                  {i + 1}
+                </div>
+                <div>
+                  <div className="text-sm font-medium">{tier.title}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {tier.guests}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <SectionDivider icon={Sparkles} label="Eller ét samlet setup" />
+          <div className="rounded-xl border border-accent/40 bg-accent/5 p-4">
+            <div className="text-sm font-medium">
+              Ét setup til alle events (20–200 gæster)
+            </div>
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              Du kan også vælge kun at have ét setup, der passer til 20–200
+              gæster. Det fås så til én fast pris — uanset om der er 20 eller 200
+              gæster.
+            </p>
+          </div>
+        </section>
+
+        <div className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 p-4">
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+          <p className="text-xs leading-relaxed text-foreground/80">
+            <b className="text-foreground">Vigtigt:</b> Du angiver selv antal
+            gæster for hvert af dine mobildiskotek-setups — lille, mellem, stort
+            eller ét samlet setup for alle.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <Header
