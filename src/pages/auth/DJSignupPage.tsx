@@ -1219,30 +1219,34 @@ function StepExperience({
           </div>
         </div>
 
-        <div
-          className={cn(
-            "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
-            draft.equipmentTransport
-              ? "border-accent bg-accent/5"
-              : "border-border hover:border-accent/40",
-          )}
-          onClick={() => update("equipmentTransport", !draft.equipmentTransport)}
-        >
-          <Checkbox
-            checked={draft.equipmentTransport}
-            onCheckedChange={(v) => update("equipmentTransport", !!v)}
-            className="mt-0.5"
-            onClick={(e) => e.stopPropagation()}
-          />
-          <div>
-            <div className="text-sm font-medium">
-              Jeg ankommer med mobildiskoteket, sætter det op og tager det ned
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Fuld service: transport, opsætning, afvikling og nedpakning.
+        {draft.equipmentOwned && (
+          <div
+            className={cn(
+              "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
+              draft.equipmentTransport
+                ? "border-accent bg-accent/5"
+                : "border-border hover:border-accent/40",
+            )}
+            onClick={() => update("equipmentTransport", !draft.equipmentTransport)}
+          >
+            <Checkbox
+              checked={draft.equipmentTransport}
+              onCheckedChange={(v) => update("equipmentTransport", !!v)}
+              className="mt-0.5"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div>
+              <div className="text-sm font-medium">
+                Jeg er indforstået med, at de fleste events kræver, at jeg selv
+                står for transport, opsætning og nedpakning af alt udstyret
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Du møder op i god tid, gør klar inden gæsterne ankommer og pakker
+                ned igen efter eventet.
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div>
           <div className="mb-2 text-sm font-medium">
