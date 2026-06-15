@@ -1017,10 +1017,12 @@ function StepHowItWorks() {
 /* ------------------------------------------------------------------ */
 
 const EVENT_COUNT_OPTIONS = [
-  { id: "0-5", label: "0–5" },
-  { id: "5-15", label: "5–15" },
-  { id: "15-30", label: "15–30" },
-  { id: "30+", label: "30+" },
+  { id: "none", label: "Ingen erfaring" },
+  { id: "1-5", label: "1–5" },
+  { id: "5+", label: "+5" },
+  { id: "10+", label: "+10" },
+  { id: "20+", label: "+20" },
+  { id: "50+", label: "+50" },
 ];
 
 const CAPACITY_OPTIONS = [
@@ -1073,7 +1075,7 @@ function StepExperience({
                 options={EVENT_COUNT_OPTIONS}
                 value={draft.eventsWeddings}
                 onChange={(v) => update("eventsWeddings", v as string)}
-                columns={4}
+                columns={3}
               />
             </div>
             <div>
@@ -1083,7 +1085,7 @@ function StepExperience({
                 options={EVENT_COUNT_OPTIONS}
                 value={draft.eventsPrivateAdult}
                 onChange={(v) => update("eventsPrivateAdult", v as string)}
-                columns={4}
+                columns={3}
               />
             </div>
             <div>
@@ -1093,7 +1095,7 @@ function StepExperience({
                 options={EVENT_COUNT_OPTIONS}
                 value={draft.eventsCorporate}
                 onChange={(v) => update("eventsCorporate", v as string)}
-                columns={4}
+                columns={3}
               />
             </div>
             <div>
@@ -1103,7 +1105,7 @@ function StepExperience({
                 options={EVENT_COUNT_OPTIONS}
                 value={draft.eventsYouth}
                 onChange={(v) => update("eventsYouth", v as string)}
-                columns={4}
+                columns={3}
               />
             </div>
           </div>
