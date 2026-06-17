@@ -79,6 +79,7 @@ type DJPackage = {
   guestsFrom: string;
   guestsTo: string;
   packagePrice: string;
+  included: string;
 };
 
 function makePackage(): DJPackage {
@@ -86,7 +87,7 @@ function makePackage(): DJPackage {
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : Math.random().toString(36).slice(2);
-  return { id, guestsFrom: "", guestsTo: "", packagePrice: "" };
+  return { id, guestsFrom: "", guestsTo: "", packagePrice: "", included: "" };
 }
 
 type Draft = {
@@ -1548,6 +1549,22 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
                     </Field>
                   </div>
 
+                  <div className="mt-4">
+                    <Field
+                      label="Hvad er inkluderet?"
+                      hint="Kort beskrivelse af hvad pakken indeholder"
+                    >
+                      <Textarea
+                        rows={2}
+                        value={pkg.included}
+                        onChange={(e) =>
+                          updatePackage(pkg.id, "included", e.target.value)
+                        }
+                        placeholder="fx lydanlæg, basis-lys, trådløs mikrofon og DJ til hele aftenen"
+                      />
+                    </Field>
+                  </div>
+
                   {(pkgPrice > 0 || hourly > 0) && (
                     <div className="mt-3 rounded-lg border border-accent/30 bg-accent/5 p-3">
                       <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
@@ -2083,6 +2100,11 @@ function validateStep(
           };
         if (!p.packagePrice)
           return { ok: false, reason: "Indtast en pakkepris for hver pakke" };
+        if (!p.included.trim())
+          return {
+            ok: false,
+            reason: "Beskriv kort hvad der er inkluderet i hver pakke",
+          };
       }
       return { ok: true };
     case 4:
