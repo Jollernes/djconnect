@@ -1290,6 +1290,26 @@ type PricingProps = {
   subStep: 0 | 1;
 };
 
+const PACKAGE_EXAMPLES = [
+  {
+    title: "Lille pakke",
+    guests: "Op til 75 gæster",
+    example: "Lyd + basis-lys til en mindre fest, fx en rund fødselsdag.",
+  },
+  {
+    title: "Mellem pakke",
+    guests: "Omkring 75–125 gæster",
+    example:
+      "Kraftigere anlæg, festbelysning og trådløs mikrofon til en firmafest.",
+  },
+  {
+    title: "Stor pakke",
+    guests: "100–200 gæster",
+    example:
+      "Stort lydanlæg, moving heads og røgmaskine til en stor fest eller galla.",
+  },
+];
+
 function StepPricing({ draft, update, subStep }: PricingProps) {
   function toggleAddOn(id: string) {
     const next = draft.addOns.includes(id)
@@ -1317,25 +1337,33 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
           </p>
 
           <div className="space-y-3">
-            {[1, 2, 3].map((n) => (
+            {PACKAGE_EXAMPLES.map((pkg, i) => (
               <div
-                key={n}
+                key={pkg.title}
                 className="flex items-start gap-3 rounded-xl border border-dashed border-border p-4"
               >
                 <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 text-sm font-semibold text-accent">
-                  {n}
+                  {i + 1}
                 </div>
                 <div>
-                  <div className="text-sm font-medium">
-                    Pakkeløsning {n}
-                  </div>
+                  <div className="text-sm font-medium">{pkg.title}</div>
                   <div className="text-xs text-muted-foreground">
-                    Defineres ud fra antal gæster
+                    {pkg.guests}
+                  </div>
+                  <div className="mt-1 text-xs text-muted-foreground/80">
+                    <span className="font-medium text-foreground/70">
+                      Eksempel:
+                    </span>{" "}
+                    {pkg.example}
                   </div>
                 </div>
               </div>
             ))}
           </div>
+          <p className="text-xs text-muted-foreground/80">
+            Eksemplerne er kun til inspiration — du sætter selv gæsteantal,
+            indhold og pris for hver pakke.
+          </p>
         </section>
 
         <section className="space-y-3">
@@ -1349,6 +1377,11 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
               mobildiskotek-pakker til bestemte events — fx bryllupper — og andre
               specifikke event-typer.
             </p>
+            <div className="mt-2 text-xs leading-relaxed text-muted-foreground/80">
+              <span className="font-medium text-foreground/70">Eksempel:</span>{" "}
+              <b>Bryllupspakke</b> (op til 120 gæster) — ceremoni-lyd, trådløs
+              mikrofon til talerne, festbelysning og DJ til natten.
+            </div>
           </div>
         </section>
 
