@@ -79,7 +79,6 @@ type DJPackage = {
   guestsFrom: string;
   guestsTo: string;
   packagePrice: string;
-  hourlyRate: string;
 };
 
 function makePackage(): DJPackage {
@@ -87,7 +86,7 @@ function makePackage(): DJPackage {
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : Math.random().toString(36).slice(2);
-  return { id, guestsFrom: "", guestsTo: "", packagePrice: "", hourlyRate: "" };
+  return { id, guestsFrom: "", guestsTo: "", packagePrice: "" };
 }
 
 type Draft = {
@@ -122,6 +121,7 @@ type Draft = {
   equipmentDescription: string;
   setupSize: string;
   // Step 4 — Pris & ydelser
+  hourlyRate: string;
   packages: DJPackage[];
   addOns: string[];
   // Step 5 — Profil & billeder
@@ -157,6 +157,7 @@ const EMPTY_DRAFT: Draft = {
   equipmentPresets: [],
   equipmentDescription: "",
   setupSize: "",
+  hourlyRate: "",
   packages: [makePackage()],
   addOns: [],
   stageName: "",
@@ -1450,18 +1451,40 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
       />
 
       <section className="space-y-4">
-        <SectionDivider icon={Coins} label="Dine pakkeløsninger" />
+        <SectionDivider icon={Coins} label="Din timepris" />
         <p className="text-xs text-muted-foreground">
-          Opret op til 3 pakkeløsninger. For hver pakke angiver du gæsteantal
-          (ca. fra–til), en pakkepris og en timepris.
+          Din timepris er den samme for alle dine pakkeløsninger. Pakkeprisen
+          dækker selve mobildiskotek-setuppet, og timeprisen lægges oveni for
+          hver time du spiller.
+        </p>
+        <div className="sm:max-w-xs">
+          <Field label="Timepris (DKK)" hint="Gælder alle pakkeløsninger">
+            <Input
+              type="number"
+              min={0}
+              value={draft.hourlyRate}
+              onChange={(e) => update("hourlyRate", e.target.value)}
+              placeholder="1200"
+            />
+          </Field>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <SectionDivider icon={Speaker} label="Dine pakkeløsninger" />
+        <p className="text-xs text-muted-foreground">
+          Opret op til 3 pakkeløsninger (mobildiskotek-størrelser). For hver
+          pakke angiver du gæsteantal (ca. fra–til) og en pakkepris for
+          setuppet.
         </p>
 
         <div className="space-y-4">
           <AnimatePresence initial={false}>
             {draft.packages.map((pkg, i) => {
               const pkgPrice = Number(pkg.packagePrice) || 0;
-              const hourly = Number(pkg.hourlyRate) || 0;
+              const hourly = Number(draft.hourlyRate) || 0;
               const hourlyTotal = hourly * EXAMPLE_HOURS;
+              const total = pkgPrice + hourlyTotal;
               return (
                 <motion.div
                   key={pkg.id}
@@ -1509,7 +1532,10 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
                         placeholder="75"
                       />
                     </Field>
-                    <Field label="Pakkepris (DKK)" hint="Fast pris for pakken">
+                    <Field
+                      label="Pakkepris (DKK)"
+                      hint="Setup-pris for mobildiskoteket"
+                    >
                       <Input
                         type="number"
                         min={0}
@@ -1518,17 +1544,6 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
                           updatePackage(pkg.id, "packagePrice", e.target.value)
                         }
                         placeholder="6500"
-                      />
-                    </Field>
-                    <Field label="Timepris (DKK)" hint="Pris pr. ekstra time">
-                      <Input
-                        type="number"
-                        min={0}
-                        value={pkg.hourlyRate}
-                        onChange={(e) =>
-                          updatePackage(pkg.id, "hourlyRate", e.target.value)
-                        }
-                        placeholder="1200"
                       />
                     </Field>
                   </div>
@@ -1541,15 +1556,25 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
                       </div>
                       <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
                         <div className="flex justify-between">
-                          <span>Med din pakkepris</span>
-                          <span className="font-semibold text-foreground">
+                          <span>Pakkepris (setup)</span>
+                          <span className="text-foreground">
                             {formatDKK(pkgPrice)} kr
                           </span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Til sammenligning ({EXAMPLE_HOURS} t × timepris)</span>
-                          <span className="font-semibold text-foreground">
+                          <span>
+                            Timepris ({EXAMPLE_HOURS} t × {formatDKK(hourly)} kr)
+                          </span>
+                          <span className="text-foreground">
                             {formatDKK(hourlyTotal)} kr
+                          </span>
+                        </div>
+                        <div className="mt-1 flex justify-between border-t border-border pt-1.5">
+                          <span className="font-medium text-foreground">
+                            Total for {EXAMPLE_HOURS} timer
+                          </span>
+                          <span className="font-semibold text-foreground">
+                            {formatDKK(total)} kr
                           </span>
                         </div>
                       </div>
@@ -2046,6 +2071,8 @@ function validateStep(
         return { ok: false, reason: "Vælg kapacitet for dit mobildiskotek" };
       return { ok: true };
     case 3:
+      if (!draft.hourlyRate)
+        return { ok: false, reason: "Indtast din timepris" };
       if (draft.packages.length === 0)
         return { ok: false, reason: "Tilføj mindst én pakkeløsning" };
       for (const p of draft.packages) {
@@ -2056,8 +2083,6 @@ function validateStep(
           };
         if (!p.packagePrice)
           return { ok: false, reason: "Indtast en pakkepris for hver pakke" };
-        if (!p.hourlyRate)
-          return { ok: false, reason: "Indtast en timepris for hver pakke" };
       }
       return { ok: true };
     case 4:
