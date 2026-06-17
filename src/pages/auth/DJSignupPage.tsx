@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -80,6 +80,7 @@ type DJPackage = {
   guestsTo: string;
   packagePrice: string;
   included: string;
+  image: string;
 };
 
 function makePackage(): DJPackage {
@@ -87,7 +88,14 @@ function makePackage(): DJPackage {
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : Math.random().toString(36).slice(2);
-  return { id, guestsFrom: "", guestsTo: "", packagePrice: "", included: "" };
+  return {
+    id,
+    guestsFrom: "",
+    guestsTo: "",
+    packagePrice: "",
+    included: "",
+    image: "",
+  };
 }
 
 type Draft = {
@@ -274,14 +282,24 @@ export function DJSignupPage() {
   useEffect(() => {
     const { password: _password, ...rest } = draft;
     void _password;
-    localStorage.setItem(
-      DRAFT_KEY,
-      JSON.stringify({
-        draft: { ...rest, password: "" },
-        step,
-        completed: Array.from(completed),
-      }),
-    );
+    try {
+      localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({
+          // Strip package images (data URLs) so a large upload can't blow
+          // the localStorage quota and crash the draft autosave.
+          draft: {
+            ...rest,
+            password: "",
+            packages: rest.packages.map((p) => ({ ...p, image: "" })),
+          },
+          step,
+          completed: Array.from(completed),
+        }),
+      );
+    } catch {
+      /* storage full or blocked — autosave is best-effort */
+    }
   }, [draft, step, completed]);
 
   useEffect(() => {
@@ -1364,6 +1382,15 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
     );
   }
 
+  async function setPackageImage(id: string, file: File | undefined) {
+    if (!file) {
+      updatePackage(id, "image", "");
+      return;
+    }
+    const dataUrl = await fileToDataUrl(file);
+    if (dataUrl) updatePackage(id, "image", dataUrl);
+  }
+
   if (subStep === 0) {
     return (
       <div className="space-y-8">
@@ -1565,6 +1592,14 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
                     </Field>
                   </div>
 
+                  <div className="mt-4">
+                    <PackageImageField
+                      value={pkg.image}
+                      onSelect={(file) => setPackageImage(pkg.id, file)}
+                      onClear={() => setPackageImage(pkg.id, undefined)}
+                    />
+                  </div>
+
                   {(pkgPrice > 0 || hourly > 0) && (
                     <div className="mt-3 rounded-lg border border-accent/30 bg-accent/5 p-3">
                       <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
@@ -1611,6 +1646,12 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
               <Plus className="h-4 w-4" /> Tilføj pakkeløsning ({draft.packages.length}/3)
             </button>
           )}
+
+          <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+            Du kan også oprette eller redigere dine pakkeløsninger på et senere
+            tidspunkt fra dit DJ-panel.
+          </p>
         </div>
       </section>
 
@@ -2017,6 +2058,73 @@ function Field({
       <Label className="text-sm font-medium">{label}</Label>
       {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
       <div className="mt-2">{children}</div>
+    </div>
+  );
+}
+
+function PackageImageField({
+  value,
+  onSelect,
+  onClear,
+}: {
+  value: string;
+  onSelect: (file: File | undefined) => void;
+  onClear: () => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  return (
+    <div>
+      <Label className="text-sm font-medium">Billede af opsætningen</Label>
+      <p className="mt-0.5 text-xs text-muted-foreground">
+        Vælg et billede der bedst visualiserer mobildiskotekets opsætning og
+        størrelse
+      </p>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => onSelect(e.target.files?.[0])}
+      />
+      {value ? (
+        <div className="mt-2 flex items-center gap-3">
+          <img
+            src={value}
+            alt="Pakke-opsætning"
+            className="h-20 w-28 rounded-lg border border-border object-cover"
+          />
+          <div className="flex flex-col gap-1.5">
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs font-medium transition-colors hover:border-accent/40"
+            >
+              <Camera className="h-3.5 w-3.5" /> Skift billede
+            </button>
+            <button
+              type="button"
+              onClick={onClear}
+              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+            >
+              <X className="h-3.5 w-3.5" /> Fjern
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          className="mt-2 flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-muted-foreground/25 bg-muted/20 px-4 py-6 text-center transition-colors hover:border-accent/40"
+        >
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
+            <Camera className="h-5 w-5" />
+          </span>
+          <span className="text-sm font-medium">Upload billede</span>
+          <span className="text-xs text-muted-foreground">
+            PNG eller JPG · valgfrit
+          </span>
+        </button>
+      )}
     </div>
   );
 }
