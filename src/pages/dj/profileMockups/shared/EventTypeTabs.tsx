@@ -56,6 +56,8 @@ export function EventTypeTabs({
                     ? "text-amber-600"
                     : meta.accent === "rose"
                     ? "text-rose-600"
+                    : meta.accent === "indigo"
+                    ? "text-indigo-600"
                     : "text-slate-700"
                   : "text-muted-foreground",
               )}

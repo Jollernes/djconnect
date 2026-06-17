@@ -1,15 +1,15 @@
 import type { DemoDJSubProfileKey } from "@/lib/demoDJProfile";
 
 /**
- * The three event-type sub-profiles shown across all redesign mockups.
- * The legacy "general" sub-profile is intentionally omitted from the
- * mockups — its content lives in the shared/account-wide block instead.
+ * The three profile types shown across all redesign mockups: a broad
+ * "Generel" profile shown first, plus the wedding and corporate
+ * event-type profiles.
  */
-export type MockupSubProfileKey = Exclude<DemoDJSubProfileKey, "general">;
+export type MockupSubProfileKey = Exclude<DemoDJSubProfileKey, "birthday">;
 
 export const MOCKUP_SUB_PROFILE_KEYS: MockupSubProfileKey[] = [
+  "general",
   "wedding",
-  "birthday",
   "corporate",
 ];
 
@@ -20,12 +20,20 @@ export type MockupSubProfileMeta = {
   tabLabel: string;
   /** Short noun for body copy (e.g. "bryllup"). */
   noun: string;
-  icon: "rings" | "cake" | "briefcase";
+  icon: "rings" | "cake" | "briefcase" | "sparkles";
   /** Accent color for progress bars / pill backgrounds. */
-  accent: "amber" | "rose" | "navy";
+  accent: "amber" | "rose" | "navy" | "indigo";
 };
 
 export const MOCKUP_SUB_PROFILE_META: Record<MockupSubProfileKey, MockupSubProfileMeta> = {
+  general: {
+    key: "general",
+    label: "General",
+    tabLabel: "Generel Profil",
+    noun: "event",
+    icon: "sparkles",
+    accent: "indigo",
+  },
   wedding: {
     key: "wedding",
     label: "Wedding",
@@ -33,14 +41,6 @@ export const MOCKUP_SUB_PROFILE_META: Record<MockupSubProfileKey, MockupSubProfi
     noun: "bryllup",
     icon: "rings",
     accent: "amber",
-  },
-  birthday: {
-    key: "birthday",
-    label: "Birthday",
-    tabLabel: "Fødselsdagsprofil",
-    noun: "fødselsdag",
-    icon: "cake",
-    accent: "rose",
   },
   corporate: {
     key: "corporate",

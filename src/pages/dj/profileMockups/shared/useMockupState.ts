@@ -11,8 +11,8 @@ import type { CompletionEntry } from "./CompletionBars";
 
 /**
  * Wraps the existing `useDJProfileEditor` hook with the mockup-specific
- * notion of an active sub-profile (only 3 event-type ones — "general"
- * is intentionally hidden in the redesigns).
+ * notion of an active sub-profile (the 3 mockup profile types — "general",
+ * "wedding" and "corporate"; "birthday" is not shown in the redesigns).
  *
  * Returns a single `state` object plus a `completionEntries` array used
  * by the "Dine profiler" overview card. Any field edit the DJ makes in
@@ -29,9 +29,11 @@ export function useMockupState(): {
 
   /** Local view of the active sub-profile, scoped to mockup keys. */
   const [activeKey, setActiveKeyLocal] = useState<MockupSubProfileKey>(() => {
-    return (
-      (state.activeKey !== "general" ? state.activeKey : null) ?? "wedding"
-    );
+    return MOCKUP_SUB_PROFILE_KEYS.includes(
+      state.activeKey as MockupSubProfileKey,
+    )
+      ? (state.activeKey as MockupSubProfileKey)
+      : "general";
   });
 
   /** Keep the upstream editor state's `activeKey` in sync so the

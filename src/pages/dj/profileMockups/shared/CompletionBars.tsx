@@ -53,6 +53,8 @@ export function CompletionBars({
               ? "bg-amber-500"
               : meta.accent === "rose"
               ? "bg-rose-500"
+              : meta.accent === "indigo"
+              ? "bg-indigo-500"
               : "bg-slate-700";
           const RowEl: "button" | "div" = onJump ? "button" : "div";
           return (
@@ -75,14 +77,16 @@ export function CompletionBars({
                       ? "text-amber-600"
                       : meta.accent === "rose"
                       ? "text-rose-600"
+                      : meta.accent === "indigo"
+                      ? "text-indigo-600"
                       : "text-slate-700",
                   )}
                 />
                 <span className="w-24 shrink-0 text-sm font-medium">
                   {meta.label === "Wedding"
                     ? "Bryllup"
-                    : meta.label === "Birthday"
-                    ? "Fødselsdag"
+                    : meta.label === "General"
+                    ? "Generel"
                     : "Firmaevent"}
                 </span>
                 <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
