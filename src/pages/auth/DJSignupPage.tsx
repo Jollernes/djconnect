@@ -74,6 +74,22 @@ import { fileToDataUrl, writeDemoDJProfile } from "@/lib/demoDJProfile";
  *     only step where the live card is shown.
  */
 
+type DJPackage = {
+  id: string;
+  guestsFrom: string;
+  guestsTo: string;
+  packagePrice: string;
+  hourlyRate: string;
+};
+
+function makePackage(): DJPackage {
+  const id =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2);
+  return { id, guestsFrom: "", guestsTo: "", packagePrice: "", hourlyRate: "" };
+}
+
 type Draft = {
   // Step 1 — Opret konto
   firstName: string;
@@ -106,11 +122,7 @@ type Draft = {
   equipmentDescription: string;
   setupSize: string;
   // Step 4 — Pris & ydelser
-  pricingMode: "hourly" | "package" | "";
-  hourlyRate: string;
-  minimumHours: string;
-  packagePrice: string;
-  includedHours: string;
+  packages: DJPackage[];
   addOns: string[];
   // Step 5 — Profil & billeder
   stageName: string;
@@ -145,11 +157,7 @@ const EMPTY_DRAFT: Draft = {
   equipmentPresets: [],
   equipmentDescription: "",
   setupSize: "",
-  pricingMode: "",
-  hourlyRate: "",
-  minimumHours: "",
-  packagePrice: "",
-  includedHours: "",
+  packages: [makePackage()],
   addOns: [],
   stageName: "",
   bio: "",
@@ -1317,12 +1325,41 @@ const PACKAGE_EXAMPLES = [
   },
 ];
 
+const EXAMPLE_HOURS = 5;
+
+function formatDKK(n: number) {
+  return new Intl.NumberFormat("da-DK").format(n);
+}
+
 function StepPricing({ draft, update, subStep }: PricingProps) {
   function toggleAddOn(id: string) {
     const next = draft.addOns.includes(id)
       ? draft.addOns.filter((a) => a !== id)
       : [...draft.addOns, id];
     update("addOns", next);
+  }
+
+  function updatePackage<K extends keyof DJPackage>(
+    id: string,
+    field: K,
+    value: DJPackage[K],
+  ) {
+    update(
+      "packages",
+      draft.packages.map((p) => (p.id === id ? { ...p, [field]: value } : p)),
+    );
+  }
+
+  function addPackage() {
+    if (draft.packages.length >= 3) return;
+    update("packages", [...draft.packages, makePackage()]);
+  }
+
+  function removePackage(id: string) {
+    update(
+      "packages",
+      draft.packages.filter((p) => p.id !== id),
+    );
   }
 
   if (subStep === 0) {
@@ -1412,96 +1449,127 @@ function StepPricing({ draft, update, subStep }: PricingProps) {
         subtitle="Sæt din pris og dine pakker. Du kan ændre alt senere fra dit DJ-panel — det her er bare en start."
       />
 
-      <section className="space-y-5">
-        <SectionDivider icon={Coins} label="Sådan vil du tage betaling" />
+      <section className="space-y-4">
+        <SectionDivider icon={Coins} label="Dine pakkeløsninger" />
+        <p className="text-xs text-muted-foreground">
+          Opret op til 3 pakkeløsninger. For hver pakke angiver du gæsteantal
+          (ca. fra–til), en pakkepris og en timepris.
+        </p>
 
-        <OptionCards
-          options={[
-            {
-              id: "hourly",
-              label: "Per time",
-              description: "Du sætter en timepris og minimumstimer",
-            },
-            {
-              id: "package",
-              label: "Pakkepris",
-              description: "En fast pris inkl. et antal timer",
-            },
-          ]}
-          value={draft.pricingMode}
-          onChange={(v) =>
-            update("pricingMode", v as "hourly" | "package")
-          }
-          columns={2}
-        />
+        <div className="space-y-4">
+          <AnimatePresence initial={false}>
+            {draft.packages.map((pkg, i) => {
+              const pkgPrice = Number(pkg.packagePrice) || 0;
+              const hourly = Number(pkg.hourlyRate) || 0;
+              const hourlyTotal = hourly * EXAMPLE_HOURS;
+              return (
+                <motion.div
+                  key={pkg.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                  className="rounded-xl border border-border p-4"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="text-sm font-semibold">
+                      Pakkeløsning {i + 1}
+                    </div>
+                    {draft.packages.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removePackage(pkg.id)}
+                        className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+                      >
+                        <X className="h-3.5 w-3.5" /> Fjern
+                      </button>
+                    )}
+                  </div>
 
-        <AnimatePresence mode="wait" initial={false}>
-          {draft.pricingMode === "hourly" && (
-            <motion.div
-              key="hourly"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="grid gap-4 sm:grid-cols-2"
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Gæster fra (ca.)" hint="Mindste antal gæster">
+                      <Input
+                        type="number"
+                        min={0}
+                        value={pkg.guestsFrom}
+                        onChange={(e) =>
+                          updatePackage(pkg.id, "guestsFrom", e.target.value)
+                        }
+                        placeholder="20"
+                      />
+                    </Field>
+                    <Field label="Gæster til (ca.)" hint="Største antal gæster">
+                      <Input
+                        type="number"
+                        min={0}
+                        value={pkg.guestsTo}
+                        onChange={(e) =>
+                          updatePackage(pkg.id, "guestsTo", e.target.value)
+                        }
+                        placeholder="75"
+                      />
+                    </Field>
+                    <Field label="Pakkepris (DKK)" hint="Fast pris for pakken">
+                      <Input
+                        type="number"
+                        min={0}
+                        value={pkg.packagePrice}
+                        onChange={(e) =>
+                          updatePackage(pkg.id, "packagePrice", e.target.value)
+                        }
+                        placeholder="6500"
+                      />
+                    </Field>
+                    <Field label="Timepris (DKK)" hint="Pris pr. ekstra time">
+                      <Input
+                        type="number"
+                        min={0}
+                        value={pkg.hourlyRate}
+                        onChange={(e) =>
+                          updatePackage(pkg.id, "hourlyRate", e.target.value)
+                        }
+                        placeholder="1200"
+                      />
+                    </Field>
+                  </div>
+
+                  {(pkgPrice > 0 || hourly > 0) && (
+                    <div className="mt-3 rounded-lg border border-accent/30 bg-accent/5 p-3">
+                      <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+                        <Info className="h-3.5 w-3.5 text-accent" />
+                        Eksempel · event på {EXAMPLE_HOURS} timer
+                      </div>
+                      <div className="mt-1.5 space-y-1 text-xs text-muted-foreground">
+                        <div className="flex justify-between">
+                          <span>Med din pakkepris</span>
+                          <span className="font-semibold text-foreground">
+                            {formatDKK(pkgPrice)} kr
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Til sammenligning ({EXAMPLE_HOURS} t × timepris)</span>
+                          <span className="font-semibold text-foreground">
+                            {formatDKK(hourlyTotal)} kr
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+
+          {draft.packages.length < 3 && (
+            <button
+              type="button"
+              onClick={addPackage}
+              className="inline-flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-border px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:border-accent/40 hover:text-foreground"
             >
-              <Field label="Timepris (DKK)" hint="Eks. 1.200">
-                <Input
-                  type="number"
-                  min={0}
-                  value={draft.hourlyRate}
-                  onChange={(e) => update("hourlyRate", e.target.value)}
-                  placeholder="1200"
-                />
-              </Field>
-              <Field
-                label="Minimumstimer"
-                hint="Hvor få timer kan du booke ad?"
-              >
-                <Input
-                  type="number"
-                  min={1}
-                  value={draft.minimumHours}
-                  onChange={(e) => update("minimumHours", e.target.value)}
-                  placeholder="4"
-                />
-              </Field>
-            </motion.div>
+              <Plus className="h-4 w-4" /> Tilføj pakkeløsning ({draft.packages.length}/3)
+            </button>
           )}
-
-          {draft.pricingMode === "package" && (
-            <motion.div
-              key="package"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="grid gap-4 sm:grid-cols-2"
-            >
-              <Field label="Pakkepris (DKK)" hint="Inkl. lyd & basis-lys">
-                <Input
-                  type="number"
-                  min={0}
-                  value={draft.packagePrice}
-                  onChange={(e) => update("packagePrice", e.target.value)}
-                  placeholder="6500"
-                />
-              </Field>
-              <Field
-                label="Inkluderede timer"
-                hint="Hvor mange timers DJ-set er pakken?"
-              >
-                <Input
-                  type="number"
-                  min={1}
-                  value={draft.includedHours}
-                  onChange={(e) => update("includedHours", e.target.value)}
-                  placeholder="5"
-                />
-              </Field>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        </div>
       </section>
 
       <section className="space-y-3">
@@ -1978,19 +2046,18 @@ function validateStep(
         return { ok: false, reason: "Vælg kapacitet for dit mobildiskotek" };
       return { ok: true };
     case 3:
-      if (!draft.pricingMode)
-        return { ok: false, reason: "Vælg en prismodel" };
-      if (draft.pricingMode === "hourly") {
-        if (!draft.hourlyRate)
-          return { ok: false, reason: "Indtast en timepris" };
-        if (!draft.minimumHours)
-          return { ok: false, reason: "Indtast minimumstimer" };
-      }
-      if (draft.pricingMode === "package") {
-        if (!draft.packagePrice)
-          return { ok: false, reason: "Indtast en pakkepris" };
-        if (!draft.includedHours)
-          return { ok: false, reason: "Indtast inkluderede timer" };
+      if (draft.packages.length === 0)
+        return { ok: false, reason: "Tilføj mindst én pakkeløsning" };
+      for (const p of draft.packages) {
+        if (!p.guestsFrom || !p.guestsTo)
+          return {
+            ok: false,
+            reason: "Angiv gæsteantal (fra og til) for hver pakke",
+          };
+        if (!p.packagePrice)
+          return { ok: false, reason: "Indtast en pakkepris for hver pakke" };
+        if (!p.hourlyRate)
+          return { ok: false, reason: "Indtast en timepris for hver pakke" };
       }
       return { ok: true };
     case 4:
