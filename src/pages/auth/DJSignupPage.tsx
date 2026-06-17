@@ -1217,11 +1217,18 @@ function StepExperience({
               ? "border-accent bg-accent/5"
               : "border-border hover:border-accent/40",
           )}
-          onClick={() => update("equipmentOwned", !draft.equipmentOwned)}
+          onClick={() => {
+            const next = !draft.equipmentOwned;
+            update("equipmentOwned", next);
+            if (!next) update("equipmentTransport", false);
+          }}
         >
           <Checkbox
             checked={draft.equipmentOwned}
-            onCheckedChange={(v) => update("equipmentOwned", !!v)}
+            onCheckedChange={(v) => {
+              update("equipmentOwned", !!v);
+              if (!v) update("equipmentTransport", false);
+            }}
             className="mt-0.5"
             onClick={(e) => e.stopPropagation()}
           />
