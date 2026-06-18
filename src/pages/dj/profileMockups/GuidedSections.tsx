@@ -46,7 +46,7 @@ const SPECIAL_SERVICES_OPTIONS = [
 ];
 
 /** A mobildiskotek package the DJ offers, defined by guest range. */
-type ProfilePackage = { included: string; photo?: string };
+type ProfilePackage = { included: string; price: string; photo?: string };
 
 /** Guest-range label derived from a package's position and how many
  * packages the DJ has. With a single package it covers the full range. */
@@ -82,8 +82,8 @@ export function GuidedSectionsMockup() {
   /** Shared pricing: one hourly rate + up to 2 guest-range packages. */
   const [hourlyRate, setHourlyRate] = useState("");
   const [packages, setPackages] = useState<ProfilePackage[]>([
-    { included: "" },
-    { included: "" },
+    { included: "", price: "" },
+    { included: "", price: "" },
   ]);
 
   function setPackageField(
@@ -99,7 +99,9 @@ export function GuidedSectionsMockup() {
     setPackages((prev) => prev.filter((_, i) => i !== index));
   }
   function addPackage() {
-    setPackages((prev) => (prev.length >= 2 ? prev : [...prev, { included: "" }]));
+    setPackages((prev) =>
+      prev.length >= 2 ? prev : [...prev, { included: "", price: "" }],
+    );
   }
 
   function toggleSection(id: string) {
@@ -126,10 +128,10 @@ export function GuidedSectionsMockup() {
     if (id === "sound") return sub.approach ? "complete" : "empty";
     if (id === "services") return sub.signatureTracks ? "complete" : "empty";
     if (id === "price") {
-      const anyIncluded = packages.some((p) => p.included.trim());
-      const allIncluded = packages.every((p) => p.included.trim());
-      if (hourlyRate.trim() && allIncluded) return "complete";
-      if (hourlyRate.trim() || anyIncluded) return "needs-attention";
+      const anyFilled = packages.some((p) => p.included.trim() || p.price.trim());
+      const allFilled = packages.every((p) => p.included.trim() && p.price.trim());
+      if (hourlyRate.trim() && allFilled) return "complete";
+      if (hourlyRate.trim() || anyFilled) return "needs-attention";
       return "empty";
     }
     if (id === "equipment") return state.equipment ? "complete" : "empty";
@@ -513,6 +515,26 @@ function PackagesPricingSection({
 
             <div className="space-y-1.5">
               <Label className="text-xs font-medium text-muted-foreground">
+                Pakkepris (DKK)
+              </Label>
+              <Input
+                type="number"
+                value={pkg.price}
+                onChange={(e) =>
+                  onPackageFieldChange(index, "price", e.target.value)
+                }
+                placeholder="fx 3.500"
+              />
+              <p className="text-[11px] text-muted-foreground">
+                Pakkeprisen lægges oveni prisen for spilletid (timepris × antal
+                timer).
+              </p>
+            </div>
+
+            <PackagePriceExample hourlyRate={hourlyRate} packagePrice={pkg.price} />
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">
                 Foto af udstyret
               </Label>
               <DottedUploadSlot
@@ -533,6 +555,43 @@ function PackagesPricingSection({
             <Plus className="h-4 w-4" /> Tilføj pakke 2 (96–200 gæster)
           </button>
         )}
+      </div>
+    </div>
+  );
+}
+
+/** Shows a worked example for a 5-hour booking: 5 × hourly rate + package
+ * price, making clear the package price is added on top of playtime. */
+function PackagePriceExample({
+  hourlyRate,
+  packagePrice,
+}: {
+  hourlyRate: string;
+  packagePrice: string;
+}) {
+  const hours = 5;
+  const rate = Number(hourlyRate) || 0;
+  const pkg = Number(packagePrice) || 0;
+  if (rate <= 0 && pkg <= 0) return null;
+
+  const playtime = rate * hours;
+  const total = playtime + pkg;
+  const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
+
+  return (
+    <div className="space-y-1 rounded-lg border border-accent/30 bg-accent/5 p-3 text-xs">
+      <p className="font-medium text-foreground">Eksempel · 5 timers spilletid</p>
+      <div className="flex items-center justify-between text-muted-foreground">
+        <span>Spilletid (5 t × {fmt(rate)})</span>
+        <span>{fmt(playtime)}</span>
+      </div>
+      <div className="flex items-center justify-between text-muted-foreground">
+        <span>+ Pakkepris</span>
+        <span>{fmt(pkg)}</span>
+      </div>
+      <div className="mt-1 flex items-center justify-between border-t border-accent/20 pt-1 font-semibold text-foreground">
+        <span>Total for kunden</span>
+        <span>{fmt(total)}</span>
       </div>
     </div>
   );
