@@ -45,6 +45,14 @@ const SPECIAL_SERVICES_OPTIONS = [
   "Konfettiskydere", "Karaoke", "Fotobooth", "DJ-assistent",
 ];
 
+/** Inclusions that every package always covers, shown as fixed items. */
+const ALWAYS_INCLUDED = [
+  "Professionelt DJ-udstyr",
+  "Opsætning af udstyr",
+  "Nedtagning af udstyr",
+  "Transport",
+];
+
 /** A mobildiskotek package the DJ offers, defined by guest range. */
 type ProfilePackage = { included: string; price: string; photo?: string };
 
@@ -128,9 +136,9 @@ export function GuidedSectionsMockup() {
     if (id === "sound") return sub.approach ? "complete" : "empty";
     if (id === "services") return sub.signatureTracks ? "complete" : "empty";
     if (id === "price") {
-      const anyFilled = packages.some((p) => p.included.trim() || p.price.trim());
-      const allFilled = packages.every((p) => p.included.trim() && p.price.trim());
-      if (hourlyRate.trim() && allFilled) return "complete";
+      const anyFilled = packages.some((p) => p.price.trim() || p.included.trim());
+      const allPriced = packages.every((p) => p.price.trim());
+      if (hourlyRate.trim() && allPriced) return "complete";
       if (hourlyRate.trim() || anyFilled) return "needs-attention";
       return "empty";
     }
@@ -503,13 +511,29 @@ function PackagesPricingSection({
               <Label className="text-xs font-medium text-muted-foreground">
                 Hvad er inkluderet?
               </Label>
+              <div className="space-y-1.5 rounded-lg border border-border/70 bg-muted/20 p-3">
+                <p className="text-[11px] font-medium text-foreground">
+                  Pakken inkluderer altid:
+                </p>
+                <ul className="space-y-1">
+                  {ALWAYS_INCLUDED.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                    >
+                      <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <Textarea
                 value={pkg.included}
                 onChange={(e) =>
                   onPackageFieldChange(index, "included", e.target.value)
                 }
                 rows={2}
-                placeholder="fx Lydanlæg, basis-lys, trådløs mikrofon og DJ hele aftenen"
+                placeholder="Tilføj hvad der ellers er inkluderet — fx festbelysning, trådløs mikrofon, røgmaskine"
               />
             </div>
 
