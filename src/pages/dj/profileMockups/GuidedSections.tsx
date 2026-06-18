@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Camera, ChevronDown, Eye, EyeOff, Music, Sparkles, Tag,
+  Camera, ChevronDown, Eye, EyeOff, Handshake, Sparkles, Tag,
   Wallet, MapPin, Speaker, Check, AlertCircle, Circle,
   ExternalLink,
 } from "lucide-react";
@@ -32,18 +32,14 @@ type SectionDef = {
 
 const SECTIONS: SectionDef[] = [
   { id: "visuals", label: "Billeder & video", scope: "sub-profile", icon: Camera },
-  { id: "voice", label: "Tagline & beskrivelse", scope: "sub-profile", icon: Sparkles },
-  { id: "sound", label: "Musik & approach", scope: "sub-profile", icon: Music },
+  { id: "voice", label: "Om mig", scope: "sub-profile", icon: Sparkles },
+  { id: "sound", label: "Din tilgang til et event", scope: "sub-profile", icon: Handshake },
   { id: "services", label: "Særlige ydelser", scope: "sub-profile", icon: Tag },
   { id: "price", label: "Pris", scope: "sub-profile", icon: Wallet },
   { id: "equipment", label: "Mobildiskotek & udstyr", scope: "shared", icon: Speaker },
   { id: "availability", label: "Tilgængelighed & rejse", scope: "shared", icon: MapPin },
 ];
 
-const MUSIC_STYLE_OPTIONS = [
-  "Pop", "Dance", "R&B", "House", "Dansk hits", "Disco", "80'er", "90'er",
-  "Latin", "Afrobeats", "Techno", "Schlager",
-];
 const SPECIAL_SERVICES_OPTIONS = [
   "Lys & stemningslys", "Trådløs mikrofon", "Røgmaskine", "Stemningsopsætning",
   "Konfettiskydere", "Karaoke", "Fotobooth", "DJ-assistent",
@@ -90,15 +86,11 @@ export function GuidedSectionsMockup() {
       return "empty";
     }
     if (id === "voice") {
-      if (sub.tagline && sub.bio.length >= 80) return "complete";
-      if (sub.tagline || sub.bio) return "needs-attention";
+      if (sub.bio.length >= 80) return "complete";
+      if (sub.bio) return "needs-attention";
       return "empty";
     }
-    if (id === "sound") {
-      if (sub.musicStyle && sub.approach) return "complete";
-      if (sub.musicStyle || sub.approach) return "needs-attention";
-      return "empty";
-    }
+    if (id === "sound") return sub.approach ? "complete" : "empty";
     if (id === "services") return sub.signatureTracks ? "complete" : "empty";
     if (id === "price") return sub.priceFromMajor > 0 ? "complete" : "empty";
     if (id === "equipment") return state.equipment ? "complete" : "empty";
@@ -290,17 +282,6 @@ function SectionBody({
       return (
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-xs font-medium text-muted-foreground">
-              Tagline (80 tegn)
-            </Label>
-            <Input
-              value={sub.tagline}
-              onChange={(e) => state.updateSubProfile(activeKey, "tagline", e.target.value)}
-              maxLength={80}
-              placeholder={`Skab magiske øjeblikke til ${meta.noun.toLowerCase()}`}
-            />
-          </div>
-          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium text-muted-foreground">
                 Længere profiltekst (min. 80 tegn)
@@ -322,24 +303,14 @@ function SectionBody({
 
     case "sound":
       return (
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label className="text-xs font-medium text-muted-foreground">Musikstilarter</Label>
-            <ChipMultiSelect
-              value={sub.musicStyle ? sub.musicStyle.split(",").map((s) => s.trim()).filter(Boolean) : []}
-              options={MUSIC_STYLE_OPTIONS}
-              onChange={(next) => state.updateSubProfile(activeKey, "musicStyle", next.join(", "))}
-              placeholder="Vælg stilarter"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs font-medium text-muted-foreground">Din tilgang</Label>
-            <Input
-              value={sub.approach}
-              onChange={(e) => state.updateSubProfile(activeKey, "approach", e.target.value)}
-              placeholder="Hvordan kører du et event af denne type?"
-            />
-          </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-muted-foreground">Din tilgang</Label>
+          <Textarea
+            value={sub.approach}
+            onChange={(e) => state.updateSubProfile(activeKey, "approach", e.target.value)}
+            rows={4}
+            placeholder="Beskriv din tilgang til et event og hvordan du er i kontakt med kunderne — fx hvordan du planlægger sammen med kunden, kommunikerer op til dagen og aflæser stemningen undervejs."
+          />
         </div>
       );
 
