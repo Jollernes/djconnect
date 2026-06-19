@@ -94,7 +94,7 @@ export function DashboardLayout() {
             ))}
           </nav>
         </aside>
-        <main className="flex-1">
+        <main className="min-w-0 flex-1">
           {/* Mobile sub-nav */}
           <nav className="no-scrollbar flex gap-2 overflow-x-auto border-b bg-card p-3 md:hidden">
             {nav.map((item) => (
