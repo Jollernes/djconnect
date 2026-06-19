@@ -6,7 +6,7 @@ import {
   Trash2,
   Info,
   Wallet,
-  MapPin,
+  Settings2,
   PackagePlus,
   Home,
 } from "lucide-react";
@@ -92,7 +92,7 @@ const ADDON_OPTIONS = [
 /* -------------------------------------------------------------------- */
 
 export function DJPricingEquipmentPage() {
-  const [open, setOpen] = useState<Set<string>>(() => new Set(["setups"]));
+  const [open, setOpen] = useState<Set<string>>(() => new Set(["standard"]));
 
   const [hourlyRate, setHourlyRate] = useState("");
   const [setups, setSetups] = useState<Setup[]>([emptySetup()]);
@@ -163,6 +163,24 @@ export function DJPricingEquipmentPage() {
       </div>
 
       <Accordion
+        id="standard"
+        icon={Settings2}
+        title="Timepris & rejse"
+        subtitle="Dine standard-indstillinger — gælder for alle opsætninger."
+        open={open.has("standard")}
+        onToggle={() => toggle("standard")}
+      >
+        <StandardSettingsSection
+          hourlyRate={hourlyRate}
+          onHourlyRateChange={setHourlyRate}
+          regions={regions}
+          onRegionChange={(region, next) =>
+            setRegions((prev) => ({ ...prev, [region]: next }))
+          }
+        />
+      </Accordion>
+
+      <Accordion
         id="setups"
         icon={PackagePlus}
         title="Mobildiskotek-opsætninger"
@@ -172,28 +190,11 @@ export function DJPricingEquipmentPage() {
       >
         <SetupsSection
           hourlyRate={hourlyRate}
-          onHourlyRateChange={setHourlyRate}
           setups={setups}
           onUpdateSetup={updateSetup}
           onToggleExtra={toggleExtra}
           onAddSetup={addSetup}
           onRemoveSetup={removeSetup}
-        />
-      </Accordion>
-
-      <Accordion
-        id="travel"
-        icon={MapPin}
-        title="Rejseradius"
-        subtitle="Hvilke regioner dækker du, og hvad koster transporten?"
-        open={open.has("travel")}
-        onToggle={() => toggle("travel")}
-      >
-        <TravelSection
-          regions={regions}
-          onChange={(region, next) =>
-            setRegions((prev) => ({ ...prev, [region]: next }))
-          }
         />
       </Accordion>
 
@@ -275,7 +276,6 @@ function Accordion({
 
 function SetupsSection({
   hourlyRate,
-  onHourlyRateChange,
   setups,
   onUpdateSetup,
   onToggleExtra,
@@ -283,7 +283,6 @@ function SetupsSection({
   onRemoveSetup,
 }: {
   hourlyRate: string;
-  onHourlyRateChange: (value: string) => void;
   setups: Setup[];
   onUpdateSetup: <K extends keyof Setup>(
     index: number,
@@ -299,24 +298,9 @@ function SetupsSection({
       <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
         En opsætning svarer til en mobildiskotek-størrelse. To opsætninger må
         gerne passe til samme antal gæster — fx hvis de inkluderer noget
-        forskelligt og derfor har forskellige priser.
+        forskelligt og derfor har forskellige priser. Opsætningens pris lægges
+        oveni din timepris.
       </p>
-
-      {/* Shared hourly rate */}
-      <div className="space-y-1.5">
-        <Label className="text-xs font-medium text-muted-foreground">
-          Generel timepris (DKK)
-        </Label>
-        <Input
-          type="number"
-          value={hourlyRate}
-          onChange={(e) => onHourlyRateChange(e.target.value)}
-          placeholder="fx 1.200"
-        />
-        <p className="text-[11px] text-muted-foreground">
-          Din timepris gælder for alle dine opsætninger.
-        </p>
-      </div>
 
       {/* Over 200 guests note */}
       <p className="flex items-start gap-1.5 rounded-lg border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground">
@@ -520,34 +504,68 @@ function PriceExample({
 }
 
 /* -------------------------------------------------------------------- */
-/* Travel section                                                        */
+/* Standard settings: hourly rate + travel                               */
 /* -------------------------------------------------------------------- */
 
-function TravelSection({
+function StandardSettingsSection({
+  hourlyRate,
+  onHourlyRateChange,
   regions,
-  onChange,
+  onRegionChange,
 }: {
+  hourlyRate: string;
+  onHourlyRateChange: (value: string) => void;
   regions: Record<string, RegionState>;
-  onChange: (region: string, next: RegionState) => void;
+  onRegionChange: (region: string, next: RegionState) => void;
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-        Rejseradius bestemmer hvilke dele af landet du tager til. Markér de
-        regioner du dækker, og sæt en fast transportpris for hver — prisen
-        gælder hele regionen, uanset hvor i regionen eventet finder sted.
+        Din timepris og rejseradius er dine standard-indstillinger — de gælder
+        på tværs af alle dine mobildiskotek-opsætninger.
       </p>
 
-      <div className="flex items-start gap-1.5 rounded-lg border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground">
-        <Home className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-        <span>
-          Din hjemstedsregion er{" "}
-          <span className="font-medium text-foreground">{HOME_REGION}</span>{" "}
-          (registreret ved oprettelse).
-        </span>
+      {/* Hourly rate */}
+      <div className="space-y-1.5">
+        <Label className="text-xs font-medium text-muted-foreground">
+          Timepris (DKK)
+        </Label>
+        <Input
+          type="number"
+          value={hourlyRate}
+          onChange={(e) => onHourlyRateChange(e.target.value)}
+          placeholder="fx 1.200"
+        />
+        <p className="text-[11px] text-muted-foreground">
+          Timeprisen er grundprisen pr. times spilletid. Prisen på den valgte
+          mobildiskotek-opsætning lægges oveni (timepris × antal timer +
+          opsætningens pris).
+        </p>
       </div>
 
-      <div className="space-y-2">
+      {/* Travel radius */}
+      <div className="space-y-3 border-t border-border/60 pt-5">
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium text-foreground">
+            Rejseradius
+          </Label>
+          <p className="text-[11px] text-muted-foreground">
+            Rejseradius bestemmer hvilke dele af landet du tager til. Markér de
+            regioner du dækker, og sæt en fast transportpris for hver — prisen
+            gælder hele regionen, uanset hvor i regionen eventet finder sted.
+          </p>
+        </div>
+
+        <div className="flex items-start gap-1.5 rounded-lg border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground">
+          <Home className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+          <span>
+            Din hjemstedsregion er{" "}
+            <span className="font-medium text-foreground">{HOME_REGION}</span>{" "}
+            (registreret ved oprettelse).
+          </span>
+        </div>
+
+        <div className="space-y-2">
         {REGIONS.map((region) => {
           const state = regions[region];
           const isHome = region === HOME_REGION;
@@ -573,7 +591,7 @@ function TravelSection({
                 <button
                   type="button"
                   onClick={() =>
-                    onChange(region, { ...state, active: !state.active })
+                    onRegionChange(region, { ...state, active: !state.active })
                   }
                   className={cn(
                     "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
@@ -594,7 +612,7 @@ function TravelSection({
                     type="number"
                     value={state.price}
                     onChange={(e) =>
-                      onChange(region, { ...state, price: e.target.value })
+                      onRegionChange(region, { ...state, price: e.target.value })
                     }
                     placeholder="fx 500"
                   />
@@ -603,6 +621,7 @@ function TravelSection({
             </div>
           );
         })}
+        </div>
       </div>
     </div>
   );
