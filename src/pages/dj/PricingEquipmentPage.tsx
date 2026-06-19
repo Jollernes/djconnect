@@ -56,6 +56,14 @@ function emptySetup(): Setup {
   return { capacity: "80", description: "", price: "", extras: [] };
 }
 
+/** Snap a price string to the nearest 50 DKK (prices are set in steps of 50). */
+function snapTo50(value: string): string {
+  if (value.trim() === "") return "";
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "";
+  return String(Math.max(0, Math.round(n / 50) * 50));
+}
+
 /* -------------------------------------------------------------------- */
 /* Travel regions                                                        */
 /* -------------------------------------------------------------------- */
@@ -430,13 +438,18 @@ function SetupsSection({
               </Label>
               <Input
                 type="number"
+                step={50}
+                min={0}
                 value={setup.price}
                 onChange={(e) => onUpdateSetup(index, "price", e.target.value)}
+                onBlur={(e) =>
+                  onUpdateSetup(index, "price", snapTo50(e.target.value))
+                }
                 placeholder="fx 3.500"
               />
               <p className="text-[11px] text-muted-foreground">
-                Pakkeprisen lægges oveni prisen for spilletid (timepris × antal
-                timer).
+                Angives i intervaller af 50 kr. Pakkeprisen lægges oveni prisen
+                for spilletid (timepris × antal timer).
               </p>
             </div>
 
@@ -540,8 +553,11 @@ function StandardSettingsSection({
         </Label>
         <Input
           type="number"
+          step={50}
+          min={0}
           value={hourlyRate}
           onChange={(e) => onHourlyRateChange(e.target.value)}
+          onBlur={(e) => onHourlyRateChange(snapTo50(e.target.value))}
           placeholder="fx 1.200"
         />
         <p className="text-[11px] text-muted-foreground">
