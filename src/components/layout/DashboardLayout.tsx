@@ -14,6 +14,7 @@ import {
   Clapperboard,
   PartyPopper,
   Inbox,
+  Wallet,
 } from "lucide-react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -42,6 +43,7 @@ const djNav = [
   { to: "/dj/messages", label: "Beskeder", icon: MessageSquare },
   { to: "/dj/availability", label: "Tilgængelighed", icon: Calendar },
   { to: "/dj/earnings", label: "Indtjening", icon: BarChart3 },
+  { to: "/dj/pricing", label: "Priser & Udstyr", icon: Wallet },
   { to: "/dj/profile", label: "Rediger profil", icon: User },
 ];
 

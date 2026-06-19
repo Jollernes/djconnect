@@ -1,18 +1,15 @@
 import { useState } from "react";
 import {
-  Camera, ChevronDown, Eye, EyeOff, Handshake, Sparkles, Tag,
-  Wallet, MapPin, Speaker, Check, AlertCircle, Circle,
-  ExternalLink, Info, Plus, Trash2,
+  Camera, ChevronDown, Eye, EyeOff, Handshake, Sparkles,
+  Speaker, Check, AlertCircle, Circle, ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { EventTypeTabs } from "./shared/EventTypeTabs";
 import { DesktopMobilePreview } from "./shared/DesktopMobilePreview";
 import { AutosaveIndicator } from "./shared/AutosaveIndicator";
 import { DottedUploadSlot } from "./shared/DottedUploadSlot";
-import { ChipMultiSelect } from "./shared/ChipMultiSelect";
 import { CompletionBars } from "./shared/CompletionBars";
 import { useMockupState } from "./shared/useMockupState";
 import {
@@ -34,34 +31,8 @@ const SECTIONS: SectionDef[] = [
   { id: "visuals", label: "Billeder & video", scope: "sub-profile", icon: Camera },
   { id: "voice", label: "Om mig", scope: "sub-profile", icon: Sparkles },
   { id: "sound", label: "Din tilgang til et event", scope: "sub-profile", icon: Handshake },
-  { id: "services", label: "Særlige ydelser", scope: "sub-profile", icon: Tag },
-  { id: "price", label: "Pakker & Pris", scope: "shared", icon: Wallet },
   { id: "equipment", label: "Mobildiskotek & udstyr", scope: "shared", icon: Speaker },
-  { id: "availability", label: "Tilgængelighed & rejse", scope: "shared", icon: MapPin },
 ];
-
-const SPECIAL_SERVICES_OPTIONS = [
-  "Lys & stemningslys", "Trådløs mikrofon", "Røgmaskine", "Stemningsopsætning",
-  "Konfettiskydere", "Karaoke", "Fotobooth", "DJ-assistent",
-];
-
-/** Inclusions that every package always covers, shown as fixed items. */
-const ALWAYS_INCLUDED = [
-  "Professionelt DJ-udstyr",
-  "Opsætning af udstyr",
-  "Nedtagning af udstyr",
-  "Transport",
-];
-
-/** A mobildiskotek package the DJ offers, defined by guest range. */
-type ProfilePackage = { included: string; price: string; photo?: string };
-
-/** Guest-range label derived from a package's position and how many
- * packages the DJ has. With a single package it covers the full range. */
-function packageGuestLabel(index: number, total: number): string {
-  if (total <= 1) return "Op til 200 gæster";
-  return index === 0 ? "Op til 95 gæster" : "96–200 gæster";
-}
 
 /**
  * Mockup 2 — Guided Sections.
@@ -87,31 +58,6 @@ export function GuidedSectionsMockup() {
   const [openSections, setOpenSections] = useState<Set<string>>(() => new Set(["visuals"]));
   const [previewOpen, setPreviewOpen] = useState(true);
 
-  /** Shared pricing: one hourly rate + up to 2 guest-range packages. */
-  const [hourlyRate, setHourlyRate] = useState("");
-  const [packages, setPackages] = useState<ProfilePackage[]>([
-    { included: "", price: "" },
-    { included: "", price: "" },
-  ]);
-
-  function setPackageField(
-    index: number,
-    field: keyof ProfilePackage,
-    value: string | undefined,
-  ) {
-    setPackages((prev) =>
-      prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)),
-    );
-  }
-  function removePackage(index: number) {
-    setPackages((prev) => prev.filter((_, i) => i !== index));
-  }
-  function addPackage() {
-    setPackages((prev) =>
-      prev.length >= 2 ? prev : [...prev, { included: "", price: "" }],
-    );
-  }
-
   function toggleSection(id: string) {
     setOpenSections((prev) => {
       const next = new Set(prev);
@@ -134,16 +80,7 @@ export function GuidedSectionsMockup() {
       return "empty";
     }
     if (id === "sound") return sub.approach ? "complete" : "empty";
-    if (id === "services") return sub.signatureTracks ? "complete" : "empty";
-    if (id === "price") {
-      const anyFilled = packages.some((p) => p.price.trim() || p.included.trim());
-      const allPriced = packages.every((p) => p.price.trim());
-      if (hourlyRate.trim() && allPriced) return "complete";
-      if (hourlyRate.trim() || anyFilled) return "needs-attention";
-      return "empty";
-    }
     if (id === "equipment") return state.equipment ? "complete" : "empty";
-    if (id === "availability") return state.travelRadius > 0 ? "complete" : "empty";
     return "empty";
   }
 
@@ -220,18 +157,7 @@ export function GuidedSectionsMockup() {
               </button>
               {isOpen && (
                 <div className="border-t border-border/60 px-5 py-5">
-                  {section.id === "price" ? (
-                    <PackagesPricingSection
-                      hourlyRate={hourlyRate}
-                      onHourlyRateChange={setHourlyRate}
-                      packages={packages}
-                      onPackageFieldChange={setPackageField}
-                      onAddPackage={addPackage}
-                      onRemovePackage={removePackage}
-                    />
-                  ) : (
-                    <SectionBody section={section} activeKey={activeKey} state={state} />
-                  )}
+                  <SectionBody section={section} activeKey={activeKey} state={state} />
                 </div>
               )}
             </section>
@@ -374,19 +300,6 @@ function SectionBody({
         </div>
       );
 
-    case "services":
-      return (
-        <div className="space-y-1.5">
-          <Label className="text-xs font-medium text-muted-foreground">Særlige ydelser</Label>
-          <ChipMultiSelect
-            value={sub.signatureTracks ? sub.signatureTracks.split(",").map((s) => s.trim()).filter(Boolean) : []}
-            options={SPECIAL_SERVICES_OPTIONS}
-            onChange={(next) => state.updateSubProfile(activeKey, "signatureTracks", next.join(", "))}
-            placeholder="Vælg ydelser inkluderet"
-          />
-        </div>
-      );
-
     case "equipment":
       return (
         <div className="space-y-1.5">
@@ -403,222 +316,9 @@ function SectionBody({
         </div>
       );
 
-    case "availability":
-      return (
-        <div className="space-y-1.5">
-          <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-            Disse oplysninger deles på alle dine sub-profiler.
-          </p>
-          <Label className="text-xs font-medium text-muted-foreground">Rejseradius (km)</Label>
-          <Input
-            type="number"
-            value={state.travelRadius || ""}
-            onChange={(e) => state.setTravelRadius(Number(e.target.value) || 0)}
-            placeholder="Hvor langt rejser du for et event?"
-          />
-        </div>
-      );
-
     default:
       return null;
   }
-}
-
-function PackagesPricingSection({
-  hourlyRate,
-  onHourlyRateChange,
-  packages,
-  onPackageFieldChange,
-  onAddPackage,
-  onRemovePackage,
-}: {
-  hourlyRate: string;
-  onHourlyRateChange: (value: string) => void;
-  packages: ProfilePackage[];
-  onPackageFieldChange: (
-    index: number,
-    field: keyof ProfilePackage,
-    value: string | undefined,
-  ) => void;
-  onAddPackage: () => void;
-  onRemovePackage: (index: number) => void;
-}) {
-  return (
-    <div className="space-y-5">
-      <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-        Dine pakker og priser deles på alle dine profiler — du tilbyder det
-        samme uanset eventtype.
-      </p>
-
-      {/* Shared hourly rate */}
-      <div className="space-y-1.5">
-        <Label className="text-xs font-medium text-muted-foreground">
-          Generel timepris (DKK)
-        </Label>
-        <Input
-          type="number"
-          value={hourlyRate}
-          onChange={(e) => onHourlyRateChange(e.target.value)}
-          placeholder="fx 1.200"
-        />
-        <p className="text-[11px] text-muted-foreground">
-          Din timepris gælder for alle dine pakker.
-        </p>
-      </div>
-
-      {/* How packages work */}
-      <div className="space-y-2 rounded-lg border border-border/70 bg-muted/20 p-3">
-        <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
-          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-          Vælger du kun én pakke, gælder den op til 200 gæster, når kunder
-          søger efter DJs på platformen.
-        </p>
-        <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
-          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-          Kunder kan altid anmode om en lavere eller højere pakke end den, deres
-          gæsteantal ellers anbefaler.
-        </p>
-      </div>
-
-      {/* Packages */}
-      <div className="space-y-3">
-        {packages.map((pkg, index) => (
-          <div key={index} className="space-y-3 rounded-xl border bg-card p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/10 text-xs font-semibold text-accent">
-                  {index + 1}
-                </span>
-                <div>
-                  <p className="text-sm font-semibold">Pakke {index + 1}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {packageGuestLabel(index, packages.length)}
-                  </p>
-                </div>
-              </div>
-              {packages.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => onRemovePackage(index)}
-                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
-                >
-                  <Trash2 className="h-3.5 w-3.5" /> Fjern
-                </button>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Hvad er inkluderet?
-              </Label>
-              <div className="space-y-1.5 rounded-lg border border-border/70 bg-muted/20 p-3">
-                <p className="text-[11px] font-medium text-foreground">
-                  Pakken inkluderer altid:
-                </p>
-                <ul className="space-y-1">
-                  {ALWAYS_INCLUDED.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-center gap-1.5 text-xs text-muted-foreground"
-                    >
-                      <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <Textarea
-                value={pkg.included}
-                onChange={(e) =>
-                  onPackageFieldChange(index, "included", e.target.value)
-                }
-                rows={2}
-                placeholder="Tilføj hvad der ellers er inkluderet — fx festbelysning, trådløs mikrofon, røgmaskine"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Pakkepris (DKK)
-              </Label>
-              <Input
-                type="number"
-                value={pkg.price}
-                onChange={(e) =>
-                  onPackageFieldChange(index, "price", e.target.value)
-                }
-                placeholder="fx 3.500"
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Pakkeprisen lægges oveni prisen for spilletid (timepris × antal
-                timer).
-              </p>
-            </div>
-
-            <PackagePriceExample hourlyRate={hourlyRate} packagePrice={pkg.price} />
-
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Foto af udstyret
-              </Label>
-              <DottedUploadSlot
-                value={pkg.photo}
-                onChange={(v) => onPackageFieldChange(index, "photo", v)}
-                hint="Valgfrit, men stærkt anbefalet"
-              />
-            </div>
-          </div>
-        ))}
-
-        {packages.length < 2 && (
-          <button
-            type="button"
-            onClick={onAddPackage}
-            className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
-          >
-            <Plus className="h-4 w-4" /> Tilføj pakke 2 (96–200 gæster)
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/** Shows a worked example for a 5-hour booking: 5 × hourly rate + package
- * price, making clear the package price is added on top of playtime. */
-function PackagePriceExample({
-  hourlyRate,
-  packagePrice,
-}: {
-  hourlyRate: string;
-  packagePrice: string;
-}) {
-  const hours = 5;
-  const rate = Number(hourlyRate) || 0;
-  const pkg = Number(packagePrice) || 0;
-  if (rate <= 0 && pkg <= 0) return null;
-
-  const playtime = rate * hours;
-  const total = playtime + pkg;
-  const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
-
-  return (
-    <div className="space-y-1 rounded-lg border border-accent/30 bg-accent/5 p-3 text-xs">
-      <p className="font-medium text-foreground">Eksempel · 5 timers spilletid</p>
-      <div className="flex items-center justify-between text-muted-foreground">
-        <span>Spilletid (5 t × {fmt(rate)})</span>
-        <span>{fmt(playtime)}</span>
-      </div>
-      <div className="flex items-center justify-between text-muted-foreground">
-        <span>+ Pakkepris</span>
-        <span>{fmt(pkg)}</span>
-      </div>
-      <div className="mt-1 flex items-center justify-between border-t border-accent/20 pt-1 font-semibold text-foreground">
-        <span>Total for kunden</span>
-        <span>{fmt(total)}</span>
-      </div>
-    </div>
-  );
 }
 
 function StatusBadge({ status }: { status: SectionStatus }) {
