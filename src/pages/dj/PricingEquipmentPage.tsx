@@ -8,7 +8,6 @@ import {
   Wallet,
   Settings2,
   PackagePlus,
-  Home,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -162,14 +161,18 @@ export function DJPricingEquipmentPage() {
         </p>
       </div>
 
-      <Accordion
-        id="standard"
-        icon={Settings2}
-        title="Timepris & rejse"
-        subtitle="Dine standard-indstillinger — gælder for alle opsætninger."
-        open={open.has("standard")}
-        onToggle={() => toggle("standard")}
-      >
+      <div className="rounded-2xl border bg-card p-5 shadow-sm">
+        <div className="mb-4 flex items-center gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <Settings2 className="h-4 w-4" />
+          </span>
+          <div>
+            <p className="text-sm font-semibold">Timepris & rejse</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Dine standard-indstillinger — gælder for alle opsætninger.
+            </p>
+          </div>
+        </div>
         <StandardSettingsSection
           hourlyRate={hourlyRate}
           onHourlyRateChange={setHourlyRate}
@@ -178,7 +181,7 @@ export function DJPricingEquipmentPage() {
             setRegions((prev) => ({ ...prev, [region]: next }))
           }
         />
-      </Accordion>
+      </div>
 
       <Accordion
         id="setups"
@@ -444,11 +447,16 @@ function SetupsSection({
               <Label className="text-xs font-medium text-muted-foreground">
                 Foto af opsætningen
               </Label>
-              <DottedUploadSlot
-                value={setup.photo}
-                onChange={(v) => onUpdateSetup(index, "photo", v)}
-                hint="Valgfrit, men stærkt anbefalet"
-              />
+              <div className="w-40">
+                <DottedUploadSlot
+                  value={setup.photo}
+                  onChange={(v) => onUpdateSetup(index, "photo", v)}
+                  aspectClassName="h-24"
+                />
+              </div>
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                Valgfrit, men stærkt anbefalet
+              </p>
             </div>
           </div>
         ))}
@@ -544,83 +552,64 @@ function StandardSettingsSection({
       </div>
 
       {/* Travel radius */}
-      <div className="space-y-3 border-t border-border/60 pt-5">
-        <div className="space-y-1.5">
+      <div className="space-y-2 border-t border-border/60 pt-5">
+        <div className="flex items-center justify-between gap-2">
           <Label className="text-xs font-medium text-foreground">
             Rejseradius
           </Label>
-          <p className="text-[11px] text-muted-foreground">
-            Rejseradius bestemmer hvilke dele af landet du tager til. Markér de
-            regioner du dækker, og sæt en fast transportpris for hver — prisen
-            gælder hele regionen, uanset hvor i regionen eventet finder sted.
-          </p>
-        </div>
-
-        <div className="flex items-start gap-1.5 rounded-lg border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground">
-          <Home className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-          <span>
-            Din hjemstedsregion er{" "}
-            <span className="font-medium text-foreground">{HOME_REGION}</span>{" "}
-            (registreret ved oprettelse).
+          <span className="text-[11px] text-muted-foreground">
+            Pris pr. region · gælder hele regionen
           </span>
         </div>
 
-        <div className="space-y-2">
-        {REGIONS.map((region) => {
-          const state = regions[region];
-          const isHome = region === HOME_REGION;
-          return (
-            <div
-              key={region}
-              className={cn(
-                "rounded-xl border p-3 transition-colors",
-                state.active ? "border-accent/40 bg-accent/5" : "border-border",
-              )}
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">
-                    {region}
-                  </span>
-                  {isHome && (
-                    <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">
-                      Hjemstedsregion
-                    </span>
-                  )}
-                </div>
+        <div className="divide-y divide-border/60 rounded-xl border">
+          {REGIONS.map((region) => {
+            const state = regions[region];
+            const isHome = region === HOME_REGION;
+            return (
+              <div
+                key={region}
+                className="flex items-center gap-2 px-3 py-2"
+              >
                 <button
                   type="button"
                   onClick={() =>
                     onRegionChange(region, { ...state, active: !state.active })
                   }
+                  aria-pressed={state.active}
                   className={cn(
-                    "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors",
                     state.active
-                      ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
-                      : "border-border text-muted-foreground hover:border-foreground/30",
+                      ? "border-emerald-500 bg-emerald-500 text-white"
+                      : "border-border text-transparent hover:border-foreground/30",
                   )}
                 >
-                  {state.active ? "Aktiv" : "Ikke aktiv"}
+                  <Check className="h-3.5 w-3.5" />
                 </button>
-              </div>
-              {state.active && (
-                <div className="mt-3 space-y-1.5">
-                  <Label className="text-xs font-medium text-muted-foreground">
-                    Transportpris for hele regionen (DKK)
-                  </Label>
+                <span className="flex-1 truncate text-sm text-foreground">
+                  {region}
+                  {isHome && (
+                    <span className="ml-1.5 text-[10px] font-medium text-accent">
+                      · hjemsted
+                    </span>
+                  )}
+                </span>
+                <div className="flex items-center gap-1">
                   <Input
                     type="number"
                     value={state.price}
                     onChange={(e) =>
                       onRegionChange(region, { ...state, price: e.target.value })
                     }
-                    placeholder="fx 500"
+                    disabled={!state.active}
+                    placeholder="—"
+                    className="h-8 w-24 text-right disabled:opacity-40"
                   />
+                  <span className="text-[11px] text-muted-foreground">kr</span>
                 </div>
-              )}
-            </div>
-          );
-        })}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
