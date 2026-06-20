@@ -45,6 +45,7 @@ const djNav = [
   { to: "/dj/earnings", label: "Indtjening", icon: BarChart3 },
   { to: "/dj/pricing", label: "Priser & Udstyr", icon: Wallet },
   { to: "/dj/profile", label: "Rediger profil", icon: User },
+  { to: "/dj/settings", label: "Indstillinger", icon: Settings },
 ];
 
 const adminNav = [

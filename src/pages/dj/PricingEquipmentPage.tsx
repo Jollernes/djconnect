@@ -6,7 +6,6 @@ import {
   Trash2,
   Info,
   Wallet,
-  Settings2,
   PackagePlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -14,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DottedUploadSlot } from "./profileMockups/shared/DottedUploadSlot";
+import { useDJStandardSettings } from "@/hooks/useDJStandardSettings";
+import { snapTo50 } from "@/lib/djStandardSettings";
 
 /* -------------------------------------------------------------------- */
 /* Mobildiskotek setups                                                  */
@@ -48,38 +49,15 @@ type Setup = {
   capacity: Capacity;
   description: string;
   price: string;
+  /** Per-setup hourly rate, pre-filled from the standard rate but editable. */
+  hourlyRate: string;
   extras: string[];
   photo?: string;
 };
 
-function emptySetup(): Setup {
-  return { capacity: "80", description: "", price: "", extras: [] };
+function emptySetup(hourlyRate: string): Setup {
+  return { capacity: "80", description: "", price: "", hourlyRate, extras: [] };
 }
-
-/** Snap a price string to the nearest 50 DKK (prices are set in steps of 50). */
-function snapTo50(value: string): string {
-  if (value.trim() === "") return "";
-  const n = Number(value);
-  if (!Number.isFinite(n)) return "";
-  return String(Math.max(0, Math.round(n / 50) * 50));
-}
-
-/* -------------------------------------------------------------------- */
-/* Travel regions                                                        */
-/* -------------------------------------------------------------------- */
-
-const REGIONS = [
-  "Region Hovedstaden",
-  "Region Sjælland",
-  "Region Syddanmark",
-  "Region Midtjylland",
-  "Region Nordjylland",
-] as const;
-
-/** Demo home region — registered during signup. */
-const HOME_REGION = "Region Hovedstaden";
-
-type RegionState = { active: boolean; price: string };
 
 /* -------------------------------------------------------------------- */
 /* Tilkøb (add-ons)                                                      */
@@ -99,19 +77,12 @@ const ADDON_OPTIONS = [
 /* -------------------------------------------------------------------- */
 
 export function DJPricingEquipmentPage() {
-  const [open, setOpen] = useState<Set<string>>(() => new Set(["standard"]));
+  const { settings } = useDJStandardSettings();
+  const [open, setOpen] = useState<Set<string>>(() => new Set(["setups"]));
 
-  const [hourlyRate, setHourlyRate] = useState("");
-  const [setups, setSetups] = useState<Setup[]>([emptySetup()]);
-
-  const [regions, setRegions] = useState<Record<string, RegionState>>(() =>
-    Object.fromEntries(
-      REGIONS.map((r) => [
-        r,
-        { active: r === HOME_REGION, price: "" } as RegionState,
-      ]),
-    ),
-  );
+  const [setups, setSetups] = useState<Setup[]>(() => [
+    emptySetup(settings.hourlyRate),
+  ]);
 
   const [addons, setAddons] = useState<Record<string, string>>(() =>
     Object.fromEntries(ADDON_OPTIONS.map((a) => [a, ""])),
@@ -152,7 +123,9 @@ export function DJPricingEquipmentPage() {
   }
 
   function addSetup() {
-    setSetups((prev) => (prev.length >= 3 ? prev : [...prev, emptySetup()]));
+    setSetups((prev) =>
+      prev.length >= 3 ? prev : [...prev, emptySetup(settings.hourlyRate)],
+    );
   }
 
   function removeSetup(index: number) {
@@ -164,31 +137,10 @@ export function DJPricingEquipmentPage() {
       <div>
         <h1 className="text-2xl font-semibold">Priser & Udstyr</h1>
         <p className="text-sm text-muted-foreground">
-          Sæt dine mobildiskotek-opsætninger, din rejseradius og dine tilkøb ét
-          samlet sted.
+          Sæt dine mobildiskotek-opsætninger og dine tilkøb. Din timepris og
+          rejseradius styres under{" "}
+          <span className="font-medium text-foreground">Indstillinger</span>.
         </p>
-      </div>
-
-      <div className="rounded-2xl border bg-card p-5 shadow-sm">
-        <div className="mb-4 flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-            <Settings2 className="h-4 w-4" />
-          </span>
-          <div>
-            <p className="text-sm font-semibold">Timepris & rejse</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Dine standard-indstillinger — gælder for alle opsætninger.
-            </p>
-          </div>
-        </div>
-        <StandardSettingsSection
-          hourlyRate={hourlyRate}
-          onHourlyRateChange={setHourlyRate}
-          regions={regions}
-          onRegionChange={(region, next) =>
-            setRegions((prev) => ({ ...prev, [region]: next }))
-          }
-        />
       </div>
 
       <Accordion
@@ -200,7 +152,6 @@ export function DJPricingEquipmentPage() {
         onToggle={() => toggle("setups")}
       >
         <SetupsSection
-          hourlyRate={hourlyRate}
           setups={setups}
           onUpdateSetup={updateSetup}
           onToggleExtra={toggleExtra}
@@ -286,14 +237,12 @@ function Accordion({
 /* -------------------------------------------------------------------- */
 
 function SetupsSection({
-  hourlyRate,
   setups,
   onUpdateSetup,
   onToggleExtra,
   onAddSetup,
   onRemoveSetup,
 }: {
-  hourlyRate: string;
   setups: Setup[];
   onUpdateSetup: <K extends keyof Setup>(
     index: number,
@@ -431,29 +380,54 @@ function SetupsSection({
               </div>
             </div>
 
-            {/* Price */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Pakkepris (DKK)
-              </Label>
-              <Input
-                type="number"
-                step={50}
-                min={0}
-                value={setup.price}
-                onChange={(e) => onUpdateSetup(index, "price", e.target.value)}
-                onBlur={(e) =>
-                  onUpdateSetup(index, "price", snapTo50(e.target.value))
-                }
-                placeholder="fx 3.500"
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Angives i intervaller af 50 kr. Pakkeprisen lægges oveni prisen
-                for spilletid (timepris × antal timer).
-              </p>
+            {/* Price + hourly rate */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Pakkepris (DKK)
+                </Label>
+                <Input
+                  type="number"
+                  step={50}
+                  min={0}
+                  value={setup.price}
+                  onChange={(e) => onUpdateSetup(index, "price", e.target.value)}
+                  onBlur={(e) =>
+                    onUpdateSetup(index, "price", snapTo50(e.target.value))
+                  }
+                  placeholder="fx 3.500"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Timepris (DKK)
+                </Label>
+                <Input
+                  type="number"
+                  step={50}
+                  min={0}
+                  value={setup.hourlyRate}
+                  onChange={(e) =>
+                    onUpdateSetup(index, "hourlyRate", e.target.value)
+                  }
+                  onBlur={(e) =>
+                    onUpdateSetup(index, "hourlyRate", snapTo50(e.target.value))
+                  }
+                  placeholder="fx 1.200"
+                />
+              </div>
             </div>
+            <p className="text-[11px] text-muted-foreground">
+              Angives i intervaller af 50 kr. Timeprisen er udfyldt med din
+              standard-timepris fra Indstillinger, men kan rettes for denne
+              opsætning. Pakkeprisen lægges oveni prisen for spilletid (timepris
+              × antal timer).
+            </p>
 
-            <PriceExample hourlyRate={hourlyRate} packagePrice={setup.price} />
+            <PriceExample
+              hourlyRate={setup.hourlyRate}
+              packagePrice={setup.price}
+            />
 
             {/* Photo */}
             <div className="space-y-1.5">
@@ -519,114 +493,6 @@ function PriceExample({
       <div className="mt-1 flex items-center justify-between border-t border-accent/20 pt-1 font-semibold text-foreground">
         <span>Total for kunden</span>
         <span>{fmt(total)}</span>
-      </div>
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------- */
-/* Standard settings: hourly rate + travel                               */
-/* -------------------------------------------------------------------- */
-
-function StandardSettingsSection({
-  hourlyRate,
-  onHourlyRateChange,
-  regions,
-  onRegionChange,
-}: {
-  hourlyRate: string;
-  onHourlyRateChange: (value: string) => void;
-  regions: Record<string, RegionState>;
-  onRegionChange: (region: string, next: RegionState) => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-        Din timepris og rejseradius er dine standard-indstillinger — de gælder
-        på tværs af alle dine mobildiskotek-opsætninger.
-      </p>
-
-      {/* Hourly rate */}
-      <div className="space-y-1.5">
-        <Label className="text-xs font-medium text-muted-foreground">
-          Timepris (DKK)
-        </Label>
-        <Input
-          type="number"
-          step={50}
-          min={0}
-          value={hourlyRate}
-          onChange={(e) => onHourlyRateChange(e.target.value)}
-          onBlur={(e) => onHourlyRateChange(snapTo50(e.target.value))}
-          placeholder="fx 1.200"
-        />
-        <p className="text-[11px] text-muted-foreground">
-          Timeprisen er grundprisen pr. times spilletid. Prisen på den valgte
-          mobildiskotek-opsætning lægges oveni (timepris × antal timer +
-          opsætningens pris).
-        </p>
-      </div>
-
-      {/* Travel radius */}
-      <div className="space-y-2 border-t border-border/60 pt-5">
-        <div className="flex items-center justify-between gap-2">
-          <Label className="text-xs font-medium text-foreground">
-            Rejseradius
-          </Label>
-          <span className="text-[11px] text-muted-foreground">
-            Pris pr. region · gælder hele regionen
-          </span>
-        </div>
-
-        <div className="divide-y divide-border/60 rounded-xl border">
-          {REGIONS.map((region) => {
-            const state = regions[region];
-            const isHome = region === HOME_REGION;
-            return (
-              <div
-                key={region}
-                className="flex items-center gap-2 px-3 py-2"
-              >
-                <button
-                  type="button"
-                  onClick={() =>
-                    onRegionChange(region, { ...state, active: !state.active })
-                  }
-                  aria-pressed={state.active}
-                  className={cn(
-                    "flex h-5 w-5 shrink-0 items-center justify-center rounded border transition-colors",
-                    state.active
-                      ? "border-emerald-500 bg-emerald-500 text-white"
-                      : "border-border text-transparent hover:border-foreground/30",
-                  )}
-                >
-                  <Check className="h-3.5 w-3.5" />
-                </button>
-                <span className="flex-1 truncate text-sm text-foreground">
-                  {region}
-                  {isHome && (
-                    <span className="ml-1.5 text-[10px] font-medium text-accent">
-                      · hjemsted
-                    </span>
-                  )}
-                </span>
-                <div className="flex items-center gap-1">
-                  <Input
-                    type="number"
-                    value={state.price}
-                    onChange={(e) =>
-                      onRegionChange(region, { ...state, price: e.target.value })
-                    }
-                    disabled={!state.active}
-                    placeholder="—"
-                    className="h-8 w-24 text-right disabled:opacity-40"
-                  />
-                  <span className="text-[11px] text-muted-foreground">kr</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
       </div>
     </div>
   );

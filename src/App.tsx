@@ -55,6 +55,7 @@ import { DJBookingDetailPage } from "@/pages/dj/BookingDetailPage";
 import { DJAvailabilityPage } from "@/pages/dj/AvailabilityPage";
 import { DJEarningsPage } from "@/pages/dj/EarningsPage";
 import { DJPricingEquipmentPage } from "@/pages/dj/PricingEquipmentPage";
+import { DJSettingsPage } from "@/pages/dj/DJSettingsPage";
 import { DJMessagesPage } from "@/pages/dj/MessagesPage";
 import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
@@ -155,6 +156,7 @@ function App() {
             <Route path="/dj/pricing" element={<DJPricingEquipmentPage />} />
             <Route path="/dj/messages" element={<DJMessagesPage />} />
             <Route path="/dj/profile" element={<GuidedSectionsMockup />} />
+            <Route path="/dj/settings" element={<DJSettingsPage />} />
           </Route>
 
           <Route
