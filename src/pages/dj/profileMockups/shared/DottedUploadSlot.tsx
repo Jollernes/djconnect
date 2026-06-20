@@ -27,6 +27,7 @@ export function DottedUploadSlot({
   aspectClassName,
   isVideo = false,
   cropAspect,
+  cropPreviewVariant,
 }: {
   value: string | undefined;
   onChange: (next: string | undefined) => void;
@@ -40,6 +41,8 @@ export function DottedUploadSlot({
    * after selecting a file so the image fits the given aspect ratio.
    */
   cropAspect?: number;
+  /** Which photo-grid slot the crop preview should mock. */
+  cropPreviewVariant?: "hero" | "gallery";
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [cropSrc, setCropSrc] = useState<string | undefined>(undefined);
@@ -79,6 +82,7 @@ export function DottedUploadSlot({
       open={cropSrc !== undefined}
       src={cropSrc}
       aspect={cropAspect as number}
+      previewVariant={cropPreviewVariant}
       onCancel={() => setCropSrc(undefined)}
       onConfirm={(cropped) => {
         onChange(cropped);

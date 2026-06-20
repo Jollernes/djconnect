@@ -6,7 +6,8 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { ZoomIn, ZoomOut, Move } from "lucide-react";
+import { ZoomIn, ZoomOut, Move, Image as ImageIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,7 @@ export function ImageCropModal({
   src,
   aspect,
   title = "Tilpas billede",
+  previewVariant,
   onCancel,
   onConfirm,
 }: {
@@ -41,6 +43,11 @@ export function ImageCropModal({
   /** Target aspect ratio (width / height) of the crop frame. */
   aspect: number;
   title?: string;
+  /**
+   * Which photo-grid slot this image is destined for. When set, a live
+   * preview of the cropped result inside the grid is shown.
+   */
+  previewVariant?: "hero" | "gallery";
   onCancel: () => void;
   onConfirm: (croppedDataUrl: string) => void;
 }) {
@@ -215,6 +222,18 @@ export function ImageCropModal({
     onConfirm(canvas.toDataURL("image/jpeg", 0.92));
   }
 
+  /** Crop transform expressed as % of the frame so the live preview
+   * scales to any slot size that shares the crop aspect ratio. */
+  const frac =
+    natural && frameW > 0 && frameH > 0
+      ? {
+          x: (offset.x / frameW) * 100,
+          y: (offset.y / frameH) * 100,
+          w: (dispW / frameW) * 100,
+          h: (dispH / frameH) * 100,
+        }
+      : null;
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onCancel()}>
       <DialogContent className="max-w-md gap-4">
@@ -295,6 +314,21 @@ export function ImageCropModal({
               <ZoomIn className="h-4 w-4" />
             </button>
           </div>
+
+          {previewVariant && (
+            <div className="space-y-1.5 rounded-xl border bg-muted/20 p-3">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                {previewVariant === "hero"
+                  ? "Forhåndsvisning — hero-billede i gridet"
+                  : "Forhåndsvisning — galleri-billede i gridet"}
+              </p>
+              <GridContextPreview
+                variant={previewVariant}
+                src={src}
+                frac={frac}
+              />
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-2">
@@ -307,5 +341,76 @@ export function ImageCropModal({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+type Frac = { x: number; y: number; w: number; h: number } | null;
+
+/**
+ * Mini mock of the "Billeder & video" grid (hero on the left, three small
+ * gallery slots on the right). The slot matching `variant` shows the live
+ * cropped image; the others are muted placeholders.
+ */
+function GridContextPreview({
+  variant,
+  src,
+  frac,
+}: {
+  variant: "hero" | "gallery";
+  src: string | undefined;
+  frac: Frac;
+}) {
+  const liveImg =
+    src && frac ? (
+      <img
+        src={src}
+        alt=""
+        draggable={false}
+        style={{
+          position: "absolute",
+          left: `${frac.x}%`,
+          top: `${frac.y}%`,
+          width: `${frac.w}%`,
+          height: `${frac.h}%`,
+          maxWidth: "none",
+        }}
+      />
+    ) : null;
+
+  const placeholder = (
+    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30">
+      <ImageIcon className="h-3.5 w-3.5 text-primary/30" />
+    </div>
+  );
+
+  return (
+    <div className="flex gap-1.5">
+      {/* Hero slot */}
+      <div
+        className={cn(
+          "relative aspect-video flex-1 overflow-hidden rounded-md",
+          variant === "hero" ? "ring-2 ring-accent" : "ring-1 ring-border",
+        )}
+      >
+        {variant === "hero" ? liveImg : placeholder}
+      </div>
+
+      {/* Three small gallery slots */}
+      <div className="grid flex-1 grid-cols-3 gap-1">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className={cn(
+              "relative aspect-square overflow-hidden rounded",
+              variant === "gallery" && i === 0
+                ? "ring-2 ring-accent"
+                : "ring-1 ring-border",
+            )}
+          >
+            {variant === "gallery" && i === 0 ? liveImg : placeholder}
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

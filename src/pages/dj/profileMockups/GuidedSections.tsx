@@ -238,6 +238,7 @@ function SectionBody({
               onChange={(v) => state.setFeaturedPhoto(activeKey, v)}
               hint="16:9 anbefales"
               cropAspect={16 / 9}
+              cropPreviewVariant="hero"
             />
           </div>
           <div className="space-y-2">
@@ -289,12 +290,14 @@ function SectionBody({
                 hint="Tilføj"
                 aspectClassName="aspect-square"
                 cropAspect={1}
+                cropPreviewVariant="gallery"
               />
             </div>
             <ImageCropModal
               open={adjustGalleryId !== null}
               src={adjustGallerySrc}
               aspect={1}
+              previewVariant="gallery"
               onCancel={() => setAdjustGalleryId(null)}
               onConfirm={(cropped) => {
                 if (adjustGalleryId)
