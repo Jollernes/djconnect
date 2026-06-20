@@ -1,6 +1,7 @@
-import { useRef, type ChangeEvent } from "react";
-import { CloudUpload, X } from "lucide-react";
+import { useRef, useState, type ChangeEvent } from "react";
+import { CloudUpload, X, Crop } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ImageCropModal } from "./ImageCropModal";
 
 /**
  * Dashed-border upload slot used throughout the mockups for hero / profile
@@ -25,6 +26,7 @@ export function DottedUploadSlot({
   shape = "rect",
   aspectClassName,
   isVideo = false,
+  cropAspect,
 }: {
   value: string | undefined;
   onChange: (next: string | undefined) => void;
@@ -33,13 +35,27 @@ export function DottedUploadSlot({
   shape?: "rect" | "circle";
   aspectClassName?: string;
   isVideo?: boolean;
+  /**
+   * When set (and the upload is an image), opens a pan/zoom crop modal
+   * after selecting a file so the image fits the given aspect ratio.
+   */
+  cropAspect?: number;
 }) {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | undefined>(undefined);
+
+  const cropEnabled = cropAspect !== undefined && !isVideo;
 
   function handleFile(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (isVideo || !f.type.startsWith("image/")) {
+    if (cropEnabled && f.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (typeof reader.result === "string") setCropSrc(reader.result);
+      };
+      reader.readAsDataURL(f);
+    } else if (isVideo || !f.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = () => {
         if (typeof reader.result === "string") onChange(reader.result);
@@ -58,70 +74,103 @@ export function DottedUploadSlot({
   const aspect =
     aspectClassName ?? (shape === "circle" ? "" : "aspect-video");
 
+  const modal = cropEnabled ? (
+    <ImageCropModal
+      open={cropSrc !== undefined}
+      src={cropSrc}
+      aspect={cropAspect as number}
+      onCancel={() => setCropSrc(undefined)}
+      onConfirm={(cropped) => {
+        onChange(cropped);
+        setCropSrc(undefined);
+      }}
+    />
+  ) : null;
+
   if (value) {
     return (
-      <div
-        className={cn(
-          "group relative overflow-hidden ring-1 ring-border bg-muted/30",
-          shapeCls,
-          aspect,
-        )}
-      >
-        {isVideo ? (
-          <video
-            src={value}
-            muted
-            loop
-            playsInline
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <img
-            src={value}
-            alt=""
-            className="h-full w-full object-cover"
-          />
-        )}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onChange(undefined);
-          }}
-          className="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm ring-1 ring-border hover:bg-white"
-          aria-label="Fjern"
+      <>
+        <div
+          className={cn(
+            "group relative overflow-hidden ring-1 ring-border bg-muted/30",
+            shapeCls,
+            aspect,
+          )}
         >
-          <X className="h-3.5 w-3.5" />
-        </button>
-      </div>
+          {isVideo ? (
+            <video
+              src={value}
+              muted
+              loop
+              playsInline
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <img src={value} alt="" className="h-full w-full object-cover" />
+          )}
+          <div className="absolute right-1.5 top-1.5 flex items-center gap-1">
+            {cropEnabled && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCropSrc(value);
+                }}
+                className="flex h-6 w-6 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm ring-1 ring-border hover:bg-white"
+                aria-label="Tilpas billede"
+                title="Tilpas billede"
+              >
+                <Crop className="h-3.5 w-3.5" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onChange(undefined);
+              }}
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm ring-1 ring-border hover:bg-white"
+              aria-label="Fjern"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+        {modal}
+      </>
     );
   }
 
   return (
-    <button
-      type="button"
-      onClick={() => inputRef.current?.click()}
-      className={cn(
-        "flex w-full flex-col items-center justify-center gap-1 border-2 border-dashed border-border bg-muted/20 px-3 py-4 text-center text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:bg-muted/40",
-        shapeCls,
-        aspect,
-      )}
-    >
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        className="hidden"
-        onChange={handleFile}
-      />
-      <CloudUpload className="h-5 w-5" aria-hidden="true" />
-      <span className="font-medium leading-tight">
-        Træk &amp; slip eller klik
-        <br />
-        for at uploade
-      </span>
-      {hint && <span className="text-[10px] uppercase tracking-wide">{hint}</span>}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className={cn(
+          "flex w-full flex-col items-center justify-center gap-1 border-2 border-dashed border-border bg-muted/20 px-3 py-4 text-center text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:bg-muted/40",
+          shapeCls,
+          aspect,
+        )}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          className="hidden"
+          onChange={handleFile}
+        />
+        <CloudUpload className="h-5 w-5" aria-hidden="true" />
+        <span className="font-medium leading-tight">
+          Træk &amp; slip eller klik
+          <br />
+          for at uploade
+        </span>
+        {hint && (
+          <span className="text-[10px] uppercase tracking-wide">{hint}</span>
+        )}
+      </button>
+      {modal}
+    </>
   );
 }
 

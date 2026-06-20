@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Camera, ChevronDown, Eye, EyeOff, Handshake, Sparkles,
-  Speaker, Check, AlertCircle, Circle, ExternalLink,
+  Speaker, Check, AlertCircle, Circle, ExternalLink, Crop, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { EventTypeTabs } from "./shared/EventTypeTabs";
 import { DesktopMobilePreview } from "./shared/DesktopMobilePreview";
 import { AutosaveIndicator } from "./shared/AutosaveIndicator";
 import { DottedUploadSlot } from "./shared/DottedUploadSlot";
+import { ImageCropModal } from "./shared/ImageCropModal";
 import { CompletionBars } from "./shared/CompletionBars";
 import { useMockupState } from "./shared/useMockupState";
 import {
@@ -220,6 +221,10 @@ function SectionBody({
   const sub = state.subProfiles[activeKey];
   const meta = MOCKUP_SUB_PROFILE_META[activeKey];
 
+  const [adjustGalleryId, setAdjustGalleryId] = useState<string | null>(null);
+  const adjustGallerySrc = sub.gallery.find((g) => g.id === adjustGalleryId)
+    ?.dataUrl;
+
   switch (section.id) {
     case "visuals":
       return (
@@ -232,6 +237,7 @@ function SectionBody({
               value={sub.featuredPhotoDataUrl}
               onChange={(v) => state.setFeaturedPhoto(activeKey, v)}
               hint="16:9 anbefales"
+              cropAspect={16 / 9}
             />
           </div>
           <div className="space-y-2">
@@ -240,12 +246,36 @@ function SectionBody({
             </Label>
             <div className="grid grid-cols-3 gap-2">
               {sub.gallery.slice(0, 3).map((g) => (
-                <div key={g.id} className="aspect-square overflow-hidden rounded-md ring-1 ring-border">
+                <div
+                  key={g.id}
+                  className="group relative aspect-square overflow-hidden rounded-md ring-1 ring-border"
+                >
                   {g.type === "video" ? (
                     <video src={g.dataUrl} className="h-full w-full object-cover" muted playsInline />
                   ) : (
                     <img src={g.dataUrl} alt="" className="h-full w-full object-cover" />
                   )}
+                  <div className="absolute right-1 top-1 flex items-center gap-1">
+                    {g.type !== "video" && (
+                      <button
+                        type="button"
+                        onClick={() => setAdjustGalleryId(g.id)}
+                        className="flex h-6 w-6 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm ring-1 ring-border hover:bg-white"
+                        aria-label="Tilpas billede"
+                        title="Tilpas billede"
+                      >
+                        <Crop className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => state.removeGalleryItem(activeKey, g.id)}
+                      className="flex h-6 w-6 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm ring-1 ring-border hover:bg-white"
+                      aria-label="Fjern"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
               <DottedUploadSlot
@@ -258,8 +288,20 @@ function SectionBody({
                 }}
                 hint="Tilføj"
                 aspectClassName="aspect-square"
+                cropAspect={1}
               />
             </div>
+            <ImageCropModal
+              open={adjustGalleryId !== null}
+              src={adjustGallerySrc}
+              aspect={1}
+              onCancel={() => setAdjustGalleryId(null)}
+              onConfirm={(cropped) => {
+                if (adjustGalleryId)
+                  state.setGalleryItemDataUrl(activeKey, adjustGalleryId, cropped);
+                setAdjustGalleryId(null);
+              }}
+            />
           </div>
         </div>
       );

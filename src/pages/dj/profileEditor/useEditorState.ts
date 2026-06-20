@@ -98,6 +98,22 @@ export function useDJProfileEditor() {
     }));
   }
 
+  function setGalleryItemDataUrl(
+    key: DemoDJSubProfileKey,
+    id: string,
+    dataUrl: string,
+  ) {
+    setSubProfiles((prev) => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        gallery: prev[key].gallery.map((g) =>
+          g.id === id ? { ...g, dataUrl } : g,
+        ),
+      },
+    }));
+  }
+
   /* ------------------------------------------------------------------ */
   /* Computed completion                                                  */
   /* ------------------------------------------------------------------ */
@@ -232,6 +248,7 @@ export function useDJProfileEditor() {
     appendGalleryItems,
     removeGalleryItem,
     setGalleryCaption,
+    setGalleryItemDataUrl,
     /* completion */
     completion,
     completedCount,
