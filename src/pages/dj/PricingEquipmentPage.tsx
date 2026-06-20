@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ChevronDown,
   Check,
@@ -7,57 +7,27 @@ import {
   Info,
   Wallet,
   PackagePlus,
+  Pencil,
+  ImageOff,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { DottedUploadSlot } from "./profileMockups/shared/DottedUploadSlot";
 import { useDJStandardSettings } from "@/hooks/useDJStandardSettings";
 import { snapTo50 } from "@/lib/djStandardSettings";
-
-/* -------------------------------------------------------------------- */
-/* Mobildiskotek setups                                                  */
-/* -------------------------------------------------------------------- */
-
-type Capacity = "80" | "150" | "200";
-
-const CAPACITY_OPTIONS: { value: Capacity; label: string }[] = [
-  { value: "80", label: "Op til 80 gæster" },
-  { value: "150", label: "Op til 150 gæster" },
-  { value: "200", label: "Op til 200 gæster" },
-];
-
-/** Tags that are always included in every setup and cannot be toggled. */
-function fixedTags(capacity: Capacity): string[] {
-  return [
-    `Lyd & lys op til ${capacity} gæster`,
-    "Opsætning af udstyr",
-    "Nedtagning af udstyr",
-  ];
-}
-
-/** Optional extras the DJ can choose to include in the setup price. */
-const OPTIONAL_INCLUSIONS = [
-  "Tidlig opsætning af udstyret",
-  "1 stk mikrofon (trådløs)",
-  "1 stk mikrofon (ikke trådløs)",
-  "Røgmaskine",
-];
-
-type Setup = {
-  capacity: Capacity;
-  description: string;
-  price: string;
-  /** Per-setup hourly rate, pre-filled from the standard rate but editable. */
-  hourlyRate: string;
-  extras: string[];
-  photo?: string;
-};
-
-function emptySetup(hourlyRate: string): Setup {
-  return { capacity: "80", description: "", price: "", hourlyRate, extras: [] };
-}
+import {
+  CAPACITY_OPTIONS,
+  OPTIONAL_INCLUSIONS,
+  emptySetup,
+  fixedTags,
+  loadSetups,
+  saveSetups,
+  type Setup,
+} from "@/lib/djSetups";
 
 /* -------------------------------------------------------------------- */
 /* Tilkøb (add-ons)                                                      */
@@ -80,9 +50,13 @@ export function DJPricingEquipmentPage() {
   const { settings } = useDJStandardSettings();
   const [open, setOpen] = useState<Set<string>>(() => new Set(["setups"]));
 
-  const [setups, setSetups] = useState<Setup[]>(() => [
-    emptySetup(settings.hourlyRate),
-  ]);
+  const [setups, setSetups] = useState<Setup[]>(
+    () => loadSetups() ?? [emptySetup(settings.hourlyRate)],
+  );
+
+  useEffect(() => {
+    saveSetups(setups);
+  }, [setups]);
 
   const [addons, setAddons] = useState<Record<string, string>>(() =>
     Object.fromEntries(ADDON_OPTIONS.map((a) => [a, ""])),
@@ -132,6 +106,12 @@ export function DJPricingEquipmentPage() {
     setSetups((prev) => prev.filter((_, i) => i !== index));
   }
 
+  function setSaved(index: number, saved: boolean) {
+    setSetups((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, saved } : s)),
+    );
+  }
+
   return (
     <div className="max-w-3xl space-y-6">
       <div>
@@ -157,6 +137,7 @@ export function DJPricingEquipmentPage() {
           onToggleExtra={toggleExtra}
           onAddSetup={addSetup}
           onRemoveSetup={removeSetup}
+          onSetSaved={setSaved}
         />
       </Accordion>
 
@@ -242,6 +223,7 @@ function SetupsSection({
   onToggleExtra,
   onAddSetup,
   onRemoveSetup,
+  onSetSaved,
 }: {
   setups: Setup[];
   onUpdateSetup: <K extends keyof Setup>(
@@ -252,6 +234,7 @@ function SetupsSection({
   onToggleExtra: (index: number, extra: string) => void;
   onAddSetup: () => void;
   onRemoveSetup: (index: number) => void;
+  onSetSaved: (index: number, saved: boolean) => void;
 }) {
   return (
     <div className="space-y-5">
@@ -271,7 +254,18 @@ function SetupsSection({
 
       {/* Setups */}
       <div className="space-y-3">
-        {setups.map((setup, index) => (
+        {setups.map((setup, index) =>
+          setup.saved ? (
+            <SetupPreviewCard
+              key={index}
+              setup={setup}
+              index={index}
+              onEdit={() => onSetSaved(index, false)}
+              onRemove={
+                setups.length > 1 ? () => onRemoveSetup(index) : undefined
+              }
+            />
+          ) : (
           <div key={index} className="space-y-3 rounded-xl border bg-card p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
@@ -445,8 +439,29 @@ function SetupsSection({
                 Valgfrit, men stærkt anbefalet
               </p>
             </div>
+
+            {/* Live preview */}
+            <div className="space-y-2 border-t border-border/60 pt-4">
+              <p className="text-xs font-medium text-muted-foreground">
+                Forhåndsvisning af pakken
+              </p>
+              <SetupPreviewCard setup={setup} index={index} />
+            </div>
+
+            {/* Save */}
+            <div className="flex justify-end border-t border-border/60 pt-3">
+              <Button
+                type="button"
+                onClick={() => onSetSaved(index, true)}
+                disabled={!setup.price.trim()}
+                className="gap-1.5"
+              >
+                <Check className="h-4 w-4" /> Gem opsætning
+              </Button>
+            </div>
           </div>
-        ))}
+          ),
+        )}
 
         {setups.length < 3 && (
           <button
@@ -493,6 +508,125 @@ function PriceExample({
       <div className="mt-1 flex items-center justify-between border-t border-accent/20 pt-1 font-semibold text-foreground">
         <span>Total for kunden</span>
         <span>{fmt(total)}</span>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* Setup preview card (live preview + saved view)                        */
+/* -------------------------------------------------------------------- */
+
+function SetupPreviewCard({
+  setup,
+  index,
+  onEdit,
+  onRemove,
+}: {
+  setup: Setup;
+  index: number;
+  /** When provided the card is shown in its saved state with edit/remove. */
+  onEdit?: () => void;
+  onRemove?: () => void;
+}) {
+  const saved = Boolean(onEdit);
+  const fmt = (v: string) =>
+    v.trim() === "" ? "—" : `${Number(v).toLocaleString("da-DK")} kr`;
+  const inclusions = [...fixedTags(setup.capacity), ...setup.extras];
+
+  return (
+    <div
+      className={cn(
+        "overflow-hidden rounded-xl border bg-card",
+        saved && "ring-1 ring-emerald-500/30",
+      )}
+    >
+      {setup.photo ? (
+        <img
+          src={setup.photo}
+          alt=""
+          className="h-36 w-full object-cover"
+        />
+      ) : (
+        <div className="flex h-20 w-full items-center justify-center gap-1.5 bg-muted text-xs text-muted-foreground">
+          <ImageOff className="h-4 w-4" /> Intet foto endnu
+        </div>
+      )}
+
+      <div className="space-y-3 p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-semibold">Opsætning {index + 1}</p>
+              {saved && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
+                  <Check className="h-3 w-3" /> Gemt
+                </span>
+              )}
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
+              <Users className="h-3.5 w-3.5" /> Op til {setup.capacity} gæster
+            </span>
+          </div>
+          {saved && (
+            <div className="flex shrink-0 items-center gap-1">
+              <button
+                type="button"
+                onClick={onEdit}
+                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Rediger
+              </button>
+              {onRemove && (
+                <button
+                  type="button"
+                  onClick={onRemove}
+                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+                >
+                  <Trash2 className="h-3.5 w-3.5" /> Fjern
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {setup.description.trim() && (
+          <p className="text-sm text-muted-foreground">{setup.description}</p>
+        )}
+
+        <div className="flex flex-wrap gap-1.5">
+          {inclusions.map((item) => (
+            <span
+              key={item}
+              className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 px-2.5 py-1 text-[11px] font-medium text-emerald-700"
+            >
+              <Check className="h-3 w-3" /> {item}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-border/60 pt-3 text-sm">
+          <div>
+            <span className="text-xs text-muted-foreground">Pakkepris </span>
+            <span className="font-semibold text-foreground">
+              {fmt(setup.price)}
+            </span>
+          </div>
+          <div>
+            <span className="text-xs text-muted-foreground">Timepris </span>
+            <span className="font-semibold text-foreground">
+              {fmt(setup.hourlyRate)}
+              {setup.hourlyRate.trim() && (
+                <span className="font-normal text-muted-foreground">/t</span>
+              )}
+            </span>
+          </div>
+        </div>
+
+        <PriceExample
+          hourlyRate={setup.hourlyRate}
+          packagePrice={setup.price}
+        />
       </div>
     </div>
   );
