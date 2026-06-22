@@ -180,8 +180,8 @@ export function SimplifiedSetupsMockup() {
   /** Whether the panel is creating a brand-new setup (vs. editing one). */
   const [isNew, setIsNew] = useState(false);
 
-  function openNew() {
-    setEditing(newSetup());
+  function openNewFor(tag: EventTag) {
+    setEditing({ ...newSetup(), eventTag: tag });
     setIsNew(true);
   }
 
@@ -249,12 +249,16 @@ export function SimplifiedSetupsMockup() {
 
       {/* Overview — grouped by event so event-specific setups stand out */}
       <div className="space-y-7">
-        {EVENT_TAGS.filter((tag) =>
-          setups.some((s) => s.eventTag === tag),
+        {EVENT_TAGS.filter(
+          (tag) =>
+            tag === "Alle events" ||
+            tag === "Bryllup" ||
+            setups.some((s) => s.eventTag === tag),
         ).map((tag) => {
           const meta = EVENT_META[tag];
           const HeaderIcon = meta.icon;
           const group = setups.filter((s) => s.eventTag === tag);
+          const addSlots = Math.max(0, 3 - group.length);
           return (
             <section key={tag} className="space-y-3">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -293,21 +297,21 @@ export function SimplifiedSetupsMockup() {
                     onRemove={() => removeSetup(setup.id)}
                   />
                 ))}
+                {Array.from({ length: addSlots }).map((_, i) => (
+                  <AddSlot
+                    key={`add-${tag}-${i}`}
+                    label={
+                      tag === "Alle events"
+                        ? "Tilføj opsætning"
+                        : `Tilføj ${tag.toLowerCase()}-opsætning`
+                    }
+                    onClick={() => openNewFor(tag)}
+                  />
+                ))}
               </div>
             </section>
           );
         })}
-
-        <button
-          type="button"
-          onClick={openNew}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/10 px-4 py-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent/50 hover:bg-accent/5 hover:text-foreground"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent">
-            <Plus className="h-4 w-4" />
-          </span>
-          Tilføj opsætning
-        </button>
       </div>
 
       <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
@@ -326,6 +330,25 @@ export function SimplifiedSetupsMockup() {
         />
       )}
     </div>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* Add slot (empty "+" card)                                             */
+/* -------------------------------------------------------------------- */
+
+function AddSlot({ label, onClick }: { label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex min-h-[280px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/10 p-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent/50 hover:bg-accent/5 hover:text-foreground"
+    >
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
+        <Plus className="h-5 w-5" />
+      </span>
+      {label}
+    </button>
   );
 }
 
