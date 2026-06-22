@@ -11,6 +11,8 @@ import {
   Pencil,
   ImageOff,
   Users,
+  Copy,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -22,6 +24,7 @@ import { useDJStandardSettings } from "@/hooks/useDJStandardSettings";
 import { snapTo50 } from "@/lib/djStandardSettings";
 import {
   CAPACITY_OPTIONS,
+  DJ_WEDDING_SETUPS_KEY,
   OPTIONAL_INCLUSIONS,
   emptySetup,
   fixedTags,
@@ -54,10 +57,17 @@ export function DJPricingEquipmentPage() {
   const [setups, setSetups] = useState<Setup[]>(
     () => loadSetups() ?? [emptySetup(settings.hourlyRate)],
   );
+  const [weddingSetups, setWeddingSetups] = useState<Setup[]>(
+    () => loadSetups(DJ_WEDDING_SETUPS_KEY) ?? [],
+  );
 
   useEffect(() => {
     saveSetups(setups);
   }, [setups]);
+
+  useEffect(() => {
+    saveSetups(weddingSetups, DJ_WEDDING_SETUPS_KEY);
+  }, [weddingSetups]);
 
   const [addons, setAddons] = useState<Record<string, string>>(() =>
     Object.fromEntries(ADDON_OPTIONS.map((a) => [a, ""])),
@@ -72,44 +82,55 @@ export function DJPricingEquipmentPage() {
     });
   }
 
-  function updateSetup<K extends keyof Setup>(
-    index: number,
-    field: K,
-    value: Setup[K],
+  /** Build the editor handlers for a given setup list state setter. */
+  function createSetupOps(
+    setList: React.Dispatch<React.SetStateAction<Setup[]>>,
   ) {
-    setSetups((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)),
-    );
+    return {
+      update<K extends keyof Setup>(index: number, field: K, value: Setup[K]) {
+        setList((prev) =>
+          prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)),
+        );
+      },
+      toggleExtra(index: number, extra: string) {
+        setList((prev) =>
+          prev.map((s, i) =>
+            i === index
+              ? {
+                  ...s,
+                  extras: s.extras.includes(extra)
+                    ? s.extras.filter((e) => e !== extra)
+                    : [...s.extras, extra],
+                }
+              : s,
+          ),
+        );
+      },
+      add() {
+        setList((prev) =>
+          prev.length >= 3 ? prev : [...prev, emptySetup(settings.hourlyRate)],
+        );
+      },
+      remove(index: number) {
+        setList((prev) => prev.filter((_, i) => i !== index));
+      },
+      setSaved(index: number, saved: boolean) {
+        setList((prev) =>
+          prev.map((s, i) => (i === index ? { ...s, saved } : s)),
+        );
+      },
+    };
   }
 
-  function toggleExtra(index: number, extra: string) {
-    setSetups((prev) =>
-      prev.map((s, i) =>
-        i === index
-          ? {
-              ...s,
-              extras: s.extras.includes(extra)
-                ? s.extras.filter((e) => e !== extra)
-                : [...s.extras, extra],
-            }
-          : s,
-      ),
-    );
-  }
+  const generalOps = createSetupOps(setSetups);
+  const weddingOps = createSetupOps(setWeddingSetups);
 
-  function addSetup() {
-    setSetups((prev) =>
-      prev.length >= 3 ? prev : [...prev, emptySetup(settings.hourlyRate)],
-    );
-  }
-
-  function removeSetup(index: number) {
-    setSetups((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  function setSaved(index: number, saved: boolean) {
-    setSetups((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, saved } : s)),
+  /** Copy an existing (general) setup into the wedding list for tailoring. */
+  function reuseSetup(sourceIndex: number) {
+    const source = setups[sourceIndex];
+    if (!source) return;
+    setWeddingSetups((prev) =>
+      prev.length >= 3 ? prev : [...prev, { ...source, saved: false }],
     );
   }
 
@@ -134,11 +155,32 @@ export function DJPricingEquipmentPage() {
       >
         <SetupsSection
           setups={setups}
-          onUpdateSetup={updateSetup}
-          onToggleExtra={toggleExtra}
-          onAddSetup={addSetup}
-          onRemoveSetup={removeSetup}
-          onSetSaved={setSaved}
+          onUpdateSetup={generalOps.update}
+          onToggleExtra={generalOps.toggleExtra}
+          onAddSetup={generalOps.add}
+          onRemoveSetup={generalOps.remove}
+          onSetSaved={generalOps.setSaved}
+        />
+      </Accordion>
+
+      <Accordion
+        id="wedding"
+        icon={Heart}
+        title="Mobildiskotek-opsætninger · Bryllup"
+        subtitle="Bryllupsspecifikke opsætninger — genbrug og tilpas dine eksisterende."
+        open={open.has("wedding")}
+        onToggle={() => toggle("wedding")}
+      >
+        <SetupsSection
+          setups={weddingSetups}
+          onUpdateSetup={weddingOps.update}
+          onToggleExtra={weddingOps.toggleExtra}
+          onAddSetup={weddingOps.add}
+          onRemoveSetup={weddingOps.remove}
+          onSetSaved={weddingOps.setSaved}
+          wedding={{ reuseSources: setups, onReuse: reuseSetup }}
+          addLabel="Tilføj bryllupsopsætning"
+          contextLabel="Bryllup"
         />
       </Accordion>
 
@@ -225,6 +267,9 @@ function SetupsSection({
   onAddSetup,
   onRemoveSetup,
   onSetSaved,
+  wedding,
+  addLabel = "Tilføj opsætning",
+  contextLabel,
 }: {
   setups: Setup[];
   onUpdateSetup: <K extends keyof Setup>(
@@ -236,15 +281,27 @@ function SetupsSection({
   onAddSetup: () => void;
   onRemoveSetup: (index: number) => void;
   onSetSaved: (index: number, saved: boolean) => void;
+  /** When set, the section is the wedding-specific variant. */
+  wedding?: { reuseSources: Setup[]; onReuse: (sourceIndex: number) => void };
+  addLabel?: string;
+  contextLabel?: string;
 }) {
   return (
     <div className="space-y-5">
-      <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-        En opsætning svarer til en mobildiskotek-størrelse. To opsætninger må
-        gerne passe til samme antal gæster — fx hvis de inkluderer noget
-        forskelligt og derfor har forskellige priser. Opsætningens pris lægges
-        oveni din timepris.
-      </p>
+      {wedding ? (
+        <WeddingReusePanel
+          reuseSources={wedding.reuseSources}
+          onReuse={wedding.onReuse}
+          full={setups.length >= 3}
+        />
+      ) : (
+        <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+          En opsætning svarer til en mobildiskotek-størrelse. To opsætninger må
+          gerne passe til samme antal gæster — fx hvis de inkluderer noget
+          forskelligt og derfor har forskellige priser. Opsætningens pris lægges
+          oveni din timepris.
+        </p>
+      )}
 
       {/* Over 200 guests note */}
       <p className="flex items-start gap-1.5 rounded-lg border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground">
@@ -261,9 +318,12 @@ function SetupsSection({
               key={index}
               setup={setup}
               index={index}
+              contextLabel={contextLabel}
               onEdit={() => onSetSaved(index, false)}
               onRemove={
-                setups.length > 1 ? () => onRemoveSetup(index) : undefined
+                wedding || setups.length > 1
+                  ? () => onRemoveSetup(index)
+                  : undefined
               }
             />
           ) : (
@@ -275,7 +335,7 @@ function SetupsSection({
                 </span>
                 <p className="text-sm font-semibold">Opsætning {index + 1}</p>
               </div>
-              {setups.length > 1 && (
+              {(wedding || setups.length > 1) && (
                 <button
                   type="button"
                   onClick={() => onRemoveSetup(index)}
@@ -285,6 +345,14 @@ function SetupsSection({
                 </button>
               )}
             </div>
+
+            {wedding && (
+              <p className="flex items-start gap-1.5 rounded-lg border border-rose-300/50 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+                <Heart className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                Tilpas til bryllup — opdatér gerne beskrivelsen og prisen, og
+                især billedet, så det viser en bryllupskontekst.
+              </p>
+            )}
 
             {/* Guest capacity */}
             <div className="space-y-1.5">
@@ -446,7 +514,11 @@ function SetupsSection({
               <p className="text-xs font-medium text-muted-foreground">
                 Forhåndsvisning af pakken
               </p>
-              <SetupPreviewCard setup={setup} index={index} />
+              <SetupPreviewCard
+                setup={setup}
+                index={index}
+                contextLabel={contextLabel}
+              />
             </div>
 
             {/* Save */}
@@ -470,8 +542,67 @@ function SetupsSection({
             onClick={onAddSetup}
             className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
           >
-            <Plus className="h-4 w-4" /> Tilføj opsætning ({setups.length}/3)
+            <Plus className="h-4 w-4" /> {addLabel} ({setups.length}/3)
           </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* Wedding reuse panel                                                    */
+/* -------------------------------------------------------------------- */
+
+function WeddingReusePanel({
+  reuseSources,
+  onReuse,
+  full,
+}: {
+  reuseSources: Setup[];
+  onReuse: (sourceIndex: number) => void;
+  full: boolean;
+}) {
+  return (
+    <div className="space-y-3 rounded-lg border border-rose-200 bg-rose-50/60 p-3">
+      <div className="flex items-start gap-2">
+        <Heart className="mt-0.5 h-4 w-4 shrink-0 text-rose-500" />
+        <p className="text-xs text-rose-800">
+          Lav bryllupsspecifikke opsætninger. Genbrug dine eksisterende
+          opsætninger og tilpas dem til bryllup — vi anbefaler at justere
+          beskrivelse, pris og især billedet, så det viser en bryllupskontekst.
+        </p>
+      </div>
+
+      <div className="space-y-1.5">
+        <p className="text-[11px] font-medium text-foreground">
+          Genbrug en eksisterende opsætning
+        </p>
+        {reuseSources.length === 0 ? (
+          <p className="text-[11px] text-muted-foreground">
+            Du har endnu ingen opsætninger at genbruge — opret en under
+            “Mobildiskotek-opsætninger” først.
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {reuseSources.map((s, i) => (
+              <button
+                key={i}
+                type="button"
+                disabled={full}
+                onClick={() => onReuse(i)}
+                className="inline-flex items-center gap-1.5 rounded-full border border-rose-300 bg-white px-3 py-1.5 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Copy className="h-3.5 w-3.5" /> Opsætning {i + 1} · op til{" "}
+                {s.capacity} gæster
+              </button>
+            ))}
+          </div>
+        )}
+        {full && (
+          <p className="text-[11px] text-muted-foreground">
+            Du kan have op til 3 bryllupsopsætninger.
+          </p>
         )}
       </div>
     </div>
@@ -523,12 +654,15 @@ function SetupPreviewCard({
   index,
   onEdit,
   onRemove,
+  contextLabel,
 }: {
   setup: Setup;
   index: number;
   /** When provided the card is shown in its saved state with edit/remove. */
   onEdit?: () => void;
   onRemove?: () => void;
+  /** Optional context tag shown on the card, e.g. "Bryllup". */
+  contextLabel?: string;
 }) {
   const saved = Boolean(onEdit);
   const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
@@ -566,7 +700,14 @@ function SetupPreviewCard({
         </div>
 
         <div className="space-y-2 p-3">
-          <p className="text-sm font-semibold">Opsætning {index + 1}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-semibold">Opsætning {index + 1}</p>
+            {contextLabel && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-medium text-rose-700">
+                <Heart className="h-2.5 w-2.5" /> {contextLabel}
+              </span>
+            )}
+          </div>
 
           {setup.description.trim() && (
             <p className="line-clamp-2 text-xs text-muted-foreground">

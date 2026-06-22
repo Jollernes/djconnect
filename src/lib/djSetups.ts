@@ -1,4 +1,5 @@
 export const DJ_SETUPS_KEY = "djconnect.dj.setups.v1";
+export const DJ_WEDDING_SETUPS_KEY = "djconnect.dj.weddingSetups.v1";
 
 export type Capacity = "80" | "150" | "200";
 
@@ -52,9 +53,9 @@ export function emptySetup(hourlyRate: string): Setup {
  * Load persisted setups. Photos are not persisted (they can be large), so a
  * reloaded setup keeps its data but loses the image preview.
  */
-export function loadSetups(): Setup[] | null {
+export function loadSetups(key: string = DJ_SETUPS_KEY): Setup[] | null {
   try {
-    const raw = localStorage.getItem(DJ_SETUPS_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Setup[];
     return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
@@ -63,10 +64,10 @@ export function loadSetups(): Setup[] | null {
   }
 }
 
-export function saveSetups(setups: Setup[]): void {
+export function saveSetups(setups: Setup[], key: string = DJ_SETUPS_KEY): void {
   try {
     const stripped = setups.map(({ photo: _photo, ...rest }) => rest);
-    localStorage.setItem(DJ_SETUPS_KEY, JSON.stringify(stripped));
+    localStorage.setItem(key, JSON.stringify(stripped));
   } catch {
     /* ignore */
   }
