@@ -8,6 +8,8 @@ import {
   Trash2,
   X,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   ImageOff,
   Sparkles,
   Info,
@@ -146,6 +148,13 @@ function uid(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 9)}`;
 }
 
+/** Per-category card title, e.g. "Opsætning 1" or "Bryllup – Opsætning 1". */
+function setupTitle(tag: EventTag, number: number): string {
+  return tag === "Alle events"
+    ? `Opsætning ${number}`
+    : `${tag} – Opsætning ${number}`;
+}
+
 function newSetup(): MockSetup {
   return {
     id: uid("new"),
@@ -199,6 +208,35 @@ export function SimplifiedSetupsMockup() {
 
   function removeSetup(id: string) {
     setSetups((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  /** Swap a setup with its neighbour of the same event tag — changes its number. */
+  function moveSetup(id: string, dir: "up" | "down") {
+    setSetups((prev) => {
+      const arr = [...prev];
+      const idx = arr.findIndex((s) => s.id === id);
+      if (idx === -1) return prev;
+      const tag = arr[idx].eventTag;
+      let target = -1;
+      if (dir === "up") {
+        for (let i = idx - 1; i >= 0; i--) {
+          if (arr[i].eventTag === tag) {
+            target = i;
+            break;
+          }
+        }
+      } else {
+        for (let i = idx + 1; i < arr.length; i++) {
+          if (arr[i].eventTag === tag) {
+            target = i;
+            break;
+          }
+        }
+      }
+      if (target === -1) return prev;
+      [arr[idx], arr[target]] = [arr[target], arr[idx]];
+      return arr;
+    });
   }
 
   function saveEditing() {
@@ -287,11 +325,15 @@ export function SimplifiedSetupsMockup() {
                 </p>
               )}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {group.map((setup) => (
+                {group.map((setup, gi) => (
                   <SetupCard
                     key={setup.id}
                     setup={setup}
-                    index={setups.indexOf(setup)}
+                    number={gi + 1}
+                    canMoveUp={gi > 0}
+                    canMoveDown={gi < group.length - 1}
+                    onMoveUp={() => moveSetup(setup.id, "up")}
+                    onMoveDown={() => moveSetup(setup.id, "down")}
                     onEdit={() => openEdit(setup)}
                     onDuplicate={() => duplicateToWedding(setup)}
                     onRemove={() => removeSetup(setup.id)}
@@ -358,13 +400,21 @@ function AddSlot({ label, onClick }: { label: string; onClick: () => void }) {
 
 function SetupCard({
   setup,
-  index,
+  number,
+  canMoveUp,
+  canMoveDown,
+  onMoveUp,
+  onMoveDown,
   onEdit,
   onDuplicate,
   onRemove,
 }: {
   setup: MockSetup;
-  index: number;
+  number: number;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   onEdit: () => void;
   onDuplicate: () => void;
   onRemove: () => void;
@@ -406,7 +456,31 @@ function SetupCard({
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-3">
-        <p className="text-sm font-semibold">Opsætning {index + 1}</p>
+        <div className="flex items-center justify-between gap-1">
+          <p className="text-sm font-semibold">
+            {setupTitle(setup.eventTag, number)}
+          </p>
+          <div className="flex items-center">
+            <button
+              type="button"
+              onClick={onMoveUp}
+              disabled={!canMoveUp}
+              aria-label="Flyt op (lavere nummer)"
+              className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              <ChevronUp className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onMoveDown}
+              disabled={!canMoveDown}
+              aria-label="Flyt ned (højere nummer)"
+              className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
         {setup.description.trim() && (
           <p className="line-clamp-2 text-xs text-muted-foreground">
             {setup.description}
