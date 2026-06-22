@@ -11,6 +11,11 @@ import {
   ImageOff,
   Sparkles,
   Info,
+  Heart,
+  Briefcase,
+  PartyPopper,
+  Globe2,
+  type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -32,6 +37,37 @@ const EVENT_TAGS = [
   "Ungdomsfest",
 ] as const;
 type EventTag = (typeof EVENT_TAGS)[number];
+
+type EventMeta = {
+  icon: LucideIcon;
+  /** Header accent classes. */
+  header: string;
+  /** Small count-pill classes. */
+  pill: string;
+};
+
+const EVENT_META: Record<EventTag, EventMeta> = {
+  "Alle events": {
+    icon: Globe2,
+    header: "text-foreground",
+    pill: "bg-muted text-muted-foreground",
+  },
+  Bryllup: {
+    icon: Heart,
+    header: "text-rose-600",
+    pill: "bg-rose-100 text-rose-700",
+  },
+  Firmafest: {
+    icon: Briefcase,
+    header: "text-sky-600",
+    pill: "bg-sky-100 text-sky-700",
+  },
+  Ungdomsfest: {
+    icon: PartyPopper,
+    header: "text-amber-600",
+    pill: "bg-amber-100 text-amber-700",
+  },
+};
 
 const CAPACITIES = ["80", "150", "200"] as const;
 type Capacity = (typeof CAPACITIES)[number];
@@ -205,26 +241,58 @@ export function SimplifiedSetupsMockup() {
         </p>
       </div>
 
-      {/* Overview grid */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {setups.map((setup, index) => (
-          <SetupCard
-            key={setup.id}
-            setup={setup}
-            index={index}
-            onEdit={() => openEdit(setup)}
-            onDuplicate={() => duplicateToWedding(setup)}
-            onRemove={() => removeSetup(setup.id)}
-          />
-        ))}
+      {/* Overview — grouped by event so event-specific setups stand out */}
+      <div className="space-y-7">
+        {EVENT_TAGS.filter((tag) =>
+          setups.some((s) => s.eventTag === tag),
+        ).map((tag) => {
+          const meta = EVENT_META[tag];
+          const HeaderIcon = meta.icon;
+          const group = setups.filter((s) => s.eventTag === tag);
+          return (
+            <section key={tag} className="space-y-3">
+              <div className="flex items-center gap-2">
+                <HeaderIcon className={cn("h-4 w-4", meta.header)} />
+                <h2 className={cn("text-sm font-semibold", meta.header)}>
+                  {tag === "Alle events" ? "Generelle opsætninger" : tag}
+                </h2>
+                <span
+                  className={cn(
+                    "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+                    meta.pill,
+                  )}
+                >
+                  {group.length}
+                </span>
+                {tag !== "Alle events" && (
+                  <span className="text-[11px] text-muted-foreground">
+                    · vises kun ved {tag.toLowerCase()}
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {group.map((setup) => (
+                  <SetupCard
+                    key={setup.id}
+                    setup={setup}
+                    index={setups.indexOf(setup)}
+                    onEdit={() => openEdit(setup)}
+                    onDuplicate={() => duplicateToWedding(setup)}
+                    onRemove={() => removeSetup(setup.id)}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
 
         <button
           type="button"
           onClick={openNew}
-          className="flex min-h-[280px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/10 p-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent/50 hover:bg-accent/5 hover:text-foreground"
+          className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/10 px-4 py-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent/50 hover:bg-accent/5 hover:text-foreground"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
-            <Plus className="h-5 w-5" />
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent">
+            <Plus className="h-4 w-4" />
           </span>
           Tilføj opsætning
         </button>
