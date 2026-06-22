@@ -44,6 +44,8 @@ type EventMeta = {
   header: string;
   /** Small count-pill classes. */
   pill: string;
+  /** Where these setups are shown — shown next to the section header. */
+  profileNote: string;
 };
 
 const EVENT_META: Record<EventTag, EventMeta> = {
@@ -51,21 +53,25 @@ const EVENT_META: Record<EventTag, EventMeta> = {
     icon: Globe2,
     header: "text-foreground",
     pill: "bg-muted text-muted-foreground",
+    profileNote: "vises på din generelle profil",
   },
   Bryllup: {
     icon: Heart,
     header: "text-rose-600",
     pill: "bg-rose-100 text-rose-700",
+    profileNote: "vises på din bryllupsprofil",
   },
   Firmafest: {
     icon: Briefcase,
     header: "text-sky-600",
     pill: "bg-sky-100 text-sky-700",
+    profileNote: "vises på din firmaprofil",
   },
   Ungdomsfest: {
     icon: PartyPopper,
     header: "text-amber-600",
     pill: "bg-amber-100 text-amber-700",
+    profileNote: "vises på din ungdomsprofil",
   },
 };
 
@@ -251,7 +257,7 @@ export function SimplifiedSetupsMockup() {
           const group = setups.filter((s) => s.eventTag === tag);
           return (
             <section key={tag} className="space-y-3">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <HeaderIcon className={cn("h-4 w-4", meta.header)} />
                 <h2 className={cn("text-sm font-semibold", meta.header)}>
                   {tag === "Alle events" ? "Generelle opsætninger" : tag}
@@ -264,12 +270,18 @@ export function SimplifiedSetupsMockup() {
                 >
                   {group.length}
                 </span>
-                {tag !== "Alle events" && (
-                  <span className="text-[11px] text-muted-foreground">
-                    · vises kun ved {tag.toLowerCase()}
-                  </span>
-                )}
+                <span className="text-[11px] text-muted-foreground">
+                  · {meta.profileNote}
+                </span>
               </div>
+              {tag !== "Alle events" && (
+                <p className="flex items-start gap-1.5 rounded-lg border border-dashed bg-muted/20 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                  <Info className="mt-0.5 h-3 w-3 shrink-0" />
+                  Dine generelle opsætninger vises ikke automatisk her — de vises
+                  kun, hvis du duplikerer dem hertil eller opretter nye
+                  opsætninger til {tag.toLowerCase()}.
+                </p>
+              )}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {group.map((setup) => (
                   <SetupCard
