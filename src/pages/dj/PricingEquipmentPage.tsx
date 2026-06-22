@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   ChevronDown,
+  ChevronRight,
   Check,
   Plus,
   Trash2,
@@ -530,104 +531,108 @@ function SetupPreviewCard({
   onRemove?: () => void;
 }) {
   const saved = Boolean(onEdit);
-  const fmt = (v: string) =>
-    v.trim() === "" ? "—" : `${Number(v).toLocaleString("da-DK")} kr`;
+  const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
   const inclusions = [...fixedTags(setup.capacity), ...setup.extras];
+  const rate = Number(setup.hourlyRate) || 0;
+  const pkg = Number(setup.price) || 0;
+  const total = pkg + rate * 5;
 
   return (
-    <div
-      className={cn(
-        "overflow-hidden rounded-xl border bg-card",
-        saved && "ring-1 ring-emerald-500/30",
-      )}
-    >
-      {setup.photo ? (
-        <img
-          src={setup.photo}
-          alt=""
-          className="h-36 w-full object-cover"
-        />
-      ) : (
-        <div className="flex h-20 w-full items-center justify-center gap-1.5 bg-muted text-xs text-muted-foreground">
-          <ImageOff className="h-4 w-4" /> Intet foto endnu
-        </div>
-      )}
-
-      <div className="space-y-3 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <p className="text-sm font-semibold">Opsætning {index + 1}</p>
-              {saved && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-                  <Check className="h-3 w-3" /> Gemt
-                </span>
-              )}
+    <div className="w-full max-w-[280px] space-y-2">
+      {/* DJ-card-style package card (clickable for more info on the site) */}
+      <div className="group cursor-pointer overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-lg">
+        <div className="relative aspect-square overflow-hidden bg-muted">
+          {setup.photo ? (
+            <img
+              src={setup.photo}
+              alt=""
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
+              <ImageOff className="h-6 w-6" />
+              <span className="text-xs">Intet foto endnu</span>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-xs font-medium text-accent">
-              <Users className="h-3.5 w-3.5" /> Op til {setup.capacity} gæster
-            </span>
-          </div>
+          )}
+          <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm backdrop-blur">
+            <Users className="h-3.5 w-3.5 text-accent" /> Op til {setup.capacity}{" "}
+            gæster
+          </span>
           {saved && (
-            <div className="flex shrink-0 items-center gap-1">
-              <button
-                type="button"
-                onClick={onEdit}
-                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <Pencil className="h-3.5 w-3.5" /> Rediger
-              </button>
-              {onRemove && (
-                <button
-                  type="button"
-                  onClick={onRemove}
-                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
-                >
-                  <Trash2 className="h-3.5 w-3.5" /> Fjern
-                </button>
-              )}
-            </div>
+            <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+              <Check className="h-3 w-3" /> Gemt
+            </span>
           )}
         </div>
 
-        {setup.description.trim() && (
-          <p className="text-sm text-muted-foreground">{setup.description}</p>
-        )}
+        <div className="space-y-2 p-3">
+          <p className="text-sm font-semibold">Opsætning {index + 1}</p>
 
-        <div className="flex flex-wrap gap-1.5">
-          {inclusions.map((item) => (
-            <span
-              key={item}
-              className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 px-2.5 py-1 text-[11px] font-medium text-emerald-700"
-            >
-              <Check className="h-3 w-3" /> {item}
-            </span>
-          ))}
-        </div>
+          {setup.description.trim() && (
+            <p className="line-clamp-2 text-xs text-muted-foreground">
+              {setup.description}
+            </p>
+          )}
 
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-border/60 pt-3 text-sm">
-          <div>
-            <span className="text-xs text-muted-foreground">Pakkepris </span>
-            <span className="font-semibold text-foreground">
-              {fmt(setup.price)}
-            </span>
+          <div className="flex flex-wrap gap-1">
+            {inclusions.slice(0, 3).map((item) => (
+              <span
+                key={item}
+                className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-medium text-emerald-700"
+              >
+                <Check className="h-2.5 w-2.5" /> {item}
+              </span>
+            ))}
+            {inclusions.length > 3 && (
+              <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                +{inclusions.length - 3}
+              </span>
+            )}
           </div>
-          <div>
-            <span className="text-xs text-muted-foreground">Timepris </span>
-            <span className="font-semibold text-foreground">
-              {fmt(setup.hourlyRate)}
-              {setup.hourlyRate.trim() && (
-                <span className="font-normal text-muted-foreground">/t</span>
-              )}
-            </span>
-          </div>
-        </div>
 
-        <PriceExample
-          hourlyRate={setup.hourlyRate}
-          packagePrice={setup.price}
-        />
+          <div className="flex items-end justify-between border-t border-border/60 pt-2">
+            <div>
+              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                Pakkepris
+              </p>
+              <p className="text-base font-semibold text-foreground">
+                {pkg > 0 ? fmt(pkg) : "—"}
+              </p>
+            </div>
+            {total > 0 && (
+              <p className="text-[11px] text-muted-foreground">
+                5 t i alt {fmt(total)}
+              </p>
+            )}
+          </div>
+
+          <p className="flex items-center gap-1 pt-0.5 text-[11px] font-medium text-accent">
+            Klik for mere info <ChevronRight className="h-3 w-3" />
+          </p>
+        </div>
       </div>
+
+      {/* Saved-state actions (not part of the customer-facing card) */}
+      {saved && (
+        <div className="flex items-center justify-end gap-1">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <Pencil className="h-3.5 w-3.5" /> Rediger
+          </button>
+          {onRemove && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Fjern
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
