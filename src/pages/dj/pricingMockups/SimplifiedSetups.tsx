@@ -188,6 +188,15 @@ export function SimplifiedSetupsMockup() {
   const [editing, setEditing] = useState<MockSetup | null>(null);
   /** Whether the panel is creating a brand-new setup (vs. editing one). */
   const [isNew, setIsNew] = useState(false);
+  /**
+   * Per-category collapse state — only affects mobile (on desktop sections are
+   * always shown). Default folded, so a DJ sees a clean overview on entry.
+   */
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const isCollapsed = (tag: EventTag) => collapsed[tag] ?? true;
+  function toggleCollapsed(tag: EventTag) {
+    setCollapsed((prev) => ({ ...prev, [tag]: !(prev[tag] ?? true) }));
+  }
 
   function openNewFor(tag: EventTag) {
     setEditing({ ...newSetup(), eventTag: tag });
@@ -297,9 +306,15 @@ export function SimplifiedSetupsMockup() {
           const HeaderIcon = meta.icon;
           const group = setups.filter((s) => s.eventTag === tag);
           const addSlots = Math.max(0, 3 - group.length);
+          const folded = isCollapsed(tag);
           return (
             <section key={tag} className="space-y-3">
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <button
+                type="button"
+                onClick={() => toggleCollapsed(tag)}
+                aria-expanded={!folded}
+                className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-md text-left lg:cursor-default lg:pointer-events-none"
+              >
                 <HeaderIcon className={cn("h-4 w-4", meta.header)} />
                 <h2 className={cn("text-sm font-semibold", meta.header)}>
                   {tag === "Alle events" ? "Generelle opsætninger" : tag}
@@ -315,7 +330,14 @@ export function SimplifiedSetupsMockup() {
                 <span className="text-[11px] text-muted-foreground">
                   · {meta.profileNote}
                 </span>
-              </div>
+                <ChevronDown
+                  className={cn(
+                    "ml-auto h-4 w-4 text-muted-foreground transition-transform lg:hidden",
+                    folded ? "" : "rotate-180",
+                  )}
+                />
+              </button>
+              <div className={cn("space-y-3", folded ? "hidden lg:block" : "")}>
               {tag !== "Alle events" && (
                 <p className="flex items-start gap-1.5 rounded-lg border border-dashed bg-muted/20 px-2.5 py-1.5 text-[11px] text-muted-foreground">
                   <Info className="mt-0.5 h-3 w-3 shrink-0" />
@@ -350,6 +372,7 @@ export function SimplifiedSetupsMockup() {
                     onClick={() => openNewFor(tag)}
                   />
                 ))}
+              </div>
               </div>
             </section>
           );
