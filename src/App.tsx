@@ -58,7 +58,6 @@ import { DJPricingEquipmentPage } from "@/pages/dj/PricingEquipmentPage";
 import { DJSettingsPage } from "@/pages/dj/DJSettingsPage";
 import { DJMessagesPage } from "@/pages/dj/MessagesPage";
 import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
-import { SimplifiedSetupsMockup } from "@/pages/dj/pricingMockups/SimplifiedSetups";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
 import { DJGuideGate } from "@/components/common/DJGuideGate";
 
@@ -155,7 +154,6 @@ function App() {
             <Route path="/dj/availability" element={<DJAvailabilityPage />} />
             <Route path="/dj/earnings" element={<DJEarningsPage />} />
             <Route path="/dj/pricing" element={<DJPricingEquipmentPage />} />
-            <Route path="/dj/pricing-mockup" element={<SimplifiedSetupsMockup />} />
             <Route path="/dj/messages" element={<DJMessagesPage />} />
             <Route path="/dj/profile" element={<GuidedSectionsMockup />} />
             <Route path="/dj/settings" element={<DJSettingsPage />} />

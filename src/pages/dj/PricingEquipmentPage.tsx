@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
 import {
-  ChevronDown,
-  ChevronRight,
-  Check,
   Plus,
-  Trash2,
-  Info,
-  Wallet,
-  PackagePlus,
-  Pencil,
-  ImageOff,
+  Check,
   Users,
+  Pencil,
   Copy,
+  Trash2,
+  X,
+  ChevronRight,
+  ChevronUp,
+  ChevronDown,
+  ImageOff,
+  Sparkles,
+  Info,
   Heart,
+  Briefcase,
+  PartyPopper,
+  Globe2,
+  Wallet,
+  type LucideIcon,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,14 +31,56 @@ import { useDJStandardSettings } from "@/hooks/useDJStandardSettings";
 import { snapTo50 } from "@/lib/djStandardSettings";
 import {
   CAPACITY_OPTIONS,
-  DJ_WEDDING_SETUPS_KEY,
+  EVENT_TAGS,
   OPTIONAL_INCLUSIONS,
   emptySetup,
   fixedTags,
   loadSetups,
   saveSetups,
+  type EventTag,
   type Setup,
 } from "@/lib/djSetups";
+
+/* -------------------------------------------------------------------- */
+/* Event metadata (icons + colours per event group)                      */
+/* -------------------------------------------------------------------- */
+
+type EventMeta = {
+  icon: LucideIcon;
+  /** Header accent classes. */
+  header: string;
+  /** Small count-pill classes. */
+  pill: string;
+  /** Where these setups are shown — shown next to the section header. */
+  profileNote: string;
+};
+
+const EVENT_META: Record<EventTag, EventMeta> = {
+  "Alle events": {
+    icon: Globe2,
+    header: "text-foreground",
+    pill: "bg-muted text-muted-foreground",
+    profileNote: "vises på din generelle profil",
+  },
+  Bryllup: {
+    icon: Heart,
+    header: "text-rose-600",
+    pill: "bg-rose-100 text-rose-700",
+    profileNote: "vises på din bryllupsprofil",
+  },
+  Firmafest: {
+    icon: Briefcase,
+    header: "text-sky-600",
+    pill: "bg-sky-100 text-sky-700",
+    profileNote: "vises på din firmaprofil",
+  },
+  Ungdomsfest: {
+    icon: PartyPopper,
+    header: "text-amber-600",
+    pill: "bg-amber-100 text-amber-700",
+    profileNote: "vises på din ungdomsprofil",
+  },
+};
 
 /* -------------------------------------------------------------------- */
 /* Tilkøb (add-ons)                                                      */
@@ -47,353 +96,566 @@ const ADDON_OPTIONS = [
 ];
 
 /* -------------------------------------------------------------------- */
+/* Helpers                                                               */
+/* -------------------------------------------------------------------- */
+
+/** Per-category card title, e.g. "Opsætning 1" or "Bryllup – Opsætning 1". */
+function setupTitle(tag: EventTag, number: number): string {
+  return tag === "Alle events"
+    ? `Opsætning ${number}`
+    : `${tag} – Opsætning ${number}`;
+}
+
+const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
+
+/* -------------------------------------------------------------------- */
 /* Page                                                                  */
 /* -------------------------------------------------------------------- */
 
+/**
+ * Priser & Udstyr — a single, event-tagged list of mobildiskotek setups.
+ *
+ *  1. ONE unified list (no separate wedding section). Each setup carries an
+ *     event tag (Alle events / Bryllup / …). A wedding variant is just a
+ *     duplicate tagged "Bryllup".
+ *  2. Overview-first: setups are shown as clean cards grouped by event.
+ *  3. Editing happens in a focused side panel (one setup at a time), split
+ *     into clear steps (Events → Størrelse → Indhold → Pris → Foto).
+ */
 export function DJPricingEquipmentPage() {
   const { settings } = useDJStandardSettings();
-  const [open, setOpen] = useState<Set<string>>(() => new Set(["setups"]));
+  const standardRate = settings.hourlyRate;
 
-  const [setups, setSetups] = useState<Setup[]>(
-    () => loadSetups() ?? [emptySetup(settings.hourlyRate)],
-  );
-  const [weddingSetups, setWeddingSetups] = useState<Setup[]>(
-    () => loadSetups(DJ_WEDDING_SETUPS_KEY) ?? [],
+  const [setups, setSetups] = useState<Setup[]>(() => loadSetups());
+  const [editing, setEditing] = useState<Setup | null>(null);
+  const [isNew, setIsNew] = useState(false);
+
+  /**
+   * Per-category collapse state — only affects mobile (on desktop sections are
+   * always shown). Default folded, so a DJ sees a clean overview on entry.
+   */
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const isCollapsed = (tag: EventTag) => collapsed[tag] ?? true;
+  function toggleCollapsed(tag: EventTag) {
+    setCollapsed((prev) => ({ ...prev, [tag]: !(prev[tag] ?? true) }));
+  }
+
+  const [addons, setAddons] = useState<Record<string, string>>(() =>
+    Object.fromEntries(ADDON_OPTIONS.map((a) => [a, ""])),
   );
 
   useEffect(() => {
     saveSetups(setups);
   }, [setups]);
 
-  useEffect(() => {
-    saveSetups(weddingSetups, DJ_WEDDING_SETUPS_KEY);
-  }, [weddingSetups]);
+  function openNewFor(tag: EventTag) {
+    setEditing(emptySetup(standardRate, tag));
+    setIsNew(true);
+  }
 
-  const [addons, setAddons] = useState<Record<string, string>>(() =>
-    Object.fromEntries(ADDON_OPTIONS.map((a) => [a, ""])),
-  );
+  function openEdit(setup: Setup) {
+    setEditing({ ...setup });
+    setIsNew(false);
+  }
 
-  function toggle(id: string) {
-    setOpen((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
+  function duplicateToWedding(setup: Setup) {
+    setSetups((prev) => [
+      ...prev,
+      {
+        ...setup,
+        id: `dup-${Math.random().toString(36).slice(2, 9)}`,
+        eventTag: "Bryllup",
+        photo: undefined,
+      },
+    ]);
+  }
+
+  function removeSetup(id: string) {
+    setSetups((prev) => prev.filter((s) => s.id !== id));
+  }
+
+  /** Swap a setup with its neighbour of the same event tag — changes its number. */
+  function moveSetup(id: string, dir: "up" | "down") {
+    setSetups((prev) => {
+      const arr = [...prev];
+      const idx = arr.findIndex((s) => s.id === id);
+      if (idx === -1) return prev;
+      const tag = arr[idx].eventTag;
+      let target = -1;
+      if (dir === "up") {
+        for (let i = idx - 1; i >= 0; i--) {
+          if (arr[i].eventTag === tag) {
+            target = i;
+            break;
+          }
+        }
+      } else {
+        for (let i = idx + 1; i < arr.length; i++) {
+          if (arr[i].eventTag === tag) {
+            target = i;
+            break;
+          }
+        }
+      }
+      if (target === -1) return prev;
+      [arr[idx], arr[target]] = [arr[target], arr[idx]];
+      return arr;
     });
   }
 
-  /** Build the editor handlers for a given setup list state setter. */
-  function createSetupOps(
-    setList: React.Dispatch<React.SetStateAction<Setup[]>>,
-  ) {
-    return {
-      update<K extends keyof Setup>(index: number, field: K, value: Setup[K]) {
-        setList((prev) =>
-          prev.map((s, i) => (i === index ? { ...s, [field]: value } : s)),
-        );
-      },
-      toggleExtra(index: number, extra: string) {
-        setList((prev) =>
-          prev.map((s, i) =>
-            i === index
-              ? {
-                  ...s,
-                  extras: s.extras.includes(extra)
-                    ? s.extras.filter((e) => e !== extra)
-                    : [...s.extras, extra],
-                }
-              : s,
-          ),
-        );
-      },
-      add() {
-        setList((prev) =>
-          prev.length >= 3 ? prev : [...prev, emptySetup(settings.hourlyRate)],
-        );
-      },
-      remove(index: number) {
-        setList((prev) => prev.filter((_, i) => i !== index));
-      },
-      setSaved(index: number, saved: boolean) {
-        setList((prev) =>
-          prev.map((s, i) => (i === index ? { ...s, saved } : s)),
-        );
-      },
-    };
-  }
-
-  const generalOps = createSetupOps(setSetups);
-  const weddingOps = createSetupOps(setWeddingSetups);
-
-  /** Copy an existing (general) setup into the wedding list for tailoring. */
-  function reuseSetup(sourceIndex: number) {
-    const source = setups[sourceIndex];
-    if (!source) return;
-    setWeddingSetups((prev) =>
-      prev.length >= 3 ? prev : [...prev, { ...source, saved: false }],
-    );
+  function saveEditing() {
+    if (!editing) return;
+    setSetups((prev) => {
+      const exists = prev.some((s) => s.id === editing.id);
+      return exists
+        ? prev.map((s) => (s.id === editing.id ? editing : s))
+        : [...prev, editing];
+    });
+    setEditing(null);
   }
 
   return (
-    <div className="max-w-3xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Priser & Udstyr</h1>
-        <p className="text-sm text-muted-foreground">
-          Sæt dine mobildiskotek-opsætninger og dine tilkøb. Din timepris og
-          rejseradius styres under{" "}
-          <span className="font-medium text-foreground">Indstillinger</span>.
+    <div className="max-w-4xl space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold">Priser & Udstyr</h1>
+          <p className="text-sm text-muted-foreground">
+            Dine mobildiskotek-opsætninger samlet ét sted. Tilføj en
+            event-version (fx bryllup) med ét klik. Din timepris og rejseradius
+            styres under{" "}
+            <Link
+              to="/dj/settings"
+              className="font-medium text-foreground underline underline-offset-2"
+            >
+              Indstillinger
+            </Link>
+            .
+          </p>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground">
+          Din timepris:{" "}
+          {standardRate ? (
+            <span className="font-semibold text-foreground">
+              {Number(standardRate).toLocaleString("da-DK")} kr/t
+            </span>
+          ) : (
+            <Link
+              to="/dj/settings"
+              className="font-medium text-accent underline underline-offset-2"
+            >
+              sæt i Indstillinger
+            </Link>
+          )}
+        </span>
+      </div>
+
+      {/* How it works */}
+      <div className="flex items-start gap-2 rounded-lg border border-dashed bg-muted/20 px-3 py-2.5 text-xs text-muted-foreground">
+        <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+        <p>
+          <span className="font-medium text-foreground">Sådan virker det:</span>{" "}
+          Opret én opsætning ad gangen i et fokuseret panel. Vil du have en
+          bryllups-version, så tryk{" "}
+          <span className="font-medium text-foreground">
+            Dupliker til bryllup
+          </span>{" "}
+          på et kort og tilpas tekst, pris og billede.
         </p>
       </div>
 
-      <Accordion
-        id="setups"
-        icon={PackagePlus}
-        title="Mobildiskotek-opsætninger"
-        subtitle="Op til 3 opsætninger (størrelser) med pris og indhold."
-        open={open.has("setups")}
-        onToggle={() => toggle("setups")}
-      >
-        <SetupsSection
-          setups={setups}
-          onUpdateSetup={generalOps.update}
-          onToggleExtra={generalOps.toggleExtra}
-          onAddSetup={generalOps.add}
-          onRemoveSetup={generalOps.remove}
-          onSetSaved={generalOps.setSaved}
-        />
-      </Accordion>
+      {/* Overview — grouped by event so event-specific setups stand out */}
+      <div className="space-y-7">
+        {EVENT_TAGS.filter(
+          (tag) =>
+            tag === "Alle events" ||
+            tag === "Bryllup" ||
+            setups.some((s) => s.eventTag === tag),
+        ).map((tag) => {
+          const meta = EVENT_META[tag];
+          const HeaderIcon = meta.icon;
+          const group = setups.filter((s) => s.eventTag === tag);
+          const addSlots = Math.max(0, 3 - group.length);
+          const folded = isCollapsed(tag);
+          return (
+            <section key={tag} className="space-y-3">
+              <button
+                type="button"
+                onClick={() => toggleCollapsed(tag)}
+                aria-expanded={!folded}
+                className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-md text-left lg:pointer-events-none lg:cursor-default"
+              >
+                <HeaderIcon className={cn("h-4 w-4", meta.header)} />
+                <h2 className={cn("text-sm font-semibold", meta.header)}>
+                  {tag === "Alle events" ? "Generelle opsætninger" : tag}
+                </h2>
+                <span
+                  className={cn(
+                    "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
+                    meta.pill,
+                  )}
+                >
+                  {group.length}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  · {meta.profileNote}
+                </span>
+                <ChevronDown
+                  className={cn(
+                    "ml-auto h-4 w-4 text-muted-foreground transition-transform lg:hidden",
+                    folded ? "" : "rotate-180",
+                  )}
+                />
+              </button>
+              <div className={cn("space-y-3", folded ? "hidden lg:block" : "")}>
+                {tag !== "Alle events" && (
+                  <p className="flex items-start gap-1.5 rounded-lg border border-dashed bg-muted/20 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                    <Info className="mt-0.5 h-3 w-3 shrink-0" />
+                    Dine generelle opsætninger vises ikke automatisk her — de
+                    vises kun, hvis du duplikerer dem hertil eller opretter nye
+                    opsætninger til {tag.toLowerCase()}.
+                  </p>
+                )}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {group.map((setup, gi) => (
+                    <SetupCard
+                      key={setup.id}
+                      setup={setup}
+                      number={gi + 1}
+                      canMoveUp={gi > 0}
+                      canMoveDown={gi < group.length - 1}
+                      onMoveUp={() => moveSetup(setup.id, "up")}
+                      onMoveDown={() => moveSetup(setup.id, "down")}
+                      onEdit={() => openEdit(setup)}
+                      onDuplicate={() => duplicateToWedding(setup)}
+                      onRemove={() => removeSetup(setup.id)}
+                    />
+                  ))}
+                  {Array.from({ length: addSlots }).map((_, i) => (
+                    <AddSlot
+                      key={`add-${tag}-${i}`}
+                      label={
+                        tag === "Alle events"
+                          ? "Tilføj opsætning"
+                          : `Tilføj ${tag.toLowerCase()}-opsætning`
+                      }
+                      onClick={() => openNewFor(tag)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </section>
+          );
+        })}
+      </div>
 
-      <Accordion
-        id="wedding"
-        icon={Heart}
-        title="Mobildiskotek-opsætninger · Bryllup"
-        subtitle="Bryllupsspecifikke opsætninger — genbrug og tilpas dine eksisterende."
-        open={open.has("wedding")}
-        onToggle={() => toggle("wedding")}
-      >
-        <SetupsSection
-          setups={weddingSetups}
-          onUpdateSetup={weddingOps.update}
-          onToggleExtra={weddingOps.toggleExtra}
-          onAddSetup={weddingOps.add}
-          onRemoveSetup={weddingOps.remove}
-          onSetSaved={weddingOps.setSaved}
-          wedding={{ reuseSources: setups, onReuse: reuseSetup }}
-          addLabel="Tilføj bryllupsopsætning"
-          contextLabel="Bryllup"
-        />
-      </Accordion>
+      <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
+        Til events med over 200 gæster laver du et individuelt tilbud til
+        kunden.
+      </p>
 
-      <Accordion
-        id="addons"
-        icon={Wallet}
-        title="Tilkøb"
-        subtitle="Sæt priser på de tilkøb kunderne kan vælge til."
-        open={open.has("addons")}
-        onToggle={() => toggle("addons")}
-      >
+      {/* Tilkøb */}
+      <section className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            <Wallet className="h-4 w-4" />
+          </span>
+          <div>
+            <p className="text-sm font-semibold">Tilkøb</p>
+            <p className="text-xs text-muted-foreground">
+              Sæt priser på de tilkøb kunderne kan vælge til.
+            </p>
+          </div>
+        </div>
         <AddonsSection
           addons={addons}
           onChange={(name, price) =>
             setAddons((prev) => ({ ...prev, [name]: price }))
           }
         />
-      </Accordion>
+      </section>
+
+      {/* Focused editor panel */}
+      {editing && (
+        <EditorPanel
+          setup={editing}
+          isNew={isNew}
+          onChange={setEditing}
+          onClose={() => setEditing(null)}
+          onSave={saveEditing}
+        />
+      )}
     </div>
   );
 }
 
 /* -------------------------------------------------------------------- */
-/* Accordion shell                                                       */
+/* Add slot (empty "+" card)                                             */
 /* -------------------------------------------------------------------- */
 
-function Accordion({
-  icon: Icon,
-  title,
-  subtitle,
-  open,
-  onToggle,
-  children,
-}: {
-  id: string;
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  subtitle: string;
-  open: boolean;
-  onToggle: () => void;
-  children: React.ReactNode;
-}) {
+function AddSlot({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <section
-      className={cn(
-        "overflow-hidden rounded-2xl border bg-card shadow-sm transition-colors",
-        open && "ring-1 ring-foreground/5",
-      )}
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex min-h-[280px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/10 p-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent/50 hover:bg-accent/5 hover:text-foreground"
     >
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-muted/30"
-      >
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-          <Icon className="h-4 w-4" />
-        </span>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold">{title}</p>
-          <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
-        </div>
-        <ChevronDown
-          className={cn(
-            "h-4 w-4 text-muted-foreground transition-transform",
-            open && "rotate-180",
-          )}
-        />
-      </button>
-      {open && (
-        <div className="border-t border-border/60 px-5 py-5">{children}</div>
-      )}
-    </section>
+      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
+        <Plus className="h-5 w-5" />
+      </span>
+      {label}
+    </button>
   );
 }
 
 /* -------------------------------------------------------------------- */
-/* Setups section                                                        */
+/* Setup card (overview)                                                 */
 /* -------------------------------------------------------------------- */
 
-function SetupsSection({
-  setups,
-  onUpdateSetup,
-  onToggleExtra,
-  onAddSetup,
-  onRemoveSetup,
-  onSetSaved,
-  wedding,
-  addLabel = "Tilføj opsætning",
-  contextLabel,
+function SetupCard({
+  setup,
+  number,
+  canMoveUp,
+  canMoveDown,
+  onMoveUp,
+  onMoveDown,
+  onEdit,
+  onDuplicate,
+  onRemove,
 }: {
-  setups: Setup[];
-  onUpdateSetup: <K extends keyof Setup>(
-    index: number,
-    field: K,
-    value: Setup[K],
-  ) => void;
-  onToggleExtra: (index: number, extra: string) => void;
-  onAddSetup: () => void;
-  onRemoveSetup: (index: number) => void;
-  onSetSaved: (index: number, saved: boolean) => void;
-  /** When set, the section is the wedding-specific variant. */
-  wedding?: { reuseSources: Setup[]; onReuse: (sourceIndex: number) => void };
-  addLabel?: string;
-  contextLabel?: string;
+  setup: Setup;
+  number: number;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  onEdit: () => void;
+  onDuplicate: () => void;
+  onRemove: () => void;
 }) {
+  const pkg = Number(setup.price) || 0;
+  const rate = Number(setup.hourlyRate) || 0;
+  const total = pkg + rate * 5;
+  const isWedding = setup.eventTag === "Bryllup";
+
   return (
-    <div className="space-y-5">
-      {wedding ? (
-        <WeddingReusePanel
-          reuseSources={wedding.reuseSources}
-          onReuse={wedding.onReuse}
-          full={setups.length >= 3}
-        />
-      ) : (
-        <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-          En opsætning svarer til en mobildiskotek-størrelse. To opsætninger må
-          gerne passe til samme antal gæster — fx hvis de inkluderer noget
-          forskelligt og derfor har forskellige priser. Opsætningens pris lægges
-          oveni din timepris.
-        </p>
-      )}
+    <div className="group flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md">
+      <div className="relative aspect-square overflow-hidden bg-muted">
+        {setup.photo ? (
+          <img
+            src={setup.photo}
+            alt=""
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
+            <ImageOff className="h-6 w-6" />
+            <span className="text-xs">Intet foto endnu</span>
+          </div>
+        )}
+        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm backdrop-blur">
+          <Users className="h-3.5 w-3.5 text-accent" /> Op til {setup.capacity}
+        </span>
+        <span
+          className={cn(
+            "absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm",
+            isWedding
+              ? "bg-rose-500 text-white"
+              : "bg-white/90 text-foreground backdrop-blur",
+          )}
+        >
+          {setup.eventTag}
+        </span>
+      </div>
 
-      {/* Over 200 guests note */}
-      <p className="flex items-start gap-1.5 rounded-lg border border-border/70 bg-muted/20 p-3 text-xs text-muted-foreground">
-        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
-        Til events med over 200 gæster laver du et individuelt tilbud til
-        kunden.
-      </p>
+      <div className="flex flex-1 flex-col gap-2 p-3">
+        <div className="flex items-center justify-between gap-1">
+          <p className="text-sm font-semibold">
+            {setupTitle(setup.eventTag, number)}
+          </p>
+          <div className="flex items-center">
+            <button
+              type="button"
+              onClick={onMoveUp}
+              disabled={!canMoveUp}
+              aria-label="Flyt op (lavere nummer)"
+              className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              <ChevronUp className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={onMoveDown}
+              disabled={!canMoveDown}
+              aria-label="Flyt ned (højere nummer)"
+              className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
+            >
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        {setup.description.trim() && (
+          <p className="line-clamp-2 text-xs text-muted-foreground">
+            {setup.description}
+          </p>
+        )}
 
-      {/* Setups */}
-      <div className="space-y-3">
-        {setups.map((setup, index) =>
-          setup.saved ? (
-            <SetupPreviewCard
-              key={index}
-              setup={setup}
-              index={index}
-              contextLabel={contextLabel}
-              onEdit={() => onSetSaved(index, false)}
-              onRemove={
-                wedding || setups.length > 1
-                  ? () => onRemoveSetup(index)
-                  : undefined
-              }
-            />
-          ) : (
-          <div key={index} className="space-y-3 rounded-xl border bg-card p-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent/10 text-xs font-semibold text-accent">
-                  {index + 1}
-                </span>
-                <p className="text-sm font-semibold">Opsætning {index + 1}</p>
-              </div>
-              {(wedding || setups.length > 1) && (
-                <button
-                  type="button"
-                  onClick={() => onRemoveSetup(index)}
-                  className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
-                >
-                  <Trash2 className="h-3.5 w-3.5" /> Fjern
-                </button>
-              )}
-            </div>
+        <div className="mt-auto flex items-end justify-between border-t border-border/60 pt-2">
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Pakkepris
+            </p>
+            <p className="text-base font-semibold">{pkg > 0 ? fmt(pkg) : "—"}</p>
+          </div>
+          {total > 0 && (
+            <p className="text-[11px] text-muted-foreground">
+              5 t i alt {fmt(total)}
+            </p>
+          )}
+        </div>
 
-            {wedding && (
-              <p className="flex items-start gap-1.5 rounded-lg border border-rose-300/50 bg-rose-50 px-3 py-2 text-xs text-rose-700">
-                <Heart className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-                Tilpas til bryllup — opdatér gerne beskrivelsen og prisen, og
-                især billedet, så det viser en bryllupskontekst.
-              </p>
-            )}
+        {/* Actions */}
+        <div className="flex flex-wrap items-center gap-1 border-t border-border/60 pt-2">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <Pencil className="h-3.5 w-3.5" /> Rediger
+          </button>
+          {!isWedding && (
+            <button
+              type="button"
+              onClick={onDuplicate}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-50"
+            >
+              <Copy className="h-3.5 w-3.5" /> Dupliker til bryllup
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onRemove}
+            className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
+            aria-label="Fjern"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-            {/* Guest capacity */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Egnet til
-              </Label>
-              <div className="grid grid-cols-3 gap-2">
-                {CAPACITY_OPTIONS.map((opt) => (
+/* -------------------------------------------------------------------- */
+/* Focused editor panel (slide-over)                                     */
+/* -------------------------------------------------------------------- */
+
+function EditorPanel({
+  setup,
+  isNew,
+  onChange,
+  onClose,
+  onSave,
+}: {
+  setup: Setup;
+  isNew: boolean;
+  onChange: (next: Setup) => void;
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  function update<K extends keyof Setup>(field: K, value: Setup[K]) {
+    onChange({ ...setup, [field]: value });
+  }
+
+  function toggleExtra(extra: string) {
+    onChange({
+      ...setup,
+      extras: setup.extras.includes(extra)
+        ? setup.extras.filter((e) => e !== extra)
+        : [...setup.extras, extra],
+    });
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end">
+      <button
+        type="button"
+        aria-label="Luk"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/40"
+      />
+      <div className="relative flex h-full w-full max-w-md flex-col bg-background shadow-2xl">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold">
+              {isNew ? "Ny opsætning" : "Rediger opsætning"}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Udfyld trin for trin — du ser et live-kort nederst.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Luk"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
+          {/* Event target */}
+          <Field step="1" label="Hvilke events passer den til?">
+            <div className="flex flex-wrap gap-1.5">
+              {EVENT_TAGS.map((tag) => {
+                const active = setup.eventTag === tag;
+                return (
                   <button
-                    key={opt.value}
+                    key={tag}
                     type="button"
-                    onClick={() => onUpdateSetup(index, "capacity", opt.value)}
+                    onClick={() => update("eventTag", tag)}
                     className={cn(
-                      "rounded-lg border px-2 py-2 text-xs font-medium transition-colors",
-                      setup.capacity === opt.value
-                        ? "border-accent bg-accent/10 text-foreground"
+                      "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                      active
+                        ? tag === "Bryllup"
+                          ? "border-rose-400 bg-rose-50 text-rose-700"
+                          : "border-accent bg-accent/10 text-foreground"
                         : "border-border text-muted-foreground hover:border-foreground/30",
                     )}
                   >
-                    {opt.label}
+                    {tag}
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
+          </Field>
 
-            {/* Description */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Kort beskrivelse af opsætningen
-              </Label>
-              <Textarea
-                value={setup.description}
-                onChange={(e) =>
-                  onUpdateSetup(index, "description", e.target.value)
-                }
-                rows={2}
-                placeholder="Beskriv opsætningen og hvilket udstyr der er inkluderet — fx lydanlæg, festbelysning og evt. andet."
-              />
+          {/* Capacity */}
+          <Field step="2" label="Størrelse — egnet til">
+            <div className="grid grid-cols-3 gap-2">
+              {CAPACITY_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => update("capacity", opt.value)}
+                  className={cn(
+                    "rounded-lg border px-2 py-2 text-xs font-medium transition-colors",
+                    setup.capacity === opt.value
+                      ? "border-accent bg-accent/10 text-foreground"
+                      : "border-border text-muted-foreground hover:border-foreground/30",
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
+          </Field>
 
-            {/* Fixed (locked) tags */}
+          {/* Content */}
+          <Field step="3" label="Indhold">
             <div className="space-y-1.5 rounded-lg border border-border/70 bg-muted/20 p-3">
               <p className="text-[11px] font-medium text-foreground">
                 Altid inkluderet:
@@ -410,43 +672,44 @@ function SetupsSection({
                 ))}
               </ul>
             </div>
-
-            {/* Optional inclusions */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Tilvalg du inkluderer i prisen
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {OPTIONAL_INCLUSIONS.map((extra) => {
-                  const active = setup.extras.includes(extra);
-                  return (
-                    <button
-                      key={extra}
-                      type="button"
-                      onClick={() => onToggleExtra(index, extra)}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                        active
-                          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
-                          : "border-border text-muted-foreground hover:border-foreground/30",
-                      )}
-                    >
-                      {active ? (
-                        <Check className="h-3.5 w-3.5" />
-                      ) : (
-                        <Plus className="h-3.5 w-3.5" />
-                      )}
-                      {extra}
-                    </button>
-                  );
-                })}
-              </div>
+            <div className="flex flex-wrap gap-1.5">
+              {OPTIONAL_INCLUSIONS.map((extra) => {
+                const active = setup.extras.includes(extra);
+                return (
+                  <button
+                    key={extra}
+                    type="button"
+                    onClick={() => toggleExtra(extra)}
+                    className={cn(
+                      "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors",
+                      active
+                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-700"
+                        : "border-border text-muted-foreground hover:border-foreground/30",
+                    )}
+                  >
+                    {active ? (
+                      <Check className="h-3 w-3" />
+                    ) : (
+                      <Plus className="h-3 w-3" />
+                    )}
+                    {extra}
+                  </button>
+                );
+              })}
             </div>
+            <Textarea
+              value={setup.description}
+              onChange={(e) => update("description", e.target.value)}
+              rows={2}
+              placeholder="Kort beskrivelse — fx hvilket udstyr der er med."
+            />
+          </Field>
 
-            {/* Price + hourly rate */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">
+          {/* Price */}
+          <Field step="4" label="Pris">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">
                   Pakkepris (DKK)
                 </Label>
                 <Input
@@ -454,15 +717,13 @@ function SetupsSection({
                   step={50}
                   min={0}
                   value={setup.price}
-                  onChange={(e) => onUpdateSetup(index, "price", e.target.value)}
-                  onBlur={(e) =>
-                    onUpdateSetup(index, "price", snapTo50(e.target.value))
-                  }
+                  onChange={(e) => update("price", e.target.value)}
+                  onBlur={(e) => update("price", snapTo50(e.target.value))}
                   placeholder="fx 3.500"
                 />
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">
                   Timepris (DKK)
                 </Label>
                 <Input
@@ -470,141 +731,90 @@ function SetupsSection({
                   step={50}
                   min={0}
                   value={setup.hourlyRate}
-                  onChange={(e) =>
-                    onUpdateSetup(index, "hourlyRate", e.target.value)
-                  }
-                  onBlur={(e) =>
-                    onUpdateSetup(index, "hourlyRate", snapTo50(e.target.value))
-                  }
+                  onChange={(e) => update("hourlyRate", e.target.value)}
+                  onBlur={(e) => update("hourlyRate", snapTo50(e.target.value))}
                   placeholder="fx 1.200"
                 />
               </div>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              Angives i intervaller af 50 kr. Timeprisen er udfyldt med din
-              standard-timepris fra Indstillinger, men kan rettes for denne
-              opsætning. Pakkeprisen lægges oveni prisen for spilletid (timepris
-              × antal timer).
+              Angives i intervaller af 50 kr. Timeprisen er udfyldt fra din
+              standard, men kan rettes her. Pakkeprisen lægges oveni prisen for
+              spilletid (timepris × antal timer).
             </p>
-
             <PriceExample
               hourlyRate={setup.hourlyRate}
               packagePrice={setup.price}
             />
+          </Field>
 
-            {/* Photo */}
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">
-                Foto af opsætningen
-              </Label>
-              <div className="w-40">
-                <DottedUploadSlot
-                  value={setup.photo}
-                  onChange={(v) => onUpdateSetup(index, "photo", v)}
-                  aspectClassName="h-24"
-                />
-              </div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                Valgfrit, men stærkt anbefalet
-              </p>
-            </div>
-
-            {/* Live preview */}
-            <div className="space-y-2 border-t border-border/60 pt-4">
-              <p className="text-xs font-medium text-muted-foreground">
-                Forhåndsvisning af pakken
-              </p>
-              <SetupPreviewCard
-                setup={setup}
-                index={index}
-                contextLabel={contextLabel}
+          {/* Photo */}
+          <Field step="5" label="Foto af opsætningen">
+            <div className="w-40">
+              <DottedUploadSlot
+                value={setup.photo}
+                onChange={(v) => update("photo", v)}
+                aspectClassName="aspect-square"
+                cropAspect={1}
               />
             </div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Valgfrit, men stærkt anbefalet
+            </p>
+            {setup.eventTag === "Bryllup" && (
+              <p className="flex items-start gap-1.5 text-[11px] text-rose-600">
+                <Copy className="mt-0.5 h-3 w-3 shrink-0" />
+                Tip: vælg et billede der viser en bryllupskontekst.
+              </p>
+            )}
+          </Field>
 
-            {/* Save */}
-            <div className="flex justify-end border-t border-border/60 pt-3">
-              <Button
-                type="button"
-                onClick={() => onSetSaved(index, true)}
-                disabled={!setup.price.trim()}
-                className="gap-1.5"
-              >
-                <Check className="h-4 w-4" /> Gem opsætning
-              </Button>
-            </div>
+          {/* Live preview */}
+          <div className="space-y-2 border-t pt-4">
+            <p className="text-xs font-medium text-muted-foreground">
+              Sådan ser kortet ud
+            </p>
+            <MiniPreview setup={setup} />
           </div>
-          ),
-        )}
+        </div>
 
-        {setups.length < 3 && (
-          <button
+        {/* Footer */}
+        <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Annuller
+          </Button>
+          <Button
             type="button"
-            onClick={onAddSetup}
-            className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-border px-3 py-3 text-sm font-medium text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground"
+            onClick={onSave}
+            disabled={!setup.price.trim()}
+            className="gap-1.5"
           >
-            <Plus className="h-4 w-4" /> {addLabel} ({setups.length}/3)
-          </button>
-        )}
+            <Check className="h-4 w-4" /> Gem opsætning
+          </Button>
+        </div>
       </div>
     </div>
   );
 }
 
-/* -------------------------------------------------------------------- */
-/* Wedding reuse panel                                                    */
-/* -------------------------------------------------------------------- */
-
-function WeddingReusePanel({
-  reuseSources,
-  onReuse,
-  full,
+function Field({
+  step,
+  label,
+  children,
 }: {
-  reuseSources: Setup[];
-  onReuse: (sourceIndex: number) => void;
-  full: boolean;
+  step: string;
+  label: string;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-3 rounded-lg border border-rose-200 bg-rose-50/60 p-3">
-      <div className="flex items-start gap-2">
-        <Heart className="mt-0.5 h-4 w-4 shrink-0 text-rose-500" />
-        <p className="text-xs text-rose-800">
-          Lav bryllupsspecifikke opsætninger. Genbrug dine eksisterende
-          opsætninger og tilpas dem til bryllup — vi anbefaler at justere
-          beskrivelse, pris og især billedet, så det viser en bryllupskontekst.
-        </p>
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/10 text-[11px] font-semibold text-accent">
+          {step}
+        </span>
+        <p className="text-sm font-medium">{label}</p>
       </div>
-
-      <div className="space-y-1.5">
-        <p className="text-[11px] font-medium text-foreground">
-          Genbrug en eksisterende opsætning
-        </p>
-        {reuseSources.length === 0 ? (
-          <p className="text-[11px] text-muted-foreground">
-            Du har endnu ingen opsætninger at genbruge — opret en under
-            “Mobildiskotek-opsætninger” først.
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {reuseSources.map((s, i) => (
-              <button
-                key={i}
-                type="button"
-                disabled={full}
-                onClick={() => onReuse(i)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-rose-300 bg-white px-3 py-1.5 text-xs font-medium text-rose-700 transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Copy className="h-3.5 w-3.5" /> Opsætning {i + 1} · op til{" "}
-                {s.capacity} gæster
-              </button>
-            ))}
-          </div>
-        )}
-        {full && (
-          <p className="text-[11px] text-muted-foreground">
-            Du kan have op til 3 bryllupsopsætninger.
-          </p>
-        )}
-      </div>
+      <div className="space-y-2 pl-7">{children}</div>
     </div>
   );
 }
@@ -624,11 +834,12 @@ function PriceExample({
 
   const playtime = rate * hours;
   const total = playtime + pkg;
-  const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
 
   return (
     <div className="space-y-1 rounded-lg border border-accent/30 bg-accent/5 p-3 text-xs">
-      <p className="font-medium text-foreground">Eksempel · 5 timers spilletid</p>
+      <p className="font-medium text-foreground">
+        Eksempel · 5 timers spilletid
+      </p>
       <div className="flex items-center justify-between text-muted-foreground">
         <span>Pakkepris</span>
         <span>{fmt(pkg)}</span>
@@ -646,134 +857,79 @@ function PriceExample({
 }
 
 /* -------------------------------------------------------------------- */
-/* Setup preview card (live preview + saved view)                        */
+/* Mini preview card                                                     */
 /* -------------------------------------------------------------------- */
 
-function SetupPreviewCard({
-  setup,
-  index,
-  onEdit,
-  onRemove,
-  contextLabel,
-}: {
-  setup: Setup;
-  index: number;
-  /** When provided the card is shown in its saved state with edit/remove. */
-  onEdit?: () => void;
-  onRemove?: () => void;
-  /** Optional context tag shown on the card, e.g. "Bryllup". */
-  contextLabel?: string;
-}) {
-  const saved = Boolean(onEdit);
-  const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
-  const inclusions = [...fixedTags(setup.capacity), ...setup.extras];
-  const rate = Number(setup.hourlyRate) || 0;
+function MiniPreview({ setup }: { setup: Setup }) {
   const pkg = Number(setup.price) || 0;
+  const rate = Number(setup.hourlyRate) || 0;
   const total = pkg + rate * 5;
+  const isWedding = setup.eventTag === "Bryllup";
+  const inclusions = [...fixedTags(setup.capacity), ...setup.extras];
 
   return (
-    <div className="w-full max-w-[280px] space-y-2">
-      {/* DJ-card-style package card (clickable for more info on the site) */}
-      <div className="group cursor-pointer overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-lg">
-        <div className="relative aspect-square overflow-hidden bg-muted">
-          {setup.photo ? (
-            <img
-              src={setup.photo}
-              alt=""
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
-              <ImageOff className="h-6 w-6" />
-              <span className="text-xs">Intet foto endnu</span>
-            </div>
+    <div className="w-full max-w-[260px] overflow-hidden rounded-xl border bg-card shadow-sm">
+      <div className="relative aspect-square overflow-hidden bg-muted">
+        {setup.photo ? (
+          <img src={setup.photo} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-muted-foreground">
+            <ImageOff className="h-6 w-6" />
+            <span className="text-xs">Intet foto endnu</span>
+          </div>
+        )}
+        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm backdrop-blur">
+          <Users className="h-3.5 w-3.5 text-accent" /> Op til {setup.capacity}
+        </span>
+        <span
+          className={cn(
+            "absolute right-2 top-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm",
+            isWedding
+              ? "bg-rose-500 text-white"
+              : "bg-white/90 text-foreground backdrop-blur",
           )}
-          <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm backdrop-blur">
-            <Users className="h-3.5 w-3.5 text-accent" /> Op til {setup.capacity}{" "}
-            gæster
-          </span>
-          {saved && (
-            <span className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
-              <Check className="h-3 w-3" /> Gemt
+        >
+          {setup.eventTag}
+        </span>
+      </div>
+      <div className="space-y-2 p-3">
+        {setup.description.trim() && (
+          <p className="line-clamp-2 text-xs text-muted-foreground">
+            {setup.description}
+          </p>
+        )}
+        <div className="flex flex-wrap gap-1">
+          {inclusions.slice(0, 3).map((item) => (
+            <span
+              key={item}
+              className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-medium text-emerald-700"
+            >
+              <Check className="h-2.5 w-2.5" /> {item}
+            </span>
+          ))}
+          {inclusions.length > 3 && (
+            <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+              +{inclusions.length - 3}
             </span>
           )}
         </div>
-
-        <div className="space-y-2 p-3">
-          <div className="flex items-center gap-2">
-            <p className="text-sm font-semibold">Opsætning {index + 1}</p>
-            {contextLabel && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-medium text-rose-700">
-                <Heart className="h-2.5 w-2.5" /> {contextLabel}
-              </span>
-            )}
+        <div className="flex items-end justify-between border-t border-border/60 pt-2">
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Pakkepris
+            </p>
+            <p className="text-base font-semibold">{pkg > 0 ? fmt(pkg) : "—"}</p>
           </div>
-
-          {setup.description.trim() && (
-            <p className="line-clamp-2 text-xs text-muted-foreground">
-              {setup.description}
+          {total > 0 && (
+            <p className="text-[11px] text-muted-foreground">
+              5 t i alt {fmt(total)}
             </p>
           )}
-
-          <div className="flex flex-wrap gap-1">
-            {inclusions.slice(0, 3).map((item) => (
-              <span
-                key={item}
-                className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/5 px-2 py-0.5 text-[10px] font-medium text-emerald-700"
-              >
-                <Check className="h-2.5 w-2.5" /> {item}
-              </span>
-            ))}
-            {inclusions.length > 3 && (
-              <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                +{inclusions.length - 3}
-              </span>
-            )}
-          </div>
-
-          <div className="flex items-end justify-between border-t border-border/60 pt-2">
-            <div>
-              <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                Pakkepris
-              </p>
-              <p className="text-base font-semibold text-foreground">
-                {pkg > 0 ? fmt(pkg) : "—"}
-              </p>
-            </div>
-            {total > 0 && (
-              <p className="text-[11px] text-muted-foreground">
-                5 t i alt {fmt(total)}
-              </p>
-            )}
-          </div>
-
-          <p className="flex items-center gap-1 pt-0.5 text-[11px] font-medium text-accent">
-            Klik for mere info <ChevronRight className="h-3 w-3" />
-          </p>
         </div>
+        <p className="flex items-center gap-1 pt-0.5 text-[11px] font-medium text-accent">
+          Klik for mere info <ChevronRight className="h-3 w-3" />
+        </p>
       </div>
-
-      {/* Saved-state actions (not part of the customer-facing card) */}
-      {saved && (
-        <div className="flex items-center justify-end gap-1">
-          <button
-            type="button"
-            onClick={onEdit}
-            className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            <Pencil className="h-3.5 w-3.5" /> Rediger
-          </button>
-          {onRemove && (
-            <button
-              type="button"
-              onClick={onRemove}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Fjern
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
