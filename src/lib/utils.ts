@@ -13,9 +13,42 @@ export function formatCurrency(amountMinorUnits: number, currency = "DKK") {
   }).format(amountMinorUnits / 100);
 }
 
+export function formatDKK(amount: number) {
+  return new Intl.NumberFormat("da-DK", {
+    style: "currency",
+    currency: "DKK",
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function formatDKKFrom(amount: number) {
+  return `Fra ${formatDKK(amount)} ekskl. moms`;
+}
+
+function toDate(input: string | Date) {
+  return typeof input === "string" ? new Date(input) : input;
+}
+
+export function formatDanishDate(date: string | Date) {
+  const d = toDate(date);
+  const weekday = new Intl.DateTimeFormat("da-DK", { weekday: "long" }).format(d);
+  const day = new Intl.DateTimeFormat("da-DK", { day: "numeric" }).format(d);
+  const month = new Intl.DateTimeFormat("da-DK", { month: "long" }).format(d);
+  const year = new Intl.DateTimeFormat("da-DK", { year: "numeric" }).format(d);
+  return `${weekday} d. ${day}. ${month} ${year}`;
+}
+
+export function formatDanishDateShort(date: string | Date) {
+  return new Intl.DateTimeFormat("da-DK", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(toDate(date));
+}
+
 export function formatDate(date: string | Date, opts: Intl.DateTimeFormatOptions = {}) {
-  const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleDateString("en-GB", {
+  const d = toDate(date);
+  return d.toLocaleDateString("da-DK", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -24,8 +57,8 @@ export function formatDate(date: string | Date, opts: Intl.DateTimeFormatOptions
 }
 
 export function formatDateTime(date: string | Date) {
-  const d = typeof date === "string" ? new Date(date) : date;
-  return d.toLocaleString("en-GB", {
+  const d = toDate(date);
+  return d.toLocaleString("da-DK", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -35,7 +68,7 @@ export function formatDateTime(date: string | Date) {
 }
 
 export function daysUntil(date: string | Date) {
-  const d = typeof date === "string" ? new Date(date) : date;
+  const d = toDate(date);
   const diff = d.getTime() - Date.now();
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }

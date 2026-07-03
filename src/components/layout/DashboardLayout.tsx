@@ -1,119 +1,90 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
-import {
-  LayoutDashboard,
-  Calendar,
-  MessageSquare,
-  Heart,
-  Settings,
-  BarChart3,
-  User,
-  ShieldCheck,
-  Users,
-  DollarSign,
-  Star,
-  Clapperboard,
-  PartyPopper,
-} from "lucide-react";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
+import { NavLink, Outlet } from "react-router-dom";
+import { LayoutDashboard, Calendar, Users, ListChecks, BadgeDollarSign, Megaphone, MessagesSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
-import { getCustomerType } from "@/lib/customerType";
-import type { Profile, UserRole } from "@/types/domain";
 
-const corporateCustomerNav = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/dashboard/bookings", label: "Bookings", icon: Calendar },
-  { to: "/dashboard/favourites", label: "Favourites", icon: Heart },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
-];
-
-const privateCustomerNav = [
-  { to: "/dashboard", label: "My event", icon: PartyPopper, end: true },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
-];
-
-const djNav = [
-  { to: "/dj/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/dj/bookings", label: "Bookings", icon: Calendar },
-  { to: "/dj/messages", label: "Messages", icon: MessageSquare },
-  { to: "/dj/availability", label: "Availability", icon: Calendar },
-  { to: "/dj/earnings", label: "Earnings", icon: BarChart3 },
-  { to: "/dj/profile", label: "Edit profile", icon: User },
-];
-
-const adminNav = [
-  { to: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/admin/verification", label: "Verification queue", icon: ShieldCheck },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/bookings", label: "Bookings", icon: Calendar },
-  { to: "/admin/financials", label: "Financials", icon: DollarSign },
-  { to: "/admin/reviews", label: "Reviews", icon: Star },
-  { to: "/admin/featured", label: "Featured DJs", icon: Clapperboard },
-];
-
-function navFor(role: UserRole, profile: Profile) {
-  if (role === "dj") return djNav;
-  if (role === "admin") return adminNav;
-  return getCustomerType(profile) === "corporate" ? corporateCustomerNav : privateCustomerNav;
-}
+const navByRole: Record<
+  "client" | "dj" | "admin",
+  Array<{ to: string; label: string; icon: typeof LayoutDashboard; end?: boolean }>
+> = {
+  client: [
+    { to: "/client", label: "Oversigt", icon: LayoutDashboard, end: true },
+    { to: "/brief", label: "Opret brief", icon: ListChecks },
+  ],
+  dj: [
+    { to: "/dj", label: "Oversigt", icon: LayoutDashboard, end: true },
+  ],
+  admin: [
+    { to: "/admin", label: "Oversigt", icon: LayoutDashboard, end: true },
+    { to: "/admin/leads", label: "Leads", icon: ListChecks },
+    { to: "/admin/bookings", label: "Bookinger", icon: Calendar },
+    { to: "/admin/djs", label: "DJ'er", icon: Users },
+    { to: "/admin/pakker", label: "Pakker", icon: BadgeDollarSign },
+    { to: "/admin/anmeldelser", label: "Anmeldelser", icon: Megaphone },
+    { to: "/admin/indhold", label: "Indhold", icon: MessagesSquare },
+  ],
+} as const;
 
 export function DashboardLayout() {
   const { profile } = useAuth();
-  const location = useLocation();
-
-  if (!profile) return null;
-  const nav = navFor(profile.role, profile);
+  const role = profile?.role ?? "client";
+  const nav = navByRole[role];
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <Header />
-      <div className="flex flex-1">
-        <aside className="hidden w-56 shrink-0 border-r bg-card md:block">
-          <nav className="sticky top-16 space-y-1 p-4">
-            {nav.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) =>
-                  cn(
-                    "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    isActive ? "bg-accent/15 text-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                  )
-                }
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-        </aside>
-        <main className="flex-1">
-          {/* Mobile sub-nav */}
-          <nav className="no-scrollbar flex gap-2 overflow-x-auto border-b bg-card p-3 md:hidden">
-            {nav.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) =>
-                  cn(
-                    "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium",
-                    isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
-                  )
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-          <div className="container py-6 md:py-8" key={location.pathname}>
-            <Outlet />
+    <div className="min-h-screen bg-muted/20 md:flex">
+      <aside className="hidden w-64 shrink-0 border-r border-border/60 bg-background md:flex md:flex-col">
+        <div className="border-b border-border/60 px-5 py-5">
+          <p className="text-sm font-medium text-muted-foreground">{profile?.full_name ?? "Demo-område"}</p>
+          <p className="text-xs text-muted-foreground">{role === "admin" ? "Operations console" : role === "dj" ? "DJ-portal" : "Kundeportal"}</p>
+        </div>
+        <nav className="space-y-1 p-3">
+          {nav.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors",
+                  isActive ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )
+              }
+            >
+              <item.icon className="h-4 w-4" />
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+      </aside>
+
+      <div className="min-w-0 flex-1">
+        <div className="border-b bg-background md:hidden">
+          <div className="container flex min-h-14 items-center gap-4 py-3">
+            <p className="text-sm font-medium text-muted-foreground">{profile?.full_name ?? "Demo-område"}</p>
+            <div className="ml-auto flex items-center gap-2 overflow-x-auto">
+              {nav.map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    cn(
+                      "inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+                      isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground",
+                    )
+                  }
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </NavLink>
+              ))}
+            </div>
           </div>
-        </main>
+        </div>
+        <div className="container py-6 md:py-8">
+          <Outlet />
+        </div>
       </div>
-      <Footer />
     </div>
   );
 }

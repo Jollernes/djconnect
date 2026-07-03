@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { Profile, UserRole } from "@/types/domain";
-import type { UserRole as RoleEnum } from "@/types/database";
+import { SEED_DJS } from "@/data/seed";
 
 interface AuthContextValue {
   user: User | null;
@@ -12,20 +12,66 @@ interface AuthContextValue {
   loading: boolean;
   isConfigured: boolean;
   signInWithPassword: (email: string, password: string) => Promise<void>;
-  signUpWithPassword: (args: { email: string; password: string; fullName: string; role: RoleEnum; company?: string }) => Promise<void>;
-  signInWithGoogle: (role?: RoleEnum) => Promise<void>;
+  signUpWithPassword: (args: { email: string; password: string; fullName: string; role: UserRole; company?: string }) => Promise<void>;
+  signInWithGoogle: (role?: UserRole) => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
-  /** Mock login (only used when Supabase is not configured, for UI demos) */
-  mockLogin: (role: UserRole, opts?: { customerKind?: "private" | "corporate" }) => void;
+  mockLogin: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
-
 const MOCK_STORAGE_KEY = "djconnect.mockRole";
-const MOCK_CUSTOMER_KIND_KEY = "djconnect.mockCustomerKind";
+const MOCK_PROFILE_KEY = "djconnect.mockProfile";
+
+function isBrowser() {
+  return typeof window !== "undefined" && typeof localStorage !== "undefined";
+}
+
+function buildMockProfile(role: UserRole, companyName?: string): Profile {
+  const now = new Date().toISOString();
+  if (role === "dj") {
+    const dj = SEED_DJS.find((item) => item.approved_for_shortlist) ?? SEED_DJS[0];
+    return {
+      id: dj.id,
+      role: "dj",
+      email: dj.email,
+      full_name: dj.legal_name,
+      phone: dj.phone,
+      company_name: null,
+      city: dj.city,
+      created_at: dj.created_at,
+      updated_at: dj.updated_at,
+    };
+  }
+
+  if (role === "admin") {
+    return {
+      id: "mock_admin_mads",
+      role: "admin",
+      email: "admin@djconnect.demo",
+      full_name: "Mads Holm",
+      phone: "+45 33 44 55 66",
+      company_name: "DJConnect",
+      city: "København",
+      created_at: now,
+      updated_at: now,
+    };
+  }
+
+  return {
+    id: "mock_client_sara",
+    role: "client",
+    email: "sara@acme.demo",
+    full_name: "Sara fra Acme A/S",
+    phone: "+45 44 55 66 77",
+    company_name: companyName ?? "Acme A/S",
+    city: "København",
+    created_at: now,
+    updated_at: now,
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -38,48 +84,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       return;
     }
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", u.id)
-      .maybeSingle();
+    const { data, error } = await supabase.from("profiles").select("*").eq("id", u.id).maybeSingle();
     if (error) {
-      // eslint-disable-next-line no-console
       console.error("Failed to load profile", error);
       setProfile(null);
       return;
     }
-    setProfile(data ?? null);
+    setProfile((data as Profile | null) ?? null);
+  }, []);
+
+  const loadMockProfile = useCallback(() => {
+    if (!isBrowser()) {
+      setLoading(false);
+      return;
+    }
+    const storedProfile = localStorage.getItem(MOCK_PROFILE_KEY);
+    const storedRole = localStorage.getItem(MOCK_STORAGE_KEY) as UserRole | null;
+    if (storedProfile) {
+      try {
+        setProfile(JSON.parse(storedProfile) as Profile);
+        setLoading(false);
+        return;
+      } catch {
+        // fall through to rehydrate from the stored role
+      }
+    }
+    if (storedRole) {
+      const next = buildMockProfile(storedRole);
+      setProfile(next);
+      localStorage.setItem(MOCK_PROFILE_KEY, JSON.stringify(next));
+    }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     if (!supabase) {
-      const mockRole = localStorage.getItem(MOCK_STORAGE_KEY) as UserRole | null;
-      if (mockRole) {
-        const kind = localStorage.getItem(MOCK_CUSTOMER_KIND_KEY) as "private" | "corporate" | null;
-        const isCorporate = mockRole === "customer" && kind === "corporate";
-        setProfile({
-          id: isCorporate ? "user-customer-2" : mockRole === "customer" ? "user-customer-1" : `mock-${mockRole}`,
-          role: mockRole,
-          email: isCorporate ? "tom@acme.example" : `${mockRole}@djconnect.example`,
-          full_name:
-            mockRole === "admin"
-              ? "Platform Admin"
-              : mockRole === "dj"
-                ? "DJ Alex Holm"
-                : isCorporate
-                  ? "Tom Bergmann"
-                  : "Sara Jensen",
-          phone: null,
-          avatar_url: null,
-          city: "Copenhagen",
-          country: "Denmark",
-          company_name: isCorporate ? "Acme A/S" : null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-      }
-      setLoading(false);
+      loadMockProfile();
       return;
     }
 
@@ -94,8 +134,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(newSession?.user ?? null);
       loadProfile(newSession?.user ?? null);
     });
+
     return () => sub.subscription.unsubscribe();
-  }, [loadProfile]);
+  }, [loadMockProfile, loadProfile]);
 
   const signInWithPassword = useCallback(async (email: string, password: string) => {
     if (!supabase) throw new Error("Supabase is not configured.");
@@ -104,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUpWithPassword = useCallback(
-    async ({ email, password, fullName, role, company }: { email: string; password: string; fullName: string; role: RoleEnum; company?: string }) => {
+    async ({ email, password, fullName, role, company }: { email: string; password: string; fullName: string; role: UserRole; company?: string }) => {
       if (!supabase) throw new Error("Supabase is not configured.");
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -115,7 +156,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       });
       if (error) throw error;
-      // Profile row is created by DB trigger `handle_new_user`.
       if (data.user) {
         await loadProfile(data.user);
       }
@@ -123,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [loadProfile],
   );
 
-  const signInWithGoogle = useCallback(async (role: RoleEnum = "customer") => {
+  const signInWithGoogle = useCallback(async (role: UserRole = "client") => {
     if (!supabase) throw new Error("Supabase is not configured.");
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -152,50 +192,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (supabase) {
       await supabase.auth.signOut();
     }
-    localStorage.removeItem(MOCK_STORAGE_KEY);
-    localStorage.removeItem(MOCK_CUSTOMER_KIND_KEY);
+    if (isBrowser()) {
+      localStorage.removeItem(MOCK_STORAGE_KEY);
+      localStorage.removeItem(MOCK_PROFILE_KEY);
+    }
     setProfile(null);
     setUser(null);
     setSession(null);
   }, []);
 
   const refreshProfile = useCallback(async () => {
+    if (!supabase) {
+      loadMockProfile();
+      return;
+    }
     await loadProfile(user);
-  }, [loadProfile, user]);
+  }, [loadMockProfile, loadProfile, user]);
 
-  const mockLogin = useCallback(
-    (role: UserRole, opts?: { customerKind?: "private" | "corporate" }) => {
+  const mockLogin = useCallback((role: UserRole) => {
+    const next = buildMockProfile(role);
+    if (isBrowser()) {
       localStorage.setItem(MOCK_STORAGE_KEY, role);
-      const kind = opts?.customerKind ?? "private";
-      if (role === "customer") {
-        localStorage.setItem(MOCK_CUSTOMER_KIND_KEY, kind);
-      } else {
-        localStorage.removeItem(MOCK_CUSTOMER_KIND_KEY);
-      }
-      const isCorporate = role === "customer" && kind === "corporate";
-      setProfile({
-        id: isCorporate ? "user-customer-2" : role === "customer" ? "user-customer-1" : `mock-${role}`,
-        role,
-        email: isCorporate ? "tom@acme.example" : `${role}@djconnect.example`,
-        full_name:
-          role === "admin"
-            ? "Platform Admin"
-            : role === "dj"
-              ? "DJ Alex Holm"
-              : isCorporate
-                ? "Tom Bergmann"
-                : "Sara Jensen",
-        phone: null,
-        avatar_url: null,
-        city: "Copenhagen",
-        country: "Denmark",
-        company_name: isCorporate ? "Acme A/S" : null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
-    },
-    [],
-  );
+      localStorage.setItem(MOCK_PROFILE_KEY, JSON.stringify(next));
+    }
+    setProfile(next);
+    setSession(null);
+    setUser(null);
+  }, []);
 
   const value = useMemo<AuthContextValue>(
     () => ({
@@ -235,6 +258,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within an AuthProvider");
+  if (!ctx) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
   return ctx;
 }

@@ -1,73 +1,105 @@
-export const PLATFORM_NAME = "DJConnect";
-export const PLATFORM_TAGLINE = "Book verified DJs with full mobile disco setups";
-export const PLATFORM_SUPPORT_EMAIL = "support@djconnect.example";
+import type {
+  BriefContactRole,
+  BudgetBand,
+  EventType,
+  GuestCountRange,
+  Region,
+  VibeTag,
+  YesNoUnsure,
+} from "@/types/domain";
 
+export const PLATFORM_NAME = "DJConnect";
+export const PLATFORM_TAGLINES = [
+  "Danmarks nemmeste og tryggeste måde at booke musik til firmafesten.",
+  "Professionel DJ, lyd, lys og backup samlet ét sted.",
+  "Fortæl os om jeres arrangement. Vi matcher jer med den rette løsning.",
+  "Du vælger pakken. Vi sikrer festen.",
+] as const;
+export const PLATFORM_TAGLINE = PLATFORM_TAGLINES[0];
+export const PLATFORM_SUPPORT_EMAIL = "support@djconnect.dk";
 export const PLATFORM_FEE_PERCENT = 10;
 
-export const EVENT_TYPES = [
-  { id: "wedding", label: "Wedding" },
-  { id: "birthday", label: "Birthday Party" },
-  { id: "corporate_event", label: "Corporate Event" },
-  { id: "corporate_party", label: "Corporate Party" },
-  { id: "private_party", label: "Private Party" },
-  { id: "other", label: "Other" },
-] as const;
-
-export type EventTypeId = (typeof EVENT_TYPES)[number]["id"];
-
-export const SETUP_SIZES = [
-  { id: "small", label: "Small", description: "Apartment / small room" },
-  { id: "medium", label: "Medium", description: "100–200 guests" },
-  { id: "large", label: "Large", description: "200+ guests / outdoor" },
-] as const;
-
-export type SetupSizeId = (typeof SETUP_SIZES)[number]["id"];
-
-export const EXPERIENCE_YEARS = [
-  { id: "1-2", label: "1–2 years" },
-  { id: "3-5", label: "3–5 years" },
-  { id: "5-10", label: "5–10 years" },
-  { id: "10+", label: "10+ years" },
-] as const;
-
-export const EVENTS_PERFORMED = [
-  { id: "1-10", label: "1–10" },
-  { id: "11-50", label: "11–50" },
-  { id: "51-100", label: "51–100" },
-  { id: "100+", label: "100+" },
-] as const;
-
-export const BOOKING_STATUSES = {
-  pending: { label: "Pending", color: "warning" },
-  quoted: { label: "Quote sent", color: "warning" },
-  awaiting_payment: { label: "Awaiting payment", color: "warning" },
-  confirmed: { label: "Confirmed", color: "success" },
-  completed: { label: "Completed", color: "muted" },
-  cancelled: { label: "Cancelled", color: "destructive" },
-  declined: { label: "Declined", color: "destructive" },
-  refunded: { label: "Refunded", color: "muted" },
-} as const;
-
-export type BookingStatus = keyof typeof BOOKING_STATUSES;
-
-export const VERIFICATION_STATUSES = {
-  draft: { label: "Draft" },
-  pending: { label: "Pending review" },
-  approved: { label: "Approved" },
-  rejected: { label: "Rejected" },
-} as const;
-
-export type VerificationStatus = keyof typeof VERIFICATION_STATUSES;
-
-export const CANCELLATION_POLICY = [
-  { windowDays: 14, refundPercent: 100, label: "More than 14 days before event: 100% refund" },
-  { windowDays: 7, refundPercent: 50, label: "7–14 days before event: 50% refund" },
-  { windowDays: 0, refundPercent: 0, label: "Less than 7 days before event: no refund" },
+export const EVENT_TYPE_OPTIONS: { id: EventType; label: string }[] = [
+  { id: "Firmafest", label: "Firmafest" },
+  { id: "Julefrokost", label: "Julefrokost" },
+  { id: "Sommerfest", label: "Sommerfest" },
+  { id: "Middag og efterfest", label: "Middag og efterfest" },
+  { id: "Kick-off", label: "Kick-off" },
+  { id: "Jubilæum", label: "Jubilæum" },
+  { id: "Reception", label: "Reception" },
+  { id: "Andet firmaarrangement", label: "Andet firmaarrangement" },
 ];
 
-export function computeRefundPercent(eventDate: Date, now = new Date()): number {
-  const days = Math.floor((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  if (days >= 14) return 100;
-  if (days >= 7) return 50;
-  return 0;
-}
+export const REGION_OPTIONS: { id: Region; label: string }[] = [
+  { id: "København / Sjælland", label: "København / Sjælland" },
+  { id: "Fyn", label: "Fyn" },
+  { id: "Aarhus / Østjylland", label: "Aarhus / Østjylland" },
+  { id: "Aalborg / Nordjylland", label: "Aalborg / Nordjylland" },
+  { id: "Sydjylland", label: "Sydjylland" },
+  { id: "Hele Danmark / andet", label: "Hele Danmark / andet" },
+];
+
+export const GUEST_COUNT_RANGE_OPTIONS: { id: GuestCountRange; label: string }[] = [
+  { id: "Under 50", label: "Under 50" },
+  { id: "50-80", label: "50-80" },
+  { id: "80-150", label: "80-150" },
+  { id: "150-250", label: "150-250" },
+  { id: "250-350", label: "250-350" },
+  { id: "350+", label: "350+" },
+];
+
+export const VIBE_OPTIONS: { id: VibeTag; label: string }[] = [
+  { id: "Elegant middag først, fest senere", label: "Elegant middag først, fest senere" },
+  { id: "Bred firmafest for alle aldre", label: "Bred firmafest for alle aldre" },
+  { id: "Julefrokost med singalong og klassikere", label: "Julefrokost med singalong og klassikere" },
+  { id: "Moderne dance/pop", label: "Moderne dance/pop" },
+  { id: "Disco, funk og 80’er/90’er", label: "Disco, funk og 80’er/90’er" },
+  { id: "Internationalt publikum", label: "Internationalt publikum" },
+  { id: "Rolig lounge og baggrund", label: "Rolig lounge og baggrund" },
+  { id: "High-energy dansegulv", label: "High-energy dansegulv" },
+];
+
+export const BUDGET_BAND_OPTIONS: { id: BudgetBand; label: string }[] = [
+  { id: "8.000-12.000 DKK", label: "8.000-12.000 DKK" },
+  { id: "12.000-18.000 DKK", label: "12.000-18.000 DKK" },
+  { id: "18.000-25.000 DKK", label: "18.000-25.000 DKK" },
+  { id: "25.000+ DKK", label: "25.000+ DKK" },
+  { id: "Ikke sikker", label: "Ikke sikker" },
+];
+
+export const YES_NO_UNSURE_OPTIONS: { id: YesNoUnsure; label: string }[] = [
+  { id: "Ja", label: "Ja" },
+  { id: "Nej", label: "Nej" },
+  { id: "Ikke sikker", label: "Ikke sikker" },
+];
+
+export const TECHNICAL_NEEDS_OPTIONS = [
+  { id: "needs_sound", label: "Brug for lydanlæg" },
+  { id: "needs_lighting", label: "Brug for dansegulvslys" },
+  { id: "needs_microphone", label: "Brug for mikrofon til taler" },
+  { id: "needs_dinner_music", label: "Brug for middag-/baggrundsmusik" },
+  { id: "needs_venue_coordination", label: "Brug for hjælp til koordinering med venue" },
+] as const;
+
+export const BRIEF_CONTACT_ROLE_OPTIONS: { value: BriefContactRole; label: string }[] = [
+  { value: "HR", label: "HR" },
+  { value: "Office manager", label: "Office manager" },
+  { value: "Assistant", label: "Assistent" },
+  { value: "Event committee", label: "Festudvalg" },
+  { value: "Founder/management", label: "Stifter/ledelse" },
+  { value: "Other", label: "Andet" },
+];
+
+export const CONTACT_ROLE_OPTIONS = [
+  { id: "client", label: "Kunde / bestiller" },
+  { id: "dj", label: "DJ" },
+  { id: "admin", label: "Admin" },
+] as const;
+
+export const PACKAGE_RECOMMENDATION_THRESHOLDS = {
+  compactMaxGuests: 70,
+  dinnerPartyMinGuests: 70,
+  dinnerPartyMaxGuests: 160,
+  largeMinGuests: 160,
+  customMinGuests: 351,
+} as const;
