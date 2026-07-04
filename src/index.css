@@ -1,4 +1,5 @@
 @import url("https://rsms.me/inter/inter.css");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -43,6 +44,45 @@
     --radius: 0.75rem;
   }
 
+  .firmadj-app {
+    --background: 219 60% 11%;
+    --foreground: 0 0% 98%;
+
+    --card: 221 42% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 221 42% 13%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 245 58% 51%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 221 35% 22%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 221 30% 20%;
+    --muted-foreground: 217 20% 70%;
+
+    --accent: 43 64% 52%;
+    --accent-foreground: 222 47% 11%;
+
+    --border: 221 30% 24%;
+    --input: 221 30% 24%;
+    --ring: 245 58% 60%;
+    --radius: 0.9rem;
+
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    isolation: isolate;
+  }
+
+  .firmadj-app * {
+    border-color: hsl(var(--border));
+  }
+
   * {
     @apply border-border;
   }
@@ -57,12 +97,43 @@
     @apply bg-background text-foreground antialiased;
   }
 
+  .firmadj-app body {
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
   }
 }
 
 @layer utilities {
+  .firmadj-app .font-display {
+    font-family: "Outfit", "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+
+  .firmadj-app .glass {
+    background: hsla(221, 42%, 18%, 0.55);
+    backdrop-filter: blur(14px);
+    border: 1px solid hsla(0, 0%, 100%, 0.08);
+  }
+
+  .firmadj-app .firma-hero-gradient {
+    background:
+      radial-gradient(ellipse 55% 50% at 18% 28%, hsla(245, 58%, 51%, 0.62), transparent 60%),
+      radial-gradient(ellipse 45% 40% at 82% 18%, hsla(43, 64%, 52%, 0.44), transparent 60%),
+      radial-gradient(ellipse 52% 46% at 65% 82%, hsla(12, 90%, 60%, 0.24), transparent 58%),
+      linear-gradient(135deg, hsl(219 60% 8%), hsl(221 42% 14%) 46%, hsl(219 60% 10%));
+    background-size: 210% 210%, 180% 180%, 180% 180%, 100% 100%;
+    animation: firma-hero-shift 20s ease-in-out infinite alternate;
+  }
+
+  .firmadj-app .firma-noise {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 3px 3px;
+    mix-blend-mode: screen;
+  }
+
   .text-balance {
     text-wrap: balance;
   }
@@ -105,6 +176,12 @@
   0%   { background-position:   0% 0%,  100% 0%,  50% 100%, 0 0; }
   50%  { background-position: 100% 50%,   0% 50%,  50%   0%, 0 0; }
   100% { background-position:  50% 100%, 50%  0%,  100%  50%, 0 0; }
+}
+
+@keyframes firma-hero-shift {
+  0%   { background-position:   0% 0%, 100% 0%,  0% 100%, 0 0; }
+  50%  { background-position: 100% 35%,  0% 50%, 50%  15%, 0 0; }
+  100% { background-position:  50% 100%, 60% 10%, 100% 55%, 0 0; }
 }
 
 @keyframes marquee {
