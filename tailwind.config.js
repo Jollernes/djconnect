@@ -68,6 +68,7 @@ export default {
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
+        display: ["Outfit", "Plus Jakarta Sans", "system-ui", "sans-serif"],
       },
       keyframes: {
         "accordion-down": {
