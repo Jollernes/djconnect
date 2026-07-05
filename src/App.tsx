@@ -6,6 +6,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { RoleGuard } from "@/components/common/RoleGuard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DevicePreview } from "@/components/common/DevicePreview";
 import { HomePage } from "@/pages/public/HomePage";
 import { DJPartnerApplicationPage } from "@/pages/public/DJPartnerApplicationPage";
 import {
@@ -125,6 +126,7 @@ export default function App() {
     <AuthProvider>
       <BrowserRouter>
         <AppShell />
+        <DevicePreview />
         <Toaster richColors position="top-center" />
       </BrowserRouter>
     </AuthProvider>
