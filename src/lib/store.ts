@@ -330,7 +330,7 @@ export function createProposalForBrief(briefId: string) {
     price_estimate_from: recommendedPackage.price_from,
     price_estimate_to: recommendedPackage.price_to,
     travel_fee_estimate: brief.region === "Hele Danmark / andet" ? 1200 : 0,
-    technical_surcharge_estimate: brief.needs_venue_coordination === "Ja" || brief.needs_microphone === "Ja" ? 1500 : 0,
+    technical_surcharge_estimate: brief.needs_microphone === "Ja" ? 1500 : 0,
     vat_note: recommendedPackage.vat_note,
     recommendation_reason: `Baseret på ${brief.guest_count_range.toLowerCase()}, ${brief.event_type.toLowerCase()} og jeres tekniske behov.`,
     proposal_djs: shortlisted,

@@ -103,7 +103,7 @@ export function AdminLeadDetailPage() {
             <InfoRow label="Rolle" value={currentBrief.contact_role} />
             <InfoRow label="Venue" value={currentBrief.venue_name ?? "Ikke udfyldt"} />
             <InfoRow label="Venue-status" value={currentBrief.venue_status} />
-            <InfoRow label="Teknisk behov" value={[currentBrief.needs_sound, currentBrief.needs_lighting, currentBrief.needs_microphone, currentBrief.needs_dinner_music, currentBrief.needs_venue_coordination].join(" · ")} />
+            <InfoRow label="Teknisk behov" value={[currentBrief.needs_sound, currentBrief.needs_lighting, currentBrief.needs_microphone, currentBrief.needs_dinner_music].join(" · ")} />
           </CardContent>
         </Card>
 

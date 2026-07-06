@@ -1,4 +1,5 @@
 import { PACKAGE_RECOMMENDATION_THRESHOLDS } from "@/lib/constants";
+import { BRIEF_EVENT_TYPE_CONFIGS, normalizeBriefEventType } from "@/lib/eventTypes";
 import { formatDKK } from "@/lib/utils";
 import { SEED_PACKAGES, SEED_DJS, getAvailability } from "@/data/seed";
 import type { DJ, EventBrief, Package, ProposalDJ, Region } from "@/types/domain";
@@ -21,7 +22,9 @@ function regionMatches(eventRegion: Region, djRegions: Region[]) {
 }
 
 function eventTypeMatches(brief: EventBrief, dj: DJ) {
-  return dj.event_type_focuses?.includes(brief.event_type) ?? false;
+  const normalizedEventType = normalizeBriefEventType(brief.event_type);
+  const matchingTypes = BRIEF_EVENT_TYPE_CONFIGS[normalizedEventType].matchingEventTypes;
+  return dj.event_type_focuses?.some((eventType) => matchingTypes.includes(eventType)) ?? false;
 }
 
 function vibeOverlap(brief: EventBrief, dj: DJ) {
@@ -49,7 +52,7 @@ function hashSeed(value: string) {
 }
 
 function hasLargeTechnicalNeed(brief: EventBrief) {
-  const required = [brief.needs_sound, brief.needs_lighting, brief.needs_microphone, brief.needs_venue_coordination].filter(yesNoIsTrue).length;
+  const required = [brief.needs_sound, brief.needs_lighting, brief.needs_microphone].filter(yesNoIsTrue).length;
   return required >= 3 || brief.guest_count_range === "350+";
 }
 

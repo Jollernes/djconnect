@@ -166,7 +166,6 @@ export function ProposalPage() {
     brief.needs_lighting === "Ja" ? "Lys er inkluderet" : null,
     brief.needs_microphone === "Ja" ? "Mikrofon til taler" : null,
     brief.needs_dinner_music === "Ja" ? "Middag og baggrundsmusik" : null,
-    brief.needs_venue_coordination === "Ja" ? "Venue-koordinering" : null,
   ].filter((item): item is string => Boolean(item));
 
   return (

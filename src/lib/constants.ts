@@ -22,12 +22,14 @@ export const PLATFORM_FEE_PERCENT = 10;
 export const EVENT_TYPE_OPTIONS: { id: EventType; label: string }[] = [
   { id: "Firmafest", label: "Firmafest" },
   { id: "Julefrokost", label: "Julefrokost" },
+  { id: "Påskefrokost", label: "Påskefrokost" },
   { id: "Sommerfest", label: "Sommerfest" },
   { id: "Middag og efterfest", label: "Middag og efterfest" },
   { id: "Kick-off", label: "Kick-off" },
   { id: "Jubilæum", label: "Jubilæum" },
   { id: "Reception", label: "Reception" },
   { id: "Andet firmaarrangement", label: "Andet firmaarrangement" },
+  { id: "Anden firmafest", label: "Anden firmafest" },
 ];
 
 export const REGION_OPTIONS: { id: Region; label: string }[] = [
@@ -77,8 +79,6 @@ export const TECHNICAL_NEEDS_OPTIONS = [
   { id: "needs_sound", label: "Brug for lydanlæg" },
   { id: "needs_lighting", label: "Brug for dansegulvslys" },
   { id: "needs_microphone", label: "Brug for mikrofon til taler" },
-  { id: "needs_dinner_music", label: "Brug for middag-/baggrundsmusik" },
-  { id: "needs_venue_coordination", label: "Brug for hjælp til koordinering med venue" },
 ] as const;
 
 export const BRIEF_CONTACT_ROLE_OPTIONS: { value: BriefContactRole; label: string }[] = [

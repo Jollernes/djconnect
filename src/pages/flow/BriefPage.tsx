@@ -17,16 +17,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { BRIEF_CONTACT_ROLE_OPTIONS, BUDGET_BAND_OPTIONS, GUEST_COUNT_RANGE_OPTIONS, REGION_OPTIONS, VIBE_OPTIONS, YES_NO_UNSURE_OPTIONS } from "@/lib/constants";
 import {
-  BRIEF_CONTACT_ROLE_OPTIONS,
-  BUDGET_BAND_OPTIONS,
-  EVENT_TYPE_OPTIONS,
-  GUEST_COUNT_RANGE_OPTIONS,
-  REGION_OPTIONS,
-  TECHNICAL_NEEDS_OPTIONS,
-  VIBE_OPTIONS,
-  YES_NO_UNSURE_OPTIONS,
-} from "@/lib/constants";
+  BRIEF_EVENT_TYPE_CONFIGS,
+  BRIEF_EVENT_TYPE_OPTIONS,
+  type BriefEventType,
+  getBriefEventTypeConfig,
+  getBriefGuestTier,
+  getBriefSetupCopy,
+  getBriefSetupImageUrl,
+  normalizeBriefEventType,
+} from "@/lib/eventTypes";
 import { createEventBrief, createProposalForBrief } from "@/lib/store";
 import { useDanishPageSeo } from "@/lib/seo";
 import { cn, formatDanishDateShort } from "@/lib/utils";
@@ -35,7 +36,6 @@ import type {
   BriefDateFlexibility,
   BriefVenueStatus,
   BudgetBand,
-  EventType,
   GuestCountRange,
   LanguagePreference,
   Region,
@@ -43,32 +43,36 @@ import type {
   YesNoUnsure,
 } from "@/types/domain";
 
-const EVENT_TYPES = [
-  "Firmafest",
-  "Julefrokost",
-  "Sommerfest",
-  "Middag og efterfest",
-  "Kick-off",
-  "Jubilæum",
-  "Reception",
-  "Andet firmaarrangement",
-] as const satisfies readonly [EventType, ...EventType[]];
-
 const DATE_FLEXIBILITY_OPTIONS = ["Fast dato", "Muligvis fleksibel", "Ikke besluttet endnu"] as const satisfies readonly [BriefDateFlexibility, ...BriefDateFlexibility[]];
-const VENUE_STATUS_OPTIONS = ["Vi har booket venue", "Vi er tæt på at booke venue", "Vi mangler stadig venue"] as const satisfies readonly [BriefVenueStatus, ...BriefVenueStatus[]];
+const VENUE_STATUS_OPTIONS = [
+  "Vi har booket venue",
+  "Vi er tæt på at booke venue",
+  "Vi mangler stadig venue",
+  "Det holdes hos os selv (eget kontor eller lokale)",
+] as const satisfies readonly [BriefVenueStatus, ...BriefVenueStatus[]];
 const LANGUAGE_OPTIONS = ["Dansk", "Engelsk", "Begge"] as const satisfies readonly [LanguagePreference, ...LanguagePreference[]];
+const TECHNICAL_FIELD_OPTIONS = [
+  { field: "needs_sound", label: "Behov for yderligere lyd" },
+  { field: "needs_lighting", label: "Behov for yderligere dansegulvslys" },
+  { field: "needs_microphone", label: "Mikrofon til taler" },
+] as const satisfies readonly { field: "needs_sound" | "needs_lighting" | "needs_microphone"; label: string }[];
+const HALF_HOUR_TIMES = Array.from({ length: 48 }, (_, index) => {
+  const totalMinutes = index * 30;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+});
 
 const STORAGE_KEY = "djconnect.flow.briefDraft.v1";
 const TEST_MODE_STORAGE_KEY = "djconnect.flow.briefTestMode.v1";
 
 const briefSchema = z.object({
-  event_type: z.enum(EVENT_TYPES, { message: "Vælg en eventtype." }),
+  event_type: z.enum(BRIEF_EVENT_TYPE_OPTIONS.map((option) => option.id) as [BriefEventType, ...BriefEventType[]], { message: "Vælg en eventtype." }),
   event_date: z.string().min(1, "Vælg en eventdato."),
   start_time: z.string().min(1, "Angiv starttidspunkt."),
   end_time: z.string().min(1, "Angiv sluttidspunkt."),
   date_flexibility: z.enum(DATE_FLEXIBILITY_OPTIONS, { message: "Vælg om datoen er fast eller fleksibel." }),
   city: z.string().min(2, "Skriv en by."),
-  venue_name: z.string().optional(),
   venue_status: z.enum(VENUE_STATUS_OPTIONS, { message: "Vælg venue-status." }),
   region: z.enum(REGION_OPTIONS.map((option) => option.id) as [Region, ...Region[]], { message: "Vælg region." }),
   guest_count_range: z.enum(GUEST_COUNT_RANGE_OPTIONS.map((option) => option.id) as [GuestCountRange, ...GuestCountRange[]], { message: "Vælg gæsteinterval." }),
@@ -76,7 +80,6 @@ const briefSchema = z.object({
   needs_lighting: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
   needs_microphone: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
   needs_dinner_music: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
-  needs_venue_coordination: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
   music_vibe_tags: z.array(z.enum(VIBE_OPTIONS.map((option) => option.id) as [VibeTag, ...VibeTag[]])).default([]),
   music_vibe_other: z.string().optional(),
   must_play: z.string().optional(),
@@ -96,13 +99,12 @@ const briefSchema = z.object({
 type BriefFormValues = z.infer<typeof briefSchema>;
 
 const DEFAULT_VALUES: BriefFormValues = {
-  event_type: "Firmafest",
+  event_type: "Julefrokost",
   event_date: "",
   start_time: "",
   end_time: "",
   date_flexibility: "Fast dato",
   city: "",
-  venue_name: "",
   venue_status: "Vi mangler stadig venue",
   region: "København / Sjælland",
   guest_count_range: "Under 50",
@@ -110,7 +112,6 @@ const DEFAULT_VALUES: BriefFormValues = {
   needs_lighting: "Ikke sikker",
   needs_microphone: "Ikke sikker",
   needs_dinner_music: "Ikke sikker",
-  needs_venue_coordination: "Ikke sikker",
   music_vibe_tags: [],
   music_vibe_other: "",
   must_play: "",
@@ -140,10 +141,10 @@ const steps = [
 const stepFieldNames: Array<(keyof BriefFormValues)[]> = [
   ["event_type"],
   ["event_date", "start_time", "end_time", "date_flexibility"],
-  ["city", "venue_name", "venue_status", "region"],
+  ["city", "venue_status", "region"],
   ["guest_count_range"],
-  ["needs_sound", "needs_lighting", "needs_microphone", "needs_dinner_music", "needs_venue_coordination"],
-  ["music_vibe_tags", "music_vibe_other", "must_play", "do_not_play", "language_preference"],
+  ["needs_sound", "needs_lighting", "needs_microphone"],
+  ["music_vibe_tags", "music_vibe_other", "must_play", "do_not_play", "language_preference", "needs_dinner_music"],
   ["budget_band"],
   ["success_description"],
   ["contact_name", "company_name", "contact_email", "contact_phone", "contact_role"],
@@ -174,6 +175,54 @@ function saveDraft(values: BriefFormValues) {
 
 function toggleTag(values: VibeTag[], tag: VibeTag) {
   return values.includes(tag) ? values.filter((item) => item !== tag) : [...values, tag];
+}
+
+function normalizeTime(value: string | undefined | null) {
+  if (!value) {
+    return "";
+  }
+  const match = /^(\d{2}):(\d{2})$/.exec(value);
+  if (!match) {
+    return "";
+  }
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (Number.isNaN(hours) || Number.isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+    return "";
+  }
+  const roundedMinutes = Math.min(23 * 60 + 30, Math.round((hours * 60 + minutes) / 30) * 30);
+  return `${String(Math.floor(roundedMinutes / 60)).padStart(2, "0")}:${String(roundedMinutes % 60).padStart(2, "0")}`;
+}
+
+function getEventTypeValue(value: string | undefined | null) {
+  return normalizeBriefEventType(value);
+}
+
+function getPrefillValue(source: Record<string, unknown>, key: string) {
+  return typeof source[key] === "string" ? (source[key] as string) : "";
+}
+
+function normalizeBriefPrefill(state: unknown): Partial<BriefFormValues> {
+  const source = (state as { prefill?: Record<string, unknown> } | null)?.prefill;
+  if (!source) {
+    return {};
+  }
+
+  const eventType = getPrefillValue(source, "event_type") || getPrefillValue(source, "eventType");
+  const eventDate = getPrefillValue(source, "event_date") || getPrefillValue(source, "eventDate");
+  const guestCountRange = getPrefillValue(source, "guest_count_range") || getPrefillValue(source, "guestCountRange");
+  const city = getPrefillValue(source, "city");
+  const startTime = getPrefillValue(source, "start_time") || getPrefillValue(source, "startTime");
+  const endTime = getPrefillValue(source, "end_time") || getPrefillValue(source, "endTime");
+
+  return {
+    ...(eventType ? { event_type: normalizeBriefEventType(eventType) } : {}),
+    ...(eventDate ? { event_date: eventDate } : {}),
+    ...(guestCountRange ? { guest_count_range: guestCountRange as GuestCountRange } : {}),
+    ...(city ? { city } : {}),
+    ...(startTime ? { start_time: normalizeTime(startTime) } : {}),
+    ...(endTime ? { end_time: normalizeTime(endTime) } : {}),
+  };
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
@@ -242,11 +291,11 @@ function buildTestModeValues(values: BriefFormValues): BriefFormValues {
   return {
     ...DEFAULT_VALUES,
     ...values,
+    event_type: normalizeBriefEventType(values.event_type),
     event_date: isNonEmpty(values.event_date) ? values.event_date : `${year}-${month}-${day}`,
-    start_time: isNonEmpty(values.start_time) ? values.start_time : "18:00",
-    end_time: isNonEmpty(values.end_time) ? values.end_time : "23:30",
+    start_time: normalizeTime(values.start_time) || "18:00",
+    end_time: normalizeTime(values.end_time) || "23:30",
     city: isNonEmpty(values.city) ? values.city : "København",
-    venue_name: isNonEmpty(values.venue_name) ? values.venue_name : "",
     success_description: isNonEmpty(values.success_description)
       ? values.success_description
       : "Testtilstand: Vi vil gerne se en fuld, realistisk løsning med DJ, teknik og backup.",
@@ -258,6 +307,46 @@ function buildTestModeValues(values: BriefFormValues): BriefFormValues {
     must_play: isNonEmpty(values.must_play) ? values.must_play : "",
     do_not_play: isNonEmpty(values.do_not_play) ? values.do_not_play : "",
   };
+}
+
+function EventTypeCards({
+  value,
+  onChange,
+}: {
+  value: BriefFormValues["event_type"];
+  onChange: (value: BriefFormValues["event_type"]) => void;
+}) {
+  return (
+    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      {BRIEF_EVENT_TYPE_OPTIONS.map((option) => {
+        const config = BRIEF_EVENT_TYPE_CONFIGS[option.id];
+        const Icon = config.icon;
+        const selected = value === option.id;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => onChange(option.id)}
+            className={cn(
+              "group flex items-center gap-4 rounded-3xl border p-4 text-left shadow-sm transition-all",
+              selected ? "border-accent bg-accent/5 ring-1 ring-accent/20" : config.cardToneClassName,
+            )}
+          >
+            <div className={cn("flex h-12 w-12 items-center justify-center rounded-2xl border", config.iconToneClassName)}>
+              <Icon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-semibold text-foreground">{option.label}</span>
+                {selected ? <Check className="h-4 w-4 text-accent" /> : null}
+              </div>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">{config.expectationCopy}</p>
+            </div>
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function OptionCards({
@@ -284,6 +373,83 @@ function OptionCards({
   );
 }
 
+function TimeSelect({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      <Select value={value} onValueChange={onChange}>
+        <SelectTrigger id={id}>
+          <SelectValue placeholder="Vælg tidspunkt" />
+        </SelectTrigger>
+        <SelectContent>
+          {HALF_HOUR_TIMES.map((time) => (
+            <SelectItem key={time} value={time}>
+              {time}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+    </div>
+  );
+}
+
+function ExpectationCard({ eventType }: { eventType: BriefEventType }) {
+  const config = getBriefEventTypeConfig(eventType);
+  return (
+    <div className="rounded-3xl border border-border/60 bg-muted/20 p-4">
+      <p className="text-sm font-semibold text-foreground">Hvad I kan forvente af os</p>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">{config.expectationCopy}</p>
+    </div>
+  );
+}
+
+function TechnicalSetupCard({
+  eventType,
+  guestCountRange,
+}: {
+  eventType: BriefEventType;
+  guestCountRange: GuestCountRange;
+}) {
+  const tier = getBriefGuestTier(guestCountRange);
+  const image = getBriefSetupImageUrl(guestCountRange);
+  const setupCopy = getBriefSetupCopy(eventType, guestCountRange);
+  const tierLabel = tier === "compact" ? "Kompakt setup" : tier === "medium" ? "Balanceret setup" : "Større setup";
+
+  return (
+    <Card className="overflow-hidden border-border/60 shadow-sm">
+      <div className="grid gap-0 md:grid-cols-[220px_1fr]">
+        <div className="relative min-h-52 bg-slate-900">
+          <img src={image} alt="" className="h-full w-full object-cover opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        </div>
+        <div className="space-y-3 p-5">
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="rounded-full px-3 py-1">
+              Anbefalet mobile-disco setup
+            </Badge>
+            <span className="text-sm font-medium text-foreground">{tierLabel}</span>
+          </div>
+          <p className="text-sm leading-6 text-muted-foreground">{setupCopy}</p>
+          <p className="text-sm font-medium text-foreground">Dette setup passer til {guestCountRange.toLowerCase()} gæster.</p>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
 function BriefSummaryCard({ values }: { values: Partial<BriefFormValues> }) {
   const selectedVibesTags = values.music_vibe_tags ?? [];
   const selectedVibes = selectedVibesTags.length ? selectedVibesTags.join(", ") : "Ikke valgt endnu";
@@ -302,6 +468,7 @@ function BriefSummaryCard({ values }: { values: Partial<BriefFormValues> }) {
         <SummaryRow label="Region" value={values.region ?? "—"} />
         <SummaryRow label="Gæster" value={values.guest_count_range ?? "—"} />
         <SummaryRow label="Budget" value={values.budget_band ?? "—"} />
+        <SummaryRow label="Venue-status" value={values.venue_status ?? "—"} />
         <SummaryRow label="Stemning" value={selectedVibes} />
       </CardContent>
     </Card>
@@ -317,10 +484,7 @@ export function BriefPage() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const prefill = useMemo<Partial<BriefFormValues>>(
-    () => (location.state as { prefill?: Partial<BriefFormValues> } | null)?.prefill ?? {},
-    [location.state],
-  );
+  const prefill = useMemo<Partial<BriefFormValues>>(() => normalizeBriefPrefill(location.state), [location.state]);
   const [currentStep, setCurrentStep] = useState(0);
   const [testMode, setTestMode] = useState(() => {
     if (typeof window === "undefined" || typeof localStorage === "undefined") {
@@ -339,7 +503,13 @@ export function BriefPage() {
   const values = useWatch({ control }) as BriefFormValues;
 
   useEffect(() => {
-    reset({ ...DEFAULT_VALUES, ...getDraft(), ...prefill } as BriefFormValues);
+    const nextValues = { ...DEFAULT_VALUES, ...getDraft(), ...prefill } as BriefFormValues;
+    reset({
+      ...nextValues,
+      event_type: normalizeBriefEventType(nextValues.event_type),
+      start_time: normalizeTime(nextValues.start_time),
+      end_time: normalizeTime(nextValues.end_time),
+    });
   }, [prefill, reset]);
 
   useEffect(() => {
@@ -385,14 +555,13 @@ export function BriefPage() {
       end_time: values.end_time,
       city: values.city,
       region: values.region,
-      venue_name: values.venue_name?.trim() ? values.venue_name.trim() : null,
+      venue_name: null,
       venue_status: values.venue_status,
       guest_count_range: values.guest_count_range,
       needs_sound: values.needs_sound,
       needs_lighting: values.needs_lighting,
       needs_microphone: values.needs_microphone,
       needs_dinner_music: values.needs_dinner_music,
-      needs_venue_coordination: values.needs_venue_coordination,
       music_vibe_tags: values.music_vibe_tags ?? [],
       music_vibe_other: values.music_vibe_other?.trim() ? values.music_vibe_other.trim() : null,
       must_play: values.must_play?.trim() ? values.must_play.trim() : null,
@@ -464,9 +633,9 @@ export function BriefPage() {
                       : currentStep === 3
                         ? "Vælg gæsteinterval."
                         : currentStep === 4
-                          ? "Sæt kryds ved de tekniske behov, der er relevante."
+                          ? "Vælg den tekniske løsning, der passer til jeres arrangement."
                           : currentStep === 5
-                            ? "Beskriv stemningen og hvilke musikvalg der skal tages hensyn til."
+                            ? "Beskriv stemningen og vælg musikønsker til aftenen."
                             : currentStep === 6
                               ? "Vælg et realistisk budgetniveau."
                               : currentStep === 7
@@ -487,52 +656,58 @@ export function BriefPage() {
                   >
                     {currentStep === 0 ? (
                       <div className="space-y-3">
-                        <OptionCards
-                          options={EVENT_TYPE_OPTIONS.map((option) => option.label)}
+                        <EventTypeCards
                           value={values.event_type ?? DEFAULT_VALUES.event_type}
-                          onChange={(value) => setValue("event_type", value as EventType, { shouldValidate: true })}
+                          onChange={(value) => setValue("event_type", value, { shouldValidate: true })}
                         />
                         {formState.errors.event_type ? <p className="text-sm text-destructive">{formState.errors.event_type.message}</p> : null}
                       </div>
                     ) : null}
 
                     {currentStep === 1 ? (
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <div className="space-y-2">
-                          <Label htmlFor="event_date">Eventdato</Label>
-                          <Input id="event_date" type="date" {...register("event_date")} />
-                          {formState.errors.event_date ? <p className="text-sm text-destructive">{formState.errors.event_date.message}</p> : null}
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="date_flexibility">Datoens fleksibilitet</Label>
-                          <Select
-                            value={values.date_flexibility}
-                            onValueChange={(value) => setValue("date_flexibility", value as BriefDateFlexibility, { shouldValidate: true })}
-                          >
-                            <SelectTrigger id="date_flexibility">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {DATE_FLEXIBILITY_OPTIONS.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          {formState.errors.date_flexibility ? (
-                            <p className="text-sm text-destructive">{formState.errors.date_flexibility.message}</p>
-                          ) : null}
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="start_time">Starttid</Label>
-                          <Input id="start_time" type="time" {...register("start_time")} />
-                          {formState.errors.start_time ? <p className="text-sm text-destructive">{formState.errors.start_time.message}</p> : null}
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="end_time">Sluttid</Label>
-                          <Input id="end_time" type="time" {...register("end_time")} />
-                          {formState.errors.end_time ? <p className="text-sm text-destructive">{formState.errors.end_time.message}</p> : null}
+                      <div className="space-y-4">
+                        <ExpectationCard eventType={getEventTypeValue(values.event_type)} />
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label htmlFor="event_date">Eventdato</Label>
+                            <Input id="event_date" type="date" {...register("event_date")} />
+                            {formState.errors.event_date ? <p className="text-sm text-destructive">{formState.errors.event_date.message}</p> : null}
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="date_flexibility">Datoens fleksibilitet</Label>
+                            <Select
+                              value={values.date_flexibility}
+                              onValueChange={(value) => setValue("date_flexibility", value as BriefDateFlexibility, { shouldValidate: true })}
+                            >
+                              <SelectTrigger id="date_flexibility">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {DATE_FLEXIBILITY_OPTIONS.map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            {formState.errors.date_flexibility ? (
+                              <p className="text-sm text-destructive">{formState.errors.date_flexibility.message}</p>
+                            ) : null}
+                          </div>
+                          <TimeSelect
+                            id="start_time"
+                            label="Starttid"
+                            value={values.start_time}
+                            onChange={(value) => setValue("start_time", value, { shouldValidate: true })}
+                            error={formState.errors.start_time?.message}
+                          />
+                          <TimeSelect
+                            id="end_time"
+                            label="Sluttid"
+                            value={values.end_time}
+                            onChange={(value) => setValue("end_time", value, { shouldValidate: true })}
+                            error={formState.errors.end_time?.message}
+                          />
                         </div>
                       </div>
                     ) : null}
@@ -561,16 +736,22 @@ export function BriefPage() {
                           {formState.errors.region ? <p className="text-sm text-destructive">{formState.errors.region.message}</p> : null}
                         </div>
                         <div className="space-y-2 md:col-span-2">
-                          <Label htmlFor="venue_name">Spillested (valgfrit)</Label>
-                          <Input id="venue_name" placeholder="Fx Hotel d'Angleterre" {...register("venue_name")} />
-                        </div>
-                        <div className="space-y-2 md:col-span-2">
                           <Label>Status på spillested</Label>
-                          <OptionCards
-                            options={VENUE_STATUS_OPTIONS}
+                          <RadioGroup
                             value={values.venue_status ?? DEFAULT_VALUES.venue_status}
-                            onChange={(value) => setValue("venue_status", value as BriefVenueStatus, { shouldValidate: true })}
-                          />
+                            onValueChange={(value) => setValue("venue_status", value as BriefVenueStatus, { shouldValidate: true })}
+                            className="grid gap-3 md:grid-cols-2"
+                          >
+                            {VENUE_STATUS_OPTIONS.map((option) => (
+                              <Label
+                                key={option}
+                                className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-colors hover:border-accent/40"
+                              >
+                                <RadioGroupItem value={option} />
+                                <span className="text-sm font-medium text-foreground">{option}</span>
+                              </Label>
+                            ))}
+                          </RadioGroup>
                           {formState.errors.venue_status ? <p className="text-sm text-destructive">{formState.errors.venue_status.message}</p> : null}
                         </div>
                       </div>
@@ -591,29 +772,35 @@ export function BriefPage() {
                     ) : null}
 
                     {currentStep === 4 ? (
-                      <div className="grid gap-4">
-                        {TECHNICAL_NEEDS_OPTIONS.map((item) => (
-                          <div key={item.id} className="grid gap-2 rounded-2xl border border-border/60 bg-muted/20 p-4 md:grid-cols-[1fr_auto] md:items-center">
-                            <div>
-                              <Label htmlFor={item.id}>{item.label}</Label>
+                      <div className="space-y-6">
+                        <TechnicalSetupCard
+                          eventType={getEventTypeValue(values.event_type)}
+                          guestCountRange={values.guest_count_range ?? DEFAULT_VALUES.guest_count_range}
+                        />
+                        <div className="grid gap-4">
+                          {TECHNICAL_FIELD_OPTIONS.map(({ field, label }) => (
+                            <div key={field} className="grid gap-2 rounded-2xl border border-border/60 bg-muted/20 p-4 md:grid-cols-[1fr_auto] md:items-center">
+                              <div>
+                                <Label htmlFor={field}>{label}</Label>
+                              </div>
+                              <Select
+                                value={values[field]}
+                                onValueChange={(value) => setValue(field, value as YesNoUnsure, { shouldValidate: true })}
+                              >
+                                <SelectTrigger id={field} className="md:w-44">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {YES_NO_UNSURE_OPTIONS.map((option) => (
+                                    <SelectItem key={option.id} value={option.id}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
-                            <Select
-                              value={values[item.id]}
-                              onValueChange={(value) => setValue(item.id, value as YesNoUnsure, { shouldValidate: true })}
-                            >
-                              <SelectTrigger id={item.id} className="md:w-44">
-                                <SelectValue />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {YES_NO_UNSURE_OPTIONS.map((option) => (
-                                  <SelectItem key={option.id} value={option.id}>
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     ) : null}
 
@@ -654,13 +841,33 @@ export function BriefPage() {
                             <Textarea id="do_not_play" placeholder="Numre, der skal undgås" {...register("do_not_play")} />
                           </div>
                         </div>
-                        <div className="space-y-2">
-                          <Label>Foretrukket sprog</Label>
-                          <OptionCards
-                            options={LANGUAGE_OPTIONS}
-                            value={values.language_preference ?? DEFAULT_VALUES.language_preference}
-                            onChange={(value) => setValue("language_preference", value as LanguagePreference, { shouldValidate: true })}
-                          />
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <div className="space-y-2">
+                            <Label>Brug for middag-/baggrundsmusik</Label>
+                            <RadioGroup
+                              value={values.needs_dinner_music ?? DEFAULT_VALUES.needs_dinner_music}
+                              onValueChange={(value) => setValue("needs_dinner_music", value as YesNoUnsure, { shouldValidate: true })}
+                              className="grid gap-3 sm:grid-cols-3"
+                            >
+                              {YES_NO_UNSURE_OPTIONS.map((option) => (
+                                <Label
+                                  key={option.id}
+                                  className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-colors hover:border-accent/40"
+                                >
+                                  <RadioGroupItem value={option.id} />
+                                  <span className="text-sm font-medium text-foreground">{option.label}</span>
+                                </Label>
+                              ))}
+                            </RadioGroup>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Foretrukket sprog</Label>
+                            <OptionCards
+                              options={LANGUAGE_OPTIONS}
+                              value={values.language_preference ?? DEFAULT_VALUES.language_preference}
+                              onChange={(value) => setValue("language_preference", value as LanguagePreference, { shouldValidate: true })}
+                            />
+                          </div>
                         </div>
                       </div>
                     ) : null}

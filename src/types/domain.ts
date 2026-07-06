@@ -3,12 +3,14 @@ export type UserRole = "client" | "dj" | "admin";
 export type EventType =
   | "Firmafest"
   | "Julefrokost"
+  | "Påskefrokost"
   | "Sommerfest"
   | "Middag og efterfest"
   | "Kick-off"
   | "Jubilæum"
   | "Reception"
-  | "Andet firmaarrangement";
+  | "Andet firmaarrangement"
+  | "Anden firmafest";
 
 export type Region =
   | "København / Sjælland"
@@ -34,7 +36,11 @@ export type BudgetBand = "8.000-12.000 DKK" | "12.000-18.000 DKK" | "18.000-25.0
 export type LanguagePreference = "Dansk" | "Engelsk" | "Begge";
 export type DJLanguage = "Dansk" | "Engelsk";
 export type YesNoUnsure = "Ja" | "Nej" | "Ikke sikker";
-export type BriefVenueStatus = "Vi har booket venue" | "Vi er tæt på at booke venue" | "Vi mangler stadig venue";
+export type BriefVenueStatus =
+  | "Vi har booket venue"
+  | "Vi er tæt på at booke venue"
+  | "Vi mangler stadig venue"
+  | "Det holdes hos os selv (eget kontor eller lokale)";
 export type BriefDateFlexibility = "Fast dato" | "Muligvis fleksibel" | "Ikke besluttet endnu";
 export type BriefContactRole = "HR" | "Office manager" | "Assistant" | "Event committee" | "Founder/management" | "Other";
 export type PackageBackupLevel = "none" | "light" | "standard" | "premium";
@@ -168,7 +174,6 @@ export interface EventBrief {
   needs_lighting: YesNoUnsure;
   needs_microphone: YesNoUnsure;
   needs_dinner_music: YesNoUnsure;
-  needs_venue_coordination: YesNoUnsure;
   music_vibe_tags: VibeTag[];
   must_play: string | null;
   do_not_play: string | null;
