@@ -100,9 +100,11 @@ export function AdminLeadDetailPage() {
             <InfoRow label="Gæster" value={currentBrief.guest_count_range} />
             <InfoRow label="Budget" value={currentBrief.budget_band} />
             <InfoRow label="Tidsrum" value={`${currentBrief.start_time} – ${currentBrief.end_time}`} />
+            <InfoRow label="Serviceomfang" value={currentBrief.service_scope} />
             <InfoRow label="Rolle" value={currentBrief.contact_role} />
             <InfoRow label="Venue" value={currentBrief.venue_name ?? "Ikke udfyldt"} />
             <InfoRow label="Venue-status" value={currentBrief.venue_status} />
+            <InfoRow label="Tidlig opsætning" value={currentBrief.early_setup_requested ? `Ja${currentBrief.dj_start_time ? ` · DJ starter kl. ${currentBrief.dj_start_time}` : ""}` : "Nej"} />
             <InfoRow label="Teknisk behov" value={[currentBrief.needs_sound, currentBrief.needs_lighting, currentBrief.needs_microphone, currentBrief.needs_dinner_music].join(" · ")} />
           </CardContent>
         </Card>

@@ -39,11 +39,33 @@ import type {
   GuestCountRange,
   LanguagePreference,
   Region,
+  ServiceScope,
   VibeTag,
   YesNoUnsure,
 } from "@/types/domain";
 
 const DATE_FLEXIBILITY_OPTIONS = ["Fast dato", "Muligvis fleksibel", "Ikke besluttet endnu"] as const satisfies readonly [BriefDateFlexibility, ...BriefDateFlexibility[]];
+const SERVICE_SCOPE_OPTIONS = [
+  {
+    value: "Kun fest",
+    description: "DJ til selve festen og dansegulvet.",
+    windowHint: "Typisk 21:00–01:00",
+  },
+  {
+    value: "Middag og fest",
+    description: "DJ fra middagen til festens slutning.",
+    windowHint: "Typisk 18:00–01:00",
+  },
+  {
+    value: "Velkomst, middag og fest",
+    description: "Fuld dækning fra velkomst/ankomst gennem middag til fest.",
+    windowHint: "Typisk 16:00–01:00",
+  },
+] as const satisfies readonly {
+  value: ServiceScope;
+  description: string;
+  windowHint: string;
+}[];
 const VENUE_STATUS_OPTIONS = [
   "Vi har booket venue",
   "Vi er tæt på at booke venue",
@@ -74,12 +96,15 @@ const briefSchema = z.object({
   date_flexibility: z.enum(DATE_FLEXIBILITY_OPTIONS, { message: "Vælg om datoen er fast eller fleksibel." }),
   city: z.string().min(2, "Skriv en by."),
   venue_status: z.enum(VENUE_STATUS_OPTIONS, { message: "Vælg venue-status." }),
+  service_scope: z.enum(SERVICE_SCOPE_OPTIONS.map((option) => option.value) as [ServiceScope, ...ServiceScope[]], { message: "Vælg service-omfang." }),
   region: z.enum(REGION_OPTIONS.map((option) => option.id) as [Region, ...Region[]], { message: "Vælg region." }),
   guest_count_range: z.enum(GUEST_COUNT_RANGE_OPTIONS.map((option) => option.id) as [GuestCountRange, ...GuestCountRange[]], { message: "Vælg gæsteinterval." }),
   needs_sound: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
   needs_lighting: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
   needs_microphone: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
   needs_dinner_music: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
+  early_setup_requested: z.boolean(),
+  dj_start_time: z.string().nullable().optional(),
   music_vibe_tags: z.array(z.enum(VIBE_OPTIONS.map((option) => option.id) as [VibeTag, ...VibeTag[]])).default([]),
   music_vibe_other: z.string().optional(),
   must_play: z.string().optional(),
@@ -106,12 +131,15 @@ const DEFAULT_VALUES: BriefFormValues = {
   date_flexibility: "Fast dato",
   city: "",
   venue_status: "Vi mangler stadig venue",
+  service_scope: "Middag og fest",
   region: "København / Sjælland",
   guest_count_range: "Under 50",
   needs_sound: "Ikke sikker",
   needs_lighting: "Ikke sikker",
   needs_microphone: "Ikke sikker",
   needs_dinner_music: "Ikke sikker",
+  early_setup_requested: false,
+  dj_start_time: null,
   music_vibe_tags: [],
   music_vibe_other: "",
   must_play: "",
@@ -140,7 +168,7 @@ const steps = [
 
 const stepFieldNames: Array<(keyof BriefFormValues)[]> = [
   ["event_type"],
-  ["event_date", "start_time", "end_time", "date_flexibility"],
+  ["event_date", "date_flexibility", "service_scope", "start_time", "end_time", "early_setup_requested", "dj_start_time"],
   ["city", "venue_status", "region"],
   ["guest_count_range"],
   ["needs_sound", "needs_lighting", "needs_microphone"],
@@ -196,6 +224,18 @@ function normalizeTime(value: string | undefined | null) {
 
 function getEventTypeValue(value: string | undefined | null) {
   return normalizeBriefEventType(value);
+}
+
+function getServiceScopePreset(scope: ServiceScope) {
+  switch (scope) {
+    case "Kun fest":
+      return { start_time: "21:00", end_time: "01:00" };
+    case "Velkomst, middag og fest":
+      return { start_time: "16:00", end_time: "01:00" };
+    case "Middag og fest":
+    default:
+      return { start_time: "18:00", end_time: "01:00" };
+  }
 }
 
 function getPrefillValue(source: Record<string, unknown>, key: string) {
@@ -295,6 +335,9 @@ function buildTestModeValues(values: BriefFormValues): BriefFormValues {
     event_date: isNonEmpty(values.event_date) ? values.event_date : `${year}-${month}-${day}`,
     start_time: normalizeTime(values.start_time) || "18:00",
     end_time: normalizeTime(values.end_time) || "23:30",
+    service_scope: values.service_scope ?? DEFAULT_VALUES.service_scope,
+    early_setup_requested: false,
+    dj_start_time: null,
     city: isNonEmpty(values.city) ? values.city : "København",
     success_description: isNonEmpty(values.success_description)
       ? values.success_description
@@ -382,14 +425,14 @@ function TimeSelect({
 }: {
   id: string;
   label: string;
-  value: string;
+  value: string | null | undefined;
   onChange: (value: string) => void;
   error?: string;
 }) {
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>{label}</Label>
-      <Select value={value} onValueChange={onChange}>
+      <Select value={value ?? ""} onValueChange={onChange}>
         <SelectTrigger id={id}>
           <SelectValue placeholder="Vælg tidspunkt" />
         </SelectTrigger>
@@ -402,6 +445,42 @@ function TimeSelect({
         </SelectContent>
       </Select>
       {error ? <p className="text-sm text-destructive">{error}</p> : null}
+    </div>
+  );
+}
+
+function ServiceScopeCards({
+  value,
+  onChange,
+}: {
+  value: ServiceScope;
+  onChange: (value: ServiceScope) => void;
+}) {
+  return (
+    <div className="grid gap-3 md:grid-cols-3">
+      {SERVICE_SCOPE_OPTIONS.map((option) => {
+        const selected = value === option.value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onChange(option.value)}
+            className={cn(
+              "rounded-3xl border p-4 text-left shadow-sm transition-all",
+              selected ? "border-accent bg-accent/5 ring-1 ring-accent/20" : "border-border/60 bg-card hover:border-accent/40",
+            )}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-foreground">{option.value}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">{option.description}</p>
+              </div>
+              {selected ? <Check className="h-4 w-4 shrink-0 text-accent" /> : null}
+            </div>
+            <p className="mt-4 text-xs font-medium uppercase tracking-[0.18em] text-accent">{option.windowHint}</p>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -464,11 +543,13 @@ function BriefSummaryCard({ values }: { values: Partial<BriefFormValues> }) {
         <SummaryRow label="Eventtype" value={values.event_type ?? "—"} />
         <SummaryRow label="Dato" value={values.event_date ? formatDanishDateShort(values.event_date) : "—"} />
         <SummaryRow label="Tid" value={values.start_time && values.end_time ? `${values.start_time} – ${values.end_time}` : "—"} />
+        <SummaryRow label="Serviceomfang" value={values.service_scope ?? "—"} />
         <SummaryRow label="By" value={values.city ?? "—"} />
         <SummaryRow label="Region" value={values.region ?? "—"} />
         <SummaryRow label="Gæster" value={values.guest_count_range ?? "—"} />
         <SummaryRow label="Budget" value={values.budget_band ?? "—"} />
         <SummaryRow label="Venue-status" value={values.venue_status ?? "—"} />
+        <SummaryRow label="Tidlig opsætning" value={values.early_setup_requested ? `Ja${values.dj_start_time ? ` · DJ starter kl. ${values.dj_start_time}` : ""}` : "Nej"} />
         <SummaryRow label="Stemning" value={selectedVibes} />
       </CardContent>
     </Card>
@@ -509,6 +590,9 @@ export function BriefPage() {
       event_type: normalizeBriefEventType(nextValues.event_type),
       start_time: normalizeTime(nextValues.start_time),
       end_time: normalizeTime(nextValues.end_time),
+      service_scope: nextValues.service_scope ?? DEFAULT_VALUES.service_scope,
+      early_setup_requested: Boolean(nextValues.early_setup_requested),
+      dj_start_time: nextValues.dj_start_time ?? null,
     });
   }, [prefill, reset]);
 
@@ -557,11 +641,14 @@ export function BriefPage() {
       region: values.region,
       venue_name: null,
       venue_status: values.venue_status,
+      service_scope: values.service_scope,
       guest_count_range: values.guest_count_range,
       needs_sound: values.needs_sound,
       needs_lighting: values.needs_lighting,
       needs_microphone: values.needs_microphone,
       needs_dinner_music: values.needs_dinner_music,
+      early_setup_requested: values.early_setup_requested,
+      dj_start_time: values.early_setup_requested ? values.dj_start_time ?? null : null,
       music_vibe_tags: values.music_vibe_tags ?? [],
       music_vibe_other: values.music_vibe_other?.trim() ? values.music_vibe_other.trim() : null,
       must_play: values.must_play?.trim() ? values.must_play.trim() : null,
@@ -694,6 +781,21 @@ export function BriefPage() {
                               <p className="text-sm text-destructive">{formState.errors.date_flexibility.message}</p>
                             ) : null}
                           </div>
+                        </div>
+                        <div className="space-y-3">
+                          <Label>Serviceomfang</Label>
+                          <ServiceScopeCards
+                            value={values.service_scope ?? DEFAULT_VALUES.service_scope}
+                            onChange={(value) => {
+                              const preset = getServiceScopePreset(value);
+                              setValue("service_scope", value, { shouldValidate: true });
+                              setValue("start_time", preset.start_time, { shouldValidate: true });
+                              setValue("end_time", preset.end_time, { shouldValidate: true });
+                            }}
+                          />
+                          {formState.errors.service_scope ? <p className="text-sm text-destructive">{formState.errors.service_scope.message}</p> : null}
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-2">
                           <TimeSelect
                             id="start_time"
                             label="Starttid"
@@ -708,6 +810,36 @@ export function BriefPage() {
                             onChange={(value) => setValue("end_time", value, { shouldValidate: true })}
                             error={formState.errors.end_time?.message}
                           />
+                        </div>
+                        <div className="rounded-3xl border border-border/60 bg-muted/20 p-4 space-y-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <Label className="text-sm font-semibold text-foreground">Tidlig opsætning</Label>
+                              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                                Vi sætter udstyret op i god tid, så I selv kan bruge lyd og mikrofon (fx til taler eller egen playliste), før DJ&apos;en tager over.
+                              </p>
+                            </div>
+                            <Switch
+                              checked={values.early_setup_requested}
+                              onCheckedChange={(checked) => {
+                                setValue("early_setup_requested", checked, { shouldValidate: true });
+                                if (!checked) {
+                                  setValue("dj_start_time", null, { shouldValidate: true });
+                                }
+                              }}
+                              aria-label="Tidlig opsætning"
+                            />
+                          </div>
+                          {values.early_setup_requested ? (
+                            <div className="max-w-sm space-y-2">
+                              <TimeSelect
+                                id="dj_start_time"
+                                label="DJ starter kl."
+                                value={values.dj_start_time}
+                                onChange={(value) => setValue("dj_start_time", value, { shouldValidate: true })}
+                              />
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     ) : null}

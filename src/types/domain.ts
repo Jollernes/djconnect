@@ -36,6 +36,7 @@ export type BudgetBand = "8.000-12.000 DKK" | "12.000-18.000 DKK" | "18.000-25.0
 export type LanguagePreference = "Dansk" | "Engelsk" | "Begge";
 export type DJLanguage = "Dansk" | "Engelsk";
 export type YesNoUnsure = "Ja" | "Nej" | "Ikke sikker";
+export type ServiceScope = "Kun fest" | "Middag og fest" | "Velkomst, middag og fest";
 export type BriefVenueStatus =
   | "Vi har booket venue"
   | "Vi er tæt på at booke venue"
@@ -169,11 +170,14 @@ export interface EventBrief {
   region: Region;
   venue_name: string | null;
   venue_status: BriefVenueStatus;
+  service_scope: ServiceScope;
   guest_count_range: GuestCountRange;
   needs_sound: YesNoUnsure;
   needs_lighting: YesNoUnsure;
   needs_microphone: YesNoUnsure;
   needs_dinner_music: YesNoUnsure;
+  early_setup_requested: boolean;
+  dj_start_time: string | null;
   music_vibe_tags: VibeTag[];
   must_play: string | null;
   do_not_play: string | null;
