@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -35,20 +36,52 @@ export function HomePage() {
     .filter((pkg) => pkg.active)
     .sort((a, b) => a.display_order - b.display_order)
     .slice(0, 3);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setPrefersReducedMotion(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
 
   return (
     <div className="overflow-hidden">
-      <section className="relative border-b border-border/60 bg-[radial-gradient(circle_at_top_right,_rgba(56,189,248,0.16),_transparent_34%),radial-gradient(circle_at_25%_20%,_rgba(212,164,72,0.16),_transparent_32%),linear-gradient(180deg,_hsl(var(--background))_0%,_hsl(var(--background))_65%,_rgba(255,255,255,0.95)_100%)]">
-        <Container className="relative py-16 sm:py-20 lg:py-24">
+      <section className="relative isolate overflow-hidden border-b border-border/60 bg-slate-950">
+        <div className="absolute inset-0">
+          {prefersReducedMotion ? (
+            <img src="/hero/hero-poster.jpg" alt="" aria-hidden="true" className="h-full w-full object-cover" />
+          ) : (
+            <video
+              className="h-full w-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              poster="/hero/hero-poster.jpg"
+              aria-hidden="true"
+            >
+              <source src="/hero/hero-loop.webm" type="video/webm" />
+              <source src="/hero/hero-loop.mp4" type="video/mp4" />
+            </video>
+          )}
+        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,_rgba(2,6,23,0.88)_0%,_rgba(2,6,23,0.7)_52%,_rgba(2,6,23,0.84)_100%),radial-gradient(circle_at_top_right,_rgba(56,189,248,0.18),_transparent_34%),radial-gradient(circle_at_25%_20%,_rgba(212,164,72,0.16),_transparent_32%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-transparent to-slate-950/55" />
+        <Container className="relative z-10 py-16 sm:py-20 lg:py-24">
           <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
             <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <Badge variant="secondary" className="mb-5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]">
+              <Badge variant="secondary" className="mb-5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white hover:bg-white/10">
                 {PLATFORM_TAGLINES[0]}
               </Badge>
-              <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+              <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Book en professionel DJ til firmafesten uden usikkerhed
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/80 sm:text-xl">
                 Få en kurateret løsning med DJ, lyd, lys, kontrakt og backup. Udfyld jeres eventdetaljer og få et anbefalet match.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -61,14 +94,14 @@ export function HomePage() {
                   <Link to="/pakker">Se pakker</Link>
                 </Button>
               </div>
-              <div className="mt-8 flex flex-wrap gap-2 text-sm text-muted-foreground">
+              <div className="mt-8 flex flex-wrap gap-2 text-sm text-white/75">
                 {[
                   "Professionel afvikling",
                   "Kurateret shortlist",
                   "Tydelig pris og kontrakt",
                   "Backup og teknik",
                 ].map((item) => (
-                  <span key={item} className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-card px-3 py-1.5 shadow-sm">
+                  <span key={item} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-white/85 shadow-[0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-sm">
                     <Sparkles className="h-4 w-4 text-gold" />
                     {item}
                   </span>
