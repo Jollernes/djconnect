@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
   BRIEF_CONTACT_ROLE_OPTIONS,
@@ -58,6 +59,7 @@ const VENUE_STATUS_OPTIONS = ["Vi har booket venue", "Vi er tæt på at booke ve
 const LANGUAGE_OPTIONS = ["Dansk", "Engelsk", "Begge"] as const satisfies readonly [LanguagePreference, ...LanguagePreference[]];
 
 const STORAGE_KEY = "djconnect.flow.briefDraft.v1";
+const TEST_MODE_STORAGE_KEY = "djconnect.flow.briefTestMode.v1";
 
 const briefSchema = z.object({
   event_type: z.enum(EVENT_TYPES, { message: "Vælg en eventtype." }),
@@ -183,20 +185,79 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function StepPills({ currentStep }: { currentStep: number }) {
+function StepPills({
+  currentStep,
+  testMode,
+  onSelectStep,
+}: {
+  currentStep: number;
+  testMode: boolean;
+  onSelectStep: (step: number) => void;
+}) {
   return (
     <div className="flex flex-wrap gap-2">
       {steps.map((label, index) => (
-        <Badge
-          key={label}
-          variant={index === currentStep ? "accent" : index < currentStep ? "secondary" : "outline"}
-          className={cn("rounded-full px-3 py-1", index === currentStep ? "shadow-sm" : "")}
-        >
-          {index + 1}. {label}
-        </Badge>
+        testMode ? (
+          <button
+            key={label}
+            type="button"
+            onClick={() => onSelectStep(index)}
+            className={cn(
+              "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors",
+              index === currentStep
+                ? "bg-accent text-accent-foreground shadow-sm"
+                : index < currentStep
+                  ? "bg-secondary text-secondary-foreground"
+                  : "border border-border/70 bg-background text-muted-foreground",
+              "cursor-pointer hover:border-accent/40 hover:bg-accent/10 hover:text-foreground",
+            )}
+            aria-current={index === currentStep ? "step" : undefined}
+          >
+            {index + 1}. {label}
+          </button>
+        ) : (
+          <Badge
+            key={label}
+            variant={index === currentStep ? "accent" : index < currentStep ? "secondary" : "outline"}
+            className={cn("rounded-full px-3 py-1", index === currentStep ? "shadow-sm" : "")}
+          >
+            {index + 1}. {label}
+          </Badge>
+        )
       ))}
     </div>
   );
+}
+
+function isNonEmpty(value: string | undefined | null) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function buildTestModeValues(values: BriefFormValues): BriefFormValues {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = `${today.getMonth() + 1}`.padStart(2, "0");
+  const day = `${today.getDate()}`.padStart(2, "0");
+
+  return {
+    ...DEFAULT_VALUES,
+    ...values,
+    event_date: isNonEmpty(values.event_date) ? values.event_date : `${year}-${month}-${day}`,
+    start_time: isNonEmpty(values.start_time) ? values.start_time : "18:00",
+    end_time: isNonEmpty(values.end_time) ? values.end_time : "23:30",
+    city: isNonEmpty(values.city) ? values.city : "København",
+    venue_name: isNonEmpty(values.venue_name) ? values.venue_name : "",
+    success_description: isNonEmpty(values.success_description)
+      ? values.success_description
+      : "Testtilstand: Vi vil gerne se en fuld, realistisk løsning med DJ, teknik og backup.",
+    contact_name: isNonEmpty(values.contact_name) ? values.contact_name : "Test Bruger",
+    company_name: isNonEmpty(values.company_name) ? values.company_name : "DJConnect Demo A/S",
+    contact_email: isNonEmpty(values.contact_email) ? values.contact_email : "test@djconnect.dk",
+    contact_phone: isNonEmpty(values.contact_phone) ? values.contact_phone : "+45 12 34 56 78",
+    music_vibe_other: isNonEmpty(values.music_vibe_other) ? values.music_vibe_other : "",
+    must_play: isNonEmpty(values.must_play) ? values.must_play : "",
+    do_not_play: isNonEmpty(values.do_not_play) ? values.do_not_play : "",
+  };
 }
 
 function OptionCards({
@@ -261,6 +322,12 @@ export function BriefPage() {
     [location.state],
   );
   const [currentStep, setCurrentStep] = useState(0);
+  const [testMode, setTestMode] = useState(() => {
+    if (typeof window === "undefined" || typeof localStorage === "undefined") {
+      return false;
+    }
+    return localStorage.getItem(TEST_MODE_STORAGE_KEY) === "1";
+  });
 
   const form = useForm<BriefFormValues>({
     resolver: zodResolver(briefSchema) as unknown as Resolver<BriefFormValues>,
@@ -279,10 +346,21 @@ export function BriefPage() {
     saveDraft(values as BriefFormValues);
   }, [values]);
 
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof localStorage === "undefined") {
+      return;
+    }
+    localStorage.setItem(TEST_MODE_STORAGE_KEY, testMode ? "1" : "0");
+  }, [testMode]);
+
   const progress = useMemo(() => ((currentStep + 1) / steps.length) * 100, [currentStep]);
   const isFinalStep = currentStep === steps.length - 1;
 
   async function goNext() {
+    if (testMode) {
+      setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
+      return;
+    }
     const valid = await trigger(stepFieldNames[currentStep]);
     if (valid) {
       setCurrentStep((step) => Math.min(step + 1, steps.length - 1));
@@ -293,7 +371,7 @@ export function BriefPage() {
     setCurrentStep((step) => Math.max(step - 1, 0));
   }
 
-  const onSubmit: SubmitHandler<BriefFormValues> = async (values) => {
+  const submitBrief = async (values: BriefFormValues) => {
     const brief = createEventBrief({
       company_name: values.company_name,
       contact_name: values.contact_name,
@@ -330,6 +408,17 @@ export function BriefPage() {
     navigate(`/proposal/${proposal.id}`);
   };
 
+  const onSubmit: SubmitHandler<BriefFormValues> = async (submittedValues) => {
+    await submitBrief(submittedValues);
+  };
+
+  const handleFormSubmit = testMode
+    ? (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        void submitBrief(buildTestModeValues({ ...values }));
+      }
+    : handleSubmit(onSubmit);
+
   return (
     <FlowLayout>
       <section className="border-b border-border/60 bg-background">
@@ -345,7 +434,17 @@ export function BriefPage() {
               </Badge>
             </div>
             <Progress value={progress} className="h-2" />
-            <StepPills currentStep={currentStep} />
+            <div className="flex flex-col gap-4 rounded-3xl border border-border/60 bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">Testtilstand</p>
+                <p className="text-sm text-muted-foreground">Klik rundt mellem trin uden validering.</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Switch checked={testMode} onCheckedChange={setTestMode} aria-label="Testtilstand" />
+                <span className="text-sm font-medium text-foreground">{testMode ? "Til" : "Fra"}</span>
+              </div>
+            </div>
+            <StepPills currentStep={currentStep} testMode={testMode} onSelectStep={setCurrentStep} />
           </div>
         </Container>
       </section>
@@ -376,7 +475,7 @@ export function BriefPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              <form onSubmit={handleFormSubmit} className="space-y-8">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={currentStep}
