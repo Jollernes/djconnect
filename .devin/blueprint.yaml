@@ -1,0 +1,21 @@
+# https://docs.devin.ai/onboard-devin/environment-yaml
+initialize: |
+  # Node.js v20 is available in the environment; no extra system tools needed.
+maintenance: |
+  # The root repo has its own lockfile (pnpm), but the new product is isolated under firmadj/.
+  (cd firmadj && npm install)
+knowledge:
+  - name: lint
+    contents: |
+      (cd firmadj && npm run lint)
+  - name: build
+    contents: |
+      (cd firmadj && npm run build)
+  - name: dev
+    contents: |
+      (cd firmadj && npm run dev)
+  - name: notes
+    contents: |
+      Two isolated products share this repo: the existing Vite React marketplace at the root and the new Next.js app at firmadj/. Run lint/build/dev from the appropriate directory.
+      Demo logins: client@firmadj.demo / dj@firmadj.demo / admin@firmadj.demo — password Demo1234!.
+      Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to switch from in-memory demo mode to Supabase.
