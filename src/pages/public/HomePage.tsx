@@ -256,26 +256,8 @@ function DesktopBelowHero({
         </motion.form>
       </div>
 
-      {/* DJ grid — 5 cards between search bar and headline */}
-      {gridDJs.length >= 5 && (
-        <div className="mx-auto mt-12 max-w-7xl px-6">
-          <div className="grid grid-cols-5 gap-5">
-            {gridDJs.map((dj, i) => (
-              <motion.div
-                key={dj.id}
-                initial={{ opacity: 0, y: 24 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 + i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                whileHover={{ y: -6 }}
-              >
-                <HomeDJCard dj={dj} density="5" />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Content below — white bg */}
+      {/* Content below — white bg. Headline is the first thing under
+          the hero + search bar; the DJ grid follows underneath it. */}
       <div className="bg-background py-12 text-center">
         <div className="mx-auto max-w-3xl px-4">
           {/* Social proof */}
@@ -348,6 +330,26 @@ function DesktopBelowHero({
             <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" /> Stripe escrow</span>
           </motion.div>
         </div>
+
+        {/* DJ grid — 5 cards below the headline */}
+        {gridDJs.length >= 5 && (
+          <div className="mx-auto mt-12 max-w-7xl px-6">
+            <div className="grid grid-cols-5 gap-5">
+              {gridDJs.map((dj, i) => (
+                <motion.div
+                  key={dj.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ delay: i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -6 }}
+                >
+                  <HomeDJCard dj={dj} density="5" />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
