@@ -98,6 +98,10 @@ export function AdminLeadDetailPage() {
             <InfoRow label="Region" value={currentBrief.region} />
             <InfoRow label="By" value={currentBrief.city} />
             <InfoRow label="Gæster" value={currentBrief.guest_count_range} />
+            <InfoRow
+              label="Størrelse på mobildiskotek"
+              value={currentBrief.setup_size === "compact" ? "Kompakt" : currentBrief.setup_size === "medium" ? "Mellem" : currentBrief.setup_size === "large" ? "Stor" : "—"}
+            />
             <InfoRow label="Budget" value={currentBrief.budget_band} />
             <InfoRow label="Tidsrum" value={`${currentBrief.start_time} – ${currentBrief.end_time}`} />
             <InfoRow label="Serviceomfang" value={currentBrief.service_scope} />

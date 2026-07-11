@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { FlowLayout } from "@/components/layout/FlowLayout";
 import { Container } from "@/components/common/Container";
+import { MobileDiscoBuilder } from "@/components/flow/MobileDiscoBuilder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,8 +25,6 @@ import {
   type BriefEventType,
   getBriefEventTypeConfig,
   getBriefGuestTier,
-  getBriefSetupCopy,
-  getBriefSetupImageUrl,
   normalizeBriefEventType,
 } from "@/lib/eventTypes";
 import { createEventBrief, createProposalForBrief } from "@/lib/store";
@@ -37,6 +36,7 @@ import type {
   BriefVenueStatus,
   BudgetBand,
   GuestCountRange,
+  GuestTier,
   LanguagePreference,
   Region,
   ServiceScope,
@@ -78,6 +78,11 @@ const TECHNICAL_FIELD_OPTIONS = [
   { field: "needs_lighting", label: "Behov for yderligere dansegulvslys" },
   { field: "needs_microphone", label: "Mikrofon til taler" },
 ] as const satisfies readonly { field: "needs_sound" | "needs_lighting" | "needs_microphone"; label: string }[];
+const SETUP_SIZE_OPTIONS = [
+  { value: "compact", label: "Kompakt", description: "Mindre arrangementer" },
+  { value: "medium", label: "Mellem", description: "Balanceret løsning" },
+  { value: "large", label: "Stor", description: "Mere rækkevidde" },
+] as const satisfies readonly { value: GuestTier; label: string; description: string }[];
 const HALF_HOUR_TIMES = Array.from({ length: 48 }, (_, index) => {
   const totalMinutes = index * 30;
   const hours = Math.floor(totalMinutes / 60);
@@ -97,6 +102,7 @@ const briefSchema = z.object({
   city: z.string().min(2, "Skriv en by."),
   venue_status: z.enum(VENUE_STATUS_OPTIONS, { message: "Vælg venue-status." }),
   service_scope: z.enum(SERVICE_SCOPE_OPTIONS.map((option) => option.value) as [ServiceScope, ...ServiceScope[]], { message: "Vælg service-omfang." }),
+  setup_size: z.enum(["compact", "medium", "large"] as const),
   region: z.enum(REGION_OPTIONS.map((option) => option.id) as [Region, ...Region[]], { message: "Vælg region." }),
   guest_count_range: z.enum(GUEST_COUNT_RANGE_OPTIONS.map((option) => option.id) as [GuestCountRange, ...GuestCountRange[]], { message: "Vælg gæsteinterval." }),
   needs_sound: z.enum(["Ja", "Nej", "Ikke sikker"] as const),
@@ -132,6 +138,7 @@ const DEFAULT_VALUES: BriefFormValues = {
   city: "",
   venue_status: "Vi mangler stadig venue",
   service_scope: "Middag og fest",
+  setup_size: "compact",
   region: "København / Sjælland",
   guest_count_range: "Under 50",
   needs_sound: "Ikke sikker",
@@ -171,7 +178,7 @@ const stepFieldNames: Array<(keyof BriefFormValues)[]> = [
   ["event_date", "date_flexibility", "service_scope", "start_time", "end_time", "early_setup_requested", "dj_start_time"],
   ["city", "venue_status", "region"],
   ["guest_count_range"],
-  ["needs_sound", "needs_lighting", "needs_microphone"],
+  ["setup_size", "needs_sound", "needs_lighting", "needs_microphone"],
   ["music_vibe_tags", "music_vibe_other", "must_play", "do_not_play", "language_preference", "needs_dinner_music"],
   ["budget_band"],
   ["success_description"],
@@ -336,6 +343,7 @@ function buildTestModeValues(values: BriefFormValues): BriefFormValues {
     start_time: normalizeTime(values.start_time) || "18:00",
     end_time: normalizeTime(values.end_time) || "23:30",
     service_scope: values.service_scope ?? DEFAULT_VALUES.service_scope,
+    setup_size: values.setup_size ?? getBriefGuestTier(values.guest_count_range ?? DEFAULT_VALUES.guest_count_range),
     early_setup_requested: false,
     dj_start_time: null,
     city: isNonEmpty(values.city) ? values.city : "København",
@@ -498,33 +506,70 @@ function ExpectationCard({ eventType }: { eventType: BriefEventType }) {
 function TechnicalSetupCard({
   eventType,
   guestCountRange,
+  setupSize,
+  onSetupSizeChange,
+  extraSound,
+  extraLighting,
+  microphone,
+  serviceScope,
 }: {
   eventType: BriefEventType;
   guestCountRange: GuestCountRange;
+  setupSize: GuestTier;
+  onSetupSizeChange: (value: GuestTier) => void;
+  extraSound: boolean;
+  extraLighting: boolean;
+  microphone: boolean;
+  serviceScope: ServiceScope;
 }) {
-  const tier = getBriefGuestTier(guestCountRange);
-  const image = getBriefSetupImageUrl(guestCountRange);
-  const setupCopy = getBriefSetupCopy(eventType, guestCountRange);
-  const tierLabel = tier === "compact" ? "Kompakt setup" : tier === "medium" ? "Balanceret setup" : "Større setup";
+  const eventConfig = getBriefEventTypeConfig(eventType);
+  const recommendedTier = getBriefGuestTier(guestCountRange);
+  const selectedTierLabel = setupSize === "compact" ? "Kompakt setup" : setupSize === "medium" ? "Balanceret setup" : "Større setup";
+  const recommendedLabel = recommendedTier === "compact" ? "Kompakt" : recommendedTier === "medium" ? "Mellem" : "Stor";
 
   return (
     <Card className="overflow-hidden border-border/60 shadow-sm">
-      <div className="grid gap-0 md:grid-cols-[220px_1fr]">
-        <div className="relative min-h-52 bg-slate-900">
-          <img src={image} alt="" className="h-full w-full object-cover opacity-90" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+      <CardContent className="space-y-5 p-4 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Badge variant="secondary" className="rounded-full px-3 py-1">
+            {selectedTierLabel}
+          </Badge>
+          <span className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">Live visualisering</span>
         </div>
-        <div className="space-y-3 p-5">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="rounded-full px-3 py-1">
-              Anbefalet mobile-disco setup
-            </Badge>
-            <span className="text-sm font-medium text-foreground">{tierLabel}</span>
+        <MobileDiscoBuilder
+          eventType={eventType}
+          sizeTier={setupSize}
+          extraSound={extraSound}
+          extraLighting={extraLighting}
+          microphone={microphone}
+          serviceScope={serviceScope}
+        />
+        <div className="space-y-3">
+          <p className="text-sm leading-6 text-muted-foreground">{eventConfig.setupCopy[setupSize]}</p>
+          <p className="text-sm font-medium text-foreground">
+            Vores anbefaling til {guestCountRange.toLowerCase()} gæster: {recommendedLabel}.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {SETUP_SIZE_OPTIONS.map((option) => {
+              const selected = setupSize === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => onSetupSizeChange(option.value)}
+                  className={cn(
+                    "rounded-2xl border p-3 text-left transition-all",
+                    selected ? "border-accent bg-accent/5 ring-1 ring-accent/20" : "border-border/60 bg-card hover:border-accent/40",
+                  )}
+                >
+                  <span className="block text-sm font-semibold text-foreground">{option.label}</span>
+                  <span className="mt-1 block text-xs text-muted-foreground">{option.description}</span>
+                </button>
+              );
+            })}
           </div>
-          <p className="text-sm leading-6 text-muted-foreground">{setupCopy}</p>
-          <p className="text-sm font-medium text-foreground">Dette setup passer til {guestCountRange.toLowerCase()} gæster.</p>
         </div>
-      </div>
+      </CardContent>
     </Card>
   );
 }
@@ -547,6 +592,10 @@ function BriefSummaryCard({ values }: { values: Partial<BriefFormValues> }) {
         <SummaryRow label="By" value={values.city ?? "—"} />
         <SummaryRow label="Region" value={values.region ?? "—"} />
         <SummaryRow label="Gæster" value={values.guest_count_range ?? "—"} />
+        <SummaryRow
+          label="Størrelse på mobildiskotek"
+          value={values.setup_size === "compact" ? "Kompakt" : values.setup_size === "medium" ? "Mellem" : values.setup_size === "large" ? "Stor" : "—"}
+        />
         <SummaryRow label="Budget" value={values.budget_band ?? "—"} />
         <SummaryRow label="Venue-status" value={values.venue_status ?? "—"} />
         <SummaryRow label="Tidlig opsætning" value={values.early_setup_requested ? `Ja${values.dj_start_time ? ` · DJ starter kl. ${values.dj_start_time}` : ""}` : "Nej"} />
@@ -591,6 +640,7 @@ export function BriefPage() {
       start_time: normalizeTime(nextValues.start_time),
       end_time: normalizeTime(nextValues.end_time),
       service_scope: nextValues.service_scope ?? DEFAULT_VALUES.service_scope,
+      setup_size: nextValues.setup_size ?? getBriefGuestTier(nextValues.guest_count_range ?? DEFAULT_VALUES.guest_count_range),
       early_setup_requested: Boolean(nextValues.early_setup_requested),
       dj_start_time: nextValues.dj_start_time ?? null,
     });
@@ -642,6 +692,7 @@ export function BriefPage() {
       venue_name: null,
       venue_status: values.venue_status,
       service_scope: values.service_scope,
+      setup_size: values.setup_size,
       guest_count_range: values.guest_count_range,
       needs_sound: values.needs_sound,
       needs_lighting: values.needs_lighting,
@@ -908,6 +959,12 @@ export function BriefPage() {
                         <TechnicalSetupCard
                           eventType={getEventTypeValue(values.event_type)}
                           guestCountRange={values.guest_count_range ?? DEFAULT_VALUES.guest_count_range}
+                          setupSize={values.setup_size ?? getBriefGuestTier(values.guest_count_range ?? DEFAULT_VALUES.guest_count_range)}
+                          onSetupSizeChange={(value) => setValue("setup_size", value, { shouldValidate: true })}
+                          extraSound={values.needs_sound === "Ja"}
+                          extraLighting={values.needs_lighting === "Ja"}
+                          microphone={values.needs_microphone === "Ja"}
+                          serviceScope={values.service_scope ?? DEFAULT_VALUES.service_scope}
                         />
                         <div className="grid gap-4">
                           {TECHNICAL_FIELD_OPTIONS.map(({ field, label }) => (

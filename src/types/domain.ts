@@ -21,6 +21,7 @@ export type Region =
   | "Hele Danmark / andet";
 
 export type GuestCountRange = "Under 50" | "50-80" | "80-150" | "150-250" | "250-350" | "350+";
+export type GuestTier = "compact" | "medium" | "large";
 
 export type VibeTag =
   | "Elegant middag først, fest senere"
@@ -171,6 +172,7 @@ export interface EventBrief {
   venue_name: string | null;
   venue_status: BriefVenueStatus;
   service_scope: ServiceScope;
+  setup_size: GuestTier;
   guest_count_range: GuestCountRange;
   needs_sound: YesNoUnsure;
   needs_lighting: YesNoUnsure;

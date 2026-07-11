@@ -1,8 +1,7 @@
 import { Flower2, PartyPopper, Snowflake, Sparkles, SunMedium, type LucideIcon } from "lucide-react";
-import type { EventType, GuestCountRange } from "@/types/domain";
+import type { EventType, GuestCountRange, GuestTier } from "@/types/domain";
 
 export type BriefEventType = "Julefrokost" | "Påskefrokost" | "Sommerfest" | "Reception" | "Anden firmafest";
-export type GuestTier = "compact" | "medium" | "large";
 
 export interface BriefEventTypeConfig {
   label: string;
@@ -11,6 +10,11 @@ export interface BriefEventTypeConfig {
   cardToneClassName: string;
   expectationCopy: string;
   setupCopy: Record<GuestTier, string>;
+  palette: {
+    beamPrimary: string;
+    beamSecondary: string;
+    glow: string;
+  };
   matchingEventTypes: EventType[];
 }
 
@@ -35,6 +39,11 @@ export const BRIEF_EVENT_TYPE_CONFIGS: Record<BriefEventType, BriefEventTypeConf
       medium: "Et balanceret setup med fuldt danselys, ekstra headroom og en overgang fra middag til fest.",
       large: "Et større setup med flere zoner, kraftigere lyd og en fleksibel løsning til hele selskabet.",
     },
+    palette: {
+      beamPrimary: "#34d399",
+      beamSecondary: "#f87171",
+      glow: "#fbbf24",
+    },
     matchingEventTypes: ["Julefrokost", "Firmafest", "Andet firmaarrangement"],
   },
   Påskefrokost: {
@@ -48,6 +57,11 @@ export const BRIEF_EVENT_TYPE_CONFIGS: Record<BriefEventType, BriefEventTypeConf
       compact: "Et lyst og let setup med diskret lyd, blød belysning og plads til taler eller præsentationer.",
       medium: "Et velafbalanceret setup med mere punch på dansegulvet, men stadig ro til spisningen.",
       large: "Et større setup med tydelig opbygning til fest, talespor og en stærk afslutning på aftenen.",
+    },
+    palette: {
+      beamPrimary: "#a3e635",
+      beamSecondary: "#fde68a",
+      glow: "#facc15",
     },
     matchingEventTypes: ["Påskefrokost", "Julefrokost", "Firmafest"],
   },
@@ -63,6 +77,11 @@ export const BRIEF_EVENT_TYPE_CONFIGS: Record<BriefEventType, BriefEventTypeConf
       medium: "Et medium setup med ekstra lydreserve, varme farver og et dansespor, der kan samle hele holdet.",
       large: "Et stort sommer-setup med flere zoner, robust lyd og en tydelig festprofil til mange gæster.",
     },
+    palette: {
+      beamPrimary: "#fbbf24",
+      beamSecondary: "#f472b6",
+      glow: "#fb923c",
+    },
     matchingEventTypes: ["Sommerfest", "Reception", "Firmafest"],
   },
   Reception: {
@@ -77,6 +96,11 @@ export const BRIEF_EVENT_TYPE_CONFIGS: Record<BriefEventType, BriefEventTypeConf
       medium: "Et afbalanceret setup med plads til taler, baggrundsmusik og en kontrolleret overgang til fest.",
       large: "Et større setup til mange gæster med tydelig lydfordeling og sikker håndtering af taler og flow.",
     },
+    palette: {
+      beamPrimary: "#38bdf8",
+      beamSecondary: "#f8fafc",
+      glow: "#facc15",
+    },
     matchingEventTypes: ["Reception", "Firmafest", "Andet firmaarrangement"],
   },
   "Anden firmafest": {
@@ -90,6 +114,11 @@ export const BRIEF_EVENT_TYPE_CONFIGS: Record<BriefEventType, BriefEventTypeConf
       compact: "Et fleksibelt kompakt setup til mindre firmaevents med tydelig lyd og rolig opsætning.",
       medium: "Et alsidigt setup, der balancerer taler, middag og dansegulv uden at fylde unødigt.",
       large: "Et markant setup til store firmafester med kraftig lyd, god lysdækning og solid afvikling.",
+    },
+    palette: {
+      beamPrimary: "#a78bfa",
+      beamSecondary: "#e879f9",
+      glow: "#c084fc",
     },
     matchingEventTypes: ["Firmafest", "Andet firmaarrangement", "Middag og efterfest", "Kick-off", "Jubilæum"],
   },
@@ -137,20 +166,4 @@ export function getBriefGuestTier(guestCountRange: GuestCountRange): GuestTier {
     default:
       return "compact";
   }
-}
-
-export function getBriefSetupImageUrl(guestCountRange: GuestCountRange) {
-  const tier = getBriefGuestTier(guestCountRange);
-  return {
-    compact:
-      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
-    medium:
-      "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80",
-    large:
-      "https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=1200&q=80",
-  }[tier];
-}
-
-export function getBriefSetupCopy(eventType: BriefEventType, guestCountRange: GuestCountRange) {
-  return getBriefEventTypeConfig(eventType).setupCopy[getBriefGuestTier(guestCountRange)];
 }
