@@ -41,7 +41,8 @@ export type SoftWeddingColourway =
   | "default"
   | "blush"
   | "sage"
-  | "champagne";
+  | "champagne"
+  | "dj";
 
 interface SoftWeddingColourwayTokens {
   /** Hex used on icon strokes/fills inside the stat row. */
@@ -114,6 +115,21 @@ export const SOFT_WEDDING_COLOURWAYS: Record<
     ctaFilledBg: "bg-[#e8d09e]",
     ctaFilledBorder: "border-[#dfc185]",
     ctaFilledHover: "hover:bg-[#dfc185]",
+  },
+  // DJConnect brand palette. Swaps the warm wedding rose-gold for the
+  // platform's orange accent so the neutral homepage card reads as
+  // "DJ" rather than "wedding-magazine". The filled CTA is normally
+  // driven by the theme's `ctaTokens` (brand accent) — these fill
+  // tokens are the fallback if a caller uses this colourway without a
+  // theme override.
+  dj: {
+    accent: "#f5761f",
+    cardBg: "bg-white",
+    ctaBorder: "border-orange-200",
+    ctaHover: "hover:border-orange-300 hover:bg-orange-50",
+    ctaFilledBg: "bg-accent",
+    ctaFilledBorder: "border-accent",
+    ctaFilledHover: "hover:bg-accent/90",
   },
 };
 
@@ -543,6 +559,7 @@ export function GridCardV23SoftWedding({
   availabilityDate,
   photoLayout = "carved",
   eventTheme = WEDDING_THEME,
+  hideHallmark = false,
   videoUrl,
   unavailable,
 }: {
@@ -670,6 +687,11 @@ export function GridCardV23SoftWedding({
    * colourway tokens, and editorial hero treatment identical. Defaults
    * to `WEDDING_THEME` so existing callers are unaffected. */
   eventTheme?: EventTheme;
+  /** When true, the event hallmark badge (e.g. "BryllupsDJ") is not
+   * rendered on the hero at all. Used by the event-neutral homepage
+   * card so the design reads as a generic DJ listing without any
+   * event-specific tag. */
+  hideHallmark?: boolean;
   /** Optional intro-video URL. When provided, a small `[▶]` button
    * appears in the hero's top-right corner; tapping it swaps the
    * hero photo for an autoplaying `<video>` element. When omitted,
@@ -803,7 +825,8 @@ export function GridCardV23SoftWedding({
   return (
     <Card
       className={cn(
-        "group flex flex-col overflow-hidden rounded-2xl border border-amber-100/70 shadow-sm transition-shadow hover:shadow-md",
+        "group flex flex-col overflow-hidden rounded-2xl border shadow-sm transition-shadow hover:shadow-md",
+        hideHallmark ? "border-slate-200/80" : "border-amber-100/70",
         palette.cardBg,
         // Muted treatment for booked / non-matching DJs. Mirrors the
         // standard `DJCard` unavailable language: dashed border, soft
@@ -868,19 +891,21 @@ export function GridCardV23SoftWedding({
                   narrower triptych hero. Label + glyph swap per
                   `eventTheme` (BryllupsDJ / FødselsdagsDJ /
                   FirmaDJ / EventDJ). */}
-              <span
-                className={cn(
-                  "absolute left-2 top-2 inline-flex items-center rounded-full bg-white/95 font-sans font-medium uppercase text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
-                  compact
-                    ? "gap-1 px-2 py-0.5 text-[9px] tracking-[0.12em]"
-                    : "gap-1 px-2.5 py-1 text-[10px] tracking-[0.14em]",
-                )}
-              >
-                <eventTheme.HallmarkIcon
-                  className={compact ? "h-2.5 w-[18px]" : "h-3 w-[20px]"}
-                />
-                {eventTheme.hallmarkLabel}
-              </span>
+              {!hideHallmark && (
+                <span
+                  className={cn(
+                    "absolute left-2 top-2 inline-flex items-center rounded-full bg-white/95 font-sans font-medium uppercase text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
+                    compact
+                      ? "gap-1 px-2 py-0.5 text-[9px] tracking-[0.12em]"
+                      : "gap-1 px-2.5 py-1 text-[10px] tracking-[0.14em]",
+                  )}
+                >
+                  <eventTheme.HallmarkIcon
+                    className={compact ? "h-2.5 w-[18px]" : "h-3 w-[20px]"}
+                  />
+                  {eventTheme.hallmarkLabel}
+                </span>
+              )}
               {/* Video + picture action buttons — top-right of the
                   hero, mirroring the hallmark on the top-left. */}
               {renderHeroActions({ position: "triptych" })}
@@ -1036,19 +1061,21 @@ export function GridCardV23SoftWedding({
             mark, top-left. Cream backdrop + thin amber ring keeps it
             premium / wedding-magazine rather than marketplace-tag-y.
             Label + glyph swap per `eventTheme`. */}
-        <span
-          className={cn(
-            "absolute left-3 top-3 inline-flex items-center rounded-full bg-white/95 font-sans font-medium uppercase text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
-            compact
-              ? "gap-1 px-2.5 py-1 text-[9.5px] tracking-[0.12em]"
-              : "gap-1.5 px-3 py-1 text-[10.5px] tracking-[0.14em]",
-          )}
-        >
-          <eventTheme.HallmarkIcon
-            className={compact ? "h-3 w-[20px]" : "h-3.5 w-[22px]"}
-          />
-          {eventTheme.hallmarkLabel}
-        </span>
+        {!hideHallmark && (
+          <span
+            className={cn(
+              "absolute left-3 top-3 inline-flex items-center rounded-full bg-white/95 font-sans font-medium uppercase text-slate-900 shadow-sm ring-1 ring-amber-200/80 backdrop-blur-sm",
+              compact
+                ? "gap-1 px-2.5 py-1 text-[9.5px] tracking-[0.12em]"
+                : "gap-1.5 px-3 py-1 text-[10.5px] tracking-[0.14em]",
+            )}
+          >
+            <eventTheme.HallmarkIcon
+              className={compact ? "h-3 w-[20px]" : "h-3.5 w-[22px]"}
+            />
+            {eventTheme.hallmarkLabel}
+          </span>
+        )}
 
         {/* Video + picture action buttons — top-right of the hero,
             mirroring the hallmark on the top-left. */}

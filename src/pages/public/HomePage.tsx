@@ -27,7 +27,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
-import { DJCard } from "@/components/common/DJCard";
+import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
+import { NEUTRAL_THEME } from "@/components/event-djs/grid/eventThemes";
 import { HeroDJCluster } from "@/components/common/HeroDJCluster";
 import { useDJs } from "@/hooks/useDJs";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -53,6 +54,41 @@ const fadeUp = {
     transition: { delay, duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
   }),
 };
+
+/** Homepage listing card. A smaller, event-neutral take on the
+ * `/wedding-djs` Soft Wedding card: the BryllupsDJ hallmark is
+ * dropped, the warm wedding wash is removed (raw colour photo), and
+ * the palette + CTA switch to the DJConnect brand accent instead of
+ * rose-gold. `density` lets the same card ride both the wide
+ * featured grid (`"4"`) and the tight 5-up hero grid (`"5"`). */
+function HomeDJCard({
+  dj,
+  density,
+}: {
+  dj: DJProfileWithRelations;
+  density: "4" | "5";
+}) {
+  return (
+    <GridCardV23SoftWedding
+      dj={dj}
+      density={density}
+      tint="none"
+      heroGrayscale={0}
+      avatarGrayscale={false}
+      bioLines={2}
+      fontStyle="sans"
+      hideHallmark
+      hideStarRating={false}
+      showRegion
+      showSeeProfileCta
+      statStyle="inline"
+      ctaProminence="filled"
+      ctaLabel="Se profil"
+      colourway="dj"
+      eventTheme={NEUTRAL_THEME}
+    />
+  );
+}
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -116,7 +152,7 @@ export function HomePage() {
                 transition={{ delay: i * 0.08, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -6 }}
               >
-                <DJCard dj={dj} />
+                <HomeDJCard dj={dj} density="4" />
               </motion.div>
             ))}
           </div>
@@ -232,7 +268,7 @@ function DesktopBelowHero({
                 transition={{ delay: 0.5 + i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -6 }}
               >
-                <DJCard dj={dj} />
+                <HomeDJCard dj={dj} density="5" />
               </motion.div>
             ))}
           </div>

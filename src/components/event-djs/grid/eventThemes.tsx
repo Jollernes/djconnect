@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { Briefcase, Cake, PartyPopper } from "lucide-react";
+import { Briefcase, Cake, Disc3, PartyPopper } from "lucide-react";
 import type { DJProfileWithRelations } from "@/types/domain";
 
 /** Hallmark colour applied to the hallmark-badge glyph regardless of
@@ -219,4 +219,36 @@ export const OTHER_THEME: EventTheme = {
   ),
   defaultPriceIncludes: ["4 timer inkl. lyd & lys"],
   ctaTokens: NAVY_CTA_TOKENS,
+};
+
+/** Filled-CTA tokens built from the DJConnect brand accent (orange)
+ * so the neutral homepage card leans on the platform's own palette
+ * rather than the warm wedding-magazine rose-gold. White text keeps
+ * the label legible on the saturated accent fill. */
+const DJ_CTA_TOKENS = {
+  bg: "bg-accent",
+  border: "border-accent",
+  hover: "hover:bg-accent/90",
+  text: "text-accent-foreground",
+};
+
+/** Event-neutral theme for the homepage listings. Reuses the Soft
+ * Wedding card layout but drops any event-specific framing: the
+ * hallmark badge is expected to be hidden by the caller
+ * (`hideHallmark`), the CTA uses the brand-accent fill, and the
+ * copy stays generic ("events"). Keeps the same shape as the other
+ * themes so it slots into `GridCardV23SoftWedding` unchanged. */
+export const NEUTRAL_THEME: EventTheme = {
+  id: "other",
+  hallmarkLabel: "DJ",
+  HallmarkIcon: makeLucideHallmarkIcon(Disc3),
+  playedLabel: "events",
+  PlayedIcon: makeLucideHallmarkIcon(Disc3),
+  playedCount: makePlayedCount(
+    { "10+": 350, "5-10": 165, "3-5": 80, "1-3": 32 },
+    1.5,
+    30,
+  ),
+  defaultPriceIncludes: ["4 timer inkl. lyd & lys"],
+  ctaTokens: DJ_CTA_TOKENS,
 };
