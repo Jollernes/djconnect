@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import { useForm, useWatch, type SubmitHandler, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { FlowLayout } from "@/components/layout/FlowLayout";
 import { Container } from "@/components/common/Container";
 import { MobileDiscoBuilder } from "@/components/flow/MobileDiscoBuilder";
@@ -290,16 +290,30 @@ function StepPills({
   testMode: boolean;
   onSelectStep: (step: number) => void;
 }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    containerRef.current?.querySelector('[data-active="true"]')?.scrollIntoView({
+      inline: "center",
+      block: "nearest",
+      behavior: "smooth",
+    });
+  }, [currentStep]);
+
   return (
-    <div className="flex flex-wrap gap-2">
+    <div
+      ref={containerRef}
+      className="flex gap-2 overflow-x-auto flex-nowrap pb-2 -mx-1 px-1 sm:mx-0 sm:px-0 sm:pb-0 sm:flex-wrap sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
       {steps.map((label, index) => (
         testMode ? (
           <button
             key={label}
             type="button"
             onClick={() => onSelectStep(index)}
+            data-active={index === currentStep}
             className={cn(
-              "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors",
+              "inline-flex shrink-0 items-center whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium transition-colors",
               index === currentStep
                 ? "bg-accent text-accent-foreground shadow-sm"
                 : index < currentStep
@@ -315,7 +329,8 @@ function StepPills({
           <Badge
             key={label}
             variant={index === currentStep ? "accent" : index < currentStep ? "secondary" : "outline"}
-            className={cn("rounded-full px-3 py-1", index === currentStep ? "shadow-sm" : "")}
+            data-active={index === currentStep}
+            className={cn("shrink-0 whitespace-nowrap rounded-full px-3 py-1", index === currentStep ? "shadow-sm" : "")}
           >
             {index + 1}. {label}
           </Badge>
@@ -574,33 +589,39 @@ function TechnicalSetupCard({
   );
 }
 
-function BriefSummaryCard({ values }: { values: Partial<BriefFormValues> }) {
+function BriefSummaryRows({ values }: { values: Partial<BriefFormValues> }) {
   const selectedVibesTags = values.music_vibe_tags ?? [];
   const selectedVibes = selectedVibesTags.length ? selectedVibesTags.join(", ") : "Ikke valgt endnu";
 
+  return (
+    <CardContent className="divide-y divide-border/60 pt-0">
+      <SummaryRow label="Eventtype" value={values.event_type ?? "—"} />
+      <SummaryRow label="Dato" value={values.event_date ? formatDanishDateShort(values.event_date) : "—"} />
+      <SummaryRow label="Tid" value={values.start_time && values.end_time ? `${values.start_time} – ${values.end_time}` : "—"} />
+      <SummaryRow label="Serviceomfang" value={values.service_scope ?? "—"} />
+      <SummaryRow label="By" value={values.city ?? "—"} />
+      <SummaryRow label="Region" value={values.region ?? "—"} />
+      <SummaryRow label="Gæster" value={values.guest_count_range ?? "—"} />
+      <SummaryRow
+        label="Størrelse på mobildiskotek"
+        value={values.setup_size === "compact" ? "Kompakt" : values.setup_size === "medium" ? "Mellem" : values.setup_size === "large" ? "Stor" : "—"}
+      />
+      <SummaryRow label="Budget" value={values.budget_band ?? "—"} />
+      <SummaryRow label="Venue-status" value={values.venue_status ?? "—"} />
+      <SummaryRow label="Tidlig opsætning" value={values.early_setup_requested ? `Ja${values.dj_start_time ? ` · DJ starter kl. ${values.dj_start_time}` : ""}` : "Nej"} />
+      <SummaryRow label="Stemning" value={selectedVibes} />
+    </CardContent>
+  );
+}
+
+function BriefSummaryCard({ values }: { values: Partial<BriefFormValues> }) {
   return (
     <Card className="sticky top-24 border-border/60 shadow-sm">
       <CardHeader>
         <CardTitle>Din brief</CardTitle>
         <CardDescription>Det her bruger vi til at finde et realistisk match.</CardDescription>
       </CardHeader>
-      <CardContent className="divide-y divide-border/60 pt-0">
-        <SummaryRow label="Eventtype" value={values.event_type ?? "—"} />
-        <SummaryRow label="Dato" value={values.event_date ? formatDanishDateShort(values.event_date) : "—"} />
-        <SummaryRow label="Tid" value={values.start_time && values.end_time ? `${values.start_time} – ${values.end_time}` : "—"} />
-        <SummaryRow label="Serviceomfang" value={values.service_scope ?? "—"} />
-        <SummaryRow label="By" value={values.city ?? "—"} />
-        <SummaryRow label="Region" value={values.region ?? "—"} />
-        <SummaryRow label="Gæster" value={values.guest_count_range ?? "—"} />
-        <SummaryRow
-          label="Størrelse på mobildiskotek"
-          value={values.setup_size === "compact" ? "Kompakt" : values.setup_size === "medium" ? "Mellem" : values.setup_size === "large" ? "Stor" : "—"}
-        />
-        <SummaryRow label="Budget" value={values.budget_band ?? "—"} />
-        <SummaryRow label="Venue-status" value={values.venue_status ?? "—"} />
-        <SummaryRow label="Tidlig opsætning" value={values.early_setup_requested ? `Ja${values.dj_start_time ? ` · DJ starter kl. ${values.dj_start_time}` : ""}` : "Nej"} />
-        <SummaryRow label="Stemning" value={selectedVibes} />
-      </CardContent>
+      <BriefSummaryRows values={values} />
     </Card>
   );
 }
@@ -741,6 +762,9 @@ export function BriefPage() {
               </Badge>
             </div>
             <Progress value={progress} className="h-2" />
+            <p className="text-sm font-medium text-muted-foreground sm:hidden">
+              Trin {currentStep + 1} af {steps.length} · {steps[currentStep]}
+            </p>
             <div className="flex flex-col gap-4 rounded-3xl border border-border/60 bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-foreground">Testtilstand</p>
@@ -1154,6 +1178,14 @@ export function BriefPage() {
               </form>
             </CardContent>
           </Card>
+
+          <details className="group rounded-3xl border border-border/60 bg-card shadow-sm lg:hidden">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-6 py-4 text-base font-semibold text-foreground [&::-webkit-details-marker]:hidden">
+              Din brief
+              <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-open:rotate-180" />
+            </summary>
+            <BriefSummaryRows values={values} />
+          </details>
 
           <div className="hidden lg:block">
             <BriefSummaryCard values={values} />
