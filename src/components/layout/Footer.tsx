@@ -1,51 +1,68 @@
 import { Link } from "react-router-dom";
-import { Music2 } from "lucide-react";
-import { PLATFORM_NAME } from "@/lib/constants";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { PLATFORM_NAME, PLATFORM_SUPPORT_EMAIL, REGION_OPTIONS, EVENT_TYPE_OPTIONS } from "@/lib/constants";
 
 export function Footer() {
   const year = new Date().getFullYear();
+
   return (
-    <footer className="border-t bg-primary text-primary-foreground">
-      <div className="container grid gap-8 py-12 md:grid-cols-4">
-        <div>
-          <Link to="/" className="flex items-center gap-2 font-semibold">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-accent text-accent-foreground">
-              <Music2 className="h-4 w-4" />
-            </span>
-            <span className="text-lg">{PLATFORM_NAME}</span>
-          </Link>
-          <p className="mt-4 max-w-xs text-sm text-primary-foreground/70">
-            Verified DJs with full mobile disco setups — book with confidence for weddings, parties, and corporate events.
+    <footer className="border-t border-border/60 bg-primary pb-24 text-primary-foreground md:pb-0">
+      <div className="container grid gap-10 py-12 md:grid-cols-2 xl:grid-cols-4">
+        <div className="space-y-4">
+          <p className="text-lg font-semibold">{PLATFORM_NAME}</p>
+          <p className="max-w-sm text-sm leading-6 text-primary-foreground/70">
+            Virksomhedsoplysninger indsættes ved lancering. Platformen er bygget som en kurateret managed-agency løsning til danske firmaevents.
           </p>
+          <a className="block text-sm text-primary-foreground/70 hover:text-primary-foreground" href={`mailto:${PLATFORM_SUPPORT_EMAIL}`}>
+            {PLATFORM_SUPPORT_EMAIL}
+          </a>
         </div>
+
         <div>
-          <h4 className="mb-3 text-sm font-semibold">Platform</h4>
-          <ul className="space-y-2 text-sm text-primary-foreground/70">
-            <li><Link to="/how-it-works" className="hover:text-primary-foreground">How it works</Link></li>
-            <li><Link to="/about" className="hover:text-primary-foreground">About</Link></li>
-            <li><Link to="/faq" className="hover:text-primary-foreground">FAQ</Link></li>
-            <li><Link to="/contact" className="hover:text-primary-foreground">Contact</Link></li>
-          </ul>
+          <p className="text-sm font-semibold">Serviceområder</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {REGION_OPTIONS.map((region) => (
+              <Badge key={region.id} variant="outline" className="border-primary-foreground/20 text-primary-foreground">
+                {region.label}
+              </Badge>
+            ))}
+          </div>
         </div>
+
         <div>
-          <h4 className="mb-3 text-sm font-semibold">For DJs</h4>
-          <ul className="space-y-2 text-sm text-primary-foreground/70">
-            <li><Link to="/signup/dj" className="hover:text-primary-foreground">Become a DJ</Link></li>
-            <li><Link to="/how-it-works#djs" className="hover:text-primary-foreground">How it works for DJs</Link></li>
-          </ul>
+          <p className="text-sm font-semibold">Eventtyper</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {EVENT_TYPE_OPTIONS.map((eventType) => (
+              <Badge key={eventType.id} variant="outline" className="border-primary-foreground/20 text-primary-foreground">
+                {eventType.label}
+              </Badge>
+            ))}
+          </div>
         </div>
-        <div>
-          <h4 className="mb-3 text-sm font-semibold">Legal</h4>
-          <ul className="space-y-2 text-sm text-primary-foreground/70">
-            <li><Link to="/terms" className="hover:text-primary-foreground">Terms of Service</Link></li>
-            <li><Link to="/privacy" className="hover:text-primary-foreground">Privacy Policy</Link></li>
-          </ul>
+
+        <div className="space-y-4">
+          <p className="text-sm font-semibold">Hurtige links</p>
+          <div className="flex flex-col gap-2 text-sm text-primary-foreground/70">
+            <Link to="/handelsbetingelser" className="hover:text-primary-foreground">
+              Handelsbetingelser
+            </Link>
+            <Link to="/privatlivspolitik" className="hover:text-primary-foreground">
+              Privatlivspolitik
+            </Link>
+            <Link to="/kontakt" className="hover:text-primary-foreground">
+              Kontakt
+            </Link>
+          </div>
+          <Button asChild variant="accent" className="w-full">
+            <Link to="/brief">Tjek dato og få match</Link>
+          </Button>
         </div>
       </div>
       <div className="border-t border-primary-foreground/10">
-        <div className="container flex flex-col items-center justify-between gap-2 py-4 text-xs text-primary-foreground/60 sm:flex-row">
-          <span>© {year} {PLATFORM_NAME}. All rights reserved.</span>
-          <span>Payments processed securely by Stripe.</span>
+        <div className="container flex flex-col gap-2 py-4 text-xs text-primary-foreground/55 sm:flex-row sm:items-center sm:justify-between">
+          <span>© {year} {PLATFORM_NAME}</span>
+          <span>Premium managed-agency booking til danske virksomheder</span>
         </div>
       </div>
     </footer>

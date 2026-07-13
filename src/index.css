@@ -6,26 +6,29 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 40 33% 98%;
+    --foreground: 222 45% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 222 45% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 222 45% 13%;
 
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 222 45% 15%;
+    --primary-foreground: 40 33% 98%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 40 25% 95%;
+    --secondary-foreground: 222 45% 13%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 42 22% 94%;
+    --muted-foreground: 215 18% 38%;
 
-    --accent: 21 90% 53%;
+    --accent: 214 90% 52%;
     --accent-foreground: 0 0% 100%;
+
+    --gold: 40 74% 52%;
+    --gold-foreground: 222 45% 13%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -34,11 +37,11 @@
     --success-foreground: 0 0% 100%;
 
     --warning: 38 92% 50%;
-    --warning-foreground: 222 47% 11%;
+    --warning-foreground: 222 45% 13%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 21 90% 53%;
+    --border: 35 18% 88%;
+    --input: 35 18% 88%;
+    --ring: 214 90% 52%;
 
     --radius: 0.75rem;
   }
@@ -69,10 +72,10 @@
 
   .hero-gradient {
     background:
-      radial-gradient(ellipse 60% 55% at 20% 30%, hsla(21, 90%, 53%, 0.55), transparent 60%),
-      radial-gradient(ellipse 55% 55% at 85% 20%, hsla(280, 85%, 60%, 0.45), transparent 60%),
-      radial-gradient(ellipse 80% 50% at 50% 100%, hsla(199, 89%, 60%, 0.35), transparent 70%),
-      linear-gradient(135deg, hsl(222 47% 9%), hsl(222 47% 14%) 45%, hsl(222 47% 11%));
+      radial-gradient(ellipse 60% 55% at 18% 22%, hsla(214, 90%, 52%, 0.18), transparent 60%),
+      radial-gradient(ellipse 48% 42% at 82% 18%, hsla(40, 74%, 52%, 0.16), transparent 58%),
+      radial-gradient(ellipse 70% 55% at 50% 100%, hsla(222, 45%, 26%, 0.42), transparent 68%),
+      linear-gradient(135deg, hsl(222 45% 12%), hsl(220 22% 18%) 46%, hsl(222 45% 14%));
     background-size: 220% 220%, 220% 220%, 200% 200%, 100% 100%;
     animation: hero-shift 18s ease-in-out infinite alternate;
   }
@@ -88,7 +91,7 @@
   }
 
   .glow-accent {
-    box-shadow: 0 0 0 0 hsla(21, 90%, 53%, 0.55);
+    box-shadow: 0 0 0 0 hsla(214, 90%, 52%, 0.45);
     animation: pulse-glow 2.6s ease-in-out infinite;
   }
 
@@ -123,8 +126,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0     hsla(21, 90%, 53%, 0.55); }
-  50%      { box-shadow: 0 0 0 18px  hsla(21, 90%, 53%, 0);    }
+  0%, 100% { box-shadow: 0 0 0 0     hsla(214, 90%, 52%, 0.45); }
+  50%      { box-shadow: 0 0 0 18px  hsla(214, 90%, 52%, 0);    }
 }
 
 @keyframes spin-slow {

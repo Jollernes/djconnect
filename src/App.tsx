@@ -1,161 +1,134 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { RoleGuard } from "@/components/common/RoleGuard";
-
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { DevicePreview } from "@/components/common/DevicePreview";
 import { HomePage } from "@/pages/public/HomePage";
-import { SearchPage } from "@/pages/public/SearchPage";
-import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
-import { GetOffersPage } from "@/pages/public/GetOffersPage";
-import { MyRequestPage } from "@/pages/public/MyRequestPage";
-import { WeddingDJsTestAPage } from "@/pages/public/WeddingDJsTestAPage";
-import { WeddingDJsTestBPage } from "@/pages/public/WeddingDJsTestBPage";
-import { WeddingDJsTestCPage } from "@/pages/public/WeddingDJsTestCPage";
-import { DJProfilePage } from "@/pages/public/DJProfilePage";
-import { BookingRequestPage } from "@/pages/public/BookingRequestPage";
-import { AboutPage } from "@/pages/public/AboutPage";
-import { HowItWorksPage } from "@/pages/public/HowItWorksPage";
-import { FAQPage } from "@/pages/public/FAQPage";
-import { TermsPage } from "@/pages/public/TermsPage";
-import { PrivacyPage } from "@/pages/public/PrivacyPage";
-import { ContactPage } from "@/pages/public/ContactPage";
+import { DJPartnerApplicationPage } from "@/pages/public/DJPartnerApplicationPage";
+import {
+  ContactPage,
+  FaqPage,
+  HowItWorksPage,
+  PackagesPage,
+  PrivacyPage,
+  TermsPage,
+  TrustQualityPage,
+  UseCaseLandingPage,
+} from "@/pages/public/StaticSeoPages";
 import { NotFoundPage } from "@/pages/public/NotFoundPage";
+import { BriefPage } from "@/pages/flow/BriefPage";
+import { ProposalPage } from "@/pages/flow/ProposalPage";
+import { ReservePage } from "@/pages/flow/ReservePage";
+import { ReservationSuccessPage } from "@/pages/flow/ReservationSuccessPage";
+import { ClientDashboardPage } from "@/pages/client/ClientDashboardPage";
+import { EventDetailPage } from "@/pages/client/EventDetailPage";
+import { DJDashboardPage } from "@/pages/dj/DJDashboardPage";
+import { AdminOverviewPage } from "@/pages/admin/AdminOverviewPage";
+import { AdminLeadsPage } from "@/pages/admin/AdminLeadsPage";
+import { AdminLeadDetailPage } from "@/pages/admin/AdminLeadDetailPage";
+import { AdminBookingsPage } from "@/pages/admin/AdminBookingsPage";
+import { AdminBookingDetailPage } from "@/pages/admin/AdminBookingDetailPage";
+import { AdminDJsPage } from "@/pages/admin/AdminDJsPage";
+import { AdminDJDetailPage } from "@/pages/admin/AdminDJDetailPage";
+import { AdminPackagesPage } from "@/pages/admin/AdminPackagesPage";
+import { AdminReviewsPage } from "@/pages/admin/AdminReviewsPage";
+import { AdminContentPage } from "@/pages/admin/AdminContentPage";
+import { USE_CASE_CONFIGS } from "@/lib/useCases";
 
-import { LoginPage } from "@/pages/auth/LoginPage";
-import { SignupPage } from "@/pages/auth/SignupPage";
-import { DJSignupPage } from "@/pages/auth/DJSignupPage";
-import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage";
-import { ResetPasswordPage } from "@/pages/auth/ResetPasswordPage";
-import { AuthCallbackPage } from "@/pages/auth/AuthCallbackPage";
-import { PendingVerificationPage } from "@/pages/auth/PendingVerificationPage";
+function LoginPage() {
+  const { mockLogin, isConfigured } = useAuth();
 
-import { CustomerDashboardPage } from "@/pages/customer/DashboardPage";
-import { CustomerBookingsPage } from "@/pages/customer/BookingsPage";
-import { CustomerBookingDetailPage } from "@/pages/customer/BookingDetailPage";
-import { CustomerFavouritesPage } from "@/pages/customer/FavouritesPage";
-import { CustomerSettingsPage } from "@/pages/customer/SettingsPage";
+  return (
+    <div className="container flex min-h-[70vh] items-center justify-center py-12">
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle>Log ind</CardTitle>
+          <CardDescription>
+            Demo-login er slået til, så du kan klikke rundt uden backend. {isConfigured ? "Supabase er også tilgængelig." : "Supabase er ikke konfigureret."}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-3 sm:flex-row">
+          <Button onClick={() => mockLogin("client")} className="flex-1">
+            Log ind som kunde
+          </Button>
+          <Button variant="secondary" onClick={() => mockLogin("dj")} className="flex-1">
+            Log ind som DJ
+          </Button>
+          <Button variant="outline" onClick={() => mockLogin("admin")} className="flex-1">
+            Log ind som admin
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
-import { DJDashboardPage } from "@/pages/dj/DashboardPage";
-import { DJBookingsPage } from "@/pages/dj/BookingsPage";
-import { DJBookingDetailPage } from "@/pages/dj/BookingDetailPage";
-import { DJAvailabilityPage } from "@/pages/dj/AvailabilityPage";
-import { DJEarningsPage } from "@/pages/dj/EarningsPage";
-import { DJMessagesPage } from "@/pages/dj/MessagesPage";
-import { DJProfileEditorPage } from "@/pages/dj/ProfileEditorPage";
-import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
-import { DJGuideGate } from "@/components/common/DJGuideGate";
+function AppShell() {
+  return (
+    <Routes>
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/pakker" element={<PackagesPage />} />
+        <Route path="/saadan-fungerer-det" element={<HowItWorksPage />} />
+        <Route path="/tryghed-og-kvalitet" element={<TrustQualityPage />} />
+        <Route path="/faq" element={<FaqPage />} />
+        <Route path="/kontakt" element={<ContactPage />} />
+        <Route path="/bliv-dj-partner" element={<DJPartnerApplicationPage />} />
+        <Route path="/dj-til-firmafest" element={<UseCaseLandingPage config={USE_CASE_CONFIGS["/dj-til-firmafest"]} />} />
+        <Route path="/dj-til-julefrokost" element={<UseCaseLandingPage config={USE_CASE_CONFIGS["/dj-til-julefrokost"]} />} />
+        <Route path="/dj-til-sommerfest" element={<UseCaseLandingPage config={USE_CASE_CONFIGS["/dj-til-sommerfest"]} />} />
+        <Route path="/dj-til-firmaarrangement" element={<UseCaseLandingPage config={USE_CASE_CONFIGS["/dj-til-firmaarrangement"]} />} />
+        <Route path="/dj-til-middag-og-fest" element={<UseCaseLandingPage config={USE_CASE_CONFIGS["/dj-til-middag-og-fest"]} />} />
+        <Route path="/mobildiskotek-firmafest" element={<UseCaseLandingPage config={USE_CASE_CONFIGS["/mobildiskotek-firmafest"]} />} />
+        <Route path="/handelsbetingelser" element={<TermsPage />} />
+        <Route path="/privatlivspolitik" element={<PrivacyPage />} />
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
 
-import { AdminDashboardPage } from "@/pages/admin/DashboardPage";
-import { VerificationQueuePage, VerificationDetailPage } from "@/pages/admin/VerificationPage";
-import { AdminUsersPage } from "@/pages/admin/UsersPage";
-import { AdminBookingsPage } from "@/pages/admin/BookingsPage";
-import { AdminFinancialsPage } from "@/pages/admin/FinancialsPage";
-import { AdminReviewsPage } from "@/pages/admin/ReviewsPage";
-import { AdminFeaturedPage } from "@/pages/admin/FeaturedPage";
+      <Route path="/brief" element={<BriefPage />} />
+      <Route path="/proposal/:id" element={<ProposalPage />} />
+      <Route path="/reserve/:proposalId" element={<ReservePage />} />
+      <Route path="/reservation/:bookingId/kvittering" element={<ReservationSuccessPage />} />
 
-function App() {
+      <Route element={<RoleGuard allow={["client"]}><DashboardLayout /></RoleGuard>}>
+        <Route path="/client" element={<ClientDashboardPage />} />
+        <Route path="/client/event/:bookingId" element={<EventDetailPage />} />
+      </Route>
+
+      <Route element={<RoleGuard allow={["dj"]}><DashboardLayout /></RoleGuard>}>
+        <Route path="/dj" element={<DJDashboardPage />} />
+      </Route>
+
+      <Route element={<RoleGuard allow={["admin"]}><DashboardLayout /></RoleGuard>}>
+        <Route path="/admin" element={<AdminOverviewPage />} />
+        <Route path="/admin/leads" element={<AdminLeadsPage />} />
+        <Route path="/admin/leads/:id" element={<AdminLeadDetailPage />} />
+        <Route path="/admin/bookings" element={<AdminBookingsPage />} />
+        <Route path="/admin/bookings/:id" element={<AdminBookingDetailPage />} />
+        <Route path="/admin/djs" element={<AdminDJsPage />} />
+        <Route path="/admin/djs/:id" element={<AdminDJDetailPage />} />
+        <Route path="/admin/pakker" element={<AdminPackagesPage />} />
+        <Route path="/admin/anmeldelser" element={<AdminReviewsPage />} />
+        <Route path="/admin/indhold" element={<AdminContentPage />} />
+      </Route>
+
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+}
+
+export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/wedding-djs" element={<WeddingDJsPage />} />
-            <Route path="/wedding-djs-test-a" element={<WeddingDJsTestAPage />} />
-            <Route path="/wedding-djs-test-b" element={<WeddingDJsTestBPage />} />
-            <Route path="/wedding-djs-test-c" element={<WeddingDJsTestCPage />} />
-            <Route path="/djs/:username" element={<DJProfilePage />} />
-            <Route path="/book/:username" element={<BookingRequestPage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/terms" element={<TermsPage />} />
-            <Route path="/privacy" element={<PrivacyPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/signup/dj" element={<DJSignupPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/auth/callback" element={<AuthCallbackPage />} />
-            <Route path="/dj/pending-verification" element={<PendingVerificationPage />} />
-          </Route>
-
-          <Route
-            element={
-              <RoleGuard allow={["customer"]}>
-                <DashboardLayout />
-              </RoleGuard>
-            }
-          >
-            <Route path="/dashboard" element={<CustomerDashboardPage />} />
-            <Route path="/dashboard/bookings" element={<CustomerBookingsPage />} />
-            <Route path="/dashboard/bookings/:id" element={<CustomerBookingDetailPage />} />
-            <Route path="/dashboard/favourites" element={<CustomerFavouritesPage />} />
-            <Route path="/dashboard/settings" element={<CustomerSettingsPage />} />
-          </Route>
-
-          <Route
-            path="/dj/onboarding"
-            element={
-              <RoleGuard allow={["dj"]}>
-                <DJOnboardingGuidePage />
-              </RoleGuard>
-            }
-          />
-
-          <Route
-            element={
-              <RoleGuard allow={["dj"]}>
-                <DJGuideGate>
-                  <DashboardLayout />
-                </DJGuideGate>
-              </RoleGuard>
-            }
-          >
-            <Route path="/dj/dashboard" element={<DJDashboardPage />} />
-            <Route path="/dj/bookings" element={<DJBookingsPage />} />
-            <Route path="/dj/bookings/:id" element={<DJBookingDetailPage />} />
-            <Route path="/dj/availability" element={<DJAvailabilityPage />} />
-            <Route path="/dj/earnings" element={<DJEarningsPage />} />
-            <Route path="/dj/messages" element={<DJMessagesPage />} />
-            <Route path="/dj/profile" element={<DJProfileEditorPage />} />
-          </Route>
-
-          <Route
-            element={
-              <RoleGuard allow={["admin"]}>
-                <DashboardLayout />
-              </RoleGuard>
-            }
-          >
-            <Route path="/admin" element={<AdminDashboardPage />} />
-            <Route path="/admin/verification" element={<VerificationQueuePage />} />
-            <Route path="/admin/verification/:id" element={<VerificationDetailPage />} />
-            <Route path="/admin/users" element={<AdminUsersPage />} />
-            <Route path="/admin/bookings" element={<AdminBookingsPage />} />
-            <Route path="/admin/financials" element={<AdminFinancialsPage />} />
-            <Route path="/admin/reviews" element={<AdminReviewsPage />} />
-            <Route path="/admin/featured" element={<AdminFeaturedPage />} />
-          </Route>
-
-          {/* Get-3-offers wizard owns its own full-screen layout (no site header/footer) */}
-          <Route path="/get-offers" element={<GetOffersPage />} />
-
-          {/* Live progress page for an offer request — public for now;
-              eventually gated behind a magic link. */}
-          <Route path="/my-requests/:requestId" element={<MyRequestPage />} />
-
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+        <AppShell />
+        <DevicePreview />
         <Toaster richColors position="top-center" />
       </BrowserRouter>
     </AuthProvider>
   );
 }
-
-export default App;

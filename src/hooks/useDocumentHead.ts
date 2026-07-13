@@ -57,6 +57,8 @@ function setJsonLd(jsonLd: object | object[]) {
 }
 
 export function useDocumentHead({ title, description, canonical, image, ogType = "website", jsonLd }: MetaInput) {
+  const jsonLdKey = jsonLd ? JSON.stringify(jsonLd) : "";
+
   useEffect(() => {
     const previousTitle = document.title;
     if (title) document.title = title;
@@ -80,11 +82,11 @@ export function useDocumentHead({ title, description, canonical, image, ogType =
       setLink("canonical", url);
       setMeta('meta[property="og:url"]', "content", url);
     }
-    if (jsonLd) setJsonLd(jsonLd);
+    if (jsonLdKey) setJsonLd(JSON.parse(jsonLdKey) as object | object[]);
 
     return () => {
       document.title = previousTitle;
       document.head.querySelectorAll(`script[type="application/ld+json"][${DATA_ATTR}]`).forEach((n) => n.remove());
     };
-  }, [title, description, canonical, image, ogType, JSON.stringify(jsonLd)]);
+  }, [title, description, canonical, image, ogType, jsonLdKey]);
 }
