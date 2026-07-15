@@ -320,17 +320,18 @@ function DesktopHeroV2({
         />
       </div>
 
-      {/* Search card — mode tabs attached to the top of the card so the
+      {/* Search card — mode tabs sit inside the top of the card so the
           two buttons read as one unit with the search menu. */}
-      <div className="relative z-20 -mt-28 mx-auto max-w-5xl px-6">
+      <div className="relative z-20 -mt-24 mx-auto max-w-5xl px-6">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={0.6}
+          className="overflow-hidden rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"
         >
-          {/* Folder tabs — the active tab merges seamlessly into the card */}
-          <div className="flex justify-center gap-1.5">
+          {/* Mode tabs — full-width segmented row across the top of the card */}
+          <div className="flex border-b border-border/60">
             {([
               { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
               { id: "browse", label: "Browse DJs", Icon: Users },
@@ -342,10 +343,10 @@ function DesktopHeroV2({
                   type="button"
                   onClick={() => setMode(id)}
                   className={cn(
-                    "relative flex items-center gap-2 rounded-t-2xl px-8 pb-4 pt-3 text-sm font-semibold transition-colors",
+                    "relative flex flex-1 items-center justify-center gap-2 py-4 text-sm font-semibold transition-colors",
                     active
-                      ? "z-10 bg-white text-foreground"
-                      : "-mb-1 bg-white/75 text-muted-foreground backdrop-blur-sm hover:bg-white/90 hover:text-foreground",
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   <Icon className={cn("h-4 w-4", active ? "text-accent" : "")} />
@@ -353,7 +354,7 @@ function DesktopHeroV2({
                   {active && (
                     <motion.span
                       layoutId="hero-mode-underline"
-                      className="absolute inset-x-5 top-0 h-1 rounded-full bg-accent"
+                      className="absolute inset-x-0 -bottom-px h-0.5 bg-accent"
                     />
                   )}
                 </button>
@@ -363,7 +364,7 @@ function DesktopHeroV2({
 
           <form
             onSubmit={handleSubmit}
-            className="-mt-3 grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-4 rounded-3xl bg-white p-6 text-foreground shadow-2xl ring-1 ring-black/5"
+            className="grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-4 p-6"
           >
             <div className="min-w-0">
               <label className="mb-1.5 block text-sm font-semibold text-foreground">
