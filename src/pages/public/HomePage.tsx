@@ -300,7 +300,7 @@ function DesktopBelowHero({
                 className="absolute -bottom-1.5 left-0 h-1.5 w-full origin-left rounded-full bg-gradient-to-r from-accent to-rose-400"
                 initial={{ scaleX: 0 }}
                 animate={{ scaleX: 1 }}
-                transition={{ delay: 1.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ delay: 1.2, duration: 2, ease: [0.22, 1, 0.36, 1] }}
               />
             </span>
           </motion.h1>
@@ -477,7 +477,7 @@ function MobileHeroContent({
               className="absolute -bottom-1 left-0 h-[3px] w-full origin-left rounded-full bg-accent/70"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ delay: 0.9, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ delay: 0.9, duration: 2, ease: [0.22, 1, 0.36, 1] }}
             />
           </span>
         </motion.h1>
