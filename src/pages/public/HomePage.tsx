@@ -261,14 +261,17 @@ function DesktopHeroV2({
     <section className="relative hidden overflow-hidden bg-background md:block">
       {/* Hero image + headline */}
       <div className="relative">
-        <div aria-hidden className="absolute inset-0">
-          <img
-            src="/hero-dj-poster.jpg"
+        <div aria-hidden className="absolute inset-0 overflow-hidden">
+          <motion.img
+            src="/hero-dj-scene.jpg"
             alt=""
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full object-cover object-right"
+            initial={{ scale: 1.08, x: "1.5%" }}
+            animate={{ scale: 1.16, x: "-1.5%" }}
+            transition={{ duration: 18, ease: "easeInOut", repeat: Infinity, repeatType: "reverse" }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-950/80 via-fuchsia-950/70 to-black/85" />
-          <div className="absolute inset-0 bg-black/25" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-950/70 via-fuchsia-950/40 to-black/80" />
         </div>
 
         <div className="relative z-10 mx-auto max-w-4xl px-6 pt-24 pb-44 text-center text-white">
