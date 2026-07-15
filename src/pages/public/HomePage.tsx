@@ -17,14 +17,20 @@ import {
   Check,
   X,
   MapPin,
-  Calendar as CalendarIcon,
   Star,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { REGIONS } from "@/lib/djStandardSettings";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
@@ -100,14 +106,12 @@ export function HomePage() {
   const heroGridDJs = [...featured, ...djs.filter((d) => !d.is_featured)].slice(0, 5);
 
   const [eventType, setEventType] = useState<string>("");
-  const [city, setCity] = useState("");
-  const [date, setDate] = useState("");
+  const [region, setRegion] = useState("");
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (city) params.set("city", city);
-    if (date) params.set("date", date);
+    if (region) params.set("region", region);
     // Event-type subpages: route to dedicated landing page when one exists.
     const eventLandingPaths: Record<string, string> = {
       wedding: "/wedding-djs",
@@ -128,10 +132,8 @@ export function HomePage() {
         navigate={navigate}
         eventType={eventType}
         setEventType={setEventType}
-        city={city}
-        setCity={setCity}
-        date={date}
-        setDate={setDate}
+        region={region}
+        setRegion={setRegion}
         onSubmit={submit}
       />
 
@@ -140,10 +142,8 @@ export function HomePage() {
         navigate={navigate}
         eventType={eventType}
         setEventType={setEventType}
-        city={city}
-        setCity={setCity}
-        date={date}
-        setDate={setDate}
+        region={region}
+        setRegion={setRegion}
         onSubmit={submit}
       />
 
@@ -195,6 +195,32 @@ export function HomePage() {
 
 const HERO_TRUST = ["Interviewede DJs", "Udstyr verificeret", "Lyd & lys", "Tryg booking"];
 
+function RegionPicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <Select value={value || undefined} onValueChange={onChange}>
+      <SelectTrigger className="h-10">
+        <div className="flex min-w-0 items-center gap-2">
+          <MapPin className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <SelectValue placeholder="Vælg region" />
+        </div>
+      </SelectTrigger>
+      <SelectContent>
+        {REGIONS.map((r) => (
+          <SelectItem key={r} value={r}>
+            {r}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
 const HERO_FEATURES: { label: string; Icon: LucideIcon }[] = [
   { label: "Top-vurderede DJs", Icon: Star },
   { label: "Udstyr verificeret", Icon: Shield },
@@ -207,19 +233,15 @@ function DesktopHeroV2({
   navigate,
   eventType,
   setEventType,
-  city,
-  setCity,
-  date,
-  setDate,
+  region,
+  setRegion,
   onSubmit,
 }: {
   navigate: ReturnType<typeof useNavigate>;
   eventType: string;
   setEventType: (v: string) => void;
-  city: string;
-  setCity: (v: string) => void;
-  date: string;
-  setDate: (v: string) => void;
+  region: string;
+  setRegion: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
   const [mode, setMode] = useState<"offers" | "browse">("offers");
@@ -232,8 +254,7 @@ function DesktopHeroV2({
     }
     const params = new URLSearchParams();
     if (eventType) params.set("eventType", eventType);
-    if (city.trim()) params.set("city", city.trim());
-    if (date) params.set("date", date);
+    if (region) params.set("region", region);
     const qs = params.toString();
     navigate(`/get-offers${qs ? `?${qs}` : ""}`);
   }
@@ -349,7 +370,7 @@ function DesktopHeroV2({
 
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-4 p-6"
+            className="grid grid-cols-[1fr_1fr_auto] items-end gap-4 p-6"
           >
             <div className="min-w-0">
               <label className="mb-1.5 block text-sm font-semibold text-foreground">
@@ -358,18 +379,8 @@ function DesktopHeroV2({
               <EventTypePicker value={eventType} onChange={setEventType} />
             </div>
             <div className="min-w-0">
-              <label className="mb-1.5 block text-sm font-semibold text-foreground">Dato</label>
-              <div className="relative">
-                <CalendarIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-8" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-              </div>
-            </div>
-            <div className="min-w-0">
-              <label className="mb-1.5 block text-sm font-semibold text-foreground">By</label>
-              <div className="relative">
-                <MapPin className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-8" placeholder="København" value={city} onChange={(e) => setCity(e.target.value)} />
-              </div>
+              <label className="mb-1.5 block text-sm font-semibold text-foreground">Region</label>
+              <RegionPicker value={region} onChange={setRegion} />
             </div>
             <div className="flex flex-col items-center">
               <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
@@ -412,19 +423,15 @@ function MobileHeroV2({
   navigate,
   eventType,
   setEventType,
-  city,
-  setCity,
-  date,
-  setDate,
+  region,
+  setRegion,
   onSubmit,
 }: {
   navigate: ReturnType<typeof useNavigate>;
   eventType: string;
   setEventType: (v: string) => void;
-  city: string;
-  setCity: (v: string) => void;
-  date: string;
-  setDate: (v: string) => void;
+  region: string;
+  setRegion: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
   const [mode, setMode] = useState<"offers" | "browse">("offers");
@@ -437,8 +444,7 @@ function MobileHeroV2({
     }
     const params = new URLSearchParams();
     if (eventType) params.set("eventType", eventType);
-    if (city.trim()) params.set("city", city.trim());
-    if (date) params.set("date", date);
+    if (region) params.set("region", region);
     const qs = params.toString();
     navigate(`/get-offers${qs ? `?${qs}` : ""}`);
   }
@@ -555,18 +561,8 @@ function MobileHeroV2({
               <EventTypePicker value={eventType} onChange={setEventType} />
             </div>
             <div>
-              <label className="mb-1.5 block text-sm font-semibold text-foreground">Dato</label>
-              <div className="relative">
-                <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-              </div>
-            </div>
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-foreground">By</label>
-              <div className="relative">
-                <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input className="pl-9" placeholder="København" value={city} onChange={(e) => setCity(e.target.value)} />
-              </div>
+              <label className="mb-1.5 block text-sm font-semibold text-foreground">Region</label>
+              <RegionPicker value={region} onChange={setRegion} />
             </div>
             <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
               {mode === "offers" ? (
