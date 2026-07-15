@@ -311,14 +311,26 @@ function DesktopHeroV2({
             ))}
           </motion.div>
 
-          {/* Mode toggle */}
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={0.5}
-            className="mt-10 inline-flex rounded-full bg-black/30 p-1.5 ring-1 ring-white/15 backdrop-blur-md"
-          >
+        </div>
+
+        {/* Curved white bottom of the hero image */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 -bottom-px z-[5] h-16 rounded-t-[100%] bg-background"
+        />
+      </div>
+
+      {/* Search card — mode tabs attached to the top of the card so the
+          two buttons read as one unit with the search menu. */}
+      <div className="relative z-20 -mt-28 mx-auto max-w-5xl px-6">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.6}
+        >
+          {/* Folder tabs — the active tab merges seamlessly into the card */}
+          <div className="flex justify-center gap-1.5">
             {([
               { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
               { id: "browse", label: "Browse DJs", Icon: Users },
@@ -330,74 +342,63 @@ function DesktopHeroV2({
                   type="button"
                   onClick={() => setMode(id)}
                   className={cn(
-                    "relative flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold transition",
-                    active ? "bg-white/10 text-white" : "text-white/70 hover:text-white",
+                    "relative flex items-center gap-2 rounded-t-2xl px-8 pb-4 pt-3 text-sm font-semibold transition-colors",
+                    active
+                      ? "z-10 bg-white text-foreground"
+                      : "-mb-1 bg-white/75 text-muted-foreground backdrop-blur-sm hover:bg-white/90 hover:text-foreground",
                   )}
                 >
-                  <Icon className={cn("h-4 w-4", active && "text-accent")} />
+                  <Icon className={cn("h-4 w-4", active ? "text-accent" : "")} />
                   {label}
                   {active && (
                     <motion.span
                       layoutId="hero-mode-underline"
-                      className="absolute inset-x-6 -bottom-0.5 h-0.5 rounded-full bg-accent"
+                      className="absolute inset-x-5 top-0 h-1 rounded-full bg-accent"
                     />
                   )}
                 </button>
               );
             })}
-          </motion.div>
-        </div>
+          </div>
 
-        {/* Curved white bottom of the hero image */}
-        <div
-          aria-hidden
-          className="absolute inset-x-0 -bottom-px z-[5] h-16 rounded-t-[100%] bg-background"
-        />
-      </div>
-
-      {/* Search card — straddles the image/white boundary */}
-      <div className="relative z-20 -mt-24 mx-auto max-w-5xl px-6">
-        <motion.form
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.6}
-          onSubmit={handleSubmit}
-          className="grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-4 rounded-3xl bg-white p-6 text-foreground shadow-2xl ring-1 ring-black/5"
-        >
-          <div className="min-w-0">
-            <label className="mb-1.5 block text-sm font-semibold text-foreground">
-              Hvilken fest holder du?
-            </label>
-            <EventTypePicker value={eventType} onChange={setEventType} />
-          </div>
-          <div className="min-w-0">
-            <label className="mb-1.5 block text-sm font-semibold text-foreground">Dato</label>
-            <div className="relative">
-              <CalendarIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-8" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <form
+            onSubmit={handleSubmit}
+            className="-mt-3 grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-4 rounded-3xl bg-white p-6 text-foreground shadow-2xl ring-1 ring-black/5"
+          >
+            <div className="min-w-0">
+              <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                Hvilken fest holder du?
+              </label>
+              <EventTypePicker value={eventType} onChange={setEventType} />
             </div>
-          </div>
-          <div className="min-w-0">
-            <label className="mb-1.5 block text-sm font-semibold text-foreground">By</label>
-            <div className="relative">
-              <MapPin className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-8" placeholder="København" value={city} onChange={(e) => setCity(e.target.value)} />
+            <div className="min-w-0">
+              <label className="mb-1.5 block text-sm font-semibold text-foreground">Dato</label>
+              <div className="relative">
+                <CalendarIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-8" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col items-center">
-            <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
-              {mode === "offers" ? (
-                <>Få 3 tilbud <ArrowRight className="h-4 w-4" /></>
-              ) : (
-                <><Search className="h-4 w-4" /> Browse DJs</>
-              )}
-            </Button>
-            <span className="mt-1.5 text-xs text-muted-foreground">
-              {mode === "offers" ? "Gratis og uforpligtende" : "Se alle verificerede DJs"}
-            </span>
-          </div>
-        </motion.form>
+            <div className="min-w-0">
+              <label className="mb-1.5 block text-sm font-semibold text-foreground">By</label>
+              <div className="relative">
+                <MapPin className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-8" placeholder="København" value={city} onChange={(e) => setCity(e.target.value)} />
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
+                {mode === "offers" ? (
+                  <>Få 3 tilbud <ArrowRight className="h-4 w-4" /></>
+                ) : (
+                  <><Search className="h-4 w-4" /> Browse DJs</>
+                )}
+              </Button>
+              <span className="mt-1.5 text-xs text-muted-foreground">
+                {mode === "offers" ? "Gratis og uforpligtende" : "Se alle verificerede DJs"}
+              </span>
+            </div>
+          </form>
+        </motion.div>
 
         {/* Feature pills */}
         <motion.div
