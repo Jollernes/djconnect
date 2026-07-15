@@ -434,7 +434,7 @@ function MobileHeroV2({
   setRegion: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
-  const [mode, setMode] = useState<"" | "offers" | "browse">("");
+  const [mode, setMode] = useState<"offers" | "browse">("offers");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -553,39 +553,27 @@ function MobileHeroV2({
             })}
           </div>
 
-          <AnimatePresence initial={false}>
-            {mode && (
-              <motion.form
-                key="mobile-hero-fields"
-                onSubmit={handleSubmit}
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                className="overflow-hidden"
-              >
-                <div className="space-y-4 p-5">
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                      Hvilken fest holder du?
-                    </label>
-                    <EventTypePicker value={eventType} onChange={setEventType} />
-                  </div>
-                  <div>
-                    <label className="mb-1.5 block text-sm font-semibold text-foreground">Region</label>
-                    <RegionPicker value={region} onChange={setRegion} />
-                  </div>
-                  <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
-                    {mode === "offers" ? (
-                      <>Få 3 tilbud <ArrowRight className="h-4 w-4" /></>
-                    ) : (
-                      <><Search className="h-4 w-4" /> Browse DJs</>
-                    )}
-                  </Button>
-                </div>
-              </motion.form>
-            )}
-          </AnimatePresence>
+          <form onSubmit={handleSubmit} className="space-y-4 p-5">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="min-w-0">
+                <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                  Hvilken fest holder du?
+                </label>
+                <EventTypePicker value={eventType} onChange={setEventType} />
+              </div>
+              <div className="min-w-0">
+                <label className="mb-1.5 block text-sm font-semibold text-foreground">Region</label>
+                <RegionPicker value={region} onChange={setRegion} />
+              </div>
+            </div>
+            <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
+              {mode === "offers" ? (
+                <>Få 3 tilbud <ArrowRight className="h-4 w-4" /></>
+              ) : (
+                <><Search className="h-4 w-4" /> Browse DJs</>
+              )}
+            </Button>
+          </form>
         </motion.div>
 
         {/* Feature pills — horizontal scroll */}
