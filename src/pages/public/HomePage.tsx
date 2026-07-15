@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
+  ArrowRight,
   CalendarCheck2,
   Sparkles,
   Shield,
@@ -19,6 +20,8 @@ import {
   X,
   MapPin,
   Calendar as CalendarIcon,
+  Mail,
+  User,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
@@ -357,13 +360,6 @@ function DesktopBelowHero({
 
 /* ---------- Mobile-only hero content (white background below video) ---------- */
 
-const MOBILE_EVENT_TYPES = [
-  { id: "wedding", label: "Bryllup", Icon: Heart },
-  { id: "birthday", label: "Fødselsdag", Icon: Cake },
-  { id: "corporate_party", label: "Firmafest", Icon: Briefcase },
-  { id: "other", label: "Anden fest", Icon: PartyPopper },
-];
-
 function MobileHeroContent({
   heroDJs,
   featured,
@@ -373,88 +369,195 @@ function MobileHeroContent({
   featured: DJProfileWithRelations[];
   navigate: ReturnType<typeof useNavigate>;
 }) {
+  const [mobileMode, setMobileMode] = useState<"" | "offers" | "browse">("");
   const [mobileEventType, setMobileEventType] = useState("");
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const pickerRef = useRef<HTMLDivElement>(null);
+  const [mobileCity, setMobileCity] = useState("");
+  const [mobileDate, setMobileDate] = useState("");
+  const [showMoreEvents, setShowMoreEvents] = useState(false);
   const avatars = heroDJs
     .slice(0, 3)
     .map((dj) => ({ url: dj.profile.avatar_url, name: dj.stage_name }));
 
   const topDJs = featured.length > 0 ? featured : heroDJs.slice(0, 3);
 
-  const selectedEvent = MOBILE_EVENT_TYPES.find((e) => e.id === mobileEventType);
-
-  useEffect(() => {
-    if (!pickerOpen) return;
-    function handleClick(e: MouseEvent) {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setPickerOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [pickerOpen]);
+  const visibleEventTypes = showMoreEvents
+    ? EVENT_TYPE_OPTIONS
+    : EVENT_TYPE_OPTIONS.slice(0, 4);
 
   function handleMobileSearch() {
     const params = new URLSearchParams();
     if (mobileEventType) params.set("eventType", mobileEventType);
-    navigate(`/search?${params.toString()}`);
+    if (mobileCity.trim()) params.set("city", mobileCity.trim());
+    if (mobileDate) params.set("date", mobileDate);
+    const qs = params.toString();
+    const suffix = qs ? `?${qs}` : "";
+    navigate(mobileMode === "offers" ? `/get-offers${suffix}` : `/search${suffix}`);
   }
 
   return (
     <div className="relative md:hidden">
-      {/* Search bar — overlaps half video, half white section */}
+      {/* Search card — overlaps half video, half white section.
+          Two-step: pick a mode first, then the fields fold in. */}
       <div className="px-5 -mt-[22px] relative z-20">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={0.2}
-          className="flex items-center gap-2 rounded-full bg-white py-1.5 pl-4 pr-1.5 shadow-lg ring-1 ring-black/5"
+          className="rounded-3xl bg-white p-2.5 shadow-lg ring-1 ring-black/5"
         >
-          <div className="relative min-w-0 flex-1" ref={pickerRef}>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-accent">
-              Festtype
-            </span>
+          {/* Mode toggle */}
+          <div className="grid grid-cols-2 gap-1.5 rounded-full bg-gray-100 p-1">
             <button
               type="button"
-              onClick={() => setPickerOpen((o) => !o)}
-              className="block w-full truncate text-left text-sm text-foreground/80"
+              onClick={() => setMobileMode("offers")}
+              className={cn(
+                "flex items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold transition",
+                mobileMode === "offers"
+                  ? "bg-accent text-white shadow-md"
+                  : "text-foreground/70",
+              )}
             >
-              {selectedEvent ? selectedEvent.label : "Vælg festtype"}
+              <Mail className="h-4 w-4" />
+              Få 3 tilbud
             </button>
-            {pickerOpen && (
-              <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-xl border bg-white p-2 shadow-xl">
-                {MOBILE_EVENT_TYPES.map(({ id, label, Icon }) => (
+            <button
+              type="button"
+              onClick={() => setMobileMode("browse")}
+              className={cn(
+                "flex items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold transition",
+                mobileMode === "browse"
+                  ? "bg-foreground text-white shadow-md"
+                  : "text-foreground/70",
+              )}
+            >
+              <User className="h-4 w-4" />
+              Browse DJs
+            </button>
+          </div>
+
+          <AnimatePresence initial={false}>
+            {mobileMode && (
+              <motion.div
+                key="mobile-search-fields"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-4 px-1.5 pb-1 pt-4">
+                  {/* Event type */}
+                  <div>
+                    <span className="mb-2 block text-xs font-semibold text-foreground">
+                      Hvilken fest holder du?
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {visibleEventTypes.map(({ id, label, Icon }) => {
+                        const active = mobileEventType === id;
+                        return (
+                          <button
+                            key={id}
+                            type="button"
+                            onClick={() =>
+                              setMobileEventType(active ? "" : id)
+                            }
+                            className={cn(
+                              "flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition",
+                              active
+                                ? "border-accent bg-accent/10 text-accent"
+                                : "border-input text-foreground/80 hover:border-foreground/30",
+                            )}
+                          >
+                            <Icon className="h-4 w-4" />
+                            {label}
+                          </button>
+                        );
+                      })}
+                      {EVENT_TYPE_OPTIONS.length > 4 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowMoreEvents((v) => !v)}
+                          className="flex items-center gap-1 rounded-xl border border-input px-3 py-2 text-sm font-medium text-foreground/80 transition hover:border-foreground/30"
+                        >
+                          Flere
+                          <ChevronDown
+                            className={cn(
+                              "h-4 w-4 transition-transform",
+                              showMoreEvents && "rotate-180",
+                            )}
+                          />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Dato */}
+                  <div>
+                    <span className="mb-1.5 block text-xs font-semibold text-foreground">
+                      Dato
+                    </span>
+                    <div className="relative">
+                      <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        className="pl-9"
+                        type="date"
+                        value={mobileDate}
+                        onChange={(e) => setMobileDate(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* By */}
+                  <div>
+                    <span className="mb-1.5 block text-xs font-semibold text-foreground">
+                      By
+                    </span>
+                    <div className="relative">
+                      <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        className="pl-9"
+                        placeholder="Vælg by"
+                        value={mobileCity}
+                        onChange={(e) => setMobileCity(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* CTA */}
                   <button
-                    key={id}
                     type="button"
-                    onClick={() => {
-                      setMobileEventType(id);
-                      setPickerOpen(false);
-                    }}
+                    onClick={handleMobileSearch}
                     className={cn(
-                      "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
-                      mobileEventType === id
-                        ? "bg-accent/10 font-semibold text-accent"
-                        : "text-foreground hover:bg-gray-50",
+                      "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-base font-semibold text-white shadow-md transition active:scale-[0.99]",
+                      mobileMode === "offers"
+                        ? "bg-accent"
+                        : "bg-foreground",
                     )}
                   >
-                    <Icon className="h-4 w-4" />
-                    {label}
+                    {mobileMode === "offers" ? (
+                      <>
+                        Få 3 tilbud
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        <Search className="h-4 w-4" />
+                        Browse DJs
+                      </>
+                    )}
                   </button>
-                ))}
-              </div>
+
+                  {mobileMode === "offers" && (
+                    <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                      <Shield className="h-3.5 w-3.5" />
+                      Gratis, uforpligtende og hurtigt
+                    </p>
+                  )}
+                </div>
+              </motion.div>
             )}
-          </div>
-          <button
-            type="button"
-            onClick={handleMobileSearch}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-white shadow-md transition active:scale-95"
-            aria-label="Søg"
-          >
-            <Search className="h-4 w-4" />
-          </button>
+          </AnimatePresence>
         </motion.div>
       </div>
 
