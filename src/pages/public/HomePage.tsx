@@ -397,9 +397,6 @@ function DesktopHeroV2({
                   <><Search className="h-4 w-4" /> Browse DJs</>
                 )}
               </Button>
-              <span className="mt-1.5 text-xs text-muted-foreground">
-                {mode === "offers" ? "Gratis og uforpligtende" : "Se alle verificerede DJs"}
-              </span>
             </div>
           </form>
         </motion.div>
