@@ -22,7 +22,6 @@ import {
   Calendar as CalendarIcon,
   Mail,
   User,
-  Star,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
@@ -94,7 +93,7 @@ function HomeDJCard({
   );
 }
 
-export function HomePage() {
+export function HomePageClassic() {
   const navigate = useNavigate();
   const { djs } = useDJs({ sortBy: "relevance" });
   const featured = djs.filter((d) => d.is_featured).slice(0, 3);
@@ -128,25 +127,10 @@ export function HomePage() {
 
   return (
     <>
-      {/* Mobile-only video hero (desktop uses the image hero below) */}
-      <div className="md:hidden">
-        <Hero heroDJs={heroDJs} />
-      </div>
+      <Hero heroDJs={heroDJs} />
 
-      {/* Desktop-only: full-bleed image hero with headline + search */}
-      <DesktopHeroV2
-        navigate={navigate}
-        eventType={eventType}
-        setEventType={setEventType}
-        city={city}
-        setCity={setCity}
-        date={date}
-        setDate={setDate}
-        onSubmit={submit}
-      />
-
-      {/* Desktop-only: DJ grid below the hero */}
-      <DesktopBelowHero gridDJs={heroGridDJs} />
+      {/* Desktop-only: search form + content below video hero */}
+      <DesktopBelowHero heroDJs={heroDJs} gridDJs={heroGridDJs} eventType={eventType} setEventType={setEventType} city={city} setCity={setCity} date={date} setDate={setDate} onSubmit={submit} />
 
       {/* Mobile-only: white-background content below video hero */}
       <MobileHeroContent heroDJs={heroDJs} featured={featured} navigate={navigate} />
@@ -210,20 +194,11 @@ function Hero({ heroDJs }: { heroDJs: DJProfileWithRelations[] }) {
   );
 }
 
-/* ---------- Desktop-only image hero (headline + search) ---------- */
+/* ---------- Desktop-only below-hero content ---------- */
 
-const HERO_TRUST = ["Interviewede DJs", "Udstyr verificeret", "Lyd & lys", "Tryg booking"];
-
-const HERO_FEATURES: { label: string; Icon: LucideIcon }[] = [
-  { label: "Top-vurderede DJs", Icon: Star },
-  { label: "Udstyr verificeret", Icon: Shield },
-  { label: "240+ events", Icon: Users },
-  { label: "Personlig hjælp", Icon: Headphones },
-  { label: "Lyd & lys", Icon: Speaker },
-];
-
-function DesktopHeroV2({
-  navigate,
+function DesktopBelowHero({
+  heroDJs,
+  gridDJs,
   eventType,
   setEventType,
   city,
@@ -232,7 +207,8 @@ function DesktopHeroV2({
   setDate,
   onSubmit,
 }: {
-  navigate: ReturnType<typeof useNavigate>;
+  heroDJs: DJProfileWithRelations[];
+  gridDJs: DJProfileWithRelations[];
   eventType: string;
   setEventType: (v: string) => void;
   city: string;
@@ -241,208 +217,142 @@ function DesktopHeroV2({
   setDate: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
-  const [mode, setMode] = useState<"offers" | "browse">("offers");
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (mode === "browse") {
-      onSubmit(e);
-      return;
-    }
-    const params = new URLSearchParams();
-    if (eventType) params.set("eventType", eventType);
-    if (city.trim()) params.set("city", city.trim());
-    if (date) params.set("date", date);
-    const qs = params.toString();
-    navigate(`/get-offers${qs ? `?${qs}` : ""}`);
-  }
+  const avatars = heroDJs
+    .slice(0, 3)
+    .map((dj) => ({ url: dj.profile.avatar_url, name: dj.stage_name }));
 
   return (
-    <section className="relative hidden overflow-hidden bg-background md:block">
-      {/* Hero image + headline */}
-      <div className="relative">
-        <div aria-hidden className="absolute inset-0">
-          <img
-            src="/hero-dj-poster.jpg"
-            alt=""
-            className="h-full w-full object-cover object-center"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-950/80 via-fuchsia-950/70 to-black/85" />
-          <div className="absolute inset-0 bg-black/25" />
-        </div>
-
-        <div className="relative z-10 mx-auto max-w-4xl px-6 pt-24 pb-44 text-center text-white">
-          <motion.h1
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={0.1}
-            className="text-5xl font-bold leading-[1.05] tracking-tight [text-shadow:0_2px_24px_rgba(0,0,0,0.4)] lg:text-7xl"
-          >
-            Den letteste måde
-            <br />
-            at booke en <span className="text-accent">DJ</span>
-          </motion.h1>
-
-          <motion.p
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={0.25}
-            className="mx-auto mt-6 max-w-2xl text-lg text-white/85"
-          >
-            Vælg selv blandt top-vurderede DJs eller få 3 tilbud fra
-            interviewede, udstyrs-verificerede DJs til bryllup, fødselsdag,
-            privatfest eller firmaevent.
-          </motion.p>
-
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={0.4}
-            className="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm font-medium text-white/80"
-          >
-            {HERO_TRUST.map((t, i) => (
-              <span key={t} className="flex items-center gap-3">
-                {i > 0 && <span className="h-1 w-1 rounded-full bg-accent" />}
-                {t}
-              </span>
-            ))}
-          </motion.div>
-
-          {/* Mode toggle */}
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={0.5}
-            className="mt-10 inline-flex rounded-full bg-black/30 p-1.5 ring-1 ring-white/15 backdrop-blur-md"
-          >
-            {([
-              { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
-              { id: "browse", label: "Browse DJs", Icon: Users },
-            ] as const).map(({ id, label, Icon }) => {
-              const active = mode === id;
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setMode(id)}
-                  className={cn(
-                    "relative flex items-center gap-2 rounded-full px-8 py-3 text-sm font-semibold transition",
-                    active ? "bg-white/10 text-white" : "text-white/70 hover:text-white",
-                  )}
-                >
-                  <Icon className={cn("h-4 w-4", active && "text-accent")} />
-                  {label}
-                  {active && (
-                    <motion.span
-                      layoutId="hero-mode-underline"
-                      className="absolute inset-x-6 -bottom-0.5 h-0.5 rounded-full bg-accent"
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </motion.div>
-        </div>
-
-        {/* Curved white bottom of the hero image */}
-        <div
-          aria-hidden
-          className="absolute inset-x-0 -bottom-px z-[5] h-16 rounded-t-[100%] bg-background"
-        />
-      </div>
-
-      {/* Search card — straddles the image/white boundary */}
-      <div className="relative z-20 -mt-24 mx-auto max-w-5xl px-6">
+    <div className="hidden md:block">
+      {/* Search form — overlapping hero bottom */}
+      <div className="relative z-20 -mt-8 mx-auto max-w-5xl px-6">
         <motion.form
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          custom={0.6}
-          onSubmit={handleSubmit}
-          className="grid grid-cols-[1fr_1fr_1fr_auto] items-end gap-4 rounded-3xl bg-white p-6 text-foreground shadow-2xl ring-1 ring-black/5"
+          custom={0.4}
+          onSubmit={onSubmit}
+          className="grid grid-cols-[1fr_1fr_1fr_auto] gap-3 rounded-2xl bg-background p-5 text-foreground shadow-2xl ring-1 ring-black/5"
         >
           <div className="min-w-0">
-            <label className="mb-1.5 block text-sm font-semibold text-foreground">
-              Hvilken fest holder du?
-            </label>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-muted-foreground">Event-type</label>
             <EventTypePicker value={eventType} onChange={setEventType} />
           </div>
           <div className="min-w-0">
-            <label className="mb-1.5 block text-sm font-semibold text-foreground">Dato</label>
-            <div className="relative">
-              <CalendarIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-8" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-            </div>
-          </div>
-          <div className="min-w-0">
-            <label className="mb-1.5 block text-sm font-semibold text-foreground">By</label>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-muted-foreground">By</label>
             <div className="relative">
               <MapPin className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input className="pl-8" placeholder="København" value={city} onChange={(e) => setCity(e.target.value)} />
             </div>
           </div>
-          <div className="flex flex-col items-center">
+          <div className="min-w-0">
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wider text-muted-foreground">Dato</label>
+            <div className="relative">
+              <CalendarIcon className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input className="pl-8" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+            </div>
+          </div>
+          <div className="flex items-end">
             <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
-              {mode === "offers" ? (
-                <>Få 3 tilbud <ArrowRight className="h-4 w-4" /></>
-              ) : (
-                <><Search className="h-4 w-4" /> Browse DJs</>
-              )}
+              <Search className="h-4 w-4" /> Søg
             </Button>
-            <span className="mt-1.5 text-xs text-muted-foreground">
-              {mode === "offers" ? "Gratis og uforpligtende" : "Se alle verificerede DJs"}
-            </span>
           </div>
         </motion.form>
-
-        {/* Feature pills */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.7}
-          className="mt-6 flex flex-wrap items-center justify-center gap-3 pb-2"
-        >
-          {HERO_FEATURES.map(({ label, Icon }) => (
-            <span
-              key={label}
-              className="flex items-center gap-2 rounded-full border border-border/60 bg-white px-4 py-2 text-sm font-medium text-foreground/80 shadow-sm"
-            >
-              <Icon className="h-4 w-4 text-accent" />
-              {label}
-            </span>
-          ))}
-        </motion.div>
       </div>
-    </section>
-  );
-}
 
-/* ---------- Desktop-only DJ grid below the hero ---------- */
+      {/* Content below — white bg. Headline is the first thing under
+          the hero + search bar; the DJ grid follows underneath it. */}
+      <div className="bg-background py-12 text-center">
+        <div className="mx-auto max-w-3xl px-4">
+          {/* Social proof */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.5}
+            className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-white px-4 py-2 shadow-sm"
+          >
+            <div className="flex -space-x-1.5">
+              {avatars.map((a, i) => (
+                <img
+                  key={i}
+                  src={a.url ?? undefined}
+                  alt={a.name}
+                  className="h-6 w-6 rounded-full border-2 border-white object-cover"
+                />
+              ))}
+            </div>
+            <span className="text-sm font-medium text-muted-foreground">
+              Brugt af 240+ par &amp; firmaer i 2026
+            </span>
+            <span className="h-2 w-2 rounded-full bg-green-500" />
+          </motion.div>
 
-function DesktopBelowHero({ gridDJs }: { gridDJs: DJProfileWithRelations[] }) {
-  if (gridDJs.length < 5) return null;
-  return (
-    <div className="hidden bg-background pb-12 pt-14 md:block">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-5 gap-5">
-          {gridDJs.map((dj, i) => (
-            <motion.div
-              key={dj.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ delay: i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -6 }}
-            >
-              <HomeDJCard dj={dj} density="5" />
-            </motion.div>
-          ))}
+          {/* Headline */}
+          <motion.h1
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.6}
+            className="mt-8 text-5xl font-semibold leading-[1.1] tracking-tight text-foreground lg:text-6xl"
+          >
+            Den letteste måde at{" "}
+            <span className="relative whitespace-nowrap">
+              <span className="bg-gradient-to-r from-accent via-orange-400 to-rose-400 bg-clip-text text-transparent">booke en DJ.</span>
+              <motion.span
+                aria-hidden
+                className="absolute -bottom-1.5 left-0 h-1.5 w-full origin-left rounded-full bg-gradient-to-r from-accent to-rose-400"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ delay: 1.2, duration: 2, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </span>
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.7}
+            className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground"
+          >
+            Book interviewede, udstyrsverificerede DJs til bryllupper, fødselsdage og firmaarrangementer.
+            De medbringer lyd, lys og energi — du tager dig af gæsterne.
+          </motion.p>
+
+          {/* Trust badges */}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.8}
+            className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground"
+          >
+            <span className="flex items-center gap-2"><Shield className="h-4 w-4 text-accent" /> Interviewet &amp; verificeret</span>
+            <span className="flex items-center gap-2"><CalendarCheck2 className="h-4 w-4 text-accent" /> Real-time tilgængelighed</span>
+            <span className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-accent" /> Stripe escrow</span>
+          </motion.div>
         </div>
+
+        {/* DJ grid — 5 cards below the headline */}
+        {gridDJs.length >= 5 && (
+          <div className="mx-auto mt-12 max-w-7xl px-6">
+            <div className="grid grid-cols-5 gap-5">
+              {gridDJs.map((dj, i) => (
+                <motion.div
+                  key={dj.id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.2 }}
+                  transition={{ delay: i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -6 }}
+                >
+                  <HomeDJCard dj={dj} density="5" />
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
