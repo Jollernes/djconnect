@@ -8,9 +8,7 @@ import {
   Shield,
   Users,
   Headphones,
-  Disc3,
   Speaker,
-  Zap,
   Heart,
   Cake,
   Briefcase,
@@ -20,8 +18,6 @@ import {
   X,
   MapPin,
   Calendar as CalendarIcon,
-  Mail,
-  User,
   Star,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
@@ -33,7 +29,6 @@ import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
 import { NEUTRAL_THEME } from "@/components/event-djs/grid/eventThemes";
-import { HeroDJCluster } from "@/components/common/HeroDJCluster";
 import { useDJs } from "@/hooks/useDJs";
 import type { DJProfileWithRelations } from "@/types/domain";
 
@@ -128,10 +123,17 @@ export function HomePage() {
 
   return (
     <>
-      {/* Mobile-only video hero (desktop uses the image hero below) */}
-      <div className="md:hidden">
-        <Hero heroDJs={heroDJs} />
-      </div>
+      {/* Mobile-only: full-bleed video hero with headline + search */}
+      <MobileHeroV2
+        navigate={navigate}
+        eventType={eventType}
+        setEventType={setEventType}
+        city={city}
+        setCity={setCity}
+        date={date}
+        setDate={setDate}
+        onSubmit={submit}
+      />
 
       {/* Desktop-only: full-bleed image hero with headline + search */}
       <DesktopHeroV2
@@ -149,7 +151,7 @@ export function HomePage() {
       <DesktopBelowHero gridDJs={heroGridDJs} />
 
       {/* Mobile-only: white-background content below video hero */}
-      <MobileHeroContent heroDJs={heroDJs} featured={featured} navigate={navigate} />
+      <MobileHeroContent heroDJs={heroDJs} featured={featured} />
 
       <Marquee />
 
@@ -186,27 +188,6 @@ export function HomePage() {
 
       <DJCta />
     </>
-  );
-}
-
-function Hero({ heroDJs }: { heroDJs: DJProfileWithRelations[] }) {
-  return (
-    <section className="relative isolate overflow-visible bg-background md:bg-transparent md:text-primary-foreground md:hero-gradient">
-      <div aria-hidden className="absolute inset-0 bg-grid opacity-40 hidden md:block" />
-      <div aria-hidden className="absolute inset-0 noise-overlay hidden md:block" />
-
-      <FloatingIcons />
-
-      {/* Video — full-width on all breakpoints */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.98, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="relative"
-      >
-        <HeroDJCluster djs={heroDJs} mobileHero className="relative" />
-      </motion.div>
-    </section>
   );
 }
 
@@ -425,6 +406,201 @@ function DesktopHeroV2({
   );
 }
 
+/* ---------- Mobile-only image/video hero (headline + search) ---------- */
+
+function MobileHeroV2({
+  navigate,
+  eventType,
+  setEventType,
+  city,
+  setCity,
+  date,
+  setDate,
+  onSubmit,
+}: {
+  navigate: ReturnType<typeof useNavigate>;
+  eventType: string;
+  setEventType: (v: string) => void;
+  city: string;
+  setCity: (v: string) => void;
+  date: string;
+  setDate: (v: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+}) {
+  const [mode, setMode] = useState<"offers" | "browse">("offers");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (mode === "browse") {
+      onSubmit(e);
+      return;
+    }
+    const params = new URLSearchParams();
+    if (eventType) params.set("eventType", eventType);
+    if (city.trim()) params.set("city", city.trim());
+    if (date) params.set("date", date);
+    const qs = params.toString();
+    navigate(`/get-offers${qs ? `?${qs}` : ""}`);
+  }
+
+  return (
+    <section className="relative overflow-hidden bg-background md:hidden">
+      <div className="relative">
+        <div aria-hidden className="absolute inset-0 overflow-hidden">
+          <video
+            className="h-full w-full object-cover object-right"
+            src="/hero-dj.mp4"
+            poster="/hero-dj-poster.jpg"
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/55 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-950/70 via-fuchsia-950/40 to-black/85" />
+        </div>
+
+        <div className="relative z-10 px-5 pt-16 pb-24 text-center text-white">
+          <motion.h1
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.1}
+            className="text-[2.15rem] font-bold leading-[1.08] tracking-tight [text-shadow:0_2px_20px_rgba(0,0,0,0.45)]"
+          >
+            Den letteste måde
+            <br />
+            at booke en <span className="text-accent">DJ</span>
+          </motion.h1>
+
+          <motion.p
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.25}
+            className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/85"
+          >
+            Vælg selv blandt top-vurderede DJs eller få 3 tilbud fra
+            interviewede, udstyrs-verificerede DJs til bryllup, fødselsdag,
+            privatfest eller firmaevent.
+          </motion.p>
+
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            custom={0.4}
+            className="mt-4 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-xs font-medium text-white/80"
+          >
+            {HERO_TRUST.map((t, i) => (
+              <span key={t} className="flex items-center gap-2.5">
+                {i > 0 && <span className="h-1 w-1 rounded-full bg-accent" />}
+                {t}
+              </span>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Curved white bottom of the hero */}
+        <div
+          aria-hidden
+          className="absolute inset-x-0 -bottom-px z-[5] h-10 rounded-t-[100%] bg-background"
+        />
+      </div>
+
+      {/* Search card — tabs + stacked fields */}
+      <div className="relative z-20 -mt-12 px-5">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.55}
+          className="overflow-hidden rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"
+        >
+          {/* Mode tabs */}
+          <div className="flex border-b border-border/60">
+            {([
+              { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
+              { id: "browse", label: "Browse DJs", Icon: Users },
+            ] as const).map(({ id, label, Icon }) => {
+              const active = mode === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setMode(id)}
+                  className={cn(
+                    "relative flex flex-1 items-center justify-center gap-2 py-3.5 text-sm font-semibold transition-colors",
+                    active ? "text-foreground" : "text-muted-foreground",
+                  )}
+                >
+                  <Icon className={cn("h-4 w-4", active ? "text-accent" : "")} />
+                  {label}
+                  {active && (
+                    <motion.span
+                      layoutId="mobile-hero-mode-underline"
+                      className="absolute inset-x-0 -bottom-px h-0.5 bg-accent"
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-4 p-5">
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                Hvilken fest holder du?
+              </label>
+              <EventTypePicker value={eventType} onChange={setEventType} />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-foreground">Dato</label>
+              <div className="relative">
+                <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-9" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+              </div>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-semibold text-foreground">By</label>
+              <div className="relative">
+                <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-9" placeholder="København" value={city} onChange={(e) => setCity(e.target.value)} />
+              </div>
+            </div>
+            <Button type="submit" variant="accent" size="lg" className="w-full glow-accent">
+              {mode === "offers" ? (
+                <>Få 3 tilbud <ArrowRight className="h-4 w-4" /></>
+              ) : (
+                <><Search className="h-4 w-4" /> Browse DJs</>
+              )}
+            </Button>
+          </form>
+        </motion.div>
+
+        {/* Feature pills — horizontal scroll */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          custom={0.7}
+          className="-mx-5 mt-4 flex gap-2.5 overflow-x-auto px-5 pb-1 scrollbar-hide"
+        >
+          {HERO_FEATURES.map(({ label, Icon }) => (
+            <span
+              key={label}
+              className="flex flex-shrink-0 items-center gap-2 rounded-full border border-border/60 bg-white px-3.5 py-2 text-sm font-medium text-foreground/80 shadow-sm"
+            >
+              <Icon className="h-4 w-4 text-accent" />
+              {label}
+            </span>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
 /* ---------- Desktop-only DJ grid below the hero ---------- */
 
 function DesktopBelowHero({ gridDJs }: { gridDJs: DJProfileWithRelations[] }) {
@@ -456,265 +632,14 @@ function DesktopBelowHero({ gridDJs }: { gridDJs: DJProfileWithRelations[] }) {
 function MobileHeroContent({
   heroDJs,
   featured,
-  navigate,
 }: {
   heroDJs: DJProfileWithRelations[];
   featured: DJProfileWithRelations[];
-  navigate: ReturnType<typeof useNavigate>;
 }) {
-  const [mobileMode, setMobileMode] = useState<"" | "offers" | "browse">("");
-  const [mobileEventType, setMobileEventType] = useState("");
-  const [mobileCity, setMobileCity] = useState("");
-  const [mobileDate, setMobileDate] = useState("");
-  const [showMoreEvents, setShowMoreEvents] = useState(false);
-  const avatars = heroDJs
-    .slice(0, 3)
-    .map((dj) => ({ url: dj.profile.avatar_url, name: dj.stage_name }));
-
   const topDJs = featured.length > 0 ? featured : heroDJs.slice(0, 3);
-
-  const visibleEventTypes = showMoreEvents
-    ? EVENT_TYPE_OPTIONS
-    : EVENT_TYPE_OPTIONS.slice(0, 4);
-
-  function handleMobileSearch() {
-    const params = new URLSearchParams();
-    if (mobileEventType) params.set("eventType", mobileEventType);
-    if (mobileCity.trim()) params.set("city", mobileCity.trim());
-    if (mobileDate) params.set("date", mobileDate);
-    const qs = params.toString();
-    const suffix = qs ? `?${qs}` : "";
-    navigate(mobileMode === "offers" ? `/get-offers${suffix}` : `/search${suffix}`);
-  }
 
   return (
     <div className="relative md:hidden">
-      {/* Search card — overlaps half video, half white section.
-          Two-step: pick a mode first, then the fields fold in. */}
-      <div className="px-5 -mt-[22px] relative z-20">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.2}
-          className="rounded-3xl bg-white p-2.5 shadow-lg ring-1 ring-black/5"
-        >
-          {/* Mode toggle */}
-          <div className="grid grid-cols-2 gap-1.5 rounded-full bg-gray-100 p-1">
-            <button
-              type="button"
-              onClick={() => setMobileMode("offers")}
-              className={cn(
-                "flex items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold transition",
-                mobileMode === "offers"
-                  ? "bg-accent text-white shadow-md"
-                  : "text-foreground/70",
-              )}
-            >
-              <Mail className="h-4 w-4" />
-              Få 3 tilbud
-            </button>
-            <button
-              type="button"
-              onClick={() => setMobileMode("browse")}
-              className={cn(
-                "flex items-center justify-center gap-2 rounded-full px-3 py-2.5 text-sm font-semibold transition",
-                mobileMode === "browse"
-                  ? "bg-foreground text-white shadow-md"
-                  : "text-foreground/70",
-              )}
-            >
-              <User className="h-4 w-4" />
-              Browse DJs
-            </button>
-          </div>
-
-          <AnimatePresence initial={false}>
-            {mobileMode && (
-              <motion.div
-                key="mobile-search-fields"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                className="overflow-hidden"
-              >
-                <div className="space-y-4 px-1.5 pb-1 pt-4">
-                  {/* Event type */}
-                  <div>
-                    <span className="mb-2 block text-xs font-semibold text-foreground">
-                      Hvilken fest holder du?
-                    </span>
-                    <div className="flex flex-wrap gap-2">
-                      {visibleEventTypes.map(({ id, label, Icon }) => {
-                        const active = mobileEventType === id;
-                        return (
-                          <button
-                            key={id}
-                            type="button"
-                            onClick={() =>
-                              setMobileEventType(active ? "" : id)
-                            }
-                            className={cn(
-                              "flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-medium transition",
-                              active
-                                ? "border-accent bg-accent/10 text-accent"
-                                : "border-input text-foreground/80 hover:border-foreground/30",
-                            )}
-                          >
-                            <Icon className="h-4 w-4" />
-                            {label}
-                          </button>
-                        );
-                      })}
-                      {EVENT_TYPE_OPTIONS.length > 4 && (
-                        <button
-                          type="button"
-                          onClick={() => setShowMoreEvents((v) => !v)}
-                          className="flex items-center gap-1 rounded-xl border border-input px-3 py-2 text-sm font-medium text-foreground/80 transition hover:border-foreground/30"
-                        >
-                          Flere
-                          <ChevronDown
-                            className={cn(
-                              "h-4 w-4 transition-transform",
-                              showMoreEvents && "rotate-180",
-                            )}
-                          />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Dato */}
-                  <div>
-                    <span className="mb-1.5 block text-xs font-semibold text-foreground">
-                      Dato
-                    </span>
-                    <div className="relative">
-                      <CalendarIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        className="pl-9"
-                        type="date"
-                        value={mobileDate}
-                        onChange={(e) => setMobileDate(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* By */}
-                  <div>
-                    <span className="mb-1.5 block text-xs font-semibold text-foreground">
-                      By
-                    </span>
-                    <div className="relative">
-                      <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        className="pl-9"
-                        placeholder="Vælg by"
-                        value={mobileCity}
-                        onChange={(e) => setMobileCity(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* CTA */}
-                  <button
-                    type="button"
-                    onClick={handleMobileSearch}
-                    className={cn(
-                      "flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-base font-semibold text-white shadow-md transition active:scale-[0.99]",
-                      mobileMode === "offers"
-                        ? "bg-accent"
-                        : "bg-foreground",
-                    )}
-                  >
-                    {mobileMode === "offers" ? (
-                      <>
-                        Få 3 tilbud
-                        <ArrowRight className="h-4 w-4" />
-                      </>
-                    ) : (
-                      <>
-                        <Search className="h-4 w-4" />
-                        Browse DJs
-                      </>
-                    )}
-                  </button>
-
-                  {mobileMode === "offers" && (
-                    <p className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-                      <Shield className="h-3.5 w-3.5" />
-                      Gratis, uforpligtende og hurtigt
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      </div>
-
-      {/* Headline + subtitle — white bg */}
-      <div className="bg-background px-5 pt-6 pb-2 text-center">
-        <motion.h1
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.1}
-          className="text-[2rem] font-bold leading-[1.15] tracking-tight text-foreground"
-        >
-          Den letteste måde at{" "}
-          <span className="relative whitespace-nowrap">
-            <span className="bg-gradient-to-r from-accent to-orange-500 bg-clip-text text-transparent">
-              booke en DJ.
-            </span>
-            <motion.span
-              aria-hidden
-              className="absolute -bottom-1 left-0 h-[3px] w-full origin-left rounded-full bg-accent/70"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ delay: 0.9, duration: 2, ease: [0.22, 1, 0.36, 1] }}
-            />
-          </span>
-        </motion.h1>
-
-        <motion.p
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.2}
-          className="mt-3 text-sm leading-relaxed text-muted-foreground"
-        >
-          Book interviewede, udstyrs-verificerede DJs til bryllupper,
-          fødselsdage og firmaevents. De medbringer lyd, lys og energi —
-          du tager dig af gæsterne.
-        </motion.p>
-
-        {/* Social proof — relocated below subtitle */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={fadeUp}
-          custom={0.25}
-          className="mt-4 inline-flex items-center gap-2"
-        >
-          <div className="flex -space-x-1.5">
-            {avatars.map((a, i) => (
-              <img
-                key={i}
-                src={a.url ?? undefined}
-                alt={a.name}
-                className="h-5 w-5 rounded-full border-[1.5px] border-white object-cover"
-              />
-            ))}
-          </div>
-          <span className="text-[11px] font-medium text-muted-foreground">
-            Brugt af 240+ par &amp; firmaer i 2026
-          </span>
-          <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
-        </motion.div>
-      </div>
-
       {/* Top-vurderede DJs — white bg */}
       {topDJs.length > 0 && (
         <div className="bg-background px-5 pt-6 pb-4">
@@ -938,35 +863,6 @@ export function EventTypePicker({ value, onChange }: { value: string; onChange: 
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
-
-function FloatingIcons() {
-  const items = [
-    { Icon: Headphones, className: "left-[6%] top-[22%]", size: "h-12 w-12", delay: "0s", duration: "7s" },
-    { Icon: Disc3, className: "right-[10%] top-[14%]", size: "h-16 w-16", delay: "1.2s", duration: "9s" },
-    { Icon: Speaker, className: "right-[18%] bottom-[18%]", size: "h-14 w-14", delay: "0.6s", duration: "8s" },
-    { Icon: Zap, className: "left-[14%] bottom-[20%]", size: "h-10 w-10", delay: "1.8s", duration: "6.5s" },
-  ];
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 hidden md:block">
-      {items.map(({ Icon, className, size, delay, duration }, i) => (
-        <span
-          key={i}
-          className={`absolute ${className} text-accent/60`}
-          style={{ animation: `float-slow ${duration} ease-in-out infinite`, animationDelay: delay }}
-        >
-          <Icon className={size} />
-        </span>
-      ))}
-      <span
-        aria-hidden
-        className="absolute right-[3%] top-[58%] text-accent/20"
-        style={{ animation: "spin-slow 40s linear infinite" }}
-      >
-        <Disc3 className="h-52 w-52" />
-      </span>
     </div>
   );
 }
