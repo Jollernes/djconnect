@@ -585,20 +585,20 @@ function MobileHeroV2({
           </form>
         </motion.div>
 
-        {/* Feature pills — horizontal scroll */}
+        {/* Feature pills — wrap into rows (no horizontal scroll) */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeUp}
           custom={0.7}
-          className="-mx-5 mt-4 flex gap-2.5 overflow-x-auto px-5 pb-1 scrollbar-hide"
+          className="mt-4 flex flex-wrap justify-center gap-2"
         >
           {HERO_FEATURES.map(({ label, Icon }) => (
             <span
               key={label}
-              className="flex flex-shrink-0 items-center gap-2 rounded-full border border-border/60 bg-white px-3.5 py-2 text-sm font-medium text-foreground/80 shadow-sm"
+              className="flex items-center gap-1.5 rounded-full border border-border/60 bg-white px-3 py-1.5 text-xs font-medium text-foreground/80 shadow-sm"
             >
-              <Icon className="h-4 w-4 text-accent" />
+              <Icon className="h-3.5 w-3.5 text-accent" />
               {label}
             </span>
           ))}
