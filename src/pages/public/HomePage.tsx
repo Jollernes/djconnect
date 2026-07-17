@@ -193,6 +193,11 @@ export function HomePage() {
 
 /* ---------- Desktop-only image hero (headline + search) ---------- */
 
+// Hero background video. To revert to the previous clip, set this back to
+// "/hero-dj.mp4" (poster "/hero-dj-poster.jpg").
+const HERO_VIDEO_SRC = "/hero-dj-alt.mp4";
+const HERO_VIDEO_POSTER = "/hero-dj-poster.jpg";
+
 const HERO_TRUST = ["Interviewede DJs", "Udstyr verificeret", "Lyd & lys", "Tryg booking"];
 
 function RegionPicker({
@@ -266,8 +271,8 @@ function DesktopHeroV2({
         <div aria-hidden className="absolute inset-0 overflow-hidden">
           <video
             className="h-full w-full object-cover object-right"
-            src="/hero-dj.mp4"
-            poster="/hero-dj-poster.jpg"
+            src={HERO_VIDEO_SRC}
+            poster={HERO_VIDEO_POSTER}
             autoPlay
             muted
             loop
@@ -455,8 +460,8 @@ function MobileHeroV2({
         <div aria-hidden className="absolute inset-0 overflow-hidden">
           <video
             className="h-full w-full object-cover object-right"
-            src="/hero-dj.mp4"
-            poster="/hero-dj-poster.jpg"
+            src={HERO_VIDEO_SRC}
+            poster={HERO_VIDEO_POSTER}
             autoPlay
             muted
             loop
