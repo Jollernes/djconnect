@@ -729,30 +729,23 @@ const HOW_IT_WORKS_STEPS: {
 function HowItWorksMini({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
   const [active, setActive] = useState(1);
 
-  function scrollToId(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  }
-
   const stepCtas: {
-    primary: { label: string; onClick: () => void };
-    secondary: { label: string; onClick: () => void };
-  }[] = [
-    {
-      primary: { label: "Vælg festtype", onClick: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
-      secondary: { label: "Se populære festtyper", onClick: () => scrollToId("populaere-festtyper") },
-    },
-    {
-      primary: { label: "Få 3 tilbud", onClick: () => navigate("/get-offers") },
-      secondary: { label: "Browse DJs", onClick: () => navigate("/search") },
-    },
-    {
-      primary: { label: "Kom i gang", onClick: () => navigate("/get-offers") },
-      secondary: { label: "Læs om tryg booking", onClick: () => navigate("/how-it-works") },
-    },
+    label: string;
+    variant: "accent" | "outline";
+    onClick: () => void;
+  }[][] = [
+    [],
+    [
+      { label: "Få 3 tilbud", variant: "accent", onClick: () => navigate("/get-offers") },
+      { label: "Browse DJs", variant: "outline", onClick: () => navigate("/search") },
+    ],
+    [
+      { label: "Læs om tryg booking", variant: "accent", onClick: () => navigate("/how-it-works") },
+    ],
   ];
 
   const ActiveIcon = HOW_IT_WORKS_STEPS[active].Icon;
-  const cta = stepCtas[active];
+  const ctas = stepCtas[active];
 
   return (
     <section className="bg-background pt-8 md:pt-10">
@@ -831,14 +824,21 @@ function HowItWorksMini({ navigate }: { navigate: ReturnType<typeof useNavigate>
               <p className="mt-2.5 text-sm leading-relaxed text-foreground/70">
                 {HOW_IT_WORKS_STEPS[active].panelText}
               </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Button type="button" variant="accent" size="sm" onClick={cta.primary.onClick}>
-                  {cta.primary.label}
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={cta.secondary.onClick}>
-                  {cta.secondary.label}
-                </Button>
-              </div>
+              {ctas.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {ctas.map((c) => (
+                    <Button
+                      key={c.label}
+                      type="button"
+                      variant={c.variant}
+                      size="sm"
+                      onClick={c.onClick}
+                    >
+                      {c.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         </AnimatePresence>
