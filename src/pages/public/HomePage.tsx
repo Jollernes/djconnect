@@ -154,6 +154,9 @@ export function HomePage() {
       {/* Popular event types — image chips under the search/trust area */}
       <PopularEventTypes navigate={navigate} />
 
+      {/* Compact interactive "how it works" strip */}
+      <HowItWorksMini />
+
       {/* Top-rated DJs carousel */}
       <TopRatedDJs djs={topRatedDJs} />
 
@@ -687,6 +690,105 @@ function PopularEventTypes({ navigate }: { navigate: ReturnType<typeof useNaviga
             </button>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Compact interactive "how it works" strip ---------- */
+
+const HOW_IT_WORKS_STEPS: { title: string; description: string; Icon: LucideIcon }[] = [
+  {
+    title: "Vælg festtype",
+    description: "Start med din festtype og dit område.",
+    Icon: Sparkles,
+  },
+  {
+    title: "Få tilbud eller browse",
+    description: "Vælg selv blandt DJs eller få 3 tilbud.",
+    Icon: Users,
+  },
+  {
+    title: "Book trygt",
+    description: "Book med verificeret udstyr og anmeldelser.",
+    Icon: Shield,
+  },
+];
+
+function HowItWorksMini() {
+  const [active, setActive] = useState(0);
+
+  return (
+    <section className="bg-background pt-8 md:pt-10">
+      <div className="mx-auto max-w-7xl px-5 md:px-6">
+        <h2 className="mb-4 text-lg font-bold text-foreground md:text-xl">Sådan fungerer det</h2>
+
+        <div className="grid grid-cols-3 gap-2 md:gap-3">
+          {HOW_IT_WORKS_STEPS.map((step, i) => {
+            const isActive = i === active;
+            return (
+              <button
+                key={step.title}
+                type="button"
+                onClick={() => setActive(i)}
+                onMouseEnter={() => setActive(i)}
+                aria-expanded={isActive}
+                className={cn(
+                  "flex items-center gap-2 rounded-xl border px-2.5 py-2.5 text-left transition md:px-3.5",
+                  isActive
+                    ? "border-accent/40 bg-accent/5 shadow-sm"
+                    : "border-border/70 bg-white hover:border-accent/30",
+                )}
+              >
+                <span
+                  className={cn(
+                    "grid h-7 w-7 shrink-0 place-items-center rounded-full text-[13px] font-bold transition",
+                    isActive
+                      ? "bg-accent text-accent-foreground"
+                      : "bg-muted text-foreground/70",
+                  )}
+                >
+                  {i + 1}
+                </span>
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <step.Icon
+                    className={cn(
+                      "hidden h-4 w-4 shrink-0 sm:block",
+                      isActive ? "text-accent" : "text-foreground/50",
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      "truncate text-[12px] font-semibold leading-tight sm:text-sm",
+                      isActive ? "text-foreground" : "text-foreground/70",
+                    )}
+                  >
+                    {step.title}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2 }}
+            className="mt-2.5 flex items-start gap-2 rounded-xl border border-border/60 bg-muted/40 px-4 py-3"
+          >
+            <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+            <p className="text-sm text-foreground/80">
+              <span className="font-semibold text-foreground">
+                {HOW_IT_WORKS_STEPS[active].title}.
+              </span>{" "}
+              {HOW_IT_WORKS_STEPS[active].description}
+            </p>
+          </motion.div>
+        </AnimatePresence>
       </div>
     </section>
   );
