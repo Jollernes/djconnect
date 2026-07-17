@@ -21,6 +21,7 @@ import {
   MapPin,
   Star,
   BadgeCheck,
+  Music,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
@@ -640,6 +641,12 @@ const POPULAR_EVENT_TYPES: { id: string; label: string; Icon: LucideIcon; image:
     Icon: Sparkles,
     image: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=500&q=60",
   },
+  {
+    id: "other",
+    label: "Anden fest",
+    Icon: Music,
+    image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=500&q=60",
+  },
 ];
 
 function PopularEventTypes({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
@@ -655,13 +662,13 @@ function PopularEventTypes({ navigate }: { navigate: ReturnType<typeof useNaviga
     <section className="bg-background pt-10 md:pt-12">
       <div className="mx-auto max-w-7xl px-5 md:px-6">
         <h2 className="mb-4 text-lg font-bold text-foreground md:text-xl">Populære festtyper</h2>
-        <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide md:mx-0 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible md:px-0">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-6 md:gap-4">
           {POPULAR_EVENT_TYPES.map((ev) => (
             <button
               key={ev.label}
               type="button"
               onClick={() => go(ev.id)}
-              className="group flex w-[42vw] max-w-[220px] flex-shrink-0 flex-col text-left md:w-auto md:max-w-none"
+              className="group flex flex-col text-left"
             >
               <div className="relative aspect-[5/3] w-full overflow-hidden rounded-2xl bg-muted shadow-sm ring-1 ring-black/5">
                 <img
