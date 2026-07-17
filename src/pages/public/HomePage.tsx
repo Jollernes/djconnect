@@ -662,7 +662,7 @@ function PopularEventTypes({ navigate }: { navigate: ReturnType<typeof useNaviga
   }
 
   return (
-    <section className="bg-background pt-10 md:pt-12">
+    <section id="populaere-festtyper" className="scroll-mt-24 bg-background pt-10 md:pt-12">
       <div className="mx-auto max-w-7xl px-5 md:px-6">
         <h2 className="mb-4 text-lg font-bold text-foreground md:text-xl">Populære festtyper</h2>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-6 md:gap-4">
@@ -704,30 +704,55 @@ const HOW_IT_WORKS_STEPS: {
   Icon: LucideIcon;
 }[] = [
   {
-    title: "Vælg festtype",
-    shortText: "Fortæl os, hvad du fejrer.",
+    title: "Vælg fest og område",
+    shortText: "Fortæl os, hvad du holder, og hvor festen er.",
     panelText:
-      "Fortæl os, hvad du fejrer — bryllup, fødselsdag, firmafest eller andet — samt dato og område, så vi kan finde de rette DJs.",
+      "Fortæl os, hvad du holder — bryllup, fødselsdag, firmafest eller andet — samt dato og område, så vi kan finde de rette DJs.",
     Icon: Sparkles,
   },
   {
-    title: "Få tilbud eller browse",
-    shortText: "Få 3 tilbud eller vælg selv DJ.",
+    title: "Få tilbud eller browse DJs",
+    shortText: "Få 3 relevante tilbud eller vælg selv blandt profiler.",
     panelText:
       "Vælg selv blandt top-vurderede DJs, eller få 3 tilbud fra DJs, der matcher festtype, dato og område.",
     Icon: Users,
   },
   {
     title: "Book trygt",
-    shortText: "Verificeret udstyr, anmeldelser og hjælp.",
+    shortText: "Verificerede DJs, udstyr og personlig hjælp.",
     panelText:
-      "Book med ro i maven: verificeret udstyr, ægte anmeldelser og personlig hjælp hele vejen.",
+      "Book med ro i maven: verificerede DJs og udstyr, ægte anmeldelser og personlig hjælp hele vejen.",
     Icon: Shield,
   },
 ];
 
 function HowItWorksMini({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
   const [active, setActive] = useState(1);
+
+  function scrollToId(id: string) {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  const stepCtas: {
+    primary: { label: string; onClick: () => void };
+    secondary: { label: string; onClick: () => void };
+  }[] = [
+    {
+      primary: { label: "Vælg festtype", onClick: () => window.scrollTo({ top: 0, behavior: "smooth" }) },
+      secondary: { label: "Se populære festtyper", onClick: () => scrollToId("populaere-festtyper") },
+    },
+    {
+      primary: { label: "Få 3 tilbud", onClick: () => navigate("/get-offers") },
+      secondary: { label: "Browse DJs", onClick: () => navigate("/search") },
+    },
+    {
+      primary: { label: "Kom i gang", onClick: () => navigate("/get-offers") },
+      secondary: { label: "Læs om tryg booking", onClick: () => navigate("/how-it-works") },
+    },
+  ];
+
+  const ActiveIcon = HOW_IT_WORKS_STEPS[active].Icon;
+  const cta = stepCtas[active];
 
   return (
     <section className="bg-background pt-8 md:pt-10">
@@ -791,31 +816,29 @@ function HowItWorksMini({ navigate }: { navigate: ReturnType<typeof useNavigate>
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
-            className="mt-3 rounded-2xl border border-border/60 bg-muted/30 px-4 py-3.5 md:px-5"
+            className="mt-3 flex gap-4 overflow-hidden rounded-2xl border border-border/70 bg-white p-5 shadow-sm md:p-6"
           >
-            <p className="text-sm font-bold text-foreground">
-              Trin {active + 1}: {HOW_IT_WORKS_STEPS[active].title}
-            </p>
-            <p className="mt-1 text-sm text-foreground/70">
-              {HOW_IT_WORKS_STEPS[active].panelText}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant="accent"
-                size="sm"
-                onClick={() => navigate("/get-offers")}
-              >
-                Få 3 tilbud
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("/search")}
-              >
-                Browse DJs
-              </Button>
+            <span className="hidden w-1 shrink-0 rounded-full bg-accent sm:block" />
+            <div className="flex-1">
+              <div className="flex items-center gap-2.5">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent/10 text-accent">
+                  <ActiveIcon className="h-[18px] w-[18px]" />
+                </span>
+                <p className="text-base font-bold text-foreground">
+                  Trin {active + 1}: {HOW_IT_WORKS_STEPS[active].title}
+                </p>
+              </div>
+              <p className="mt-2.5 text-sm leading-relaxed text-foreground/70">
+                {HOW_IT_WORKS_STEPS[active].panelText}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button type="button" variant="accent" size="sm" onClick={cta.primary.onClick}>
+                  {cta.primary.label}
+                </Button>
+                <Button type="button" variant="outline" size="sm" onClick={cta.secondary.onClick}>
+                  {cta.secondary.label}
+                </Button>
+              </div>
             </div>
           </motion.div>
         </AnimatePresence>
