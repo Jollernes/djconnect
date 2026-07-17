@@ -131,3 +131,31 @@
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-elegant {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-elegant::-webkit-scrollbar {
+    height: 6px;
+  }
+  .scrollbar-elegant::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-elegant::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+  }
+  .scrollbar-elegant:hover::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--muted-foreground) / 0.5);
+  }
+}

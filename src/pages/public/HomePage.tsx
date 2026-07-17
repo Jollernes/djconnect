@@ -829,7 +829,7 @@ function TopRatedDJs({ djs }: { djs: DJProfileWithRelations[] }) {
         </div>
         <div
           ref={scrollRef}
-          className="-mx-5 flex snap-x gap-4 overflow-x-auto px-5 pb-2 scrollbar-hide md:mx-0 md:px-0"
+          className="scrollbar-elegant -mx-5 flex snap-x gap-4 overflow-x-auto px-5 pb-3 md:mx-0 md:px-0"
         >
           {djs.map((dj) => (
             <div
