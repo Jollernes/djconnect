@@ -14,10 +14,13 @@ import {
   Briefcase,
   PartyPopper,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Check,
   X,
   MapPin,
   Star,
+  BadgeCheck,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
@@ -34,6 +37,7 @@ import { REGIONS } from "@/lib/djStandardSettings";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
+import { priceFromLabel } from "@/components/event-djs/grid/shared";
 import { NEUTRAL_THEME } from "@/components/event-djs/grid/eventThemes";
 import { useDJs } from "@/hooks/useDJs";
 import type { DJProfileWithRelations } from "@/types/domain";
@@ -99,11 +103,10 @@ export function HomePage() {
   const navigate = useNavigate();
   const { djs } = useDJs({ sortBy: "relevance" });
   const featured = djs.filter((d) => d.is_featured).slice(0, 3);
-  // Hero cluster: prefer featured DJs, then top up with the rest so we
-  // always have up to 4 cards for social proof.
-  const heroDJs = [...featured, ...djs.filter((d) => !d.is_featured)].slice(0, 4);
-  // Desktop hero grid: 5 DJ cards shown between the search bar and headline.
-  const heroGridDJs = [...featured, ...djs.filter((d) => !d.is_featured)].slice(0, 5);
+  // Top-rated carousel below the hero: highest-rated DJs first.
+  const topRatedDJs = [...djs]
+    .sort((a, b) => b.rating_average - a.rating_average)
+    .slice(0, 8);
 
   const [eventType, setEventType] = useState<string>("");
   const [region, setRegion] = useState("");
@@ -147,11 +150,11 @@ export function HomePage() {
         onSubmit={submit}
       />
 
-      {/* Desktop-only: DJ grid below the hero */}
-      <DesktopBelowHero gridDJs={heroGridDJs} />
+      {/* Popular event types — image chips under the search/trust area */}
+      <PopularEventTypes navigate={navigate} />
 
-      {/* Mobile-only: white-background content below video hero */}
-      <MobileHeroContent heroDJs={heroDJs} featured={featured} />
+      {/* Top-rated DJs carousel */}
+      <TopRatedDJs djs={topRatedDJs} />
 
       <Marquee />
 
@@ -604,117 +607,234 @@ function MobileHeroV2({
   );
 }
 
-/* ---------- Desktop-only DJ grid below the hero ---------- */
+/* ---------- Popular event types (image chips) ---------- */
 
-function DesktopBelowHero({ gridDJs }: { gridDJs: DJProfileWithRelations[] }) {
-  if (gridDJs.length < 5) return null;
+const POPULAR_EVENT_TYPES: { id: string; label: string; Icon: LucideIcon; image: string }[] = [
+  {
+    id: "wedding",
+    label: "Bryllup",
+    Icon: Heart,
+    image: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=500&q=60",
+  },
+  {
+    id: "birthday",
+    label: "Fødselsdag",
+    Icon: Cake,
+    image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=500&q=60",
+  },
+  {
+    id: "corporate_party",
+    label: "Firmafest",
+    Icon: PartyPopper,
+    image: "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=500&q=60",
+  },
+  {
+    id: "private_party",
+    label: "Privatfest",
+    Icon: Users,
+    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=500&q=60",
+  },
+  {
+    id: "corporate_party",
+    label: "Julefrokost",
+    Icon: Sparkles,
+    image: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=500&q=60",
+  },
+];
+
+function PopularEventTypes({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  function go(id: string) {
+    if (id === "wedding") {
+      navigate("/wedding-djs");
+      return;
+    }
+    navigate(`/search?eventType=${id}`);
+  }
+
   return (
-    <div className="hidden bg-background pb-12 pt-14 md:block">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-5 gap-5">
-          {gridDJs.map((dj, i) => (
-            <motion.div
-              key={dj.id}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ delay: i * 0.06, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              whileHover={{ y: -6 }}
+    <section className="bg-background pt-10 md:pt-12">
+      <div className="mx-auto max-w-7xl px-5 md:px-6">
+        <h2 className="mb-4 text-lg font-bold text-foreground md:text-xl">Populære festtyper</h2>
+        <div className="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 scrollbar-hide md:mx-0 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible md:px-0">
+          {POPULAR_EVENT_TYPES.map((ev) => (
+            <button
+              key={ev.label}
+              type="button"
+              onClick={() => go(ev.id)}
+              className="group flex w-[42vw] max-w-[220px] flex-shrink-0 flex-col text-left md:w-auto md:max-w-none"
             >
-              <HomeDJCard dj={dj} density="5" />
-            </motion.div>
+              <div className="relative aspect-[5/3] w-full overflow-hidden rounded-2xl bg-muted shadow-sm ring-1 ring-black/5">
+                <img
+                  src={ev.image}
+                  alt={ev.label}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <span className="absolute bottom-2 left-2 grid h-7 w-7 place-items-center rounded-full bg-white/90 shadow ring-1 ring-black/5">
+                  <ev.Icon className="h-3.5 w-3.5 text-accent" />
+                </span>
+              </div>
+              <span className="mt-2 text-sm font-semibold text-foreground group-hover:text-accent">
+                {ev.label}
+              </span>
+            </button>
           ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- Top-rated DJs carousel (compact horizontal cards) ---------- */
+
+const DA_EVENT_LABELS: Record<string, string> = {
+  wedding: "Bryllup",
+  birthday: "Fødselsdag",
+  corporate_event: "Firmaevent",
+  corporate_party: "Firmafest",
+  private_party: "Privatfest",
+  other: "Fest",
+};
+
+function HomeDJCardV2({ dj }: { dj: DJProfileWithRelations }) {
+  const photo = dj.equipment_photos[0]?.url ?? dj.profile.avatar_url ?? "";
+  const verified = dj.verification_status === "approved";
+  const rating = dj.rating_average > 0 ? dj.rating_average.toFixed(1).replace(".", ",") : null;
+  const tags = dj.event_types
+    .slice(0, 2)
+    .map((t) => `${DA_EVENT_LABELS[t.id] ?? t.label}-DJ`);
+
+  return (
+    <div className="relative flex h-full gap-3 rounded-2xl border border-border/70 bg-white p-3 shadow-sm transition hover:shadow-md">
+      <button
+        type="button"
+        aria-label="Gem DJ"
+        className="absolute right-2.5 top-2.5 z-10 grid h-8 w-8 place-items-center rounded-full text-foreground/60 transition hover:bg-muted hover:text-foreground"
+      >
+        <Heart className="h-4 w-4" />
+      </button>
+
+      <Link to={`/djs/${dj.username}`} className="shrink-0">
+        <div className="h-28 w-24 overflow-hidden rounded-xl bg-muted sm:h-32 sm:w-28">
+          {photo ? (
+            <img
+              src={photo}
+              alt={dj.stage_name}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center px-1 text-center text-[11px] text-muted-foreground">
+              Intet foto
+            </div>
+          )}
+        </div>
+      </Link>
+
+      <div className="flex min-w-0 flex-1 flex-col pr-7">
+        <div className="flex items-center gap-1.5">
+          <Link
+            to={`/djs/${dj.username}`}
+            className="truncate text-[15px] font-bold text-foreground hover:text-accent"
+          >
+            {dj.stage_name}
+          </Link>
+          {verified && <BadgeCheck className="h-4 w-4 shrink-0 text-amber-500" />}
+        </div>
+
+        {rating && (
+          <div className="mt-0.5 flex items-center gap-1 text-[13px]">
+            <div className="flex">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Star
+                  key={i}
+                  className={cn(
+                    "h-3.5 w-3.5",
+                    i < Math.round(dj.rating_average)
+                      ? "fill-accent text-accent"
+                      : "fill-muted text-muted",
+                  )}
+                />
+              ))}
+            </div>
+            <span className="font-semibold text-foreground">{rating}</span>
+            <span className="text-muted-foreground">({dj.rating_count})</span>
+          </div>
+        )}
+
+        <div className="mt-1.5 flex flex-wrap gap-1.5">
+          {tags.map((t) => (
+            <span
+              key={t}
+              className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground/70"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-auto flex items-center justify-between gap-2 pt-2.5">
+          <span className="truncate text-[13px] font-semibold text-foreground">
+            {priceFromLabel(dj)}
+          </span>
+          <Button asChild variant="outline" size="sm" className="h-8 shrink-0">
+            <Link to={`/djs/${dj.username}`}>Se profil</Link>
+          </Button>
         </div>
       </div>
     </div>
   );
 }
 
-/* ---------- Mobile-only hero content (white background below video) ---------- */
+function TopRatedDJs({ djs }: { djs: DJProfileWithRelations[] }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  if (djs.length === 0) return null;
 
-function MobileHeroContent({
-  heroDJs,
-  featured,
-}: {
-  heroDJs: DJProfileWithRelations[];
-  featured: DJProfileWithRelations[];
-}) {
-  const topDJs = featured.length > 0 ? featured : heroDJs.slice(0, 3);
+  function scroll(dir: "left" | "right") {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir === "left" ? -380 : 380, behavior: "smooth" });
+  }
 
   return (
-    <div className="relative md:hidden">
-      {/* Top-vurderede DJs — white bg */}
-      {topDJs.length > 0 && (
-        <div className="bg-background px-5 pt-6 pb-4">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={0.4}
-          >
-            <div className="flex items-baseline justify-between">
-              <h2 className="text-base font-semibold text-foreground">Top-vurderede DJs</h2>
-              <Link
-                to="/search"
-                className="text-xs font-semibold text-accent hover:underline"
-              >
-                Se alle →
-              </Link>
-            </div>
-            <div className="-mx-5 mt-3 flex gap-3 overflow-x-auto px-5 pb-4 scrollbar-hide">
-              {topDJs.map((dj) => {
-                const heroImage = dj.equipment_photos[0]?.url ?? dj.profile.avatar_url;
-                const reviews = dj.reviews ?? [];
-                const avgRating = reviews.length > 0
-                  ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(2)
-                  : null;
-                const eventLabel = dj.event_types[0]?.label
-                  ? `${dj.event_types[0].label.toUpperCase()}-DJ`
-                  : "DJ";
-                return (
-                  <Link
-                    key={dj.id}
-                    to={`/djs/${dj.username}`}
-                    className="group relative w-[70vw] max-w-[280px] flex-shrink-0 overflow-hidden rounded-2xl"
-                  >
-                    <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-                      {heroImage ? (
-                        <img
-                          src={heroImage}
-                          alt={dj.stage_name}
-                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                          loading="lazy"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-muted-foreground">
-                          Intet foto
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute left-3 top-3 flex items-center gap-2">
-                        <span className="rounded-md bg-gray-900/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                          {eventLabel}
-                        </span>
-                      </div>
-                      {avgRating && (
-                        <div className="absolute right-3 top-3 flex items-center gap-1 rounded-md bg-gray-900/70 px-2 py-0.5">
-                          <Sparkles className="h-3 w-3 text-amber-400" />
-                          <span className="text-[11px] font-semibold text-white">{avgRating}</span>
-                        </div>
-                      )}
-                      <div className="absolute bottom-3 left-3 right-3">
-                        <p className="text-sm font-semibold text-white">{dj.stage_name}</p>
-                        <p className="text-xs text-white/70">{dj.profile.city ?? "Danmark"}</p>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </motion.div>
+    <section className="bg-background py-10 md:py-12">
+      <div className="mx-auto max-w-7xl px-5 md:px-6">
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <h2 className="text-lg font-bold text-foreground md:text-xl">Top-vurderede DJs</h2>
+          <div className="hidden items-center gap-2 md:flex">
+            <button
+              type="button"
+              onClick={() => scroll("left")}
+              aria-label="Forrige"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border bg-white text-foreground/70 shadow-sm transition hover:text-foreground"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scroll("right")}
+              aria-label="Næste"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border bg-white text-foreground/70 shadow-sm transition hover:text-foreground"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
-      )}
-    </div>
+        <div
+          ref={scrollRef}
+          className="-mx-5 flex snap-x gap-4 overflow-x-auto px-5 pb-2 scrollbar-hide md:mx-0 md:px-0"
+        >
+          {djs.map((dj) => (
+            <div
+              key={dj.id}
+              className="w-[86vw] max-w-[360px] flex-shrink-0 snap-start sm:w-[360px]"
+            >
+              <HomeDJCardV2 dj={dj} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }
 
