@@ -162,10 +162,10 @@ export function ProfileGallery({ images, className, fullBleedMobile }: Props) {
         <button
           type="button"
           onClick={() => setAllOpen(true)}
-          className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-foreground shadow-lg ring-1 ring-black/5 transition hover:bg-white/95 hover:shadow-xl"
+          className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-xs font-medium text-foreground shadow-md ring-1 ring-black/5 backdrop-blur-sm transition hover:bg-white md:bottom-4 md:right-4 md:gap-2 md:px-4 md:py-2 md:text-sm md:shadow-lg md:hover:shadow-xl"
         >
-          <Grid2X2 className="h-4 w-4" />
-          <span className="md:inline">Se alle{" "}
+          <Grid2X2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
+          <span>Se alle{" "}
             <span className="hidden md:inline">{images.length} </span>billeder
           </span>
         </button>
