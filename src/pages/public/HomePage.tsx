@@ -155,7 +155,7 @@ export function HomePage() {
       <PopularEventTypes navigate={navigate} />
 
       {/* Compact interactive "how it works" strip */}
-      <HowItWorksMini />
+      <HowItWorksMini navigate={navigate} />
 
       {/* Top-rated DJs carousel */}
       <TopRatedDJs djs={topRatedDJs} />
@@ -697,33 +697,45 @@ function PopularEventTypes({ navigate }: { navigate: ReturnType<typeof useNaviga
 
 /* ---------- Compact interactive "how it works" strip ---------- */
 
-const HOW_IT_WORKS_STEPS: { title: string; description: string; Icon: LucideIcon }[] = [
+const HOW_IT_WORKS_STEPS: {
+  title: string;
+  shortText: string;
+  panelText: string;
+  Icon: LucideIcon;
+}[] = [
   {
     title: "Vælg festtype",
-    description: "Start med din festtype og dit område.",
+    shortText: "Fortæl os, hvad du fejrer.",
+    panelText:
+      "Fortæl os, hvad du fejrer — bryllup, fødselsdag, firmafest eller andet — samt dato og område, så vi kan finde de rette DJs.",
     Icon: Sparkles,
   },
   {
     title: "Få tilbud eller browse",
-    description: "Vælg selv blandt DJs eller få 3 tilbud.",
+    shortText: "Få 3 tilbud eller vælg selv DJ.",
+    panelText:
+      "Vælg selv blandt top-vurderede DJs, eller få 3 tilbud fra DJs, der matcher festtype, dato og område.",
     Icon: Users,
   },
   {
     title: "Book trygt",
-    description: "Book med verificeret udstyr og anmeldelser.",
+    shortText: "Verificeret udstyr, anmeldelser og hjælp.",
+    panelText:
+      "Book med ro i maven: verificeret udstyr, ægte anmeldelser og personlig hjælp hele vejen.",
     Icon: Shield,
   },
 ];
 
-function HowItWorksMini() {
-  const [active, setActive] = useState(0);
+function HowItWorksMini({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  const [active, setActive] = useState(1);
 
   return (
     <section className="bg-background pt-8 md:pt-10">
       <div className="mx-auto max-w-7xl px-5 md:px-6">
-        <h2 className="mb-4 text-lg font-bold text-foreground md:text-xl">Sådan fungerer det</h2>
+        <h2 className="text-lg font-bold text-foreground md:text-xl">Sådan fungerer det</h2>
+        <p className="mt-1 text-sm text-foreground/60">Tre enkle trin fra festidé til booking</p>
 
-        <div className="grid grid-cols-3 gap-2 md:gap-3">
+        <div className="mt-4 grid grid-cols-3 gap-2.5 md:gap-4">
           {HOW_IT_WORKS_STEPS.map((step, i) => {
             const isActive = i === active;
             return (
@@ -734,37 +746,38 @@ function HowItWorksMini() {
                 onMouseEnter={() => setActive(i)}
                 aria-expanded={isActive}
                 className={cn(
-                  "flex items-center gap-2 rounded-xl border px-2.5 py-2.5 text-left transition md:px-3.5",
+                  "group relative flex flex-col gap-2 overflow-hidden rounded-2xl border bg-white p-3 text-left shadow-sm transition md:p-4",
                   isActive
-                    ? "border-accent/40 bg-accent/5 shadow-sm"
-                    : "border-border/70 bg-white hover:border-accent/30",
+                    ? "border-accent/60 shadow-md"
+                    : "border-border/70 hover:border-accent/40 hover:shadow-md",
                 )}
               >
                 <span
                   className={cn(
-                    "grid h-7 w-7 shrink-0 place-items-center rounded-full text-[13px] font-bold transition",
-                    isActive
-                      ? "bg-accent text-accent-foreground"
-                      : "bg-muted text-foreground/70",
+                    "absolute inset-x-0 top-0 h-1 rounded-t-2xl bg-accent transition-opacity",
+                    isActive ? "opacity-100" : "opacity-0",
                   )}
-                >
-                  {i + 1}
-                </span>
-                <span className="flex min-w-0 items-center gap-1.5">
-                  <step.Icon
-                    className={cn(
-                      "hidden h-4 w-4 shrink-0 sm:block",
-                      isActive ? "text-accent" : "text-foreground/50",
-                    )}
-                  />
+                />
+                <span className="flex items-center gap-2">
                   <span
                     className={cn(
-                      "truncate text-[12px] font-semibold leading-tight sm:text-sm",
-                      isActive ? "text-foreground" : "text-foreground/70",
+                      "grid h-8 w-8 shrink-0 place-items-center rounded-lg transition md:h-9 md:w-9",
+                      isActive
+                        ? "bg-accent text-accent-foreground"
+                        : "bg-accent/10 text-accent",
                     )}
                   >
-                    {step.title}
+                    <step.Icon className="h-4 w-4 md:h-[18px] md:w-[18px]" />
                   </span>
+                  <span className="text-[11px] font-semibold uppercase tracking-wide text-foreground/40">
+                    Trin {i + 1}
+                  </span>
+                </span>
+                <span className="text-[13px] font-bold leading-tight text-foreground md:text-[15px]">
+                  {step.title}
+                </span>
+                <span className="hidden text-xs leading-snug text-foreground/60 sm:block">
+                  {step.shortText}
                 </span>
               </button>
             );
@@ -778,15 +791,32 @@ function HowItWorksMini() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
-            className="mt-2.5 flex items-start gap-2 rounded-xl border border-border/60 bg-muted/40 px-4 py-3"
+            className="mt-3 rounded-2xl border border-border/60 bg-muted/30 px-4 py-3.5 md:px-5"
           >
-            <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-            <p className="text-sm text-foreground/80">
-              <span className="font-semibold text-foreground">
-                {HOW_IT_WORKS_STEPS[active].title}.
-              </span>{" "}
-              {HOW_IT_WORKS_STEPS[active].description}
+            <p className="text-sm font-bold text-foreground">
+              Trin {active + 1}: {HOW_IT_WORKS_STEPS[active].title}
             </p>
+            <p className="mt-1 text-sm text-foreground/70">
+              {HOW_IT_WORKS_STEPS[active].panelText}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="accent"
+                size="sm"
+                onClick={() => navigate("/get-offers")}
+              >
+                Få 3 tilbud
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => navigate("/search")}
+              >
+                Browse DJs
+              </Button>
+            </div>
           </motion.div>
         </AnimatePresence>
       </div>
