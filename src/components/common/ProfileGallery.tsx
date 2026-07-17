@@ -12,9 +12,12 @@ interface Image {
 interface Props {
   images: Image[];
   className?: string;
+  /** On mobile, break the hero out of the page container so it spans the
+   * full viewport width and reaches up to the header. */
+  fullBleedMobile?: boolean;
 }
 
-export function ProfileGallery({ images, className }: Props) {
+export function ProfileGallery({ images, className, fullBleedMobile }: Props) {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [allOpen, setAllOpen] = useState(false);
 
@@ -44,7 +47,14 @@ export function ProfileGallery({ images, className }: Props) {
     cn(i === 1 && "rounded-tr-2xl", i === 3 && "rounded-br-2xl");
 
   return (
-    <div className={cn("relative", className)}>
+    <div
+      className={cn(
+        "relative",
+        fullBleedMobile &&
+          "-mx-4 -mt-6 sm:-mx-6 sm:-mt-10 md:mx-0 md:mt-0",
+        className,
+      )}
+    >
       {/* Desktop: Airbnb-style collage — hero 50% left + 2×2 grid right */}
       <div className="relative hidden h-[320px] w-full overflow-hidden rounded-2xl md:block lg:h-[420px]">
         <div className="grid h-full grid-cols-4 grid-rows-2 gap-2">
@@ -98,7 +108,10 @@ export function ProfileGallery({ images, className }: Props) {
       <button
         type="button"
         onClick={() => setOpenIdx(0)}
-        className="relative block aspect-[4/3] w-full max-h-[320px] overflow-hidden rounded-3xl bg-muted md:hidden"
+        className={cn(
+          "relative block aspect-[4/3] w-full max-h-[380px] overflow-hidden bg-muted md:hidden",
+          fullBleedMobile ? "rounded-none" : "rounded-3xl",
+        )}
       >
         <img src={hero.url} alt={hero.alt ?? ""} className="absolute inset-0 h-full w-full object-cover" />
       </button>

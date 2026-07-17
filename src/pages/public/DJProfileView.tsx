@@ -107,7 +107,7 @@ export function DJProfileView({
     <div className={cn("bg-gradient-to-b from-white via-white to-slate-50", preview ? "pb-6" : "pb-28")}>
       <div className={cn(preview ? "px-4 pt-4 sm:px-6 sm:pt-6" : "container pt-6 sm:pt-10")}>
         {/* Photo collage */}
-        <ProfileGallery images={galleryImages} />
+        <ProfileGallery images={galleryImages} fullBleedMobile={!preview} />
 
         {/* Festive ribbon — neon strip with equalizer + signal pills */}
         <div className="relative mt-5 overflow-hidden rounded-2xl border bg-[hsl(222_47%_10%)] px-4 py-3 text-white sm:px-6">
