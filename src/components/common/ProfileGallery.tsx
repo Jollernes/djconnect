@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Grid2X2, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
@@ -20,6 +20,13 @@ interface Props {
 export function ProfileGallery({ images, className, fullBleedMobile }: Props) {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [allOpen, setAllOpen] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  function onTrackScroll(e: React.UIEvent<HTMLDivElement>) {
+    const el = e.currentTarget;
+    setActiveIdx(Math.round(el.scrollLeft / el.clientWidth));
+  }
 
   useEffect(() => {
     if (openIdx === null) return;
@@ -104,17 +111,52 @@ export function ProfileGallery({ images, className, fullBleedMobile }: Props) {
         </div>
       </div>
 
-      {/* Mobile: single hero */}
-      <button
-        type="button"
-        onClick={() => setOpenIdx(0)}
-        className={cn(
-          "relative block aspect-[4/3] w-full max-h-[380px] overflow-hidden bg-muted md:hidden",
-          fullBleedMobile ? "rounded-none" : "rounded-3xl",
+      {/* Mobile: swipeable carousel */}
+      <div className="md:hidden">
+        <div
+          ref={trackRef}
+          onScroll={onTrackScroll}
+          className="scrollbar-hide flex snap-x snap-mandatory overflow-x-auto"
+        >
+          {images.map((img, i) => (
+            <button
+              key={img.id}
+              type="button"
+              onClick={() => setOpenIdx(i)}
+              className={cn(
+                "relative block aspect-[4/3] max-h-[380px] w-full shrink-0 snap-start overflow-hidden bg-muted",
+                fullBleedMobile ? "rounded-none" : "rounded-3xl",
+              )}
+            >
+              <img
+                src={img.url}
+                alt={img.alt ?? ""}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* Photo counter */}
+        <span className="pointer-events-none absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
+          {activeIdx + 1}/{images.length} billeder
+        </span>
+
+        {/* Pagination dots */}
+        {images.length > 1 && (
+          <div className="pointer-events-none absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
+            {images.map((img, i) => (
+              <span
+                key={img.id}
+                className={cn(
+                  "h-1.5 rounded-full bg-white transition-all",
+                  i === activeIdx ? "w-4 opacity-100" : "w-1.5 opacity-50",
+                )}
+              />
+            ))}
+          </div>
         )}
-      >
-        <img src={hero.url} alt={hero.alt ?? ""} className="absolute inset-0 h-full w-full object-cover" />
-      </button>
+      </div>
 
       {images.length > 1 && (
         <button
@@ -123,7 +165,9 @@ export function ProfileGallery({ images, className, fullBleedMobile }: Props) {
           className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-foreground shadow-lg ring-1 ring-black/5 transition hover:bg-white/95 hover:shadow-xl"
         >
           <Grid2X2 className="h-4 w-4" />
-          Se alle {images.length} billeder
+          <span className="md:inline">Se alle{" "}
+            <span className="hidden md:inline">{images.length} </span>billeder
+          </span>
         </button>
       )}
 
