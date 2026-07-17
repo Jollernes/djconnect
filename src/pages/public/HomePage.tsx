@@ -750,10 +750,13 @@ function HowItWorksMini({ navigate }: { navigate: ReturnType<typeof useNavigate>
   return (
     <section className="bg-background pt-8 md:pt-10">
       <div className="mx-auto max-w-7xl px-5 md:px-6">
-        <h2 className="text-lg font-bold text-foreground md:text-xl">Sådan fungerer det</h2>
-        <p className="mt-1 text-sm text-foreground/60">Tre enkle trin fra festidé til booking</p>
+        <div className="rounded-3xl border border-accent/10 bg-[#FFF8F3] px-4 py-6 shadow-sm md:px-8 md:py-8">
+        <div className="md:text-center">
+          <h2 className="text-lg font-bold text-foreground md:text-xl">Sådan fungerer det</h2>
+          <p className="mt-1 text-sm text-foreground/60">Tre enkle trin fra festidé til booking</p>
+        </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2.5 md:gap-4">
+        <div className="mt-5 grid grid-cols-3 gap-2.5 md:gap-4">
           {HOW_IT_WORKS_STEPS.map((step, i) => {
             const isActive = i === active;
             return (
@@ -842,6 +845,7 @@ function HowItWorksMini({ navigate }: { navigate: ReturnType<typeof useNavigate>
             </div>
           </motion.div>
         </AnimatePresence>
+        </div>
       </div>
     </section>
   );
