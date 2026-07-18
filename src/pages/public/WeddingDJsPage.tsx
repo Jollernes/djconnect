@@ -30,9 +30,19 @@ import type { EventListingConfig } from "@/lib/eventDJsContent";
  * EventDJ). Card layout, colourway, and editorial hero treatment
  * are identical across event types so the marketplace reads as a
  * single surface. */
+/** Per-DJ hero photo overrides for the live `/wedding-djs` cards,
+ * keyed by DJ username. Applied to both the mobile row and the desktop
+ * editorial card so the visible listings use the supplied portraits. */
+const WEDDING_HERO_OVERRIDES: Record<string, string> = {
+  "alex-holm": "/dj-photos/wedding-hero-1.png",
+  "mia-sorensen": "/dj-photos/wedding-hero-3.png",
+  "flashback-mobildiskotek": "/dj-photos/wedding-hero-2.png",
+};
+
 export function renderSoftWeddingCard(
   eventTheme: EventTheme,
   priceIncludes?: string[],
+  heroOverrides?: Record<string, string>,
 ) {
   return function renderCard({
     dj,
@@ -53,6 +63,7 @@ export function renderSoftWeddingCard(
             dj={dj}
             eventTypeId={eventTypeId}
             eventTheme={eventTheme}
+            heroOverrides={heroOverrides}
             unavailable={unavailable}
           />
         </div>
@@ -66,6 +77,7 @@ export function renderSoftWeddingCard(
             heroGrayscale={0}
             avatarGrayscale={false}
             bioLines={3}
+            heroOverrides={heroOverrides}
             showWeddingsPlayed
             hideEventTypes
             hideStarRating
@@ -91,15 +103,17 @@ export function SoftWeddingListingPage({
   config,
   eventTheme,
   priceIncludes,
+  heroOverrides,
 }: {
   config: EventListingConfig;
   eventTheme: EventTheme;
   priceIncludes?: string[];
+  heroOverrides?: Record<string, string>;
 }) {
   return (
     <EventDJsListingPage
       config={config}
-      renderCard={renderSoftWeddingCard(eventTheme, priceIncludes)}
+      renderCard={renderSoftWeddingCard(eventTheme, priceIncludes, heroOverrides)}
     />
   );
 }
@@ -109,6 +123,7 @@ export function WeddingDJsPage() {
     <SoftWeddingListingPage
       config={EVENT_LISTING_CONFIG.wedding}
       eventTheme={WEDDING_THEME}
+      heroOverrides={WEDDING_HERO_OVERRIDES}
     />
   );
 }

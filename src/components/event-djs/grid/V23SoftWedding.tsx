@@ -545,15 +545,20 @@ export function SoftWeddingMobileRow({
   dj,
   eventTypeId,
   eventTheme = WEDDING_THEME,
+  heroOverrides,
   unavailable,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
   eventTheme?: EventTheme;
+  heroOverrides?: Record<string, string>;
   unavailable?: { reason: string; subReason?: string } | null;
 }) {
   const hero =
-    dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
+    heroOverrides?.[dj.username] ||
+    dj.equipment_photos[0]?.url ||
+    dj.profile.avatar_url ||
+    "";
   const avatar = dj.profile.avatar_url || hero;
   const href = djHref(dj, eventTypeId);
   const region = regionFor(dj);
@@ -808,7 +813,7 @@ export function GridCardV23SoftWedding({
 }) {
   const palette = SOFT_WEDDING_COLOURWAYS[colourway];
   const hero =
-    heroOverrides?.[dj.id] ||
+    heroOverrides?.[dj.username] ||
     dj.equipment_photos[0]?.url ||
     dj.profile.avatar_url ||
     "";
