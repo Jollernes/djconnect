@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -45,15 +45,32 @@ export function BookingRequestPage() {
   const { dj, loading } = useDJ(username ?? "");
   const { profile } = useAuth();
   const { eventTypeId: contextEventTypeId, set: setEventType } = useEventContext();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [eventPickerOpen, setEventPickerOpen] = useState(false);
   const [submittedRef, setSubmittedRef] = useState<string | null>(null);
 
+  const initialDate = searchParams.get("date") ?? "";
+  const initialGuestsParam = searchParams.get("guests");
+  const initialGuests =
+    initialGuestsParam && Number(initialGuestsParam) > 0
+      ? Number(initialGuestsParam)
+      : undefined;
+
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
-    defaultValues: { eventTypeId: contextEventTypeId, eventDate: "", startTime: "", endTime: "", venueName: "", venueAddress: "", notes: "" },
+    defaultValues: {
+      eventTypeId: contextEventTypeId,
+      eventDate: initialDate,
+      startTime: "",
+      endTime: "",
+      venueName: "",
+      venueAddress: "",
+      estimatedGuests: initialGuests,
+      notes: "",
+    },
   });
 
   // Keep the form's event type in sync with context (URL / sessionStorage).
@@ -187,20 +204,22 @@ export function BookingRequestPage() {
                       <span className="text-sm text-muted-foreground">Intet event valgt endnu</span>
                     )}
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEventPickerOpen(true)}
-                    className="rounded-full"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    {selectedOption ? "Ændr" : "Vælg event"}
-                  </Button>
+                  {!selectedOption && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEventPickerOpen(true)}
+                      className="rounded-full"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Vælg event
+                    </Button>
+                  )}
                 </div>
                 {form.formState.errors.eventTypeId && <p className="mt-1 text-xs text-destructive">{form.formState.errors.eventTypeId.message}</p>}
                 <p className="mt-1.5 text-xs text-muted-foreground">
-                  Angivet på forsiden. At skifte event kan ændre DJ'ens pris eller hvad de medbringer.
+                  Angivet tidligere i din søgning.
                 </p>
               </div>
               <div>

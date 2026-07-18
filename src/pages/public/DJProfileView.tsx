@@ -41,7 +41,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import type { DJProfileWithRelations, Review } from "@/types/domain";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
-import { EVENT_TYPE_OPTIONS } from "@/lib/eventTypeOptions";
+import { EVENT_TYPE_OPTIONS, getEventTypeOption } from "@/lib/eventTypeOptions";
 import { formatDanishDate } from "@/lib/formatDanishDate";
 import { mockBookings } from "@/data/mock";
 
@@ -143,8 +143,30 @@ export function DJProfileView({
     .map((s) => s.trim())
     .filter(Boolean);
 
+  const selectedEventOption = getEventTypeOption(eventTypeId);
+
   const bookingFields = (
     <div className="space-y-3">
+      {selectedEventOption && (
+        <div className="flex items-center gap-2.5 rounded-lg border border-accent/30 bg-accent/5 px-3 py-2">
+          <span
+            className={cn(
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br",
+              selectedEventOption.tint,
+            )}
+          >
+            <selectedEventOption.Icon className="h-4 w-4" />
+          </span>
+          <div className="min-w-0">
+            <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Booking til
+            </div>
+            <div className="truncate text-sm font-semibold">
+              {selectedEventOption.label}
+            </div>
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <label className="block">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -668,6 +690,20 @@ export function DJProfileView({
       {!preview && (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 p-3 shadow-2xl backdrop-blur lg:hidden">
           <div className="container space-y-2.5">
+            {selectedEventOption && (
+              <div className="flex items-center gap-1.5 text-xs">
+                <span
+                  className={cn(
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded bg-gradient-to-br",
+                    selectedEventOption.tint,
+                  )}
+                >
+                  <selectedEventOption.Icon className="h-3 w-3" />
+                </span>
+                <span className="text-muted-foreground">Booking til</span>
+                <span className="font-semibold">{selectedEventOption.label}</span>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="date"
