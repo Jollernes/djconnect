@@ -225,10 +225,12 @@ export function BookingRequestPage() {
               <div>
                 <Label htmlFor="eventDate">Eventdato</Label>
                 <Input id="eventDate" type="date" {...form.register("eventDate")} />
+                {form.formState.errors.eventDate && <p className="mt-1 text-xs text-destructive">Vælg en dato.</p>}
               </div>
               <div>
                 <Label htmlFor="startTime">Starttidspunkt</Label>
                 <Input id="startTime" type="time" {...form.register("startTime")} />
+                {form.formState.errors.startTime && <p className="mt-1 text-xs text-destructive">Angiv et starttidspunkt.</p>}
               </div>
               <div>
                 <Label htmlFor="endTime">Forventet sluttidspunkt</Label>
@@ -237,14 +239,17 @@ export function BookingRequestPage() {
               <div>
                 <Label htmlFor="estimatedGuests">Forventet antal gæster</Label>
                 <Input id="estimatedGuests" type="number" min={1} {...form.register("estimatedGuests", { valueAsNumber: true })} />
+                {form.formState.errors.estimatedGuests && <p className="mt-1 text-xs text-destructive">Angiv et gyldigt antal gæster.</p>}
               </div>
               <div className="sm:col-span-2">
                 <Label htmlFor="venueName">Lokationens navn</Label>
                 <Input id="venueName" {...form.register("venueName")} />
+                {form.formState.errors.venueName && <p className="mt-1 text-xs text-destructive">Angiv lokationens navn.</p>}
               </div>
               <div className="sm:col-span-2">
                 <Label htmlFor="venueAddress">Lokationens adresse</Label>
                 <Input id="venueAddress" {...form.register("venueAddress")} />
+                {form.formState.errors.venueAddress && <p className="mt-1 text-xs text-destructive">Angiv lokationens adresse.</p>}
               </div>
               <div className="sm:col-span-2">
                 <Label htmlFor="notes">Særlige ønsker / noter (valgfrit)</Label>
