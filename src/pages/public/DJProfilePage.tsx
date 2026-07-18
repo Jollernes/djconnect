@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -18,6 +18,9 @@ export function DJProfilePage() {
   const { dj, reviews: liveReviews, loading } = useDJ(username ?? "");
   const { djs: allDJs } = useDJs();
   const { eventTypeId, set: setEventType } = useEventContext();
+  const [searchParams] = useSearchParams();
+  const initialDate = searchParams.get("date");
+  const initialGuests = searchParams.get("guests");
 
   if (loading) {
     return (
@@ -63,6 +66,8 @@ export function DJProfilePage() {
       similarDJs={similarDJs}
       eventTypeId={eventTypeId}
       onEventTypeChange={setEventType}
+      initialDate={initialDate}
+      initialGuests={initialGuests}
     />
   );
 }

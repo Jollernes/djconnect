@@ -18,6 +18,7 @@ import {
   Check,
   Award,
   Disc3,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +42,8 @@ import type { DJProfileWithRelations, Review } from "@/types/domain";
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { EVENT_TYPE_OPTIONS } from "@/lib/eventTypeOptions";
+import { formatDanishDate } from "@/lib/formatDanishDate";
+import { mockBookings } from "@/data/mock";
 
 export interface DJProfileViewProps {
   dj: DJProfileWithRelations;
@@ -48,6 +51,10 @@ export interface DJProfileViewProps {
   similarDJs: DJProfileWithRelations[];
   eventTypeId?: string | null;
   onEventTypeChange?: (id: string) => void;
+  /** Event date pre-filled from an earlier search (ISO `yyyy-mm-dd`). */
+  initialDate?: string | null;
+  /** Guest count pre-filled from an earlier search. */
+  initialGuests?: string | null;
   /**
    * `"page"` (default) renders the fully-interactive public profile.
    * `"preview"` neuters every navigation/CTA so the same JSX can be
@@ -72,14 +79,47 @@ export function DJProfileView({
   similarDJs,
   eventTypeId = null,
   onEventTypeChange,
+  initialDate = null,
+  initialGuests = null,
   mode = "page",
 }: DJProfileViewProps) {
   const preview = mode === "preview";
   const [aboutExpanded, setAboutExpanded] = useState(false);
+  const [date, setDate] = useState(initialDate ?? "");
+  const [guests, setGuests] = useState(initialGuests ?? "");
 
-  const bookHref = eventTypeId
-    ? `/book/${dj.username}?eventType=${eventTypeId}`
-    : `/book/${dj.username}`;
+  const isUnavailable = useMemo(() => {
+    if (!date) return false;
+    return mockBookings.some(
+      (b) =>
+        b.dj_profile_id === dj.id &&
+        (b.status === "confirmed" || b.status === "pending") &&
+        b.event_date === date,
+    );
+  }, [date, dj.id]);
+
+  const dateChosen = date.trim() !== "";
+  const guestsChosen = guests.trim() !== "" && Number(guests) > 0;
+  const canBook = dateChosen && guestsChosen && !isUnavailable;
+
+  const bookHref = useMemo(() => {
+    const p = new URLSearchParams();
+    if (eventTypeId) p.set("eventType", eventTypeId);
+    if (date) p.set("date", date);
+    if (guests) p.set("guests", guests);
+    const qs = p.toString();
+    return `/book/${dj.username}${qs ? `?${qs}` : ""}`;
+  }, [eventTypeId, date, guests, dj.username]);
+
+  const bookingHint = isUnavailable
+    ? "DJ'en er ikke ledig på den valgte dato — vælg en anden dato."
+    : !dateChosen && !guestsChosen
+    ? "Vælg dato og antal gæster for at anmode om booking."
+    : !dateChosen
+    ? "Vælg en dato for at anmode om booking."
+    : !guestsChosen
+    ? "Angiv antal gæster for at anmode om booking."
+    : null;
 
   const galleryImages = useMemo(() => {
     const equip = dj.equipment_photos.map((p) => ({
@@ -102,6 +142,77 @@ export function DJProfileView({
     .split(/[,.·]/)
     .map((s) => s.trim())
     .filter(Boolean);
+
+  const bookingFields = (
+    <div className="space-y-3">
+      <div className="grid grid-cols-2 gap-3">
+        <label className="block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Dato
+          </span>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="mt-1 w-full rounded-lg border bg-white px-2.5 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/40"
+          />
+        </label>
+        <label className="block">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Antal gæster
+          </span>
+          <input
+            type="number"
+            min={1}
+            inputMode="numeric"
+            placeholder="fx 120"
+            value={guests}
+            onChange={(e) => setGuests(e.target.value)}
+            className="mt-1 w-full rounded-lg border bg-white px-2.5 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/40"
+          />
+        </label>
+      </div>
+      {dateChosen ? (
+        <div
+          className={cn(
+            "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium",
+            isUnavailable
+              ? "bg-red-50 text-red-700"
+              : "bg-emerald-50 text-emerald-700",
+          )}
+        >
+          {isUnavailable ? (
+            <X className="h-4 w-4" />
+          ) : (
+            <Check className="h-4 w-4" />
+          )}
+          <span>
+            {isUnavailable ? "Ikke ledig" : "Ledig"} {formatDanishDate(date)}
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+          <CalendarIcon className="h-4 w-4" />
+          <span>Vælg en dato for at se ledighed</span>
+        </div>
+      )}
+    </div>
+  );
+
+  const bookingCta = canBook ? (
+    <Button asChild variant="accent" size="lg" className="w-full text-base shadow-lg">
+      <Link to={bookHref}>Anmod om booking</Link>
+    </Button>
+  ) : (
+    <Button
+      variant="accent"
+      size="lg"
+      className="w-full text-base shadow-lg"
+      disabled
+    >
+      Anmod om booking
+    </Button>
+  );
 
   return (
     <div className={cn("bg-gradient-to-b from-white via-white to-slate-50", preview ? "pb-6" : "pb-28")}>
@@ -442,27 +553,18 @@ export function DJProfileView({
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 overflow-hidden rounded-xl border">
-                    <div className="border-r p-3">
-                      <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                        Eventtype
-                      </div>
-                      <div className="mt-1 text-sm font-medium">Bryllup · 6t</div>
-                    </div>
-                    <div className="p-3">
-                      <div className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                        Gæster
-                      </div>
-                      <div className="mt-1 text-sm font-medium">Op til 250</div>
-                    </div>
-                  </div>
+                  {bookingFields}
 
-                  <Button asChild variant="accent" size="lg" className="w-full text-base shadow-lg">
-                    <Link to={bookHref}>Anmod om booking</Link>
-                  </Button>
-                  <p className="text-center text-xs text-muted-foreground">
-                    Du bliver ikke opkrævet endnu — først et tilbud, derefter sikker betaling.
-                  </p>
+                  {bookingCta}
+                  {bookingHint ? (
+                    <p className="text-center text-xs text-muted-foreground">
+                      {bookingHint}
+                    </p>
+                  ) : (
+                    <p className="text-center text-xs text-muted-foreground">
+                      Du bliver ikke opkrævet endnu — først et tilbud, derefter sikker betaling.
+                    </p>
+                  )}
 
                   <Separator />
 
@@ -565,23 +667,69 @@ export function DJProfileView({
       {/* Sticky mobile CTA */}
       {!preview && (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 p-3 shadow-2xl backdrop-blur lg:hidden">
-          <div className="container flex items-center justify-between gap-3">
-            <div>
-              <div className="text-base font-semibold">
-                {dj.price_on_request
-                  ? "På forespørgsel"
-                  : dj.price_from_minor
-                  ? formatCurrency(dj.price_from_minor, dj.currency)
-                  : "—"}
-              </div>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                {dj.rating_average.toFixed(2)} · {dj.rating_count} anmeldelser
-              </div>
+          <div className="container space-y-2.5">
+            <div className="grid grid-cols-2 gap-2">
+              <input
+                type="date"
+                aria-label="Dato"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full rounded-lg border bg-white px-2.5 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/40"
+              />
+              <input
+                type="number"
+                min={1}
+                inputMode="numeric"
+                aria-label="Antal gæster"
+                placeholder="Antal gæster"
+                value={guests}
+                onChange={(e) => setGuests(e.target.value)}
+                className="w-full rounded-lg border bg-white px-2.5 py-2 text-sm outline-none focus:ring-2 focus:ring-accent/40"
+              />
             </div>
-            <Button asChild variant="accent" size="lg" className="shadow-lg">
-              <Link to={bookHref}>Anmod om booking</Link>
-            </Button>
+            {dateChosen && (
+              <div
+                className={cn(
+                  "flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium",
+                  isUnavailable
+                    ? "bg-red-50 text-red-700"
+                    : "bg-emerald-50 text-emerald-700",
+                )}
+              >
+                {isUnavailable ? (
+                  <X className="h-3.5 w-3.5" />
+                ) : (
+                  <Check className="h-3.5 w-3.5" />
+                )}
+                <span>
+                  {isUnavailable ? "Ikke ledig" : "Ledig"} {formatDanishDate(date)}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-base font-semibold">
+                  {dj.price_on_request
+                    ? "På forespørgsel"
+                    : dj.price_from_minor
+                    ? formatCurrency(dj.price_from_minor, dj.currency)
+                    : "—"}
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                  {dj.rating_average.toFixed(2)} · {dj.rating_count} anmeldelser
+                </div>
+              </div>
+              {canBook ? (
+                <Button asChild variant="accent" size="lg" className="shadow-lg">
+                  <Link to={bookHref}>Anmod om booking</Link>
+                </Button>
+              ) : (
+                <Button variant="accent" size="lg" className="shadow-lg" disabled>
+                  Anmod om booking
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       )}
