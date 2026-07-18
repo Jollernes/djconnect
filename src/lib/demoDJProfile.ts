@@ -20,6 +20,13 @@ export type DemoDJMediaItem = {
   dataUrl: string;
   /** Optional caption shown to customers under the asset. */
   caption?: string;
+  /**
+   * Optional event types this asset is specifically relevant for (e.g.
+   * a wedding first-dance shot vs. a corporate stage). Keyed by
+   * `DemoDJSubProfileKey` (excluding "general"). Empty/undefined means
+   * the asset is shown for any event type.
+   */
+  eventTags?: DemoDJSubProfileKey[];
 };
 
 export type DemoDJSubProfile = {

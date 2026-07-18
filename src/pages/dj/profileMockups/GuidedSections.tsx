@@ -17,6 +17,7 @@ import {
   MOCKUP_SUB_PROFILE_META,
   type MockupSubProfileKey,
 } from "./shared/types";
+import type { DemoDJSubProfileKey } from "@/lib/demoDJProfile";
 
 type SectionStatus = "complete" | "needs-attention" | "empty";
 
@@ -246,37 +247,44 @@ function SectionBody({
               Galleri ({sub.gallery.length} / mindst 3)
             </Label>
             <div className="grid grid-cols-3 gap-2">
-              {sub.gallery.slice(0, 3).map((g) => (
-                <div
-                  key={g.id}
-                  className="group relative aspect-square overflow-hidden rounded-md ring-1 ring-border"
-                >
-                  {g.type === "video" ? (
-                    <video src={g.dataUrl} className="h-full w-full object-cover" muted playsInline />
-                  ) : (
-                    <img src={g.dataUrl} alt="" className="h-full w-full object-cover" />
-                  )}
-                  <div className="absolute right-1 top-1 flex items-center gap-1">
-                    {g.type !== "video" && (
+              {sub.gallery.map((g) => (
+                <div key={g.id} className="space-y-1.5">
+                  <div className="group relative aspect-square overflow-hidden rounded-md ring-1 ring-border">
+                    {g.type === "video" ? (
+                      <video src={g.dataUrl} className="h-full w-full object-cover" muted playsInline />
+                    ) : (
+                      <img src={g.dataUrl} alt="" className="h-full w-full object-cover" />
+                    )}
+                    <div className="absolute right-1 top-1 flex items-center gap-1">
+                      {g.type !== "video" && (
+                        <button
+                          type="button"
+                          onClick={() => setAdjustGalleryId(g.id)}
+                          className="flex h-6 w-6 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm ring-1 ring-border hover:bg-white"
+                          aria-label="Tilpas billede"
+                          title="Tilpas billede"
+                        >
+                          <Crop className="h-3.5 w-3.5" />
+                        </button>
+                      )}
                       <button
                         type="button"
-                        onClick={() => setAdjustGalleryId(g.id)}
+                        onClick={() => state.removeGalleryItem(activeKey, g.id)}
                         className="flex h-6 w-6 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm ring-1 ring-border hover:bg-white"
-                        aria-label="Tilpas billede"
-                        title="Tilpas billede"
+                        aria-label="Fjern"
                       >
-                        <Crop className="h-3.5 w-3.5" />
+                        <X className="h-3.5 w-3.5" />
                       </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => state.removeGalleryItem(activeKey, g.id)}
-                      className="flex h-6 w-6 items-center justify-center rounded-full bg-white/95 text-foreground shadow-sm ring-1 ring-border hover:bg-white"
-                      aria-label="Fjern"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
+                    </div>
                   </div>
+                  {g.type !== "video" && (
+                    <GalleryTagPicker
+                      selected={g.eventTags ?? []}
+                      onToggle={(tag) =>
+                        state.toggleGalleryItemTag(activeKey, g.id, tag)
+                      }
+                    />
+                  )}
                 </div>
               ))}
               <DottedUploadSlot
@@ -293,6 +301,10 @@ function SectionBody({
                 cropPreviewVariant="gallery"
               />
             </div>
+            <p className="text-[11px] text-muted-foreground">
+              Tag hvert billede med den festtype, det passer bedst til, så
+              kunderne ser de mest relevante billeder.
+            </p>
             <ImageCropModal
               open={adjustGalleryId !== null}
               src={adjustGallerySrc}
@@ -364,6 +376,49 @@ function SectionBody({
     default:
       return null;
   }
+}
+
+/** Event types a gallery photo can be tagged with. "Generel" is
+ * intentionally excluded — a tag only marks a photo as *specifically*
+ * relevant for a named party type. */
+const GALLERY_TAG_OPTIONS: { key: DemoDJSubProfileKey; label: string }[] = [
+  { key: "wedding", label: "Bryllup" },
+  { key: "corporate", label: "Firmafest" },
+  { key: "birthday", label: "Fødselsdag" },
+];
+
+/** Row of toggle chips letting the DJ tag which party types a photo is
+ * specifically relevant for (wedding / corporate / birthday). */
+function GalleryTagPicker({
+  selected,
+  onToggle,
+}: {
+  selected: DemoDJSubProfileKey[];
+  onToggle: (tag: DemoDJSubProfileKey) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-1">
+      {GALLERY_TAG_OPTIONS.map((opt) => {
+        const active = selected.includes(opt.key);
+        return (
+          <button
+            key={opt.key}
+            type="button"
+            onClick={() => onToggle(opt.key)}
+            aria-pressed={active}
+            className={cn(
+              "rounded-full border px-1.5 py-0.5 text-[10px] font-medium transition-colors",
+              active
+                ? "border-foreground bg-foreground text-background"
+                : "border-border bg-background text-muted-foreground hover:bg-muted",
+            )}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function StatusBadge({ status }: { status: SectionStatus }) {

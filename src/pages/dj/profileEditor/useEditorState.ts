@@ -114,6 +114,27 @@ export function useDJProfileEditor() {
     }));
   }
 
+  function toggleGalleryItemTag(
+    key: DemoDJSubProfileKey,
+    id: string,
+    tag: DemoDJSubProfileKey,
+  ) {
+    setSubProfiles((prev) => ({
+      ...prev,
+      [key]: {
+        ...prev[key],
+        gallery: prev[key].gallery.map((g) => {
+          if (g.id !== id) return g;
+          const current = g.eventTags ?? [];
+          const next = current.includes(tag)
+            ? current.filter((t) => t !== tag)
+            : [...current, tag];
+          return { ...g, eventTags: next };
+        }),
+      },
+    }));
+  }
+
   /* ------------------------------------------------------------------ */
   /* Computed completion                                                  */
   /* ------------------------------------------------------------------ */
@@ -249,6 +270,7 @@ export function useDJProfileEditor() {
     removeGalleryItem,
     setGalleryCaption,
     setGalleryItemDataUrl,
+    toggleGalleryItemTag,
     /* completion */
     completion,
     completedCount,
