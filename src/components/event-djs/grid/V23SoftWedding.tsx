@@ -565,12 +565,13 @@ export function SoftWeddingMobileRow({
     <Link
       to={href}
       className={cn(
-        "group flex min-h-[13.5rem] overflow-hidden rounded-2xl border border-amber-100/70 bg-white shadow-sm transition-shadow hover:shadow-md",
+        "group relative flex h-40 overflow-hidden rounded-2xl border border-amber-100/70 bg-white shadow-sm transition-shadow hover:shadow-md",
         isUnavailable && "border-dashed bg-muted/30",
       )}
     >
-      {/* Left: hero photo with carved avatar */}
-      <div className="relative w-36 shrink-0 overflow-hidden bg-amber-50">
+      {/* Left: hero photo. ~3:4 portrait keeps a natural photo
+          proportion against the text column. */}
+      <div className="relative h-full w-[7.5rem] shrink-0 overflow-hidden bg-amber-50">
         {hero && (
           <img
             src={hero}
@@ -579,23 +580,26 @@ export function SoftWeddingMobileRow({
             loading="lazy"
           />
         )}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-        <span className="absolute bottom-2 left-2 h-14 w-14 overflow-hidden rounded-full border-2 border-white shadow-md">
-          {avatar && (
-            <img
-              src={avatar}
-              alt=""
-              className="h-full w-full object-cover"
-              loading="lazy"
-            />
-          )}
-        </span>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
       </div>
 
+      {/* Avatar carved onto the seam between the photo and the text
+          column, vertically centred. */}
+      <span className="absolute top-1/2 z-10 h-14 w-14 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-[3px] border-white bg-white shadow-md left-[7.5rem]">
+        {avatar && (
+          <img
+            src={avatar}
+            alt=""
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
+        )}
+      </span>
+
       {/* Right: details */}
-      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 p-3">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 py-3 pl-9 pr-3">
         <div className="flex items-center gap-1">
-          <h3 className="truncate text-sm font-semibold text-foreground">
+          <h3 className="truncate text-[15px] font-semibold text-foreground">
             {dj.stage_name}
           </h3>
           <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-600" />
@@ -604,15 +608,15 @@ export function SoftWeddingMobileRow({
           <MapPin className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{region}</span>
         </div>
-        <div className="text-sm font-semibold text-foreground">{price}</div>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
-          <span className="inline-flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5" />
+        <div className="text-base font-semibold text-foreground">{price}</div>
+        <div className="mt-0.5 flex flex-col gap-1 text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5 shrink-0" />
             {dj.years_experience} års erfaring
           </span>
           {played != null && (
-            <span className="inline-flex items-center gap-1">
-              <eventTheme.PlayedIcon className="h-3.5 w-3.5" />
+            <span className="inline-flex items-center gap-1.5">
+              <eventTheme.PlayedIcon className="h-3.5 w-3.5 shrink-0" />
               {played}+ {eventTheme.playedLabel}
             </span>
           )}
