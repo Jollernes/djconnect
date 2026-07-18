@@ -159,7 +159,7 @@ export function EventDJsListingPage({
         {/* Listings — 4-col grid */}
         <div>
           {loading ? (
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid gap-3 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, i) => (
                 <Skeleton key={i} className="aspect-[4/5] w-full" />
               ))}
@@ -173,7 +173,7 @@ export function EventDJsListingPage({
           ) : (
             <div className="space-y-10">
               {availableDJs.length > 0 ? (
-                <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                <div className="grid gap-3 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {availableDJs.map((dj) => {
                     const custom = renderCard?.({
                       dj,
@@ -206,7 +206,7 @@ export function EventDJsListingPage({
                       {unavailableDJs.length} {unavailableDJs.length === 1 ? "DJ" : "DJs"}
                     </span>
                   </div>
-                  <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                  <div className="grid gap-3 sm:gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {unavailableDJs.map((u) => {
                       const reason = { reason: u.reason, subReason: u.subReason };
                       const custom = renderCard?.({

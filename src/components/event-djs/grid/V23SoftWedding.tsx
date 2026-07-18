@@ -534,6 +534,94 @@ const WEDDING_TINTS: SoftWeddingTint[] = [
   "wedding-grade-matte",
 ];
 
+/**
+ * Compact horizontal listing row used on mobile for the event-DJs
+ * pages (e.g. `/wedding-djs`). The hero photo + carved avatar sit on
+ * the left; the DJ name, region, starting price, years of experience
+ * and events-played count stack on the right. Sized so ~2.5 rows fit
+ * on a phone screen. Desktop keeps the full `GridCardV23SoftWedding`.
+ */
+export function SoftWeddingMobileRow({
+  dj,
+  eventTypeId,
+  eventTheme = WEDDING_THEME,
+  unavailable,
+}: {
+  dj: DJProfileWithRelations;
+  eventTypeId?: string;
+  eventTheme?: EventTheme;
+  unavailable?: { reason: string; subReason?: string } | null;
+}) {
+  const hero =
+    dj.equipment_photos[0]?.url || dj.profile.avatar_url || "";
+  const avatar = dj.profile.avatar_url || hero;
+  const href = djHref(dj, eventTypeId);
+  const region = regionFor(dj);
+  const price = priceFromLabel(dj);
+  const played = eventTheme.playedCount(dj);
+  const isUnavailable = Boolean(unavailable);
+
+  return (
+    <Link
+      to={href}
+      className={cn(
+        "group flex overflow-hidden rounded-2xl border border-amber-100/70 bg-white shadow-sm transition-shadow hover:shadow-md",
+        isUnavailable && "border-dashed bg-muted/30",
+      )}
+    >
+      {/* Left: hero photo with carved avatar */}
+      <div className="relative w-28 shrink-0 overflow-hidden bg-amber-50">
+        {hero && (
+          <img
+            src={hero}
+            alt={dj.stage_name}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            loading="lazy"
+          />
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+        <span className="absolute bottom-2 left-2 h-11 w-11 overflow-hidden rounded-full border-2 border-white shadow-md">
+          {avatar && (
+            <img
+              src={avatar}
+              alt=""
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          )}
+        </span>
+      </div>
+
+      {/* Right: details */}
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 p-3">
+        <div className="flex items-center gap-1">
+          <h3 className="truncate text-sm font-semibold text-foreground">
+            {dj.stage_name}
+          </h3>
+          <BadgeCheck className="h-4 w-4 shrink-0 text-emerald-600" />
+        </div>
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <MapPin className="h-3.5 w-3.5 shrink-0" />
+          <span className="truncate">{region}</span>
+        </div>
+        <div className="text-sm font-semibold text-foreground">{price}</div>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1">
+            <Clock className="h-3.5 w-3.5" />
+            {dj.years_experience} års erfaring
+          </span>
+          {played != null && (
+            <span className="inline-flex items-center gap-1">
+              <eventTheme.PlayedIcon className="h-3.5 w-3.5" />
+              {played}+ {eventTheme.playedLabel}
+            </span>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export function GridCardV23SoftWedding({
   dj,
   eventTypeId,

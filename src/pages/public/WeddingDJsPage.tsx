@@ -1,6 +1,6 @@
 import { EventDJsListingPage } from "@/pages/public/EventDJsListingPage";
 import { EVENT_LISTING_CONFIG } from "@/lib/eventDJsContent";
-import { GridCardV23SoftWedding } from "@/components/event-djs/grid/V23SoftWedding";
+import { GridCardV23SoftWedding, SoftWeddingMobileRow } from "@/components/event-djs/grid/V23SoftWedding";
 import {
   WEDDING_THEME,
   type EventTheme,
@@ -46,26 +46,40 @@ export function renderSoftWeddingCard(
     unavailable?: { reason: string; subReason?: string } | null;
   }) {
     return (
-      <GridCardV23SoftWedding
-        dj={dj}
-        eventTypeId={eventTypeId}
-        density="4"
-        tint="none"
-        heroGrayscale={0}
-        avatarGrayscale={false}
-        bioLines={3}
-        showWeddingsPlayed
-        hideEventTypes
-        hideStarRating
-        showRegion
-        showSeeProfileCta
-        priceIncludes={priceIncludes ?? eventTheme.defaultPriceIncludes}
-        statStyle="inline"
-        ctaProminence="filled"
-        availabilityDate={formatDanishDate(selectedDate)}
-        eventTheme={eventTheme}
-        unavailable={unavailable}
-      />
+      <>
+        {/* Mobile: compact horizontal row */}
+        <div className="md:hidden">
+          <SoftWeddingMobileRow
+            dj={dj}
+            eventTypeId={eventTypeId}
+            eventTheme={eventTheme}
+            unavailable={unavailable}
+          />
+        </div>
+        {/* Desktop: full editorial card */}
+        <div className="hidden md:block">
+          <GridCardV23SoftWedding
+            dj={dj}
+            eventTypeId={eventTypeId}
+            density="4"
+            tint="none"
+            heroGrayscale={0}
+            avatarGrayscale={false}
+            bioLines={3}
+            showWeddingsPlayed
+            hideEventTypes
+            hideStarRating
+            showRegion
+            showSeeProfileCta
+            priceIncludes={priceIncludes ?? eventTheme.defaultPriceIncludes}
+            statStyle="inline"
+            ctaProminence="filled"
+            availabilityDate={formatDanishDate(selectedDate)}
+            eventTheme={eventTheme}
+            unavailable={unavailable}
+          />
+        </div>
+      </>
     );
   };
 }
