@@ -9,14 +9,23 @@ import type { DJProfileWithRelations } from "@/types/domain";
 export function DJCard({
   dj,
   eventTypeId,
+  selectedDate,
+  guests,
   unavailable,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
+  selectedDate?: string;
+  guests?: string;
   unavailable?: { reason: string; subReason?: string } | null;
 }) {
   const heroImage = dj.equipment_photos[0]?.url ?? dj.profile.avatar_url;
-  const href = eventTypeId ? `/djs/${dj.username}?eventType=${eventTypeId}` : `/djs/${dj.username}`;
+  const params = new URLSearchParams();
+  if (eventTypeId) params.set("eventType", eventTypeId);
+  if (selectedDate) params.set("date", selectedDate);
+  if (guests) params.set("guests", guests);
+  const query = params.toString();
+  const href = query ? `/djs/${dj.username}?${query}` : `/djs/${dj.username}`;
   const isUnavailable = Boolean(unavailable);
 
   return (

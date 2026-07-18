@@ -53,10 +53,18 @@ export function photoCountFor(dj: DJProfileWithRelations): number {
   return 6 + (seed % 7); // 6..12
 }
 
-export function djHref(dj: DJProfileWithRelations, eventTypeId?: string): string {
-  return eventTypeId
-    ? `/djs/${dj.username}?eventType=${eventTypeId}`
-    : `/djs/${dj.username}`;
+export function djHref(
+  dj: DJProfileWithRelations,
+  eventTypeId?: string,
+  selectedDate?: string,
+  guests?: string,
+): string {
+  const params = new URLSearchParams();
+  if (eventTypeId) params.set("eventType", eventTypeId);
+  if (selectedDate) params.set("date", selectedDate);
+  if (guests) params.set("guests", guests);
+  const query = params.toString();
+  return query ? `/djs/${dj.username}?${query}` : `/djs/${dj.username}`;
 }
 
 /** N deterministic thumbnail URLs sourced from `dj.equipment_photos`,

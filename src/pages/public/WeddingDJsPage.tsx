@@ -65,6 +65,7 @@ export function renderSoftWeddingCard(
             eventTheme={eventTheme}
             heroOverrides={heroOverrides}
             availabilityDate={formatDanishDate(selectedDate)}
+            selectedDate={selectedDate}
             unavailable={unavailable}
           />
         </div>
@@ -88,6 +89,7 @@ export function renderSoftWeddingCard(
             statStyle="inline"
             ctaProminence="filled"
             availabilityDate={formatDanishDate(selectedDate)}
+            selectedDate={selectedDate}
             eventTheme={eventTheme}
             unavailable={unavailable}
           />

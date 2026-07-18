@@ -548,6 +548,7 @@ export function SoftWeddingMobileRow({
   eventTheme = WEDDING_THEME,
   heroOverrides,
   availabilityDate,
+  selectedDate,
   unavailable,
 }: {
   dj: DJProfileWithRelations;
@@ -555,6 +556,7 @@ export function SoftWeddingMobileRow({
   eventTheme?: EventTheme;
   heroOverrides?: Record<string, string>;
   availabilityDate?: string;
+  selectedDate?: string;
   unavailable?: { reason: string; subReason?: string } | null;
 }) {
   const hero =
@@ -563,7 +565,7 @@ export function SoftWeddingMobileRow({
     dj.profile.avatar_url ||
     "";
   const avatar = dj.profile.avatar_url || hero;
-  const href = djHref(dj, eventTypeId);
+  const href = djHref(dj, eventTypeId, selectedDate);
   const region = regionFor(dj);
   const price = priceFromLabel(dj);
   const played = eventTheme.playedCount(dj);
@@ -670,6 +672,7 @@ export function GridCardV23SoftWedding({
   colourway = "default",
   ctaProminence = "ghost",
   availabilityDate,
+  selectedDate,
   photoLayout = "carved",
   eventTheme = WEDDING_THEME,
   hideHallmark = false,
@@ -794,6 +797,9 @@ export function GridCardV23SoftWedding({
    * pill button on the right. Intended to reflect a customer-
    * selected event date from the listings page. */
   availabilityDate?: string;
+  /** Raw ISO `yyyy-mm-dd` event date carried into the profile link so
+   * the booking form is pre-filled with the customer's chosen date. */
+  selectedDate?: string;
   /** Per-event theme pack that swaps the hallmark badge label/glyph
    * and the played-events stat (`brylluper` → `fødselsdage`,
    * `firmaevents`, `events`) while keeping the card layout,
@@ -833,7 +839,7 @@ export function GridCardV23SoftWedding({
     dj.equipment_photos[0]?.url ||
     dj.profile.avatar_url ||
     "";
-  const href = djHref(dj, eventTypeId);
+  const href = djHref(dj, eventTypeId, selectedDate);
   // 4-col and 5-col cards both collapse paddings, fonts, and the
   // avatar to the tighter "compact" set. 5-col gets a few additional
   // tweaks (`ultraCompact`) further below so the inline stat row and

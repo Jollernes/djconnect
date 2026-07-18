@@ -209,7 +209,13 @@ Eventtypen er valgt ovenfor og gælder for alle viste DJs. Tryk "Skift event" fo
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {djs.map((dj) => (
-                <DJCard key={dj.id} dj={dj} eventTypeId={eventTypeId || undefined} />
+                <DJCard
+                  key={dj.id}
+                  dj={dj}
+                  eventTypeId={eventTypeId || undefined}
+                  selectedDate={params.get("date") || undefined}
+                  guests={params.get("guests") || undefined}
+                />
               ))}
             </div>
           )}

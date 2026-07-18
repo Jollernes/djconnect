@@ -183,7 +183,11 @@ export function EventDJsListingPage({
                     return (
                       <div key={dj.id}>
                         {custom ?? (
-                          <DJCard dj={dj} eventTypeId={config.id} />
+                          <DJCard
+                            dj={dj}
+                            eventTypeId={config.id}
+                            selectedDate={selectedDate}
+                          />
                         )}
                       </div>
                     );
@@ -221,6 +225,7 @@ export function EventDJsListingPage({
                             <DJCard
                               dj={u.dj}
                               eventTypeId={config.id}
+                              selectedDate={selectedDate}
                               unavailable={reason}
                             />
                           )}
