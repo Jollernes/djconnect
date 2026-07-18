@@ -9,10 +9,14 @@ import {
   type OfferRequestRecord,
 } from "@/lib/offerRequestStore";
 import {
+  effectivePricing,
   listBookingRequestsForCustomer,
   type BookingRequest,
-  type BookingRequestStatus,
 } from "@/lib/bookingRequestStore";
+import {
+  bookingStatusLabel,
+  bookingStatusToneClass,
+} from "@/lib/bookingRequestStatus";
 import {
   listAdvisoryRecordsForCustomer,
   type PersonalAdviceRecord,
@@ -249,17 +253,18 @@ function BookingRequestRow({ record }: { record: BookingRequest }) {
       })
     : "Dato ikke fastlagt";
 
-  const status = statusLabel(record.status);
-  const statusTone = statusToneClass(record.status);
+  const status = bookingStatusLabel(record.status);
+  const statusTone = bookingStatusToneClass(record.status);
 
-  const priceLabel = record.pricing
-    ? formatCurrency(record.pricing.totalMinor, record.djCurrency)
+  const pricing = effectivePricing(record);
+  const priceLabel = pricing
+    ? formatCurrency(pricing.fullPriceMinor, record.djCurrency)
     : "På forespørgsel";
 
   return (
     <li>
       <Link
-        to={`/djs/${record.djUsername}`}
+        to={`/dashboard/requests/booking/${record.id}`}
         className="flex items-center justify-between gap-4 px-5 py-4 text-sm transition-colors hover:bg-muted/30"
       >
         <div className="flex min-w-0 items-center gap-3">
@@ -362,35 +367,6 @@ function AdvisoryRequestRow({ record }: { record: PersonalAdviceRecord }) {
       </Link>
     </li>
   );
-}
-
-function statusLabel(status: BookingRequestStatus): string {
-  switch (status) {
-    case "pending_dj":
-      return "Afventer DJ-svar";
-    case "accepted":
-      return "Accepteret — betal depositum";
-    case "declined":
-      return "Afslået";
-    case "expired":
-      return "Udløbet";
-    case "paid":
-      return "Booket";
-  }
-}
-
-function statusToneClass(status: BookingRequestStatus): string {
-  switch (status) {
-    case "pending_dj":
-      return "text-muted-foreground";
-    case "accepted":
-      return "text-amber-700";
-    case "declined":
-    case "expired":
-      return "text-muted-foreground";
-    case "paid":
-      return "text-emerald-700";
-  }
 }
 
 function timeSince(ms: number): string {

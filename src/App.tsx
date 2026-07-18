@@ -48,6 +48,7 @@ import { CustomerFavouritesPage } from "@/pages/customer/FavouritesPage";
 import { CustomerSettingsPage } from "@/pages/customer/SettingsPage";
 import { CustomerRequestsListPage } from "@/pages/customer/RequestsListPage";
 import { CustomerRequestDetailPage } from "@/pages/customer/RequestDetailPage";
+import { CustomerBookingRequestDetailPage } from "@/pages/customer/BookingRequestDetailPage";
 import { PersonalAdviceDetailPage } from "@/pages/customer/PersonalAdviceDetailPage";
 
 import { DJDashboardPage } from "@/pages/dj/DashboardPage";
@@ -58,6 +59,8 @@ import { DJEarningsPage } from "@/pages/dj/EarningsPage";
 import { DJPricingEquipmentPage } from "@/pages/dj/PricingEquipmentPage";
 import { DJSettingsPage } from "@/pages/dj/DJSettingsPage";
 import { DJMessagesPage } from "@/pages/dj/MessagesPage";
+import { DJRequestsPage } from "@/pages/dj/RequestsPage";
+import { DJRequestDetailPage } from "@/pages/dj/RequestDetailPage";
 import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
 import { DJGuideGate } from "@/components/common/DJGuideGate";
@@ -119,6 +122,10 @@ function App() {
             <Route path="/dashboard" element={<CustomerDashboardPage />} />
             <Route path="/dashboard/requests" element={<CustomerRequestsListPage />} />
             <Route
+              path="/dashboard/requests/booking/:requestId"
+              element={<CustomerBookingRequestDetailPage />}
+            />
+            <Route
               path="/dashboard/requests/:requestId"
               element={<CustomerRequestDetailPage />}
             />
@@ -151,6 +158,8 @@ function App() {
             }
           >
             <Route path="/dj/dashboard" element={<DJDashboardPage />} />
+            <Route path="/dj/requests" element={<DJRequestsPage />} />
+            <Route path="/dj/requests/:requestId" element={<DJRequestDetailPage />} />
             <Route path="/dj/bookings" element={<DJBookingsPage />} />
             <Route path="/dj/bookings/:id" element={<DJBookingDetailPage />} />
             <Route path="/dj/availability" element={<DJAvailabilityPage />} />

@@ -39,6 +39,7 @@ const privateCustomerNav = [
 
 const djNav = [
   { to: "/dj/dashboard", label: "Oversigt", icon: LayoutDashboard, end: true },
+  { to: "/dj/requests", label: "Forespørgsler", icon: Inbox },
   { to: "/dj/bookings", label: "Bookinger", icon: Calendar },
   { to: "/dj/messages", label: "Beskeder", icon: MessageSquare },
   { to: "/dj/availability", label: "Tilgængelighed", icon: Calendar },

@@ -4,6 +4,13 @@ export const PLATFORM_SUPPORT_EMAIL = "support@djconnect.example";
 
 export const PLATFORM_FEE_PERCENT = 10;
 
+/**
+ * Deposit taken up front when a customer gives their final booking
+ * confirmation. It is 25% of the full price and doubles as the platform fee;
+ * the remaining 75% is the DJ's payout, settled after the event.
+ */
+export const DEPOSIT_PERCENT = 25;
+
 export const EVENT_TYPES = [
   { id: "wedding", label: "Bryllup" },
   { id: "birthday", label: "Fødselsdagsfest" },

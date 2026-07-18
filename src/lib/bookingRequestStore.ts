@@ -10,15 +10,29 @@
  */
 
 export type BookingRequestStatus =
-  | "pending_dj" // submitted, waiting for the DJ to accept or decline
-  | "accepted" // DJ accepted, customer can now pay the deposit into escrow
+  | "pending_dj" // submitted, waiting for the DJ to confirm or adjust the price
+  | "pending_customer" // DJ confirmed/adjusted the price; awaiting the customer's final confirmation + deposit
+  | "confirmed" // customer confirmed and paid the 25% deposit; booking is locked in
   | "declined" // DJ declined; customer should pick another DJ
-  | "expired" // DJ never responded within the response window
-  | "paid"; // customer paid the deposit, booking is confirmed
+  | "expired"; // DJ never responded within the response window
+
+/**
+ * A price breakdown for a booking. The customer pays `fullPriceMinor` in
+ * total; the `depositMinor` (25% of the full price) is paid up front on final
+ * confirmation and *is* the platform fee. The remaining `payoutMinor` is the
+ * DJ's payout, settled after the event.
+ */
+export type BookingPricing = {
+  fullPriceMinor: number;
+  depositPercent: number;
+  depositMinor: number;
+  payoutMinor: number;
+};
 
 export type BookingRequest = {
   id: string;
   customerId?: string; // undefined for anonymous (guest) submissions
+  customerName?: string;
   createdAtMs: number;
   status: BookingRequestStatus;
   djId: string;
@@ -27,13 +41,23 @@ export type BookingRequest = {
   djAvatarUrl?: string;
   djCity?: string;
   djCurrency: string;
-  /** Quoted price snapshot at request time. `null` if DJ is "price on request". */
-  pricing: {
-    basePriceMinor: number;
-    feePercent: number;
-    feeMinor: number;
-    totalMinor: number;
-  } | null;
+  /** Estimated price snapshot at request time. `null` if DJ is "price on request". */
+  pricing: BookingPricing | null;
+  /**
+   * The DJ's response: the confirmed (possibly adjusted) full price. Set when
+   * the DJ moves the request to `pending_customer`. This is the authoritative
+   * price the customer confirms and pays a deposit against.
+   */
+  djQuote?: BookingPricing & {
+    respondedAtMs: number;
+    changed: boolean;
+    note?: string;
+  };
+  /** Deposit payment (25% of full price), set when the customer confirms. */
+  deposit?: {
+    paidAtMs: number;
+    amountMinor: number;
+  };
   event: {
     eventTypeId: string;
     eventDate: string;
@@ -47,6 +71,28 @@ export type BookingRequest = {
   /** Free-text from the customer to the DJ (optional). */
   message?: string;
 };
+
+/**
+ * Deposit is 25% of the full price and doubles as the platform fee. Keep this
+ * in sync with `DEPOSIT_PERCENT` in `@/lib/constants`.
+ */
+export const DEPOSIT_PERCENT = 25;
+
+/** Build a full price breakdown (deposit = 25% up front, rest is DJ payout). */
+export function computeBookingPricing(fullPriceMinor: number): BookingPricing {
+  const depositMinor = Math.round((fullPriceMinor * DEPOSIT_PERCENT) / 100);
+  return {
+    fullPriceMinor,
+    depositPercent: DEPOSIT_PERCENT,
+    depositMinor,
+    payoutMinor: fullPriceMinor - depositMinor,
+  };
+}
+
+/** The authoritative pricing for a request: the DJ quote if present, else the estimate. */
+export function effectivePricing(req: BookingRequest): BookingPricing | null {
+  return req.djQuote ?? req.pricing;
+}
 
 const STORAGE_PREFIX = "djconnect.bookingRequest.record.";
 const INDEX_KEY = "djconnect.bookingRequest.index";
@@ -101,6 +147,31 @@ export function listBookingRequestsForCustomer(
   const all = listBookingRequests();
   if (customerId === null) return all.filter((r) => !r.customerId);
   return all.filter((r) => !r.customerId || r.customerId === customerId);
+}
+
+/**
+ * Booking requests addressed to a specific DJ. When no record matches the
+ * given `djId` (common in the mock/demo where the logged-in DJ's id differs
+ * from the profile id a request was sent to) we fall back to the full inbox so
+ * the DJ can still review and respond to requests in a single-browser demo.
+ */
+export function listBookingRequestsForDj(djId: string | null): BookingRequest[] {
+  const all = listBookingRequests();
+  if (!djId) return all;
+  const mine = all.filter((r) => r.djId === djId);
+  return mine.length > 0 ? mine : all;
+}
+
+/** Merge a partial patch into an existing request and persist it. */
+export function updateBookingRequest(
+  id: string,
+  patch: Partial<BookingRequest>,
+): BookingRequest | null {
+  const existing = readBookingRequest(id);
+  if (!existing) return null;
+  const next: BookingRequest = { ...existing, ...patch };
+  writeBookingRequest(next);
+  return next;
 }
 
 function addToIndex(id: string): void {

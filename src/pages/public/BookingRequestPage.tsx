@@ -17,13 +17,14 @@ import { useDJ } from "@/hooks/useDJs";
 import { useAuth } from "@/hooks/useAuth";
 import { useEventContext } from "@/hooks/useEventContext";
 import { EventContextModal } from "@/components/common/EventContextModal";
-import { EVENT_TYPES, PLATFORM_FEE_PERCENT, CANCELLATION_POLICY } from "@/lib/constants";
+import { EVENT_TYPES, DEPOSIT_PERCENT, CANCELLATION_POLICY } from "@/lib/constants";
 import { getEventTypeOption } from "@/lib/eventTypeOptions";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import {
   newBookingRequestId,
   writeBookingRequest,
+  computeBookingPricing,
   type BookingRequest,
 } from "@/lib/bookingRequestStore";
 
@@ -82,13 +83,9 @@ export function BookingRequestPage() {
 
   const selectedOption = getEventTypeOption(form.watch("eventTypeId"));
 
-  const totals = useMemo(() => {
+  const pricing = useMemo(() => {
     if (!dj || dj.price_on_request) return null;
-    const price = dj.price_from_minor ?? 0;
-    const fee = Math.round((price * PLATFORM_FEE_PERCENT) / 100);
-    const total = price + fee;
-    const payout = price - fee;
-    return { price, fee, total, payout };
+    return computeBookingPricing(dj.price_from_minor ?? 0);
   }, [dj]);
 
   if (loading) return <div className="container py-12">Indlæser…</div>;
@@ -106,18 +103,11 @@ export function BookingRequestPage() {
     try {
       const values = form.getValues();
       const id = newBookingRequestId();
-      const pricing = totals
-        ? {
-            basePriceMinor: totals.price,
-            feePercent: PLATFORM_FEE_PERCENT,
-            feeMinor: totals.fee,
-            totalMinor: totals.total,
-          }
-        : null;
       const customerId = profile?.role === "customer" ? profile.id : undefined;
       const record: BookingRequest = {
         id,
         customerId,
+        customerName: profile?.full_name ?? undefined,
         createdAtMs: Date.now(),
         status: "pending_dj",
         djId: dj.id,
@@ -284,18 +274,17 @@ export function BookingRequestPage() {
               <div className="rounded-md bg-muted/40 p-4 text-sm">
                 <Badge variant="warning" className="mb-2">Pris efter forespørgsel</Badge>
                 <p>
-                  Du bliver ikke opkrævet endnu. Din forespørgsel sendes til {dj.stage_name}, som svarer med et tilbud. Når du accepterer, bliver du bedt om at betale depositum til escrow.
+                  Du bliver ikke opkrævet endnu. Din forespørgsel sendes til {dj.stage_name}, som bekræfter prisen (eller justerer den). Først når du bekræfter endeligt, betaler du depositum på {DEPOSIT_PERCENT}%.
                 </p>
               </div>
-            ) : totals ? (
+            ) : pricing ? (
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">DJ-pris</span><span>{formatCurrency(totals.price, dj.currency)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Platformsgebyr ({PLATFORM_FEE_PERCENT}%)</span><span>{formatCurrency(totals.fee, dj.currency)}</span></div>
-                <Separator />
-                <div className="flex justify-between text-base font-semibold"><span>Forventet total</span><span>{formatCurrency(totals.total, dj.currency)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Fuld pris (estimat)</span><span>{formatCurrency(pricing.fullPriceMinor, dj.currency)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Depositum nu ({DEPOSIT_PERCENT}%)</span><span>{formatCurrency(pricing.depositMinor, dj.currency)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Rest til DJ efter event</span><span>{formatCurrency(pricing.payoutMinor, dj.currency)}</span></div>
                 <p className="text-xs text-muted-foreground">
                   <strong className="font-semibold text-foreground">Du bliver ikke opkrævet endnu.</strong>{" "}
-                  Vi beder først om depositum, når {dj.stage_name} bekræfter tilgængelighed. Beløbet holdes derefter sikkert i escrow og udbetales til DJ'en 24 timer efter eventet.
+                  {dj.stage_name} bekræfter først prisen (eller justerer den, hvis der er ekstra ønsker). Når du derefter bekræfter endeligt, betaler du et depositum på {DEPOSIT_PERCENT}% (platformsgebyret). Resten udbetales til DJ'en efter eventet.
                 </p>
               </div>
             ) : null}
@@ -338,7 +327,7 @@ export function BookingRequestPage() {
             </div>
             <h2 className="text-xl font-semibold">Forespørgsel sendt til {dj.stage_name}</h2>
             <p className="max-w-md text-sm text-muted-foreground">
-              {dj.stage_name} gennemgår dine eventdetaljer og svarer hurtigst muligt. Så snart de accepterer, sender vi dig et betalingslink på e-mail, så du kan reservere datoen med et depositum i escrow.
+              {dj.stage_name} gennemgår dine eventdetaljer og bekræfter prisen (eller justerer den). Så snart de har svaret, kan du bekræfte booking endeligt og betale depositummet på {DEPOSIT_PERCENT}%. Følg status under Mine forespørgsler.
             </p>
             <div className="rounded-md bg-muted/40 px-4 py-2 text-sm">
               Reference: <span className="font-mono font-semibold">{submittedRef ?? "—"}</span>
