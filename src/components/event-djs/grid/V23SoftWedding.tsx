@@ -565,12 +565,12 @@ export function SoftWeddingMobileRow({
     <Link
       to={href}
       className={cn(
-        "group flex overflow-hidden rounded-2xl border border-amber-100/70 bg-white shadow-sm transition-shadow hover:shadow-md",
+        "group flex min-h-[13.5rem] overflow-hidden rounded-2xl border border-amber-100/70 bg-white shadow-sm transition-shadow hover:shadow-md",
         isUnavailable && "border-dashed bg-muted/30",
       )}
     >
       {/* Left: hero photo with carved avatar */}
-      <div className="relative w-28 shrink-0 overflow-hidden bg-amber-50">
+      <div className="relative w-36 shrink-0 overflow-hidden bg-amber-50">
         {hero && (
           <img
             src={hero}
@@ -580,7 +580,7 @@ export function SoftWeddingMobileRow({
           />
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
-        <span className="absolute bottom-2 left-2 h-11 w-11 overflow-hidden rounded-full border-2 border-white shadow-md">
+        <span className="absolute bottom-2 left-2 h-14 w-14 overflow-hidden rounded-full border-2 border-white shadow-md">
           {avatar && (
             <img
               src={avatar}
