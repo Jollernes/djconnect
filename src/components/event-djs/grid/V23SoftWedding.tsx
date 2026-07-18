@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   BadgeCheck,
+  CalendarCheck2,
   CalendarX2,
   Clock,
   Disc3,
@@ -546,12 +547,14 @@ export function SoftWeddingMobileRow({
   eventTypeId,
   eventTheme = WEDDING_THEME,
   heroOverrides,
+  availabilityDate,
   unavailable,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
   eventTheme?: EventTheme;
   heroOverrides?: Record<string, string>;
+  availabilityDate?: string;
   unavailable?: { reason: string; subReason?: string } | null;
 }) {
   const hero =
@@ -586,6 +589,19 @@ export function SoftWeddingMobileRow({
           />
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
+
+        {/* Availability status pill */}
+        {isUnavailable ? (
+          <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-rose-600/95 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+            <CalendarX2 className="h-3 w-3" />
+            Ikke ledig
+          </span>
+        ) : (
+          <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-emerald-600/95 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm">
+            <CalendarCheck2 className="h-3 w-3" />
+            {availabilityDate ? "Ledig" : "Åben"}
+          </span>
+        )}
       </div>
 
       {/* Avatar carved onto the seam between the photo and the text
