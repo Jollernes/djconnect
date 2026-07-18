@@ -24,7 +24,8 @@ import {
   Music,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useLayoutEffect } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -346,7 +347,7 @@ function DesktopHeroV2({
           animate="visible"
           variants={fadeUp}
           custom={0.6}
-          className="overflow-hidden rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"
+          className="rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"
         >
           {/* Mode tabs — full-width segmented row across the top of the card */}
           <div className="flex border-b border-border/60">
@@ -382,7 +383,7 @@ function DesktopHeroV2({
 
           <form
             onSubmit={handleSubmit}
-            className="grid grid-cols-[1fr_1fr_auto] items-end gap-4 p-6"
+            className="grid grid-cols-[1fr_1fr_auto] items-end gap-5 p-7"
           >
             <div className="min-w-0">
               <label className="mb-1.5 block text-sm font-semibold text-foreground">
@@ -533,7 +534,7 @@ function MobileHeroV2({
           animate="visible"
           variants={fadeUp}
           custom={0.55}
-          className="overflow-hidden rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"
+          className="rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"
         >
           {/* Mode tabs */}
           <div className="flex border-b border-border/60">
@@ -566,7 +567,7 @@ function MobileHeroV2({
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4 p-5">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div className="min-w-0">
                 <label className="mb-1.5 block text-sm font-semibold text-foreground">
                   Hvilken fest holder du?
@@ -1016,12 +1017,35 @@ const EVENT_TYPE_OPTIONS: EventTypeOption[] = [
 export function EventTypePicker({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number; width: number } | null>(null);
   const selected = EVENT_TYPE_OPTIONS.find((o) => o.id === value);
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    function update() {
+      const el = containerRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setCoords({ top: r.bottom + 8, left: r.left, width: r.width });
+    }
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      if (
+        containerRef.current && !containerRef.current.contains(target) &&
+        panelRef.current && !panelRef.current.contains(target)
+      ) {
         setOpen(false);
       }
     }
@@ -1087,16 +1111,24 @@ export function EventTypePicker({ value, onChange }: { value: string; onChange: 
         </span>
       </button>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute left-0 right-0 z-30 mt-2 origin-top rounded-xl border bg-popover p-2 shadow-2xl ring-1 ring-black/5 sm:min-w-[22rem]"
-            role="listbox"
-          >
+      {createPortal(
+        <AnimatePresence>
+          {open && coords && (
+            <motion.div
+              ref={panelRef}
+              initial={{ opacity: 0, y: -6, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={{ duration: 0.16, ease: [0.22, 1, 0.36, 1] }}
+              style={{
+                position: "fixed",
+                top: coords.top,
+                left: coords.left,
+                width: Math.max(coords.width, 352),
+              }}
+              className="z-[60] origin-top rounded-xl border bg-popover p-2 shadow-2xl ring-1 ring-black/5"
+              role="listbox"
+            >
             <div className="mb-1.5 flex items-center justify-between px-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               <span>Vælg din begivenhed</span>
               {selected && (
@@ -1147,9 +1179,11 @@ export function EventTypePicker({ value, onChange }: { value: string; onChange: 
                 );
               })}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
     </div>
   );
 }
