@@ -565,13 +565,13 @@ export function SoftWeddingMobileRow({
     <Link
       to={href}
       className={cn(
-        "group relative flex h-40 overflow-hidden rounded-2xl border border-amber-100/70 bg-white shadow-sm transition-shadow hover:shadow-md",
+        "group relative flex h-48 overflow-hidden rounded-2xl border border-amber-100/70 bg-white shadow-sm transition-shadow hover:shadow-md",
         isUnavailable && "border-dashed bg-muted/30",
       )}
     >
       {/* Left: hero photo. ~3:4 portrait keeps a natural photo
           proportion against the text column. */}
-      <div className="relative h-full w-[7.5rem] shrink-0 overflow-hidden bg-amber-50">
+      <div className="relative h-full w-[9.5rem] shrink-0 overflow-hidden bg-amber-50">
         {hero && (
           <img
             src={hero}
@@ -585,7 +585,7 @@ export function SoftWeddingMobileRow({
 
       {/* Avatar carved onto the seam between the photo and the text
           column, vertically centred. */}
-      <span className="absolute top-1/2 z-10 h-14 w-14 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-[3px] border-white bg-white shadow-md left-[7.5rem]">
+      <span className="absolute top-1/2 z-10 h-16 w-16 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-[3px] border-white bg-white shadow-md left-[9.5rem]">
         {avatar && (
           <img
             src={avatar}
@@ -597,7 +597,7 @@ export function SoftWeddingMobileRow({
       </span>
 
       {/* Right: details */}
-      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 py-3 pl-9 pr-3">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 py-3 pl-10 pr-3">
         <div className="flex items-center gap-1">
           <h3 className="truncate text-[15px] font-semibold text-foreground">
             {dj.stage_name}
