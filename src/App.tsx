@@ -62,6 +62,7 @@ import { DJMessagesPage } from "@/pages/dj/MessagesPage";
 import { DJRequestsPage } from "@/pages/dj/RequestsPage";
 import { DJRequestDetailPage } from "@/pages/dj/RequestDetailPage";
 import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
+import { CompactBookingProfileMockup } from "@/pages/dj/profileMockups/CompactBookingProfile";
 import { DJOnboardingGuidePage } from "@/pages/dj/OnboardingGuidePage";
 import { DJGuideGate } from "@/components/common/DJGuideGate";
 
@@ -95,6 +96,7 @@ function App() {
             <Route path="/corporate-djs" element={<CorporateDJsPage />} />
             <Route path="/other-djs" element={<OtherDJsPage />} />
             <Route path="/djs/:username" element={<DJProfilePage />} />
+            <Route path="/dj-profil-mockup" element={<CompactBookingProfileMockup />} />
             <Route path="/book/:username" element={<BookingRequestPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
