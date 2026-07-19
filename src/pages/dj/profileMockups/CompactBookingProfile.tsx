@@ -24,6 +24,12 @@ const HERO_IMAGE =
 const AVATAR_IMAGE =
   "https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800";
 
+const galleryImages = [
+  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800",
+  "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800",
+  "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=800",
+];
+
 type Package = {
   title: string;
   description: string;
@@ -152,7 +158,18 @@ export function CompactBookingProfileMockup() {
               </div>
             </div>
 
-            <h1 className="mt-14 text-3xl font-bold tracking-tight text-foreground">
+            <div className="mt-14 grid w-full grid-cols-3 gap-3">
+              {galleryImages.map((src, i) => (
+                <img
+                  key={src}
+                  src={src}
+                  alt={`Galleri ${i + 1}`}
+                  className="aspect-[4/3] w-full rounded-xl object-cover shadow-sm"
+                />
+              ))}
+            </div>
+
+            <h1 className="mt-6 text-3xl font-bold tracking-tight text-foreground">
               DJ Flashback
             </h1>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted-foreground">
