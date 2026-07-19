@@ -24,10 +24,22 @@ const HERO_IMAGE =
 const AVATAR_IMAGE =
   "https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800";
 
-const galleryImages = [
-  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800",
-  "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800",
-  "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=800",
+const galleryCategories = [
+  {
+    label: "Bryllup",
+    image:
+      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=800",
+  },
+  {
+    label: "Udstyr",
+    image:
+      "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=800",
+  },
+  {
+    label: "Se alle",
+    image:
+      "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=800",
+  },
 ];
 
 type Package = {
@@ -159,13 +171,22 @@ export function CompactBookingProfileMockup() {
             </div>
 
             <div className="mt-14 grid w-full grid-cols-3 gap-3">
-              {galleryImages.map((src, i) => (
-                <img
-                  key={src}
-                  src={src}
-                  alt={`Galleri ${i + 1}`}
-                  className="aspect-[4/3] w-full rounded-xl object-cover shadow-sm"
-                />
+              {galleryCategories.map((category) => (
+                <button
+                  key={category.label}
+                  type="button"
+                  className="group relative aspect-[4/3] w-full overflow-hidden rounded-xl shadow-sm"
+                >
+                  <img
+                    src={category.image}
+                    alt={category.label}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  <span className="absolute inset-x-0 bottom-0 p-2 text-center text-sm font-semibold text-white">
+                    {category.label}
+                  </span>
+                </button>
               ))}
             </div>
 
