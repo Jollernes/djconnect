@@ -353,6 +353,42 @@ export function DJRequestDetailPage() {
         </Card>
       )}
 
+      {record.status === "pending_invoice" && pricing && (
+        <Card className="border-amber-200">
+          <CardContent className="space-y-3 p-5 text-sm">
+            <div className="flex items-center gap-2 font-medium text-amber-700">
+              <Clock className="h-4 w-4" />
+              Afventer betaling af faktura
+            </div>
+            <p className="text-muted-foreground">
+              Kunden har valgt at betale depositummet via faktura. Bookingen
+              bekræftes automatisk, når depositummet på fakturaen er betalt.
+            </p>
+            <div className="space-y-2 rounded-lg bg-muted/40 p-4">
+              <Row
+                label="Bekræftet fuld pris"
+                value={formatCurrency(pricing.fullPriceMinor, record.djCurrency)}
+                strong
+              />
+              <Row
+                label={`Depositum på faktura (${pricing.depositPercent}%)`}
+                value={formatCurrency(
+                  record.invoice?.amountMinor ?? pricing.depositMinor,
+                  record.djCurrency,
+                )}
+                muted
+              />
+              <Separator />
+              <Row
+                label="Din udbetaling efter event"
+                value={formatCurrency(pricing.payoutMinor, record.djCurrency)}
+                muted
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {record.status === "confirmed" && pricing && (
         <Card className="border-emerald-200">
           <CardContent className="space-y-3 p-5 text-sm">

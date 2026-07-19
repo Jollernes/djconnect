@@ -5,8 +5,11 @@ import {
   CalendarClock,
   CheckCircle2,
   Clock,
+  CreditCard,
+  FileText,
   MapPin,
   ShieldCheck,
+  Smartphone,
   Wallet,
   XCircle,
 } from "lucide-react";
@@ -23,17 +26,40 @@ import {
   readBookingRequest,
   updateBookingRequest,
   type BookingRequest,
+  type PaymentMethod,
 } from "@/lib/bookingRequestStore";
 import {
   bookingStatusBadgeClass,
   bookingStatusLabel,
 } from "@/lib/bookingRequestStatus";
 
+const PAYMENT_METHODS: {
+  id: PaymentMethod;
+  label: string;
+  icon: typeof CreditCard;
+}[] = [
+  { id: "card", label: "Kreditkort", icon: CreditCard },
+  { id: "mobilepay", label: "MobilePay", icon: Smartphone },
+  { id: "invoice", label: "Faktura", icon: FileText },
+];
+
+const PAYMENT_METHOD_LABEL: Record<PaymentMethod, string> = {
+  card: "Kreditkort",
+  mobilepay: "MobilePay",
+  invoice: "Faktura",
+};
+
+function makeInvoiceNumber(requestId: string): string {
+  const suffix = requestId.replace(/[^a-z0-9]/gi, "").slice(-6).toUpperCase();
+  return `INV-${new Date().getFullYear()}-${suffix}`;
+}
+
 /**
  * Customer view of a single direct booking request and its live status:
  *   1. Afventer DJ-svar — the DJ has to confirm/adjust the price.
  *   2. Bekræft & betal depositum — the DJ confirmed a price; the customer
- *      gives their final confirmation and pays a 25% deposit up front.
+ *      gives their final confirmation and pays a 25% deposit up front
+ *      (card, MobilePay or invoice).
  *   3. Bekræftet — deposit paid, booking locked in.
  */
 export function CustomerBookingRequestDetailPage() {
@@ -41,6 +67,7 @@ export function CustomerBookingRequestDetailPage() {
   const [record, setRecord] = useState<BookingRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [paying, setPaying] = useState(false);
+  const [method, setMethod] = useState<PaymentMethod>("card");
 
   useDocumentHead({
     title: "Bookingforespørgsel · DJConnect",
@@ -71,11 +98,50 @@ export function CustomerBookingRequestDetailPage() {
     setPaying(true);
     try {
       await new Promise((r) => setTimeout(r, 500));
+      if (method === "invoice") {
+        const now = Date.now();
+        updateBookingRequest(record.id, {
+          status: "pending_invoice",
+          invoice: {
+            issuedAtMs: now,
+            dueAtMs: now + 7 * 24 * 60 * 60 * 1000,
+            amountMinor: pricing.depositMinor,
+            number: makeInvoiceNumber(record.id),
+          },
+        });
+        toast.success("Faktura sendt — bookingen bekræftes, når depositummet er betalt");
+      } else {
+        updateBookingRequest(record.id, {
+          status: "confirmed",
+          deposit: {
+            paidAtMs: Date.now(),
+            amountMinor: pricing.depositMinor,
+            method,
+          },
+        });
+        toast.success("Booking bekræftet — depositum betalt");
+      }
+    } finally {
+      setPaying(false);
+    }
+  }
+
+  async function handlePayInvoice() {
+    if (!record) return;
+    const pricing = effectivePricing(record);
+    if (!pricing) return;
+    setPaying(true);
+    try {
+      await new Promise((r) => setTimeout(r, 500));
       updateBookingRequest(record.id, {
         status: "confirmed",
-        deposit: { paidAtMs: Date.now(), amountMinor: pricing.depositMinor },
+        deposit: {
+          paidAtMs: Date.now(),
+          amountMinor: record.invoice?.amountMinor ?? pricing.depositMinor,
+          method: "invoice",
+        },
       });
-      toast.success("Booking bekræftet — depositum betalt");
+      toast.success("Depositum betalt — booking bekræftet");
     } finally {
       setPaying(false);
     }
@@ -255,6 +321,42 @@ export function CustomerBookingRequestDetailPage() {
               efter eventet.
             </p>
 
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">
+                Betalingsmetode
+              </p>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {PAYMENT_METHODS.map((m) => (
+                  <button
+                    key={m.id}
+                    type="button"
+                    onClick={() => setMethod(m.id)}
+                    disabled={paying}
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg border p-3 text-left text-sm transition-colors",
+                      method === m.id
+                        ? "border-accent bg-accent/5 ring-1 ring-accent"
+                        : "border-input hover:bg-muted/40",
+                    )}
+                  >
+                    <m.icon
+                      className={cn(
+                        "h-4 w-4 shrink-0",
+                        method === m.id ? "text-accent" : "text-muted-foreground",
+                      )}
+                    />
+                    <span className="font-medium">{m.label}</span>
+                  </button>
+                ))}
+              </div>
+              {method === "invoice" && (
+                <p className="text-xs text-muted-foreground">
+                  Ved faktura sender vi en faktura på depositummet. Bookingen
+                  bliver først bekræftet, når depositummet på fakturaen er betalt.
+                </p>
+              )}
+            </div>
+
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button
                 variant="accent"
@@ -262,18 +364,86 @@ export function CustomerBookingRequestDetailPage() {
                 onClick={handleConfirmAndPay}
                 disabled={paying}
               >
-                <Wallet className="h-4 w-4" />
+                {method === "invoice" ? (
+                  <FileText className="h-4 w-4" />
+                ) : (
+                  <Wallet className="h-4 w-4" />
+                )}
                 {paying
-                  ? "Behandler betaling…"
-                  : `Bekræft & betal ${formatCurrency(
-                      pricing.depositMinor,
-                      record.djCurrency,
-                    )}`}
+                  ? "Behandler…"
+                  : method === "invoice"
+                    ? "Bekræft & modtag faktura"
+                    : `Bekræft & betal ${formatCurrency(
+                        pricing.depositMinor,
+                        record.djCurrency,
+                      )}`}
               </Button>
               <Button variant="outline" onClick={handleDecline} disabled={paying}>
                 Afvis tilbud
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {record.status === "pending_invoice" && pricing && (
+        <Card className="border-amber-200">
+          <CardContent className="space-y-4 p-5">
+            <div className="flex items-center gap-2 text-sm font-semibold text-amber-800">
+              <FileText className="h-4 w-4" />
+              Faktura sendt — afventer betaling af depositum
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Bookingen bliver bekræftet, så snart depositummet på fakturaen er
+              betalt. Din dato er reserveret indtil forfald.
+            </p>
+
+            <div className="space-y-2 rounded-lg bg-muted/40 p-4 text-sm">
+              {record.invoice && (
+                <>
+                  <Row label="Fakturanr." value={record.invoice.number} />
+                  <Row
+                    label="Forfald"
+                    value={formatDate(
+                      new Date(record.invoice.dueAtMs).toISOString().slice(0, 10),
+                    )}
+                  />
+                  <Separator />
+                </>
+              )}
+              <Row
+                label={`Depositum (${pricing.depositPercent}%)`}
+                value={formatCurrency(
+                  record.invoice?.amountMinor ?? pricing.depositMinor,
+                  record.djCurrency,
+                )}
+                strong
+              />
+              <Row
+                label="Rest til DJ efter event"
+                value={formatCurrency(pricing.payoutMinor, record.djCurrency)}
+                muted
+              />
+            </div>
+
+            <Button
+              variant="accent"
+              className="w-full"
+              onClick={handlePayInvoice}
+              disabled={paying}
+            >
+              <Wallet className="h-4 w-4" />
+              {paying
+                ? "Behandler betaling…"
+                : `Markér depositum som betalt (${formatCurrency(
+                    record.invoice?.amountMinor ?? pricing.depositMinor,
+                    record.djCurrency,
+                  )})`}
+            </Button>
+            <p className="text-[11px] text-muted-foreground">
+              Demo: i produktion registreres betalingen automatisk, når fakturaen
+              er betalt.
+            </p>
           </CardContent>
         </Card>
       )}
@@ -294,6 +464,13 @@ export function CustomerBookingRequestDetailPage() {
                 )}
                 strong
               />
+              {record.deposit?.method && (
+                <Row
+                  label="Betalt med"
+                  value={PAYMENT_METHOD_LABEL[record.deposit.method]}
+                  muted
+                />
+              )}
               <Separator />
               <Row
                 label="Rest til DJ efter event"
@@ -340,7 +517,11 @@ const STEPS: { key: BookingRequest["status"]; label: string }[] = [
 function StepTimeline({ status }: { status: BookingRequest["status"] }) {
   if (status === "declined" || status === "expired") return null;
   const activeIndex =
-    status === "pending_dj" ? 0 : status === "pending_customer" ? 1 : 2;
+    status === "pending_dj"
+      ? 0
+      : status === "pending_customer" || status === "pending_invoice"
+        ? 1
+        : 2;
   return (
     <div className="flex items-center gap-2">
       {STEPS.map((step, i) => {

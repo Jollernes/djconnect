@@ -12,9 +12,13 @@
 export type BookingRequestStatus =
   | "pending_dj" // submitted, waiting for the DJ to confirm or adjust the price
   | "pending_customer" // DJ confirmed/adjusted the price; awaiting the customer's final confirmation + deposit
+  | "pending_invoice" // customer chose invoice; deposit invoice issued and awaiting payment before the booking is confirmed
   | "confirmed" // customer confirmed and paid the 25% deposit; booking is locked in
   | "declined" // DJ declined; customer should pick another DJ
   | "expired"; // DJ never responded within the response window
+
+/** How the customer pays the 25% deposit. */
+export type PaymentMethod = "card" | "mobilepay" | "invoice";
 
 /**
  * A price breakdown for a booking. The customer pays `fullPriceMinor` in
@@ -53,10 +57,22 @@ export type BookingRequest = {
     changed: boolean;
     note?: string;
   };
-  /** Deposit payment (25% of full price), set when the customer confirms. */
+  /**
+   * The deposit invoice, set when the customer chooses to pay by invoice.
+   * The booking stays in `pending_invoice` until the deposit on this invoice
+   * is paid, at which point it becomes `confirmed`.
+   */
+  invoice?: {
+    issuedAtMs: number;
+    dueAtMs: number;
+    amountMinor: number;
+    number: string;
+  };
+  /** Deposit payment (25% of full price), set when the deposit is paid. */
   deposit?: {
     paidAtMs: number;
     amountMinor: number;
+    method: PaymentMethod;
   };
   event: {
     eventTypeId: string;

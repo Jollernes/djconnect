@@ -7,6 +7,8 @@ export function bookingStatusLabel(status: BookingRequestStatus): string {
       return "Afventer DJ-svar";
     case "pending_customer":
       return "Bekræft & betal depositum";
+    case "pending_invoice":
+      return "Afventer betaling af faktura";
     case "confirmed":
       return "Bekræftet";
     case "declined":
@@ -23,6 +25,8 @@ export function djBookingStatusLabel(status: BookingRequestStatus): string {
       return "Ny — bekræft pris";
     case "pending_customer":
       return "Afventer kundens bekræftelse";
+    case "pending_invoice":
+      return "Afventer betaling af faktura";
     case "confirmed":
       return "Bekræftet";
     case "declined":
@@ -37,6 +41,7 @@ export function bookingStatusToneClass(status: BookingRequestStatus): string {
     case "pending_dj":
       return "text-muted-foreground";
     case "pending_customer":
+    case "pending_invoice":
       return "text-amber-700";
     case "confirmed":
       return "text-emerald-700";
@@ -52,6 +57,7 @@ export function bookingStatusBadgeClass(status: BookingRequestStatus): string {
     case "pending_dj":
       return "bg-muted text-muted-foreground";
     case "pending_customer":
+    case "pending_invoice":
       return "bg-amber-100 text-amber-800";
     case "confirmed":
       return "bg-emerald-100 text-emerald-800";
