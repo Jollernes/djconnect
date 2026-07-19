@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Star,
@@ -7,6 +8,7 @@ import {
   ShieldCheck,
   Speaker,
   Clock,
+  ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,8 +21,12 @@ import { useDocumentHead } from "@/hooks/useDocumentHead";
  * data fetching) and does not replace the live {@link DJProfilePage}.
  */
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600";
+const heroImages = [
+  "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600",
+  "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1600",
+  "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600",
+  "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=1600",
+];
 const AVATAR_IMAGE =
   "https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800";
 
@@ -147,6 +153,26 @@ export function CompactBookingProfileMockup() {
     description: "Kompakt booking-fokuseret DJ-profil mockup.",
   });
 
+  const [heroIndex, setHeroIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+
+  const goToHero = (index: number) => {
+    const count = heroImages.length;
+    setHeroIndex(((index % count) + count) % count);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    if (delta > 50) goToHero(heroIndex - 1);
+    else if (delta < -50) goToHero(heroIndex + 1);
+    touchStartX.current = null;
+  };
+
   return (
     <div className="min-h-screen bg-background pb-32">
       <div className="container py-8 lg:py-12">
@@ -154,12 +180,58 @@ export function CompactBookingProfileMockup() {
           {/* Left: hero + identity */}
           <div className="flex flex-col items-center text-center">
             <div className="relative w-full">
-              <div className="overflow-hidden rounded-2xl shadow-sm">
-                <img
-                  src={HERO_IMAGE}
-                  alt="DJ Flashback live"
-                  className="aspect-[16/10] w-full object-cover"
-                />
+              <div
+                className="group relative overflow-hidden rounded-2xl shadow-sm"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+              >
+                <div
+                  className="flex transition-transform duration-500 ease-out"
+                  style={{ transform: `translateX(-${heroIndex * 100}%)` }}
+                >
+                  {heroImages.map((src, i) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt={`DJ Flashback ${i + 1}`}
+                      className="aspect-[16/10] w-full shrink-0 object-cover"
+                      draggable={false}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => goToHero(heroIndex - 1)}
+                  className="absolute left-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow-sm backdrop-blur transition-opacity hover:bg-background group-hover:opacity-100"
+                  aria-label="Forrige billede"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => goToHero(heroIndex + 1)}
+                  className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/80 text-foreground opacity-0 shadow-sm backdrop-blur transition-opacity hover:bg-background group-hover:opacity-100"
+                  aria-label="Næste billede"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+
+                <div className="absolute inset-x-0 bottom-3 flex items-center justify-center gap-1.5">
+                  {heroImages.map((src, i) => (
+                    <button
+                      key={src}
+                      type="button"
+                      onClick={() => goToHero(i)}
+                      className={`h-1.5 rounded-full transition-all ${
+                        i === heroIndex
+                          ? "w-5 bg-white"
+                          : "w-1.5 bg-white/60 hover:bg-white/80"
+                      }`}
+                      aria-label={`Gå til billede ${i + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
               <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
                 <img
