@@ -146,7 +146,7 @@ export function CompactBookingProfileMockup() {
                 <img
                   src={HERO_IMAGE}
                   alt="DJ Flashback live"
-                  className="aspect-[5/4] w-full object-cover"
+                  className="aspect-[16/10] w-full object-cover"
                 />
               </div>
               <div className="absolute -bottom-10 left-1/2 -translate-x-1/2">
