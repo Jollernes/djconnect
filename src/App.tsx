@@ -47,6 +47,8 @@ import { CustomerBookingDetailPage } from "@/pages/customer/BookingDetailPage";
 import { CustomerFavouritesPage } from "@/pages/customer/FavouritesPage";
 import { CustomerSettingsPage } from "@/pages/customer/SettingsPage";
 import { CustomerRequestsListPage } from "@/pages/customer/RequestsListPage";
+import { CustomerMessagesPage } from "@/pages/customer/MessagesPage";
+import { CustomerMessageThreadPage } from "@/pages/customer/MessageThreadPage";
 import { CustomerRequestDetailPage } from "@/pages/customer/RequestDetailPage";
 import { CustomerBookingRequestDetailPage } from "@/pages/customer/BookingRequestDetailPage";
 import { PersonalAdviceDetailPage } from "@/pages/customer/PersonalAdviceDetailPage";
@@ -59,6 +61,7 @@ import { DJEarningsPage } from "@/pages/dj/EarningsPage";
 import { DJPricingEquipmentPage } from "@/pages/dj/PricingEquipmentPage";
 import { DJSettingsPage } from "@/pages/dj/DJSettingsPage";
 import { DJMessagesPage } from "@/pages/dj/MessagesPage";
+import { DJMessageThreadPage } from "@/pages/dj/MessageThreadPage";
 import { DJRequestsPage } from "@/pages/dj/RequestsPage";
 import { DJRequestDetailPage } from "@/pages/dj/RequestDetailPage";
 import { GuidedSectionsMockup } from "@/pages/dj/profileMockups/GuidedSections";
@@ -135,6 +138,11 @@ function App() {
               path="/dashboard/personlig-radgivning/:adviceId"
               element={<PersonalAdviceDetailPage />}
             />
+            <Route path="/dashboard/messages" element={<CustomerMessagesPage />} />
+            <Route
+              path="/dashboard/messages/:conversationId"
+              element={<CustomerMessageThreadPage />}
+            />
             <Route path="/dashboard/bookings" element={<CustomerBookingsPage />} />
             <Route path="/dashboard/bookings/:id" element={<CustomerBookingDetailPage />} />
             <Route path="/dashboard/favourites" element={<CustomerFavouritesPage />} />
@@ -168,6 +176,7 @@ function App() {
             <Route path="/dj/earnings" element={<DJEarningsPage />} />
             <Route path="/dj/pricing" element={<DJPricingEquipmentPage />} />
             <Route path="/dj/messages" element={<DJMessagesPage />} />
+            <Route path="/dj/messages/:conversationId" element={<DJMessageThreadPage />} />
             <Route path="/dj/profile" element={<GuidedSectionsMockup />} />
             <Route path="/dj/settings" element={<DJSettingsPage />} />
           </Route>

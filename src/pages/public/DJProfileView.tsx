@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   MapPin,
   Shield,
@@ -44,6 +44,8 @@ import { ChevronDown } from "lucide-react";
 import { EVENT_TYPE_OPTIONS, getEventTypeOption } from "@/lib/eventTypeOptions";
 import { formatDanishDate } from "@/lib/formatDanishDate";
 import { mockBookings } from "@/data/mock";
+import { useAuth } from "@/hooks/useAuth";
+import { findOrCreateConversation } from "@/lib/messageStore";
 
 export interface DJProfileViewProps {
   dj: DJProfileWithRelations;
@@ -84,9 +86,27 @@ export function DJProfileView({
   mode = "page",
 }: DJProfileViewProps) {
   const preview = mode === "preview";
+  const navigate = useNavigate();
+  const { profile } = useAuth();
   const [aboutExpanded, setAboutExpanded] = useState(false);
   const [date, setDate] = useState(initialDate ?? "");
   const [guests, setGuests] = useState(initialGuests ?? "");
+
+  function handleSendMessage() {
+    if (preview) return;
+    const customerId = profile?.role === "customer" ? profile.id : undefined;
+    const conv = findOrCreateConversation({
+      customerId,
+      customerName: profile?.role === "customer" ? profile.full_name ?? undefined : undefined,
+      djId: dj.id,
+      djUsername: dj.username,
+      djStageName: dj.stage_name,
+      djAvatarUrl: dj.profile.avatar_url ?? undefined,
+      djCity: dj.base_location ?? undefined,
+      djCurrency: dj.currency,
+    });
+    navigate(`/dashboard/messages/${conv.id}`);
+  }
 
   const isUnavailable = useMemo(() => {
     if (!date) return false;
@@ -578,6 +598,15 @@ export function DJProfileView({
                   {bookingFields}
 
                   {bookingCta}
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full gap-2"
+                    onClick={handleSendMessage}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    Send besked
+                  </Button>
                   {bookingHint ? (
                     <p className="text-center text-xs text-muted-foreground">
                       {bookingHint}
@@ -756,15 +785,26 @@ export function DJProfileView({
                   {dj.rating_average.toFixed(2)} · {dj.rating_count} anmeldelser
                 </div>
               </div>
-              {canBook ? (
-                <Button asChild variant="accent" size="lg" className="shadow-lg">
-                  <Link to={bookHref}>Anmod om booking</Link>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="shrink-0 px-3"
+                  aria-label="Send besked"
+                  onClick={handleSendMessage}
+                >
+                  <MessageCircle className="h-5 w-5" />
                 </Button>
-              ) : (
-                <Button variant="accent" size="lg" className="shadow-lg" disabled>
-                  Anmod om booking
-                </Button>
-              )}
+                {canBook ? (
+                  <Button asChild variant="accent" size="lg" className="shadow-lg">
+                    <Link to={bookHref}>Anmod om booking</Link>
+                  </Button>
+                ) : (
+                  <Button variant="accent" size="lg" className="shadow-lg" disabled>
+                    Anmod om booking
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>

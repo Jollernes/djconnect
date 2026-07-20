@@ -26,6 +26,7 @@ import type { Profile, UserRole } from "@/types/domain";
 const corporateCustomerNav = [
   { to: "/dashboard", label: "Oversigt", icon: LayoutDashboard, end: true },
   { to: "/dashboard/requests", label: "Mine forespørgsler", icon: Inbox },
+  { to: "/dashboard/messages", label: "Beskeder", icon: MessageSquare },
   { to: "/dashboard/bookings", label: "Bookinger", icon: Calendar },
   { to: "/dashboard/favourites", label: "Favoritter", icon: Heart },
   { to: "/dashboard/settings", label: "Indstillinger", icon: Settings },
@@ -34,6 +35,7 @@ const corporateCustomerNav = [
 const privateCustomerNav = [
   { to: "/dashboard", label: "Mit event", icon: PartyPopper, end: true },
   { to: "/dashboard/requests", label: "Mine forespørgsler", icon: Inbox },
+  { to: "/dashboard/messages", label: "Beskeder", icon: MessageSquare },
   { to: "/dashboard/settings", label: "Indstillinger", icon: Settings },
 ];
 
