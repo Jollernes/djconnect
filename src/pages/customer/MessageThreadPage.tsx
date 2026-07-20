@@ -21,6 +21,10 @@ export function CustomerMessageThreadPage() {
   const navigate = useNavigate();
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
+  const guest = profile?.role !== "customer";
+  const backTo = guest && conversation
+    ? `/djs/${conversation.djUsername}`
+    : "/dashboard/messages";
 
   useDocumentHead({
     title: "Besked · DJConnect",
@@ -45,6 +49,9 @@ export function CustomerMessageThreadPage() {
         </h1>
         <Button asChild variant="outline" className="mt-6">
           <Link to="/dashboard/messages">Alle beskeder</Link>
+        </Button>
+        <Button asChild variant="ghost" className="mt-2">
+          <Link to="/search">Find DJs</Link>
         </Button>
       </div>
     );
@@ -94,10 +101,10 @@ export function CustomerMessageThreadPage() {
     <div className="mx-auto flex h-[calc(100vh-13rem)] max-w-2xl flex-col space-y-4">
       <div>
         <Link
-          to="/dashboard/messages"
+          to={backTo}
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Alle beskeder
+          <ArrowLeft className="h-3.5 w-3.5" /> {guest ? "Tilbage til profil" : "Alle beskeder"}
         </Link>
         <header className="mt-2 flex items-center gap-3">
           {conversation.djAvatarUrl ? (
@@ -128,6 +135,7 @@ export function CustomerMessageThreadPage() {
       <ChatThread
         conversation={conversation}
         viewer="customer"
+        guest={guest}
         onAcceptOffer={handleAcceptOffer}
       />
     </div>

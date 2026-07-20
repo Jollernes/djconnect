@@ -12,6 +12,7 @@ import {
   markConversationRead,
   sendOffer,
   sendText,
+  updateConversation,
   updateOffer,
   type ChatMessage,
   type Conversation,
@@ -27,6 +28,11 @@ interface ChatThreadProps {
    * Return the created booking-request id so the offer can link to it.
    */
   onAcceptOffer?: (message: ChatMessage) => string | undefined;
+  /**
+   * Guest (not-logged-in) customer: require a name + email before the first
+   * message can be sent.
+   */
+  guest?: boolean;
 }
 
 /**
@@ -34,11 +40,22 @@ interface ChatThreadProps {
  * Renders the message list (text + custom offers) and a composer. DJs get an
  * extra "Send tilbud" builder to send a tailored price offer inside the chat.
  */
-export function ChatThread({ conversation, viewer, onAcceptOffer }: ChatThreadProps) {
+export function ChatThread({
+  conversation,
+  viewer,
+  onAcceptOffer,
+  guest = false,
+}: ChatThreadProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [offerOpen, setOfferOpen] = useState(false);
+  const [guestName, setGuestName] = useState(conversation.customerName ?? "");
+  const [guestEmail, setGuestEmail] = useState(conversation.customerEmail ?? "");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const composerRef = useRef<HTMLDivElement>(null);
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail.trim());
+  const contactComplete = !guest || (guestName.trim().length > 0 && emailValid);
 
   const load = useCallback(() => {
     setMessages(listMessages(conversation.id));
@@ -67,9 +84,24 @@ export function ChatThread({ conversation, viewer, onAcceptOffer }: ChatThreadPr
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
+  useEffect(() => {
+    if (offerOpen) {
+      composerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [offerOpen]);
+
+  function persistGuestContact() {
+    if (!guest) return;
+    updateConversation(conversation.id, {
+      customerName: guestName.trim(),
+      customerEmail: guestEmail.trim(),
+    });
+  }
+
   function handleSendText() {
     const text = draft.trim();
-    if (!text) return;
+    if (!text || !contactComplete) return;
+    persistGuestContact();
     sendText(conversation.id, viewer, text);
     setDraft("");
   }
@@ -93,7 +125,7 @@ export function ChatThread({ conversation, viewer, onAcceptOffer }: ChatThreadPr
     <div className="flex h-full min-h-0 flex-col">
       <div
         ref={scrollRef}
-        className="min-h-[280px] flex-1 space-y-3 overflow-y-auto rounded-xl border bg-muted/20 p-4"
+        className="min-h-0 flex-1 space-y-3 overflow-y-auto rounded-xl border bg-muted/20 p-4"
       >
         {empty ? (
           <div className="flex h-full items-center justify-center text-center text-sm text-muted-foreground">
@@ -116,50 +148,80 @@ export function ChatThread({ conversation, viewer, onAcceptOffer }: ChatThreadPr
       </div>
 
       {offerOpen && viewer === "dj" ? (
-        <OfferComposer
-          currency={conversation.djCurrency}
-          onCancel={() => setOfferOpen(false)}
-          onSend={(offer, note) => {
-            sendOffer(conversation.id, { ...offer, currency: conversation.djCurrency }, note);
-            setOfferOpen(false);
-          }}
-        />
-      ) : (
-        <div className="mt-3 flex items-end gap-2">
-          <Textarea
-            rows={1}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSendText();
-              }
+        <div ref={composerRef}>
+          <OfferComposer
+            currency={conversation.djCurrency}
+            onCancel={() => setOfferOpen(false)}
+            onSend={(offer, note) => {
+              sendOffer(conversation.id, { ...offer, currency: conversation.djCurrency }, note);
+              setOfferOpen(false);
             }}
-            placeholder="Skriv en besked…"
-            className="min-h-[42px] resize-none"
           />
-          {viewer === "dj" && (
+        </div>
+      ) : (
+        <div ref={composerRef} className="mt-3 space-y-2">
+          {guest && (
+            <div className="grid gap-2 rounded-xl border bg-white p-3 sm:grid-cols-2">
+              <div className="sm:col-span-2 text-xs text-muted-foreground">
+                Angiv navn og email for at sende din besked.
+              </div>
+              <div>
+                <Label htmlFor="guest-name">Navn</Label>
+                <Input
+                  id="guest-name"
+                  value={guestName}
+                  onChange={(e) => setGuestName(e.target.value)}
+                  placeholder="Dit navn"
+                />
+              </div>
+              <div>
+                <Label htmlFor="guest-email">Email</Label>
+                <Input
+                  id="guest-email"
+                  type="email"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                  placeholder="dig@eksempel.dk"
+                />
+              </div>
+            </div>
+          )}
+          <div className="flex items-end gap-2">
+            <Textarea
+              rows={1}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendText();
+                }
+              }}
+              placeholder="Skriv en besked…"
+              className="min-h-[42px] resize-none"
+            />
+            {viewer === "dj" && (
+              <Button
+                type="button"
+                variant="outline"
+                className="shrink-0"
+                onClick={() => setOfferOpen(true)}
+              >
+                <Tag className="h-4 w-4" />
+                Tilbud
+              </Button>
+            )}
             <Button
               type="button"
-              variant="outline"
+              variant="accent"
               className="shrink-0"
-              onClick={() => setOfferOpen(true)}
+              onClick={handleSendText}
+              disabled={!draft.trim() || !contactComplete}
             >
-              <Tag className="h-4 w-4" />
-              Tilbud
+              <Send className="h-4 w-4" />
+              Send
             </Button>
-          )}
-          <Button
-            type="button"
-            variant="accent"
-            className="shrink-0"
-            onClick={handleSendText}
-            disabled={!draft.trim()}
-          >
-            <Send className="h-4 w-4" />
-            Send
-          </Button>
+          </div>
         </div>
       )}
     </div>

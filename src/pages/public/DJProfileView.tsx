@@ -105,7 +105,10 @@ export function DJProfileView({
       djCity: dj.base_location ?? undefined,
       djCurrency: dj.currency,
     });
-    navigate(`/dashboard/messages/${conv.id}`);
+    const isCustomer = profile?.role === "customer";
+    navigate(
+      isCustomer ? `/dashboard/messages/${conv.id}` : `/besked/${conv.id}`,
+    );
   }
 
   const isUnavailable = useMemo(() => {

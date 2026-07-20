@@ -101,6 +101,10 @@ function App() {
             <Route path="/djs/:username" element={<DJProfilePage />} />
             <Route path="/dj-profil-mockup" element={<CompactBookingProfileMockup />} />
             <Route path="/book/:username" element={<BookingRequestPage />} />
+            <Route
+              path="/besked/:conversationId"
+              element={<CustomerMessageThreadPage />}
+            />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="/faq" element={<FAQPage />} />

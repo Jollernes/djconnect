@@ -52,6 +52,7 @@ export type Conversation = {
   updatedAtMs: number;
   customerId?: string; // undefined for anonymous (guest) senders
   customerName?: string;
+  customerEmail?: string; // captured for guest senders
   djId: string;
   djUsername: string;
   djStageName: string;
@@ -136,6 +137,19 @@ function writeConversation(conv: Conversation): void {
   } catch {
     // ignore quota / privacy failures
   }
+}
+
+/** Merge a partial patch into a stored conversation and persist it. */
+export function updateConversation(
+  id: string,
+  patch: Partial<Conversation>,
+): Conversation | null {
+  const existing = readConversation(id);
+  if (!existing) return null;
+  const next: Conversation = { ...existing, ...patch };
+  writeConversation(next);
+  emitUpdate(id);
+  return next;
 }
 
 export function listConversations(): Conversation[] {
