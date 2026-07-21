@@ -7,13 +7,11 @@ import {
   ShieldCheck,
   Speaker,
   Clock,
-  Award,
-  Disc3,
+  MessageCircle,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Equalizer } from "@/components/common/Equalizer";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 
@@ -286,34 +284,37 @@ export function CompactBookingProfileMockup() {
               Leveres på din lokation
             </div>
 
-            <div className="relative mt-5 w-full overflow-hidden rounded-xl border bg-[hsl(222_47%_10%)] px-3 py-2 text-white">
-              <div
-                className="absolute inset-0 opacity-80"
-                style={{
-                  background:
-                    "linear-gradient(90deg, hsla(21,90%,53%,0.55) 0%, hsla(280,85%,60%,0.45) 35%, hsla(199,89%,60%,0.4) 65%, hsla(21,90%,53%,0.55) 100%)",
-                  backgroundSize: "200% 100%",
-                  animation: "marquee 14s linear infinite",
-                }}
-              />
-              <div className="absolute inset-0 bg-grid opacity-30" />
-              <div className="relative flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px]">
-                <span className="inline-flex items-center gap-1.5 font-medium">
-                  <Equalizer bars={4} className="h-3 text-amber-300" />
-                  <span>LIVE på DJConnect</span>
+            <div className="mt-6 grid w-full grid-cols-2 gap-y-5 sm:grid-cols-4">
+              <div className="flex items-center gap-2 text-left">
+                <Equalizer bars={4} className="h-5 shrink-0 text-accent" />
+                <span className="text-xs font-medium leading-tight text-foreground">
+                  LIVE på
+                  <br />
+                  DJConnect
                 </span>
-                <Separator orientation="vertical" className="hidden h-3 bg-white/30 sm:block" />
-                <span className="inline-flex items-center gap-1">
-                  <Award className="h-3.5 w-3.5 text-amber-300" /> 100+ events
+              </div>
+              <div className="flex items-center gap-2 text-left">
+                <MessageCircle className="h-5 w-5 shrink-0 text-foreground" />
+                <span className="text-xs font-medium leading-tight text-foreground">
+                  100+
+                  <br />
+                  events udført
                 </span>
-                <Separator orientation="vertical" className="hidden h-3 bg-white/30 sm:block" />
-                <span className="inline-flex items-center gap-1">
-                  <Clock className="h-3.5 w-3.5" /> Svarer &lt; 2 timer
+              </div>
+              <div className="flex items-center gap-2 text-left">
+                <Clock className="h-5 w-5 shrink-0 text-foreground" />
+                <span className="text-xs font-medium leading-tight text-foreground">
+                  Svarer inden
+                  <br />
+                  for 2 timer
                 </span>
-                <Separator orientation="vertical" className="hidden h-3 bg-white/30 sm:block" />
-                <span className="inline-flex items-center gap-1">
-                  <Disc3 className="h-3.5 w-3.5 animate-spin-slow" style={{ animationDuration: "8s" }} />
-                  10+ års erfaring
+              </div>
+              <div className="flex items-center gap-2 text-left">
+                <ShieldCheck className="h-5 w-5 shrink-0 text-foreground" />
+                <span className="text-xs font-medium leading-tight text-foreground">
+                  10+ års
+                  <br />
+                  erfaring
                 </span>
               </div>
             </div>
