@@ -285,29 +285,29 @@ export function CompactBookingProfileMockup() {
               Leveres på din lokation
             </div>
 
-            <div className="mt-6 grid w-full grid-cols-1 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-y-5">
-              <div className="flex items-center gap-2 text-left">
+            <div className="mt-6 grid w-full grid-cols-4 gap-2 sm:gap-3">
+              <div className="flex flex-col items-center gap-1.5 text-center">
                 <Equalizer bars={4} className="h-5 shrink-0 text-accent" />
-                <span className="whitespace-nowrap text-xs font-medium leading-tight text-foreground">
-                  LIVE på DJConnect
+                <span className="whitespace-nowrap text-[11px] font-medium leading-tight text-foreground sm:text-xs">
+                  LIVE
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-left">
+              <div className="flex flex-col items-center gap-1.5 text-center">
                 <MessageCircle className="h-5 w-5 shrink-0 text-foreground" />
-                <span className="whitespace-nowrap text-xs font-medium leading-tight text-foreground">
-                  100+ events udført
+                <span className="whitespace-nowrap text-[11px] font-medium leading-tight text-foreground sm:text-xs">
+                  100+ events
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-left">
+              <div className="flex flex-col items-center gap-1.5 text-center">
                 <Clock className="h-5 w-5 shrink-0 text-foreground" />
-                <span className="whitespace-nowrap text-xs font-medium leading-tight text-foreground">
-                  Svarer inden for 2 timer
+                <span className="whitespace-nowrap text-[11px] font-medium leading-tight text-foreground sm:text-xs">
+                  Svar &lt; 2t
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-left">
+              <div className="flex flex-col items-center gap-1.5 text-center">
                 <ShieldCheck className="h-5 w-5 shrink-0 text-foreground" />
-                <span className="whitespace-nowrap text-xs font-medium leading-tight text-foreground">
-                  10+ års erfaring
+                <span className="whitespace-nowrap text-[11px] font-medium leading-tight text-foreground sm:text-xs">
+                  10+ års erf.
                 </span>
               </div>
             </div>
