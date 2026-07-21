@@ -68,9 +68,9 @@ export function RoleSwitcher() {
   const current = ROLES.find((r) => r.role === role);
 
   return (
-    <div className="fixed bottom-4 left-4 z-[60] print:hidden">
+    <div className="fixed left-1/2 top-3 z-[60] flex -translate-x-1/2 flex-col-reverse items-center print:hidden sm:bottom-4 sm:left-4 sm:top-auto sm:translate-x-0 sm:flex-col sm:items-stretch">
       {open && (
-        <div className="mb-2 w-56 overflow-hidden rounded-2xl border border-border bg-background shadow-xl">
+        <div className="mt-2 w-56 overflow-hidden rounded-2xl border border-border bg-background shadow-xl sm:mb-2 sm:mt-0">
           <div className="border-b border-border bg-muted/40 px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Skift visning
           </div>
@@ -116,15 +116,16 @@ export function RoleSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2.5 text-sm font-medium shadow-lg transition hover:bg-muted"
+        aria-label="Vælg rolle"
+        className="flex h-9 w-9 items-center justify-center gap-2 rounded-full border border-border bg-background text-sm font-medium shadow-lg transition hover:bg-muted sm:h-auto sm:w-auto sm:px-4 sm:py-2.5"
       >
         {current ? (
           <current.Icon className={cn("h-4 w-4", current.accent)} />
         ) : (
           <Users className="h-4 w-4 text-muted-foreground" />
         )}
-        <span>{current ? current.label : "Vælg rolle"}</span>
-        <ChevronUp className={cn("h-4 w-4 text-muted-foreground transition", open && "rotate-180")} />
+        <span className="hidden sm:inline">{current ? current.label : "Vælg rolle"}</span>
+        <ChevronUp className={cn("hidden h-4 w-4 text-muted-foreground transition sm:inline", open && "rotate-180")} />
       </button>
     </div>
   );
