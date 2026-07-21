@@ -480,28 +480,31 @@ export function CompactBookingProfileMockup() {
       {/* Sticky booking bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-6">
         <div className="container">
-          <div className="mx-auto flex max-w-4xl items-center justify-between gap-4 rounded-2xl border border-border bg-background/95 px-6 py-4 shadow-lg backdrop-blur">
-            <div>
-              <p className="text-lg text-foreground">
-                <span className="font-bold">Fra 7.500 kr.</span>{" "}
-                <span className="text-sm text-muted-foreground">/ event</span>
-              </p>
-              <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <ShieldCheck className="h-3.5 w-3.5" />
-                Gratis afbestilling inden for vilkår
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
+          <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 rounded-2xl border border-border bg-background/95 px-4 py-3 shadow-lg backdrop-blur sm:px-6 sm:py-4">
+            <p className="shrink-0 text-base text-foreground sm:text-lg">
+              <span className="font-bold">Fra 7.500 kr.</span>{" "}
+              <span className="text-sm text-muted-foreground">/ event</span>
+            </p>
+            <div className="flex items-center gap-2 sm:gap-3">
               <Button
                 asChild
                 size="lg"
-                className="bg-accent px-8 text-accent-foreground hover:bg-accent/90"
+                variant="outline"
+                className="gap-2 px-3 sm:px-5"
+              >
+                <Link to="/besked/conv-guest-mockup">
+                  <MessageCircle className="h-4 w-4" />
+                  <span className="hidden sm:inline">Send besked</span>
+                  <span className="sm:hidden">Besked</span>
+                </Link>
+              </Button>
+              <Button
+                asChild
+                size="lg"
+                className="bg-accent px-5 text-accent-foreground hover:bg-accent/90 sm:px-8"
               >
                 <Link to="/book/flashback-mobildiskotek">Tjek dato</Link>
               </Button>
-              <span className="mt-1 text-xs text-muted-foreground">
-                Du betaler ikke endnu
-              </span>
             </div>
           </div>
         </div>
