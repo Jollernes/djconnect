@@ -285,37 +285,29 @@ export function CompactBookingProfileMockup() {
               Leveres på din lokation
             </div>
 
-            <div className="mt-6 grid w-full grid-cols-2 gap-y-5 sm:grid-cols-4">
+            <div className="mt-6 grid w-full grid-cols-1 gap-3 gap-y-4 sm:grid-cols-4 sm:gap-y-5">
               <div className="flex items-center gap-2 text-left">
                 <Equalizer bars={4} className="h-5 shrink-0 text-accent" />
-                <span className="text-xs font-medium leading-tight text-foreground">
-                  LIVE på
-                  <br />
-                  DJConnect
+                <span className="whitespace-nowrap text-xs font-medium leading-tight text-foreground">
+                  LIVE på DJConnect
                 </span>
               </div>
               <div className="flex items-center gap-2 text-left">
                 <MessageCircle className="h-5 w-5 shrink-0 text-foreground" />
-                <span className="text-xs font-medium leading-tight text-foreground">
-                  100+
-                  <br />
-                  events udført
+                <span className="whitespace-nowrap text-xs font-medium leading-tight text-foreground">
+                  100+ events udført
                 </span>
               </div>
               <div className="flex items-center gap-2 text-left">
                 <Clock className="h-5 w-5 shrink-0 text-foreground" />
-                <span className="text-xs font-medium leading-tight text-foreground">
-                  Svarer inden
-                  <br />
-                  for 2 timer
+                <span className="whitespace-nowrap text-xs font-medium leading-tight text-foreground">
+                  Svarer inden for 2 timer
                 </span>
               </div>
               <div className="flex items-center gap-2 text-left">
                 <ShieldCheck className="h-5 w-5 shrink-0 text-foreground" />
-                <span className="text-xs font-medium leading-tight text-foreground">
-                  10+ års
-                  <br />
-                  erfaring
+                <span className="whitespace-nowrap text-xs font-medium leading-tight text-foreground">
+                  10+ års erfaring
                 </span>
               </div>
             </div>
