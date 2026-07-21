@@ -480,7 +480,7 @@ export function CompactBookingProfileMockup() {
       {/* Sticky booking bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-6">
         <div className="container">
-          <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 rounded-2xl border border-border bg-background/95 px-4 py-3 shadow-lg backdrop-blur sm:px-6 sm:py-4">
+          <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-2xl border border-border bg-background/95 px-4 py-3 shadow-lg backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-4">
             <p className="shrink-0 text-base text-foreground sm:text-lg">
               <span className="font-bold">Fra 7.500 kr.</span>{" "}
               <span className="text-sm text-muted-foreground">/ event</span>
@@ -490,18 +490,17 @@ export function CompactBookingProfileMockup() {
                 asChild
                 size="lg"
                 variant="outline"
-                className="gap-2 px-3 sm:px-5"
+                className="flex-1 gap-2 sm:flex-none sm:px-5"
               >
                 <Link to="/besked/conv-guest-mockup">
                   <MessageCircle className="h-4 w-4" />
-                  <span className="hidden sm:inline">Send besked</span>
-                  <span className="sm:hidden">Besked</span>
+                  Send besked
                 </Link>
               </Button>
               <Button
                 asChild
                 size="lg"
-                className="bg-accent px-5 text-accent-foreground hover:bg-accent/90 sm:px-8"
+                className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 sm:flex-none sm:px-8"
               >
                 <Link to="/book/flashback-mobildiskotek">Tjek dato</Link>
               </Button>
