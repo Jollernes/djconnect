@@ -340,6 +340,46 @@ export function CompactBookingProfileMockup() {
 
             <hr className="my-8 border-border" />
 
+            <section>
+              <h2 className="text-xl font-bold text-foreground">
+                Min tilgang til jeres fest
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Jeg starter altid med en snak om jeres aften — stemning,
+                gæster og de sange, der betyder noget for jer. Ud fra det
+                bygger jeg et forløb, der passer til programmet: rolig
+                velkomst, energi under middagen og et dansegulv, der er fyldt
+                fra første til sidste nummer.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Jeg læser rummet løbende og justerer musikken efter, hvordan
+                gæsterne reagerer — så I kan slappe af og nyde festen, mens
+                jeg holder gang i den.
+              </p>
+            </section>
+
+            <hr className="my-8 border-border" />
+
+            <section>
+              <h2 className="text-xl font-bold text-foreground">
+                Om DJ Flashback
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Med over 10 års erfaring bag pulten har jeg spillet til alt
+                fra intime bryllupper til store firmafester. Jeg medbringer et
+                komplet, mobilt anlæg med professionelt lyd- og lysudstyr og
+                sørger for en diskret opsætning, så I ikke skal tænke på det
+                tekniske.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                Jeg er baseret i København og kører gerne i hele landet.
+                Fleksibel, verificeret og altid klar med en plan B — så jeres
+                fest er i trygge hænder hele vejen.
+              </p>
+            </section>
+
+            <hr className="my-8 border-border" />
+
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 fill-foreground text-foreground" />
               <h2 className="text-xl font-bold text-foreground">
