@@ -8,6 +8,7 @@ import {
   Speaker,
   Clock,
   MessageCircle,
+  Music,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -176,13 +177,13 @@ export function CompactBookingProfileMockup() {
 
   return (
     <div className="min-h-screen bg-background pb-32">
-      <div className="container py-8 lg:py-12">
+      <div className="container pb-8 pt-0 sm:pt-8 lg:pb-12 lg:pt-12">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
           {/* Left: hero + identity */}
           <div className="flex flex-col items-center text-center">
             <div className="relative w-full">
               <div
-                className="group relative overflow-hidden rounded-2xl shadow-sm"
+                className="group relative -mx-4 overflow-hidden rounded-none shadow-sm sm:mx-0 sm:rounded-2xl"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
               >
@@ -479,30 +480,37 @@ export function CompactBookingProfileMockup() {
 
       {/* Sticky booking bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 px-3 pb-4 sm:px-4 sm:pb-6">
-        <div className="mx-auto flex max-w-4xl items-center justify-between gap-2 rounded-2xl border border-border bg-background/95 px-3 py-2.5 shadow-lg backdrop-blur sm:gap-3 sm:px-6 sm:py-4">
-          <p className="shrink-0 leading-tight text-foreground">
-            <span className="text-base font-bold sm:text-lg">Fra 7.500 kr.</span>
-            <br />
-            <span className="text-xs text-muted-foreground">/ event</span>
-          </p>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Button
-              asChild
-              variant="outline"
-              className="gap-1.5 px-2.5 text-sm sm:px-5 sm:text-base"
-            >
-              <Link to="/besked/conv-guest-mockup">
-                <MessageCircle className="h-4 w-4" />
-                Send besked
-              </Link>
-            </Button>
-            <Button
-              asChild
-              className="bg-accent px-3 text-sm text-accent-foreground hover:bg-accent/90 sm:px-8 sm:text-base"
-            >
-              <Link to="/book/flashback-mobildiskotek">Tjek dato</Link>
-            </Button>
+        <div className="mx-auto flex max-w-4xl items-center gap-2 rounded-2xl border border-border bg-background/95 p-2 pl-3 shadow-lg backdrop-blur sm:gap-3 sm:p-3 sm:pl-5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/10">
+            <Music className="h-5 w-5 text-accent" />
           </div>
+          <div className="min-w-0 flex-1 leading-tight">
+            <p className="truncate text-[11px] font-medium text-muted-foreground">
+              Festpakke
+            </p>
+            <p className="text-sm font-bold text-foreground sm:text-base">
+              Fra 7.500 kr.
+            </p>
+            <p className="truncate text-[11px] text-muted-foreground">
+              5 timer · lyd og lys
+            </p>
+          </div>
+          <Button
+            asChild
+            variant="ghost"
+            className="shrink-0 gap-1.5 px-2 text-sm text-foreground hover:bg-muted sm:px-3"
+          >
+            <Link to="/besked/conv-guest-mockup">
+              <MessageCircle className="h-4 w-4" />
+              Spørg DJ'en
+            </Link>
+          </Button>
+          <Button
+            asChild
+            className="shrink-0 rounded-xl bg-accent px-4 text-sm text-accent-foreground hover:bg-accent/90 sm:px-8 sm:text-base"
+          >
+            <Link to="/book/flashback-mobildiskotek">Tjek dato</Link>
+          </Button>
         </div>
       </div>
     </div>
