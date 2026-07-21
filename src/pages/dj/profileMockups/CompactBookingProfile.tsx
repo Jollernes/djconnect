@@ -22,13 +22,13 @@ import { useDocumentHead } from "@/hooks/useDocumentHead";
  */
 
 const heroImages = [
+  "/dj-photos/mockup-hero-disco.png",
   "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600",
   "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1600",
   "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1600",
   "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=1600",
 ];
-const AVATAR_IMAGE =
-  "https://images.unsplash.com/photo-1516280440614-37939bbacd81?q=80&w=800";
+const AVATAR_IMAGE = "/dj-photos/mockup-avatar-dj.png";
 
 const galleryCategories = [
   {
