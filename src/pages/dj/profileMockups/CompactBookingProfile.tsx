@@ -3,15 +3,18 @@ import { Link } from "react-router-dom";
 import {
   Star,
   MapPin,
-  Share2,
   Heart,
   ShieldCheck,
   Speaker,
   Clock,
+  Award,
+  Disc3,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Equalizer } from "@/components/common/Equalizer";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 
 /**
@@ -283,21 +286,36 @@ export function CompactBookingProfileMockup() {
               Leveres på din lokation
             </div>
 
-            <div className="mt-5 flex items-center gap-3">
-              <button
-                type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted"
-                aria-label="Del profil"
-              >
-                <Share2 className="h-4 w-4" />
-              </button>
-              <button
-                type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted"
-                aria-label="Gem DJ"
-              >
-                <Heart className="h-4 w-4" />
-              </button>
+            <div className="relative mt-5 w-full overflow-hidden rounded-xl border bg-[hsl(222_47%_10%)] px-3 py-2 text-white">
+              <div
+                className="absolute inset-0 opacity-80"
+                style={{
+                  background:
+                    "linear-gradient(90deg, hsla(21,90%,53%,0.55) 0%, hsla(280,85%,60%,0.45) 35%, hsla(199,89%,60%,0.4) 65%, hsla(21,90%,53%,0.55) 100%)",
+                  backgroundSize: "200% 100%",
+                  animation: "marquee 14s linear infinite",
+                }}
+              />
+              <div className="absolute inset-0 bg-grid opacity-30" />
+              <div className="relative flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[11px]">
+                <span className="inline-flex items-center gap-1.5 font-medium">
+                  <Equalizer bars={4} className="h-3 text-amber-300" />
+                  <span>LIVE på DJConnect</span>
+                </span>
+                <Separator orientation="vertical" className="hidden h-3 bg-white/30 sm:block" />
+                <span className="inline-flex items-center gap-1">
+                  <Award className="h-3.5 w-3.5 text-amber-300" /> 100+ events
+                </span>
+                <Separator orientation="vertical" className="hidden h-3 bg-white/30 sm:block" />
+                <span className="inline-flex items-center gap-1">
+                  <Clock className="h-3.5 w-3.5" /> Svarer &lt; 2 timer
+                </span>
+                <Separator orientation="vertical" className="hidden h-3 bg-white/30 sm:block" />
+                <span className="inline-flex items-center gap-1">
+                  <Disc3 className="h-3.5 w-3.5 animate-spin-slow" style={{ animationDuration: "8s" }} />
+                  10+ års erfaring
+                </span>
+              </div>
             </div>
           </div>
 
