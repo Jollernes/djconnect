@@ -347,7 +347,7 @@ export function CompactBookingProfileMockup() {
             </div>
 
             <p className="mt-4 text-sm text-muted-foreground">
-              Du kan sende en forespørgsel for at tilpasse eller ændre pakken.
+              Klik på pakkerne for at tilpasse til dit event
             </p>
 
             <hr className="my-8 border-border" />
