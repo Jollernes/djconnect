@@ -257,7 +257,7 @@ function DesktopHeroV2({
   setRegion: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
-  const [mode, setMode] = useState<"offers" | "browse">("offers");
+  const [mode, setMode] = useState<"offers" | "browse">("browse");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -352,8 +352,8 @@ function DesktopHeroV2({
           {/* Mode tabs — full-width segmented row across the top of the card */}
           <div className="flex border-b border-border/60">
             {([
-              { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
               { id: "browse", label: "Browse DJs", Icon: Users },
+              { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
             ] as const).map(({ id, label, Icon }) => {
               const active = mode === id;
               return (
@@ -447,7 +447,7 @@ function MobileHeroV2({
   setRegion: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
-  const [mode, setMode] = useState<"offers" | "browse">("offers");
+  const [mode, setMode] = useState<"offers" | "browse">("browse");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -539,8 +539,8 @@ function MobileHeroV2({
           {/* Mode tabs */}
           <div className="flex border-b border-border/60">
             {([
-              { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
               { id: "browse", label: "Browse DJs", Icon: Users },
+              { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
             ] as const).map(({ id, label, Icon }) => {
               const active = mode === id;
               return (
