@@ -31,6 +31,12 @@ import {
   type Capacity,
   type Setup,
 } from "@/lib/djSetups";
+import {
+  EVENT_PACKAGE_FIELDS,
+  loadEventPackages,
+  saveEventPackages,
+  type EventPackage,
+} from "@/lib/djEventPackages";
 
 /* -------------------------------------------------------------------- */
 /* Tilkøb (add-ons)                                                      */
@@ -92,6 +98,13 @@ export function DJPricingEquipmentPage() {
   );
   const [editing, setEditing] = useState<Setup | null>(null);
 
+  const [eventPackages, setEventPackages] = useState<EventPackage[]>(() =>
+    loadEventPackages(),
+  );
+  const [editingPackage, setEditingPackage] = useState<EventPackage | null>(
+    null,
+  );
+
   const [addons, setAddons] = useState<Record<string, string>>(() =>
     Object.fromEntries(ADDON_OPTIONS.map((a) => [a, ""])),
   );
@@ -99,6 +112,18 @@ export function DJPricingEquipmentPage() {
   useEffect(() => {
     saveSetups(setups);
   }, [setups]);
+
+  useEffect(() => {
+    saveEventPackages(eventPackages);
+  }, [eventPackages]);
+
+  function saveEditingPackage() {
+    if (!editingPackage) return;
+    setEventPackages((prev) =>
+      prev.map((p) => (p.key === editingPackage.key ? editingPackage : p)),
+    );
+    setEditingPackage(null);
+  }
 
   function openEdit(setup: Setup) {
     setEditing({ ...setup });
@@ -202,6 +227,28 @@ export function DJPricingEquipmentPage() {
         kunden.
       </p>
 
+      {/* Event Pakker */}
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-sm font-semibold text-foreground">
+            Event Pakker
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Fortæl kunderne hvordan du gør deres event til noget særligt —
+            skræddersyet til hver type fest.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {eventPackages.map((pkg) => (
+            <EventPackageCard
+              key={pkg.key}
+              pkg={pkg}
+              onEdit={() => setEditingPackage({ ...pkg })}
+            />
+          ))}
+        </div>
+      </section>
+
       {/* Tilkøb */}
       <section className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
         <div className="flex items-center gap-3">
@@ -232,6 +279,120 @@ export function DJPricingEquipmentPage() {
           onSave={saveEditing}
         />
       )}
+
+      {editingPackage && (
+        <EventPackageEditor
+          pkg={editingPackage}
+          onChange={setEditingPackage}
+          onClose={() => setEditingPackage(null)}
+          onSave={saveEditingPackage}
+        />
+      )}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------- */
+/* Event package card + editor                                           */
+/* -------------------------------------------------------------------- */
+
+function EventPackageCard({
+  pkg,
+  onEdit,
+}: {
+  pkg: EventPackage;
+  onEdit: () => void;
+}) {
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-sm transition-all hover:shadow-md">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold text-foreground">{pkg.title}</p>
+        <button
+          type="button"
+          onClick={onEdit}
+          className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <Pencil className="h-3.5 w-3.5" /> Rediger
+        </button>
+      </div>
+      <div className="space-y-3">
+        {EVENT_PACKAGE_FIELDS.map(({ key, label }) => (
+          <div key={key}>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-accent">
+              {label}
+            </p>
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              {pkg[key].trim() || (
+                <span className="italic">Ikke udfyldt endnu</span>
+              )}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EventPackageEditor({
+  pkg,
+  onChange,
+  onClose,
+  onSave,
+}: {
+  pkg: EventPackage;
+  onChange: (next: EventPackage) => void;
+  onClose: () => void;
+  onSave: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end">
+      <button
+        type="button"
+        aria-label="Luk"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/40"
+      />
+      <div className="relative flex h-full w-full max-w-md flex-col bg-background shadow-2xl">
+        <div className="flex items-center justify-between border-b px-4 py-3">
+          <div>
+            <p className="text-sm font-semibold">Rediger — {pkg.title}</p>
+            <p className="text-xs text-muted-foreground">
+              Skræddersy teksterne til denne type event.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            aria-label="Luk"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
+          {EVENT_PACKAGE_FIELDS.map(({ key, label }) => (
+            <div key={key} className="space-y-1.5">
+              <Label className="text-sm font-medium">{label}</Label>
+              <Textarea
+                value={pkg[key]}
+                onChange={(e) => onChange({ ...pkg, [key]: e.target.value })}
+                rows={3}
+                placeholder={`Beskriv "${label.toLowerCase()}" for ${pkg.title.toLowerCase()}.`}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-end gap-2 border-t px-4 py-3">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Annuller
+          </Button>
+          <Button type="button" onClick={onSave} className="gap-1.5">
+            <Check className="h-4 w-4" /> Gem pakke
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }
