@@ -1,24 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Plus,
   Check,
   Users,
   Pencil,
   Copy,
-  Trash2,
   X,
   ChevronRight,
-  ChevronUp,
-  ChevronDown,
   ImageOff,
   Sparkles,
   Info,
-  Heart,
-  Briefcase,
-  PartyPopper,
-  Globe2,
   Wallet,
-  type LucideIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -31,56 +23,14 @@ import { useDJStandardSettings } from "@/hooks/useDJStandardSettings";
 import { snapTo50 } from "@/lib/djStandardSettings";
 import {
   CAPACITY_OPTIONS,
-  EVENT_TAGS,
   OPTIONAL_INCLUSIONS,
   emptySetup,
   fixedTags,
   loadSetups,
   saveSetups,
-  type EventTag,
+  type Capacity,
   type Setup,
 } from "@/lib/djSetups";
-
-/* -------------------------------------------------------------------- */
-/* Event metadata (icons + colours per event group)                      */
-/* -------------------------------------------------------------------- */
-
-type EventMeta = {
-  icon: LucideIcon;
-  /** Header accent classes. */
-  header: string;
-  /** Small count-pill classes. */
-  pill: string;
-  /** Where these setups are shown — shown next to the section header. */
-  profileNote: string;
-};
-
-const EVENT_META: Record<EventTag, EventMeta> = {
-  "Alle events": {
-    icon: Globe2,
-    header: "text-foreground",
-    pill: "bg-muted text-muted-foreground",
-    profileNote: "vises på din generelle profil",
-  },
-  Bryllup: {
-    icon: Heart,
-    header: "text-rose-600",
-    pill: "bg-rose-100 text-rose-700",
-    profileNote: "vises på din bryllupsprofil",
-  },
-  Firmafest: {
-    icon: Briefcase,
-    header: "text-sky-600",
-    pill: "bg-sky-100 text-sky-700",
-    profileNote: "vises på din firmaprofil",
-  },
-  Ungdomsfest: {
-    icon: PartyPopper,
-    header: "text-amber-600",
-    pill: "bg-amber-100 text-amber-700",
-    profileNote: "vises på din ungdomsprofil",
-  },
-};
 
 /* -------------------------------------------------------------------- */
 /* Tilkøb (add-ons)                                                      */
@@ -99,11 +49,24 @@ const ADDON_OPTIONS = [
 /* Helpers                                                               */
 /* -------------------------------------------------------------------- */
 
-/** Per-category card title, e.g. "Opsætning 1" or "Bryllup – Opsætning 1". */
-function setupTitle(tag: EventTag, number: number): string {
-  return tag === "Alle events"
-    ? `Opsætning ${number}`
-    : `${tag} – Opsætning ${number}`;
+/** Fixed set of size-based setups, in display order. */
+const CAPACITY_VALUES: Capacity[] = ["80", "150", "200"];
+
+function capacityLabel(capacity: Capacity): string {
+  return CAPACITY_OPTIONS.find((o) => o.value === capacity)?.label ??
+    `Op til ${capacity} gæster`;
+}
+
+/**
+ * Reconcile the persisted list into exactly one setup per capacity
+ * (80 / 150 / 200), in order. Missing sizes are seeded as empty setups.
+ */
+function reconcileByCapacity(list: Setup[], hourlyRate: string): Setup[] {
+  return CAPACITY_VALUES.map((cap) => {
+    const found = list.find((s) => s.capacity === cap);
+    if (found) return { ...found, capacity: cap, eventTag: "Alle events" };
+    return { ...emptySetup(hourlyRate, "Alle events"), capacity: cap };
+  });
 }
 
 const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
@@ -113,32 +76,21 @@ const fmt = (n: number) => `${n.toLocaleString("da-DK")} kr`;
 /* -------------------------------------------------------------------- */
 
 /**
- * Priser & Udstyr — a single, event-tagged list of mobildiskotek setups.
+ * Priser & Udstyr — three fixed, size-based mobildiskotek setups.
  *
- *  1. ONE unified list (no separate wedding section). Each setup carries an
- *     event tag (Alle events / Bryllup / …). A wedding variant is just a
- *     duplicate tagged "Bryllup".
- *  2. Overview-first: setups are shown as clean cards grouped by event.
- *  3. Editing happens in a focused side panel (one setup at a time), split
- *     into clear steps (Events → Størrelse → Indhold → Pris → Foto).
+ *  1. Exactly three setups, one per guest capacity: op til 80, 150 and 200.
+ *  2. Overview-first: the three sizes are shown as clean cards.
+ *  3. A setup's content can be copied from one size to another.
+ *  4. Editing happens in a focused side panel (one setup at a time).
  */
 export function DJPricingEquipmentPage() {
   const { settings } = useDJStandardSettings();
   const standardRate = settings.hourlyRate;
 
-  const [setups, setSetups] = useState<Setup[]>(() => loadSetups());
+  const [setups, setSetups] = useState<Setup[]>(() =>
+    reconcileByCapacity(loadSetups(), ""),
+  );
   const [editing, setEditing] = useState<Setup | null>(null);
-  const [isNew, setIsNew] = useState(false);
-
-  /**
-   * Per-category collapse state — only affects mobile (on desktop sections are
-   * always shown). Default folded, so a DJ sees a clean overview on entry.
-   */
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
-  const isCollapsed = (tag: EventTag) => collapsed[tag] ?? true;
-  function toggleCollapsed(tag: EventTag) {
-    setCollapsed((prev) => ({ ...prev, [tag]: !(prev[tag] ?? true) }));
-  }
 
   const [addons, setAddons] = useState<Record<string, string>>(() =>
     Object.fromEntries(ADDON_OPTIONS.map((a) => [a, ""])),
@@ -148,69 +100,33 @@ export function DJPricingEquipmentPage() {
     saveSetups(setups);
   }, [setups]);
 
-  function openNewFor(tag: EventTag) {
-    setEditing(emptySetup(standardRate, tag));
-    setIsNew(true);
-  }
-
   function openEdit(setup: Setup) {
     setEditing({ ...setup });
-    setIsNew(false);
   }
 
-  function duplicateToWedding(setup: Setup) {
-    setSetups((prev) => [
-      ...prev,
-      {
-        ...setup,
-        id: `dup-${Math.random().toString(36).slice(2, 9)}`,
-        eventTag: "Bryllup",
-        photo: undefined,
-      },
-    ]);
-  }
-
-  function removeSetup(id: string) {
-    setSetups((prev) => prev.filter((s) => s.id !== id));
-  }
-
-  /** Swap a setup with its neighbour of the same event tag — changes its number. */
-  function moveSetup(id: string, dir: "up" | "down") {
-    setSetups((prev) => {
-      const arr = [...prev];
-      const idx = arr.findIndex((s) => s.id === id);
-      if (idx === -1) return prev;
-      const tag = arr[idx].eventTag;
-      let target = -1;
-      if (dir === "up") {
-        for (let i = idx - 1; i >= 0; i--) {
-          if (arr[i].eventTag === tag) {
-            target = i;
-            break;
-          }
-        }
-      } else {
-        for (let i = idx + 1; i < arr.length; i++) {
-          if (arr[i].eventTag === tag) {
-            target = i;
-            break;
-          }
-        }
-      }
-      if (target === -1) return prev;
-      [arr[idx], arr[target]] = [arr[target], arr[idx]];
-      return arr;
-    });
+  /** Copy the content of one size setup into another (keeps the target size). */
+  function copyTo(from: Setup, targetCapacity: Capacity) {
+    setSetups((prev) =>
+      prev.map((s) =>
+        s.capacity === targetCapacity
+          ? {
+              ...s,
+              description: from.description,
+              price: from.price,
+              hourlyRate: from.hourlyRate,
+              extras: [...from.extras],
+              photo: from.photo,
+            }
+          : s,
+      ),
+    );
   }
 
   function saveEditing() {
     if (!editing) return;
-    setSetups((prev) => {
-      const exists = prev.some((s) => s.id === editing.id);
-      return exists
-        ? prev.map((s) => (s.id === editing.id ? editing : s))
-        : [...prev, editing];
-    });
+    setSetups((prev) =>
+      prev.map((s) => (s.capacity === editing.capacity ? editing : s)),
+    );
     setEditing(null);
   }
 
@@ -220,9 +136,8 @@ export function DJPricingEquipmentPage() {
         <div className="min-w-0">
           <h1 className="text-2xl font-semibold">Priser & Udstyr</h1>
           <p className="text-sm text-muted-foreground">
-            Dine mobildiskotek-opsætninger samlet ét sted. Tilføj en
-            event-version (fx bryllup) med ét klik. Din timepris og rejseradius
-            styres under{" "}
+            Tre faste opsætninger efter eventstørrelse — op til 80, 150 og 200
+            gæster. Din timepris og rejseradius styres under{" "}
             <Link
               to="/dj/settings"
               className="font-medium text-foreground underline underline-offset-2"
@@ -254,99 +169,32 @@ export function DJPricingEquipmentPage() {
         <Sparkles className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
         <p>
           <span className="font-medium text-foreground">Sådan virker det:</span>{" "}
-          Opret én opsætning ad gangen i et fokuseret panel. Vil du have en
-          bryllups-version, så tryk{" "}
-          <span className="font-medium text-foreground">
-            Dupliker til bryllup
-          </span>{" "}
-          på et kort og tilpas tekst, pris og billede.
+          Udfyld hver størrelse for sig. Har to størrelser samme indhold, så
+          tryk{" "}
+          <span className="font-medium text-foreground">Kopiér til</span> på et
+          kort for at overføre indhold, pris og billede til en anden størrelse.
         </p>
       </div>
 
-      {/* Overview — grouped by event so event-specific setups stand out */}
-      <div className="space-y-7">
-        {EVENT_TAGS.filter(
-          (tag) =>
-            tag === "Alle events" ||
-            tag === "Bryllup" ||
-            setups.some((s) => s.eventTag === tag),
-        ).map((tag) => {
-          const meta = EVENT_META[tag];
-          const HeaderIcon = meta.icon;
-          const group = setups.filter((s) => s.eventTag === tag);
-          const addSlots = Math.max(0, 3 - group.length);
-          const folded = isCollapsed(tag);
-          return (
-            <section key={tag} className="space-y-3">
-              <button
-                type="button"
-                onClick={() => toggleCollapsed(tag)}
-                aria-expanded={!folded}
-                className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-md text-left lg:pointer-events-none lg:cursor-default"
-              >
-                <HeaderIcon className={cn("h-4 w-4", meta.header)} />
-                <h2 className={cn("text-sm font-semibold", meta.header)}>
-                  {tag === "Alle events" ? "Generelle opsætninger" : tag}
-                </h2>
-                <span
-                  className={cn(
-                    "rounded-full px-1.5 py-0.5 text-[10px] font-semibold",
-                    meta.pill,
-                  )}
-                >
-                  {group.length}
-                </span>
-                <span className="text-[11px] text-muted-foreground">
-                  · {meta.profileNote}
-                </span>
-                <ChevronDown
-                  className={cn(
-                    "ml-auto h-4 w-4 text-muted-foreground transition-transform lg:hidden",
-                    folded ? "" : "rotate-180",
-                  )}
-                />
-              </button>
-              <div className={cn("space-y-3", folded ? "hidden lg:block" : "")}>
-                {tag !== "Alle events" && (
-                  <p className="flex items-start gap-1.5 rounded-lg border border-dashed bg-muted/20 px-2.5 py-1.5 text-[11px] text-muted-foreground">
-                    <Info className="mt-0.5 h-3 w-3 shrink-0" />
-                    Dine generelle opsætninger vises ikke automatisk her — de
-                    vises kun, hvis du duplikerer dem hertil eller opretter nye
-                    opsætninger til {tag.toLowerCase()}.
-                  </p>
-                )}
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {group.map((setup, gi) => (
-                    <SetupCard
-                      key={setup.id}
-                      setup={setup}
-                      number={gi + 1}
-                      canMoveUp={gi > 0}
-                      canMoveDown={gi < group.length - 1}
-                      onMoveUp={() => moveSetup(setup.id, "up")}
-                      onMoveDown={() => moveSetup(setup.id, "down")}
-                      onEdit={() => openEdit(setup)}
-                      onDuplicate={() => duplicateToWedding(setup)}
-                      onRemove={() => removeSetup(setup.id)}
-                    />
-                  ))}
-                  {Array.from({ length: addSlots }).map((_, i) => (
-                    <AddSlot
-                      key={`add-${tag}-${i}`}
-                      label={
-                        tag === "Alle events"
-                          ? "Tilføj opsætning"
-                          : `Tilføj ${tag.toLowerCase()}-opsætning`
-                      }
-                      onClick={() => openNewFor(tag)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </section>
-          );
-        })}
-      </div>
+      {/* Overview — three fixed setups by guest capacity */}
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold text-foreground">
+          Opsætninger efter antal gæster
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {setups.map((setup) => (
+            <SetupCard
+              key={setup.capacity}
+              setup={setup}
+              onEdit={() => openEdit(setup)}
+              copyTargets={CAPACITY_VALUES.filter(
+                (c) => c !== setup.capacity,
+              )}
+              onCopyTo={(target) => copyTo(setup, target)}
+            />
+          ))}
+        </div>
+      </section>
 
       <p className="flex items-start gap-1.5 text-xs text-muted-foreground">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-accent" />
@@ -379,7 +227,6 @@ export function DJPricingEquipmentPage() {
       {editing && (
         <EditorPanel
           setup={editing}
-          isNew={isNew}
           onChange={setEditing}
           onClose={() => setEditing(null)}
           onSave={saveEditing}
@@ -390,53 +237,36 @@ export function DJPricingEquipmentPage() {
 }
 
 /* -------------------------------------------------------------------- */
-/* Add slot (empty "+" card)                                             */
-/* -------------------------------------------------------------------- */
-
-function AddSlot({ label, onClick }: { label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex min-h-[280px] flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/10 p-4 text-sm font-medium text-muted-foreground transition-colors hover:border-accent/50 hover:bg-accent/5 hover:text-foreground"
-    >
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
-        <Plus className="h-5 w-5" />
-      </span>
-      {label}
-    </button>
-  );
-}
-
-/* -------------------------------------------------------------------- */
 /* Setup card (overview)                                                 */
 /* -------------------------------------------------------------------- */
 
 function SetupCard({
   setup,
-  number,
-  canMoveUp,
-  canMoveDown,
-  onMoveUp,
-  onMoveDown,
   onEdit,
-  onDuplicate,
-  onRemove,
+  copyTargets,
+  onCopyTo,
 }: {
   setup: Setup;
-  number: number;
-  canMoveUp: boolean;
-  canMoveDown: boolean;
-  onMoveUp: () => void;
-  onMoveDown: () => void;
   onEdit: () => void;
-  onDuplicate: () => void;
-  onRemove: () => void;
+  copyTargets: Capacity[];
+  onCopyTo: (target: Capacity) => void;
 }) {
   const pkg = Number(setup.price) || 0;
   const rate = Number(setup.hourlyRate) || 0;
   const total = pkg + rate * 5;
-  const isWedding = setup.eventTag === "Bryllup";
+  const [copyOpen, setCopyOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!copyOpen) return;
+    function onDocClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setCopyOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [copyOpen]);
 
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm transition-all hover:shadow-md">
@@ -456,44 +286,10 @@ function SetupCard({
         <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm backdrop-blur">
           <Users className="h-3.5 w-3.5 text-accent" /> Op til {setup.capacity}
         </span>
-        <span
-          className={cn(
-            "absolute right-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm",
-            isWedding
-              ? "bg-rose-500 text-white"
-              : "bg-white/90 text-foreground backdrop-blur",
-          )}
-        >
-          {setup.eventTag}
-        </span>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 p-3">
-        <div className="flex items-center justify-between gap-1">
-          <p className="text-sm font-semibold">
-            {setupTitle(setup.eventTag, number)}
-          </p>
-          <div className="flex items-center">
-            <button
-              type="button"
-              onClick={onMoveUp}
-              disabled={!canMoveUp}
-              aria-label="Flyt op (lavere nummer)"
-              className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
-            >
-              <ChevronUp className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              onClick={onMoveDown}
-              disabled={!canMoveDown}
-              aria-label="Flyt ned (højere nummer)"
-              className="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent"
-            >
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
+        <p className="text-sm font-semibold">{capacityLabel(setup.capacity)}</p>
         {setup.description.trim() && (
           <p className="line-clamp-2 text-xs text-muted-foreground">
             {setup.description}
@@ -523,23 +319,33 @@ function SetupCard({
           >
             <Pencil className="h-3.5 w-3.5" /> Rediger
           </button>
-          {!isWedding && (
+          <div className="relative ml-auto" ref={menuRef}>
             <button
               type="button"
-              onClick={onDuplicate}
-              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-50"
+              onClick={() => setCopyOpen((v) => !v)}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-accent transition-colors hover:bg-accent/10"
             >
-              <Copy className="h-3.5 w-3.5" /> Dupliker til bryllup
+              <Copy className="h-3.5 w-3.5" /> Kopiér til
             </button>
-          )}
-          <button
-            type="button"
-            onClick={onRemove}
-            className="ml-auto inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground transition-colors hover:text-destructive"
-            aria-label="Fjern"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+            {copyOpen && (
+              <div className="absolute bottom-full right-0 z-20 mb-1 w-44 overflow-hidden rounded-lg border bg-background shadow-lg">
+                {copyTargets.map((target) => (
+                  <button
+                    key={target}
+                    type="button"
+                    onClick={() => {
+                      onCopyTo(target);
+                      setCopyOpen(false);
+                    }}
+                    className="flex w-full items-center gap-1.5 px-3 py-2 text-left text-xs text-foreground transition-colors hover:bg-muted"
+                  >
+                    <Users className="h-3.5 w-3.5 text-accent" />
+                    {capacityLabel(target)}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -552,13 +358,11 @@ function SetupCard({
 
 function EditorPanel({
   setup,
-  isNew,
   onChange,
   onClose,
   onSave,
 }: {
   setup: Setup;
-  isNew: boolean;
   onChange: (next: Setup) => void;
   onClose: () => void;
   onSave: () => void;
@@ -589,7 +393,7 @@ function EditorPanel({
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div>
             <p className="text-sm font-semibold">
-              {isNew ? "Ny opsætning" : "Rediger opsætning"}
+              Rediger — {capacityLabel(setup.capacity)}
             </p>
             <p className="text-xs text-muted-foreground">
               Udfyld trin for trin — du ser et live-kort nederst.
@@ -607,55 +411,16 @@ function EditorPanel({
 
         {/* Body */}
         <div className="flex-1 space-y-5 overflow-y-auto px-4 py-4">
-          {/* Event target */}
-          <Field step="1" label="Hvilke events passer den til?">
-            <div className="flex flex-wrap gap-1.5">
-              {EVENT_TAGS.map((tag) => {
-                const active = setup.eventTag === tag;
-                return (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => update("eventTag", tag)}
-                    className={cn(
-                      "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                      active
-                        ? tag === "Bryllup"
-                          ? "border-rose-400 bg-rose-50 text-rose-700"
-                          : "border-accent bg-accent/10 text-foreground"
-                        : "border-border text-muted-foreground hover:border-foreground/30",
-                    )}
-                  >
-                    {tag}
-                  </button>
-                );
-              })}
-            </div>
-          </Field>
-
-          {/* Capacity */}
-          <Field step="2" label="Størrelse — egnet til">
-            <div className="grid grid-cols-3 gap-2">
-              {CAPACITY_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => update("capacity", opt.value)}
-                  className={cn(
-                    "rounded-lg border px-2 py-2 text-xs font-medium transition-colors",
-                    setup.capacity === opt.value
-                      ? "border-accent bg-accent/10 text-foreground"
-                      : "border-border text-muted-foreground hover:border-foreground/30",
-                  )}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </Field>
+          {/* Capacity (fixed for this card) */}
+          <div className="flex items-center gap-2 rounded-lg border bg-muted/20 px-3 py-2.5">
+            <Users className="h-4 w-4 shrink-0 text-accent" />
+            <p className="text-sm font-medium text-foreground">
+              {capacityLabel(setup.capacity)}
+            </p>
+          </div>
 
           {/* Content */}
-          <Field step="3" label="Indhold">
+          <Field step="1" label="Indhold">
             <div className="space-y-1.5 rounded-lg border border-border/70 bg-muted/20 p-3">
               <p className="text-[11px] font-medium text-foreground">
                 Altid inkluderet:
@@ -706,7 +471,7 @@ function EditorPanel({
           </Field>
 
           {/* Price */}
-          <Field step="4" label="Pris">
+          <Field step="2" label="Pris">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">
@@ -749,7 +514,7 @@ function EditorPanel({
           </Field>
 
           {/* Photo */}
-          <Field step="5" label="Foto af opsætningen">
+          <Field step="3" label="Foto af opsætningen">
             <div className="w-40">
               <DottedUploadSlot
                 value={setup.photo}
@@ -761,12 +526,6 @@ function EditorPanel({
             <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
               Valgfrit, men stærkt anbefalet
             </p>
-            {setup.eventTag === "Bryllup" && (
-              <p className="flex items-start gap-1.5 text-[11px] text-rose-600">
-                <Copy className="mt-0.5 h-3 w-3 shrink-0" />
-                Tip: vælg et billede der viser en bryllupskontekst.
-              </p>
-            )}
           </Field>
 
           {/* Live preview */}
@@ -864,7 +623,6 @@ function MiniPreview({ setup }: { setup: Setup }) {
   const pkg = Number(setup.price) || 0;
   const rate = Number(setup.hourlyRate) || 0;
   const total = pkg + rate * 5;
-  const isWedding = setup.eventTag === "Bryllup";
   const inclusions = [...fixedTags(setup.capacity), ...setup.extras];
 
   return (
@@ -880,16 +638,6 @@ function MiniPreview({ setup }: { setup: Setup }) {
         )}
         <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-foreground shadow-sm backdrop-blur">
           <Users className="h-3.5 w-3.5 text-accent" /> Op til {setup.capacity}
-        </span>
-        <span
-          className={cn(
-            "absolute right-2 top-2 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm",
-            isWedding
-              ? "bg-rose-500 text-white"
-              : "bg-white/90 text-foreground backdrop-blur",
-          )}
-        >
-          {setup.eventTag}
         </span>
       </div>
       <div className="space-y-2 p-3">
