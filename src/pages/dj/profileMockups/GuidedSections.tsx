@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Camera, ChevronDown, Eye, EyeOff, Handshake, Sparkles,
-  Speaker, Check, AlertCircle, Circle, ExternalLink, Crop, X,
+  Check, AlertCircle, Circle, ExternalLink, Crop, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -33,7 +33,6 @@ const SECTIONS: SectionDef[] = [
   { id: "visuals", label: "Billeder & video", scope: "sub-profile", icon: Camera },
   { id: "voice", label: "Om mig", scope: "sub-profile", icon: Sparkles },
   { id: "sound", label: "Din tilgang til et event", scope: "sub-profile", icon: Handshake },
-  { id: "equipment", label: "Mobildiskotek & udstyr", scope: "shared", icon: Speaker },
 ];
 
 /**
@@ -82,7 +81,6 @@ export function GuidedSectionsMockup() {
       return "empty";
     }
     if (id === "sound") return sub.approach ? "complete" : "empty";
-    if (id === "equipment") return state.equipment ? "complete" : "empty";
     return "empty";
   }
 
@@ -353,22 +351,6 @@ function SectionBody({
             onChange={(e) => state.updateSubProfile(activeKey, "approach", e.target.value)}
             rows={4}
             placeholder="Beskriv din tilgang til et event og hvordan du er i kontakt med kunderne — fx hvordan du planlægger sammen med kunden, kommunikerer op til dagen og aflæser stemningen undervejs."
-          />
-        </div>
-      );
-
-    case "equipment":
-      return (
-        <div className="space-y-1.5">
-          <p className="rounded-lg border border-dashed bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-            Disse oplysninger deles på alle dine sub-profiler — du har kun ét mobildiskotek.
-          </p>
-          <Label className="text-xs font-medium text-muted-foreground">Udstyrsbeskrivelse</Label>
-          <Textarea
-            value={state.equipment}
-            onChange={(e) => state.setEquipment(e.target.value)}
-            rows={4}
-            placeholder="Beskriv dit setup — højtalere, lys, mikrofoner, backup …"
           />
         </div>
       );
