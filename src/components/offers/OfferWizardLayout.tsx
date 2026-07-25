@@ -20,7 +20,7 @@ export function OfferWizardLayout({
   children,
   onBack,
   onNext,
-  nextLabel = "Continue",
+  nextLabel = "Fortsæt",
   nextDisabled = false,
   hideBack = false,
   hideNext = false,
@@ -54,7 +54,7 @@ export function OfferWizardLayout({
           {showProgress && (
             <div className="flex flex-1 items-center justify-center gap-3">
               <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
-                Step {step} of {totalSteps}
+                Trin {step} af {totalSteps}
               </span>
               <div className="relative h-1.5 w-full max-w-md overflow-hidden rounded-full bg-rose-100/60">
                 <motion.div
@@ -67,7 +67,7 @@ export function OfferWizardLayout({
               <span className="text-xs font-medium tabular-nums text-muted-foreground">{pct}%</span>
             </div>
           )}
-          <Button asChild variant="ghost" size="icon" aria-label="Close wizard">
+          <Button asChild variant="ghost" size="icon" aria-label="Luk guide">
             <Link to="/">
               <X className="h-4 w-4" />
             </Link>
@@ -113,7 +113,7 @@ export function OfferWizardLayout({
             <div>
               {!hideBack && onBack && (
                 <Button variant="ghost" onClick={onBack}>
-                  <ArrowLeft className="h-4 w-4" /> Back
+                  <ArrowLeft className="h-4 w-4" /> Tilbage
                 </Button>
               )}
             </div>

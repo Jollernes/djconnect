@@ -7,8 +7,8 @@ import { toast } from "sonner";
 export function AdminFeaturedPage() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Featured DJs</h1>
-      <p className="text-sm text-muted-foreground">Toggle which DJs appear in the Featured section on the homepage.</p>
+      <h1 className="text-2xl font-semibold">Fremhævede DJs</h1>
+      <p className="text-sm text-muted-foreground">Vælg hvilke DJs der vises i sektionen Fremhævede på forsiden.</p>
       <div className="space-y-3">
         {mockDJs.map((d) => (
           <Card key={d.id}>
@@ -21,8 +21,8 @@ export function AdminFeaturedPage() {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                {d.is_featured && <Badge variant="accent">Featured</Badge>}
-                <Switch defaultChecked={d.is_featured} onCheckedChange={() => toast.success(`${d.stage_name} updated`)} />
+                {d.is_featured && <Badge variant="accent">Fremhævet</Badge>}
+                <Switch defaultChecked={d.is_featured} onCheckedChange={() => toast.success(`${d.stage_name} opdateret`)} />
               </div>
             </CardContent>
           </Card>

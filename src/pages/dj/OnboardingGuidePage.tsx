@@ -32,58 +32,58 @@ import { markDJGuideCompleted } from "@/lib/djGuide";
 const CHAPTERS = [
   {
     id: "welcome",
-    title: "Welcome aboard",
+    title: "Velkommen ombord",
     icon: Sparkles,
-    description: "What DJConnect is, and what we expect from you",
+    description: "Hvad DJConnect er, og hvad vi forventer af dig",
     minutes: 1,
   },
   {
     id: "profile",
-    title: "Your profile is your storefront",
+    title: "Din profil er dit udstillingsvindue",
     icon: BookOpen,
-    description: "How customers discover and choose you",
+    description: "Hvordan kunder finder og vælger dig",
     minutes: 2,
   },
   {
     id: "bookings",
-    title: "The booking lifecycle",
+    title: "Bookingens livscyklus",
     icon: Workflow,
-    description: "From request to payout — walk the flow yourself",
+    description: "Fra forespørgsel til udbetaling — gå selv flowet igennem",
     minutes: 3,
   },
   {
     id: "payouts",
-    title: "Getting paid",
+    title: "Sådan får du betaling",
     icon: Banknote,
-    description: "Stripe escrow, the 10% fee, and timing",
+    description: "Stripe escrow, 10%-gebyret og timing",
     minutes: 2,
   },
   {
     id: "cancellations",
-    title: "Cancellations & disputes",
+    title: "Afbestillinger & tvister",
     icon: ShieldAlert,
-    description: "Play with the refund slider to see the rules",
+    description: "Leg med refunderingsskyderen for at se reglerne",
     minutes: 2,
   },
   {
     id: "communication",
-    title: "Messages, reviews & ratings",
+    title: "Beskeder, anmeldelser & bedømmelser",
     icon: MessageSquareText,
-    description: "The platform rules for customer communication",
+    description: "Platformens regler for kundekommunikation",
     minutes: 2,
   },
   {
     id: "standards",
-    title: "DJ standards & code of conduct",
+    title: "DJ-standarder & adfærdskodeks",
     icon: BadgeCheck,
-    description: "The bar we hold every verified DJ to",
+    description: "Den standard vi holder enhver verificeret DJ op imod",
     minutes: 2,
   },
   {
     id: "quiz",
-    title: "Comprehension check",
+    title: "Forståelsestjek",
     icon: GraduationCap,
-    description: "Quick 5-question quiz. 100% required to finish.",
+    description: "Hurtig quiz med 5 spørgsmål. 100% kræves for at afslutte.",
     minutes: 2,
   },
 ];
@@ -107,28 +107,28 @@ const EMPTY_STATE: ChapterState = {
 const STANDARDS = [
   {
     id: "equipment",
-    title: "Complete, tested equipment at every event",
-    body: "I bring my own full mobile disco setup — decks, mixer, speakers, cables, basic lighting. Venue gear is a bonus, never a dependency.",
+    title: "Komplet, testet udstyr til hvert event",
+    body: "Jeg medbringer mit eget komplette mobildiskotek — afspillere, mixer, højtalere, kabler, grundlæggende lys. Lokationens udstyr er en bonus, aldrig en afhængighed.",
   },
   {
     id: "punctuality",
-    title: "Arrive at least 90 minutes before showtime",
-    body: "I set up calmly, soundcheck with the venue, and am ready to play 30 minutes before guests arrive.",
+    title: "Mød op mindst 90 minutter før start",
+    body: "Jeg stiller roligt op, laver lydtjek med lokationen og er klar til at spille 30 minutter før gæsterne ankommer.",
   },
   {
     id: "professionalism",
-    title: "Professional appearance & conduct",
-    body: "I dress appropriately for the event, don't consume alcohol excessively during the booking, and treat guests and venue staff with respect.",
+    title: "Professionelt fremtoning & adfærd",
+    body: "Jeg klæder mig passende til eventet, indtager ikke alkohol i overdreven grad under bookingen og behandler gæster og personale med respekt.",
   },
   {
     id: "music",
-    title: "Do-not-play list and customer requests",
-    body: "I ask the customer for their do-not-play list and accommodate requests where reasonable, while keeping the floor alive.",
+    title: "Spil-ikke-liste og kundens ønsker",
+    body: "Jeg beder kunden om deres spil-ikke-liste og imødekommer ønsker, hvor det er rimeligt, samtidig med at jeg holder dansegulvet i live.",
   },
   {
     id: "exclusive",
-    title: "Platform-exclusive communication",
-    body: "I keep all booking conversations inside DJConnect messaging and never encourage off-platform payments.",
+    title: "Kommunikation kun på platformen",
+    body: "Jeg holder alle bookingsamtaler inde i DJConnects beskeder og opfordrer aldrig til betalinger uden for platformen.",
   },
 ];
 
@@ -212,15 +212,15 @@ export function DJOnboardingGuidePage() {
       <div className="border-b bg-background">
         <div className="container flex flex-wrap items-center justify-between gap-4 py-3">
           <div className="flex items-center gap-3 text-sm">
-            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">Mandatory training</span>
+            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">Obligatorisk træning</span>
             <span className="text-muted-foreground hidden sm:inline">
-              Complete the guide before accepting your first booking.
+              Gennemfør guiden, før du accepterer din første booking.
             </span>
           </div>
           <div className="flex items-center gap-3">
             {restored && (
               <span className="hidden items-center gap-1 text-xs text-muted-foreground sm:inline-flex">
-                <Check className="h-3 w-3 text-accent" /> Progress restored
+                <Check className="h-3 w-3 text-accent" /> Fremskridt gendannet
               </span>
             )}
             <div className="flex w-48 items-center gap-2">
@@ -293,10 +293,10 @@ export function DJOnboardingGuidePage() {
 
             <div className="mt-6 rounded-xl border bg-background p-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-2 font-semibold text-foreground">
-                <Lock className="h-3.5 w-3.5 text-accent" /> Gated access
+                <Lock className="h-3.5 w-3.5 text-accent" /> Låst adgang
               </div>
               <p className="mt-2">
-                Your dashboard and booking inbox unlock the moment you finish this guide. Estimated time: ~15 minutes.
+                Dit dashboard og din bookingindbakke låses op, så snart du gennemfører denne guide. Estimeret tid: ~15 minutter.
               </p>
             </div>
           </div>
@@ -312,18 +312,18 @@ export function DJOnboardingGuidePage() {
                       index={state.currentIndex}
                       total={CHAPTERS.length}
                       icon={Sparkles}
-                      eyebrow="Welcome"
-                      title="Welcome to DJConnect"
-                      subtitle="Before you accept your first booking, we want to make sure we're on the same page about how the platform works, how you get paid, and the standards our customers expect."
+                      eyebrow="Velkommen"
+                      title="Velkommen til DJConnect"
+                      subtitle="Før du accepterer din første booking, vil vi sikre os, at vi er enige om, hvordan platformen fungerer, hvordan du får betaling, og hvilke standarder vores kunder forventer."
                       acked={ackedSet.has("welcome")}
                       onAck={(v) => ackChapter("welcome", v)}
                       illustration={<WelcomeIllustration />}
                     >
                       <ul className="grid gap-3 sm:grid-cols-3">
                         {[
-                          { icon: Workflow, title: "Understand the flow", body: "From booking request to payout — you'll walk each step yourself." },
-                          { icon: Banknote, title: "Predictable payouts", body: "Escrow, a flat 10% fee, released 24h after the event." },
-                          { icon: BadgeCheck, title: "Clear standards", body: "One shared bar so every DJConnect DJ earns the verified badge." },
+                          { icon: Workflow, title: "Forstå flowet", body: "Fra bookingforespørgsel til udbetaling — du går selv hvert trin igennem." },
+                          { icon: Banknote, title: "Forudsigelige udbetalinger", body: "Escrow, et fast gebyr på 10%, frigivet 24 timer efter eventet." },
+                          { icon: BadgeCheck, title: "Klare standarder", body: "Én fælles standard, så enhver DJConnect-DJ optjener det verificerede mærke." },
                         ].map((f) => (
                           <li key={f.title} className="rounded-xl border bg-card p-4">
                             <f.icon className="h-5 w-5 text-accent" />
@@ -333,9 +333,9 @@ export function DJOnboardingGuidePage() {
                         ))}
                       </ul>
                       <div className="rounded-xl border bg-accent/5 p-4 text-sm">
-                        <div className="font-semibold">You'll finish in about 15 minutes.</div>
+                        <div className="font-semibold">Du er færdig på cirka 15 minutter.</div>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Progress auto-saves. If you navigate away, pick up exactly where you left off.
+                          Fremskridt gemmes automatisk. Hvis du forlader siden, fortsætter du præcis, hvor du slap.
                         </p>
                       </div>
                     </ChapterShell>
@@ -346,25 +346,25 @@ export function DJOnboardingGuidePage() {
                       index={state.currentIndex}
                       total={CHAPTERS.length}
                       icon={BookOpen}
-                      eyebrow="Your storefront"
-                      title="Your profile sells for you"
-                      subtitle="Most customers never talk to you until they've already decided. Your profile is the whole pitch."
+                      eyebrow="Dit udstillingsvindue"
+                      title="Din profil sælger for dig"
+                      subtitle="De fleste kunder taler aldrig med dig, før de allerede har besluttet sig. Din profil er hele præsentationen."
                       acked={ackedSet.has("profile")}
                       onAck={(v) => ackChapter("profile", v)}
                       illustration={<ProfileCardIllustration />}
                     >
                       <ul className="space-y-3 text-sm">
-                        <Bullet title="Photo quality matters more than you think">
-                          The hero shot + equipment photos drive first impressions. Real photos beat stock every time.
+                        <Bullet title="Billedkvalitet betyder mere, end du tror">
+                          Hero-billedet + udstyrsbilleder afgør første indtryk. Ægte billeder slår stockfotos hver gang.
                         </Bullet>
-                        <Bullet title="Your bio sets the vibe">
-                          Write in first person. Mention genres, signature moments, and what you're best at. Avoid copy-paste.
+                        <Bullet title="Din bio sætter stemningen">
+                          Skriv i første person. Nævn genrer, signaturmomenter og hvad du er bedst til. Undgå copy-paste.
                         </Bullet>
-                        <Bullet title="Specific event types rank you higher">
-                          Customers filter by event type. Pick every one you genuinely cover — and nothing you don't.
+                        <Bullet title="Specifikke eventtyper rangerer dig højere">
+                          Kunder filtrerer efter eventtype. Vælg alle dem, du reelt dækker — og intet, du ikke gør.
                         </Bullet>
-                        <Bullet title="Keep availability current">
-                          Block unavailable dates promptly. Instant-book DJs with live availability get ~2× more requests.
+                        <Bullet title="Hold tilgængeligheden opdateret">
+                          Blokér utilgængelige datoer hurtigt. DJs med live tilgængelighed får ~2× flere forespørgsler.
                         </Bullet>
                       </ul>
                     </ChapterShell>
@@ -375,19 +375,19 @@ export function DJOnboardingGuidePage() {
                       index={state.currentIndex}
                       total={CHAPTERS.length}
                       icon={Workflow}
-                      eyebrow="Booking lifecycle"
-                      title="Walk a booking end-to-end"
-                      subtitle="Click through each stage below. This is exactly how bookings flow on DJConnect — there are no surprises."
+                      eyebrow="Bookingens livscyklus"
+                      title="Gå en booking igennem fra start til slut"
+                      subtitle="Klik dig gennem hvert trin nedenfor. Sådan forløber bookinger præcis på DJConnect — der er ingen overraskelser."
                       acked={ackedSet.has("bookings")}
                       onAck={(v) => ackChapter("bookings", v)}
                       illustration={<BookingFlowDemo />}
-                      ackLabel="I've clicked through every stage and understand the flow"
+                      ackLabel="Jeg har klikket gennem hvert trin og forstår flowet"
                     >
                       <ul className="space-y-2 text-sm text-muted-foreground">
-                        <li><b className="text-foreground">Respond fast.</b> You have 24 hours to accept or decline. Faster replies convert much better.</li>
-                        <li><b className="text-foreground">Quote transparently.</b> If the booking is price-on-request, send a single, clear total.</li>
-                        <li><b className="text-foreground">Use messaging for logistics.</b> Set up times, access, parking, and playlists in-platform.</li>
-                        <li><b className="text-foreground">Mark events complete.</b> Helps the system release your payout on time.</li>
+                        <li><b className="text-foreground">Svar hurtigt.</b> Du har 24 timer til at acceptere eller afvise. Hurtigere svar konverterer langt bedre.</li>
+                        <li><b className="text-foreground">Giv et gennemsigtigt tilbud.</b> Hvis bookingen er pris-efter-forespørgsel, så send én klar totalpris.</li>
+                        <li><b className="text-foreground">Brug beskeder til logistik.</b> Aftal tider, adgang, parkering og playlister på platformen.</li>
+                        <li><b className="text-foreground">Marker events som gennemført.</b> Det hjælper systemet med at frigive din udbetaling til tiden.</li>
                       </ul>
                     </ChapterShell>
                   )}
@@ -397,19 +397,19 @@ export function DJOnboardingGuidePage() {
                       index={state.currentIndex}
                       total={CHAPTERS.length}
                       icon={Banknote}
-                      eyebrow="Payouts"
-                      title="How you actually get paid"
-                      subtitle="Try the slider — it's the same math we run behind the scenes on every booking."
+                      eyebrow="Udbetalinger"
+                      title="Sådan får du rent faktisk betaling"
+                      subtitle="Prøv skyderen — det er den samme udregning, vi kører bag kulisserne på hver booking."
                       acked={ackedSet.has("payouts")}
                       onAck={(v) => ackChapter("payouts", v)}
                       illustration={<PayoutCalculator />}
-                      ackLabel="I've tried the calculator and understand the 10% fee and 24h release"
+                      ackLabel="Jeg har prøvet beregneren og forstår 10%-gebyret og frigivelsen efter 24 timer"
                     >
                       <ul className="space-y-2 text-sm text-muted-foreground">
-                        <li><b className="text-foreground">Escrow.</b> The customer's payment sits with Stripe, not you, until after the event.</li>
-                        <li><b className="text-foreground">Fee.</b> 10% platform fee, deducted automatically — you never pay it out of pocket.</li>
-                        <li><b className="text-foreground">Release.</b> 24 hours after the event date, 90% is released to your connected Stripe account.</li>
-                        <li><b className="text-foreground">Bank deposit.</b> Your bank posts funds 2–5 business days later, per Stripe's schedule.</li>
+                        <li><b className="text-foreground">Escrow.</b> Kundens betaling ligger hos Stripe, ikke dig, indtil efter eventet.</li>
+                        <li><b className="text-foreground">Gebyr.</b> 10% platformsgebyr trækkes automatisk — du betaler det aldrig af egen lomme.</li>
+                        <li><b className="text-foreground">Frigivelse.</b> 24 timer efter eventdatoen frigives 90% til din tilknyttede Stripe-konto.</li>
+                        <li><b className="text-foreground">Bankindbetaling.</b> Din bank indsætter pengene 2–5 bankdage senere ifølge Stripes tidsplan.</li>
                       </ul>
                     </ChapterShell>
                   )}
@@ -419,18 +419,18 @@ export function DJOnboardingGuidePage() {
                       index={state.currentIndex}
                       total={CHAPTERS.length}
                       icon={ShieldAlert}
-                      eyebrow="Cancellations"
-                      title="Refunds are automatic and rule-based"
-                      subtitle="Drag the slider to see what happens at different points before an event. These rules are non-negotiable."
+                      eyebrow="Afbestillinger"
+                      title="Refunderinger er automatiske og regelbaserede"
+                      subtitle="Træk i skyderen for at se, hvad der sker på forskellige tidspunkter før et event. Disse regler er ikke til forhandling."
                       acked={ackedSet.has("cancellations")}
                       onAck={(v) => ackChapter("cancellations", v)}
                       illustration={<RefundSimulator />}
-                      ackLabel="I've explored the refund bands and understand each threshold"
+                      ackLabel="Jeg har udforsket refunderingstrinnene og forstår hver grænse"
                     >
                       <ul className="space-y-2 text-sm text-muted-foreground">
-                        <li><b className="text-foreground">If the customer cancels</b>, the automatic policy (14d/7d/0d) runs immediately.</li>
-                        <li><b className="text-foreground">If you cancel</b>, the customer receives a full refund and your profile takes a reliability hit. Only do this in genuine emergencies.</li>
-                        <li><b className="text-foreground">Disputes</b> go through support — we always have the paper trail thanks to in-platform messaging.</li>
+                        <li><b className="text-foreground">Hvis kunden afbestiller</b>, kører den automatiske politik (14d/7d/0d) med det samme.</li>
+                        <li><b className="text-foreground">Hvis du afbestiller</b>, modtager kunden fuld refundering, og din profil tager et tillidstab. Gør kun dette i ægte nødstilfælde.</li>
+                        <li><b className="text-foreground">Tvister</b> går gennem support — vi har altid dokumentationen takket være beskeder på platformen.</li>
                       </ul>
                     </ChapterShell>
                   )}
@@ -441,17 +441,17 @@ export function DJOnboardingGuidePage() {
                       total={CHAPTERS.length}
                       icon={MessageSquareText}
                       eyebrow="Communication"
-                      title="Messages, reviews & ratings"
-                      subtitle="Every DJConnect interaction is on-record. It keeps everyone safe and helps you grow."
+                      title="Beskeder, anmeldelser & bedømmelser"
+                      subtitle="Enhver interaktion på DJConnect registreres. Det holder alle trygge og hjælper dig med at vokse."
                       acked={ackedSet.has("communication")}
                       onAck={(v) => ackChapter("communication", v)}
                       illustration={<CommunicationIllustration />}
                     >
                       <ul className="space-y-2 text-sm text-muted-foreground">
-                        <li><b className="text-foreground">Platform-only comms.</b> Never move conversations off-platform — it's a policy violation and voids dispute protection.</li>
-                        <li><b className="text-foreground">Reply within 24h.</b> Fast, friendly responses boost your search ranking automatically.</li>
-                        <li><b className="text-foreground">Reviews are gold.</b> Only customers with a completed booking can leave one. Aim for a proactive review request right after the event.</li>
-                        <li><b className="text-foreground">Ratings compound.</b> DJs with 4.8+ average rating get featured in search and land ~3× more bookings.</li>
+                        <li><b className="text-foreground">Kun kommunikation på platformen.</b> Flyt aldrig samtaler væk fra platformen — det er en overtrædelse af reglerne og ophæver tvistbeskyttelsen.</li>
+                        <li><b className="text-foreground">Svar inden for 24 timer.</b> Hurtige, venlige svar booster automatisk din placering i søgningen.</li>
+                        <li><b className="text-foreground">Anmeldelser er guld værd.</b> Kun kunder med en gennemført booking kan efterlade en. Sigt efter proaktivt at bede om en anmeldelse lige efter eventet.</li>
+                        <li><b className="text-foreground">Bedømmelser hober sig op.</b> DJs med en gennemsnitsbedømmelse på 4,8+ bliver fremhævet i søgningen og lander ~3× flere bookinger.</li>
                       </ul>
                     </ChapterShell>
                   )}
@@ -461,13 +461,13 @@ export function DJOnboardingGuidePage() {
                       index={state.currentIndex}
                       total={CHAPTERS.length}
                       icon={BadgeCheck}
-                      eyebrow="Standards"
-                      title="The DJConnect code of conduct"
-                      subtitle="Check each commitment below. All five are required to continue — this is the bar every verified DJ signs up to."
+                      eyebrow="Standarder"
+                      title="DJConnects adfærdskodeks"
+                      subtitle="Afkryds hvert løfte nedenfor. Alle fem kræves for at fortsætte — det er den standard, enhver verificeret DJ forpligter sig til."
                       acked={ackedSet.has("standards")}
                       onAck={(v) => ackChapter("standards", v)}
                       illustration={<StandardsIllustration acked={Object.values(state.standardsAcks).filter(Boolean).length} total={STANDARDS.length} />}
-                      ackLabel="I commit to every standard above and understand violations can lead to suspension"
+                      ackLabel="Jeg forpligter mig til hver standard ovenfor og forstår, at overtrædelser kan føre til suspendering"
                     >
                       <ul className="space-y-2">
                         {STANDARDS.map((s) => {
@@ -502,7 +502,7 @@ export function DJOnboardingGuidePage() {
                       </ul>
                       {!standardsAllAcked && (
                         <p className="text-xs text-muted-foreground">
-                          Check all {STANDARDS.length} commitments before you can confirm and continue.
+                          Afkryds alle {STANDARDS.length} løfter, før du kan bekræfte og fortsætte.
                         </p>
                       )}
                     </ChapterShell>
@@ -521,14 +521,14 @@ export function DJOnboardingGuidePage() {
                         </span>
                         <div>
                           <div className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                            Comprehension check · Chapter 8 of {CHAPTERS.length}
+                            Forståelsestjek · Kapitel 8 af {CHAPTERS.length}
                           </div>
                           <h2 className="mt-1 text-3xl font-semibold tracking-tight md:text-4xl">
-                            Quick 5-question quiz
+                            Hurtig quiz med 5 spørgsmål
                           </h2>
                           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                            You need 5 / 5 correct to finish the guide. Each question has an explanation if you get it wrong —
-                            review the earlier chapters from the sidebar anytime.
+                            Du skal have 5 / 5 rigtige for at gennemføre guiden. Hvert spørgsmål har en forklaring, hvis du svarer forkert —
+                            gennemgå de tidligere kapitler fra sidemenuen når som helst.
                           </p>
                         </div>
                       </div>
@@ -541,10 +541,10 @@ export function DJOnboardingGuidePage() {
 
             <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t bg-background/95 px-6 py-4 backdrop-blur md:px-8">
               <Button type="button" variant="ghost" onClick={goBack} disabled={state.currentIndex === 0}>
-                <ChevronLeft className="h-4 w-4" /> Back
+                <ChevronLeft className="h-4 w-4" /> Tilbage
               </Button>
               <div className="hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
-                <Headphones className="h-3.5 w-3.5" /> Chapter {state.currentIndex + 1} of {CHAPTERS.length} · {currentChapter.minutes}m
+                <Headphones className="h-3.5 w-3.5" /> Kapitel {state.currentIndex + 1} af {CHAPTERS.length} · {currentChapter.minutes}m
               </div>
               {state.currentIndex < CHAPTERS.length - 1 ? (
                 <Button
@@ -555,7 +555,7 @@ export function DJOnboardingGuidePage() {
                   onClick={goNext}
                   className={cn("min-w-[160px]", canAdvance && "shadow-lg shadow-accent/30")}
                 >
-                  Next chapter <ChevronRight className="h-4 w-4" />
+                  Næste kapitel <ChevronRight className="h-4 w-4" />
                 </Button>
               ) : (
                 <Button
@@ -567,9 +567,9 @@ export function DJOnboardingGuidePage() {
                   className="min-w-[200px] shadow-lg shadow-accent/40"
                 >
                   {celebrated ? (
-                    <><PartyPopper className="h-4 w-4" /> Completed!</>
+                    <><PartyPopper className="h-4 w-4" /> Gennemført!</>
                   ) : (
-                    <>Finish guide <PartyPopper className="h-4 w-4" /></>
+                    <>Afslut guide <PartyPopper className="h-4 w-4" /></>
                   )}
                 </Button>
               )}
@@ -577,8 +577,8 @@ export function DJOnboardingGuidePage() {
           </div>
 
           <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
-            <span>Need help? <a href="mailto:support@djconnect.example" className="underline-offset-4 hover:underline">support@djconnect.example</a></span>
-            <span>Each DJ who completes this guide gets their verified badge faster.</span>
+            <span>Brug for hjælp? <a href="mailto:support@djconnect.example" className="underline-offset-4 hover:underline">support@djconnect.example</a></span>
+            <span>Hver DJ, der gennemfører denne guide, får sit verificerede mærke hurtigere.</span>
           </div>
         </main>
       </div>
@@ -600,12 +600,12 @@ export function DJOnboardingGuidePage() {
               <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/15 text-accent">
                 <GraduationCap className="h-8 w-8" />
               </span>
-              <h3 className="mt-5 text-2xl font-semibold">Guide completed!</h3>
+              <h3 className="mt-5 text-2xl font-semibold">Guide gennemført!</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                You're cleared to accept bookings. Taking you to your DJ dashboard…
+                Du er klar til at acceptere bookinger. Vi sender dig til dit DJ-dashboard…
               </p>
               <div className="mt-5 flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                <Play className="h-3 w-3" /> Redirecting
+                <Play className="h-3 w-3" /> Omdirigerer
               </div>
             </motion.div>
           </motion.div>
@@ -642,11 +642,11 @@ function WelcomeIllustration() {
       />
       <div className="relative">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.22em] text-accent">
-          <Sparkles className="h-3.5 w-3.5" /> Mandatory training
+          <Sparkles className="h-3.5 w-3.5" /> Obligatorisk træning
         </div>
-        <h3 className="mt-3 text-2xl font-semibold">8 chapters · ~15 minutes</h3>
+        <h3 className="mt-3 text-2xl font-semibold">8 kapitler · ~15 minutter</h3>
         <p className="mt-2 max-w-xs text-sm text-white/80">
-          Interactive demos, a live refund calculator, a payout slider, and a 5-question quiz. No fluff.
+          Interaktive demoer, en live refunderingsberegner, en udbetalingsskyder og en quiz med 5 spørgsmål. Ingen fyld.
         </p>
         <div className="mt-6 grid grid-cols-2 gap-2 text-xs">
           {CHAPTERS.slice(0, 6).map((c) => (
@@ -672,28 +672,28 @@ function ProfileCardIllustration() {
         <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
           <div>
             <div className="text-xl font-semibold text-white">DJ Nova</div>
-            <div className="text-xs text-white/80">Copenhagen, DK</div>
+            <div className="text-xs text-white/80">København, DK</div>
           </div>
           <span className="flex items-center gap-1 rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-semibold text-white">
-            <BadgeCheck className="h-3 w-3" /> Verified
+            <BadgeCheck className="h-3 w-3" /> Verificeret
           </span>
         </div>
       </div>
       <div className="space-y-3 p-4">
         <div className="flex items-center gap-2 text-xs">
           <span className="flex items-center gap-1">
-            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> 4.9 · 38 reviews
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> 4,9 · 38 anmeldelser
           </span>
-          <span className="rounded-full border px-2 py-0.5">5–10 years</span>
+          <span className="rounded-full border px-2 py-0.5">5–10 år</span>
         </div>
         <div className="flex flex-wrap gap-1">
-          {["Wedding", "Corporate", "Birthday"].map((t) => (
+          {["Bryllup", "Firma", "Fødselsdag"].map((t) => (
             <span key={t} className="rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">{t}</span>
           ))}
         </div>
         <div className="flex justify-between border-t pt-2 text-xs">
-          <span>From <b>DKK 3,500</b></span>
-          <span className="text-muted-foreground">Responds &lt; 24h</span>
+          <span>Fra <b>3.500 kr.</b></span>
+          <span className="text-muted-foreground">Svarer &lt; 24t</span>
         </div>
       </div>
     </div>
@@ -704,19 +704,19 @@ function CommunicationIllustration() {
   return (
     <div className="space-y-3 rounded-2xl border bg-card p-5 shadow-sm">
       <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} className="max-w-[80%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2 text-sm">
-        Hi! Would you be free for our wedding reception on 14 June? ~120 guests, Copenhagen.
-        <div className="mt-1 text-[10px] text-muted-foreground">Sara · Customer</div>
+        Hej! Er du ledig til vores bryllupsreception den 14. juni? ~120 gæster, København.
+        <div className="mt-1 text-[10px] text-muted-foreground">Sara · Kunde</div>
       </motion.div>
       <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }} className="ml-auto max-w-[80%] rounded-2xl rounded-br-sm bg-accent/15 px-3 py-2 text-sm">
-        Absolutely — that date is open. I've sent over a DKK 6,500 quote covering setup, 6 hours of music and a wireless mic.
-        <div className="mt-1 text-right text-[10px] text-muted-foreground">You · DJ</div>
+        Helt sikkert — den dato er ledig. Jeg har sendt et tilbud på 6.500 kr. inkl. opsætning, 6 timers musik og en trådløs mikrofon.
+        <div className="mt-1 text-right text-[10px] text-muted-foreground">Dig · DJ</div>
       </motion.div>
       <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.4 }} className="max-w-[80%] rounded-2xl rounded-bl-sm bg-muted px-3 py-2 text-sm">
-        Perfect — accepting now. Love your setup photos. 💜
-        <div className="mt-1 text-[10px] text-muted-foreground">Sara · Customer</div>
+        Perfekt — jeg accepterer nu. Elsker dine billeder af opsætningen. 💜
+        <div className="mt-1 text-[10px] text-muted-foreground">Sara · Kunde</div>
       </motion.div>
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="flex items-center gap-2 rounded-lg border-2 border-dashed border-accent/40 bg-accent/5 px-3 py-2 text-xs text-accent">
-        <Star className="h-3.5 w-3.5" /> After the event, Sara will be asked for a rating and written review.
+        <Star className="h-3.5 w-3.5" /> Efter eventet bliver Sara bedt om en bedømmelse og en skriftlig anmeldelse.
       </motion.div>
     </div>
   );
@@ -726,7 +726,7 @@ function StandardsIllustration({ acked, total }: { acked: number; total: number 
   return (
     <div className="rounded-2xl border bg-card p-6 shadow-sm">
       <div className="flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground">
-        <span>Your signed commitments</span>
+        <span>Dine underskrevne løfter</span>
         <span>{acked} / {total}</span>
       </div>
       <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted">
@@ -742,12 +742,12 @@ function StandardsIllustration({ acked, total }: { acked: number; total: number 
             )}
           >
             {i < acked ? <Check className="h-3.5 w-3.5 text-accent" /> : <span className="h-3.5 w-3.5 rounded-full border border-muted-foreground/40" />}
-            Commitment #{i + 1}
+            Løfte #{i + 1}
           </div>
         ))}
       </div>
       <p className="mt-5 text-xs text-muted-foreground">
-        Your signatures are stored on your profile and reviewed during any customer dispute.
+        Dine underskrifter gemmes på din profil og gennemgås ved enhver kundetvist.
       </p>
     </div>
   );

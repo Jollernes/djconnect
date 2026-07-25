@@ -15,25 +15,25 @@ export function PaymentBreakdown({ booking }: { booking: BookingWithRelations })
     <div className="rounded-2xl border bg-card p-6">
       <div className="mb-4 flex items-center gap-2">
         <CreditCard className="h-5 w-5 text-accent" />
-        <h2 className="text-lg font-semibold">Payment</h2>
+        <h2 className="text-lg font-semibold">Betaling</h2>
       </div>
 
       {!hasQuote ? (
         <div className="rounded-lg border border-dashed bg-muted/30 p-4 text-sm text-muted-foreground">
-          Awaiting a quote from your DJ. You won't be charged until you accept and pay.
+          Afventer et tilbud fra din DJ. Du bliver ikke opkrævet, før du accepterer og betaler.
         </div>
       ) : (
         <>
           <dl className="space-y-2 text-sm">
-            <Row label={`Booking price`} value={formatCurrency(booking.price_minor!, booking.currency)} />
+            <Row label={`Bookingpris`} value={formatCurrency(booking.price_minor!, booking.currency)} />
             <Row
-              label={`Platform fee (${PLATFORM_FEE_PERCENT}%)`}
+              label={`Platformgebyr (${PLATFORM_FEE_PERCENT}%)`}
               value={formatCurrency(booking.platform_fee_minor, booking.currency)}
-              hint="Covers escrow, payment processing & support"
+              hint="Dækker escrow, betalingsbehandling & support"
             />
             <Separator className="my-2" />
             <Row
-              label="Total paid"
+              label="Samlet betalt"
               value={<span className="font-semibold">{formatCurrency(total, booking.currency)}</span>}
             />
           </dl>
@@ -43,35 +43,35 @@ export function PaymentBreakdown({ booking }: { booking: BookingWithRelations })
               {released ? (
                 <>
                   <Receipt className="h-4 w-4 text-emerald-600" />
-                  Released to DJ
+                  Frigivet til DJ
                 </>
               ) : escrow ? (
                 <>
                   <Lock className="h-4 w-4 text-emerald-600" />
-                  Held in escrow
+                  I escrow
                 </>
               ) : (
                 <>
                   <ShieldCheck className="h-4 w-4 text-amber-600" />
-                  Awaiting payment
+                  Afventer betaling
                 </>
               )}
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               {released
-                ? `Funds released to ${booking.dj_profile.stage_name} on ${formatDate(booking.completed_at!)}.`
+                ? `Pengene blev frigivet til ${booking.dj_profile.stage_name} den ${formatDate(booking.completed_at!)}.`
                 : escrow
-                  ? "Your payment is safe with DJConnect and will only be released to the DJ after your event."
-                  : "Payment will be held in escrow until your event is complete."}
+                  ? "Din betaling er sikker hos DJConnect og frigives først til DJ'en efter dit event."
+                  : "Betalingen holdes i escrow, indtil dit event er gennemført."}
             </p>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
             <Button variant="outline" size="sm" className="gap-2">
-              <FileText className="h-4 w-4" /> Download invoice (PDF)
+              <FileText className="h-4 w-4" /> Download faktura (PDF)
             </Button>
             <Button variant="outline" size="sm" className="gap-2">
-              <Receipt className="h-4 w-4" /> Booking confirmation
+              <Receipt className="h-4 w-4" /> Bookingbekræftelse
             </Button>
           </div>
         </>

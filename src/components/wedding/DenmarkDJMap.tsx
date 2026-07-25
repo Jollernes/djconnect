@@ -120,7 +120,7 @@ export function DenmarkDJMap({
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
         preserveAspectRatio="xMidYMid meet"
         className="h-full w-full"
-        aria-label="Map of Denmark showing wedding DJs by city"
+        aria-label="Kort over Danmark med bryllups-DJs efter by"
         role="img"
       >
         <defs>
@@ -218,7 +218,7 @@ export function DenmarkDJMap({
       {/* Header chip */}
       <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full border bg-white/90 px-2.5 py-1 text-[10px] font-semibold text-slate-700 shadow-sm backdrop-blur">
         <MapPin className="h-3 w-3 text-rose-500" />
-        {pins.length} DJs across Denmark
+        {pins.length} DJs i hele Danmark
       </div>
     </div>
   );
@@ -236,7 +236,7 @@ function Tooltip({
   const leftPct = (x / VIEW_W) * 100;
   const topPct = (y / VIEW_H) * 100;
   const flipBelow = topPct < 22;
-  const city = dj.base_location ?? dj.profile.city ?? "Denmark";
+  const city = dj.base_location ?? dj.profile.city ?? "Danmark";
   const price = dj.price_from_minor
     ? Math.round(dj.price_from_minor / 100).toLocaleString("da-DK")
     : null;

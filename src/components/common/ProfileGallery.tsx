@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Grid2X2, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
@@ -12,11 +12,21 @@ interface Image {
 interface Props {
   images: Image[];
   className?: string;
+  /** On mobile, break the hero out of the page container so it spans the
+   * full viewport width and reaches up to the header. */
+  fullBleedMobile?: boolean;
 }
 
-export function ProfileGallery({ images, className }: Props) {
+export function ProfileGallery({ images, className, fullBleedMobile }: Props) {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [allOpen, setAllOpen] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  function onTrackScroll(e: React.UIEvent<HTMLDivElement>) {
+    const el = e.currentTarget;
+    setActiveIdx(Math.round(el.scrollLeft / el.clientWidth));
+  }
 
   useEffect(() => {
     if (openIdx === null) return;
@@ -39,15 +49,26 @@ export function ProfileGallery({ images, className }: Props) {
   const grid = images.slice(1, 5);
   const placeholders = Math.max(0, 4 - grid.length);
 
+  // Rounded outer corners for each 2×2 grid slot (top-right, bottom-right).
+  const gridCorner = (i: number) =>
+    cn(i === 1 && "rounded-tr-2xl", i === 3 && "rounded-br-2xl");
+
   return (
-    <div className={cn("relative", className)}>
-      {/* Desktop: 2-col asymmetric collage with fixed aspect frame */}
-      <div className="relative hidden aspect-[2/1] w-full md:block">
-        <div className="grid h-full grid-cols-2 gap-2 lg:gap-3">
+    <div
+      className={cn(
+        "relative",
+        fullBleedMobile &&
+          "-mx-4 -mt-6 sm:-mx-6 sm:-mt-10 md:mx-0 md:mt-0",
+        className,
+      )}
+    >
+      {/* Desktop: Airbnb-style collage — hero 50% left + 2×2 grid right */}
+      <div className="relative hidden h-[320px] w-full overflow-hidden rounded-2xl md:block lg:h-[420px]">
+        <div className="grid h-full grid-cols-4 grid-rows-2 gap-2">
           <button
             type="button"
             onClick={() => setOpenIdx(0)}
-            className="group relative h-full overflow-hidden rounded-l-3xl bg-muted"
+            className="group relative col-span-2 row-span-2 h-full overflow-hidden bg-muted"
           >
             <img
               src={hero.url}
@@ -56,61 +77,97 @@ export function ProfileGallery({ images, className }: Props) {
             />
             <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
           </button>
-          <div className="grid h-full grid-cols-2 grid-rows-2 gap-2 lg:gap-3">
-            {grid.map((img, i) => (
-              <button
-                key={img.id}
-                type="button"
-                onClick={() => setOpenIdx(i + 1)}
-                className={cn(
-                  "group relative h-full overflow-hidden bg-muted",
-                  i === 1 && "rounded-tr-3xl",
-                  i === 3 && "rounded-br-3xl",
-                )}
-              >
-                <img
-                  src={img.url}
-                  alt={img.alt ?? ""}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
-              </button>
-            ))}
-            {Array.from({ length: placeholders }).map((_, i) => (
-              <div
-                key={`ph-${i}`}
-                className={cn(
-                  "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
-                  grid.length + i === 1 && "rounded-tr-3xl",
-                  grid.length + i === 3 && "rounded-br-3xl",
-                )}
-              >
-                <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
-                  DJConnect
-                </div>
+          {grid.map((img, i) => (
+            <button
+              key={img.id}
+              type="button"
+              onClick={() => setOpenIdx(i + 1)}
+              className={cn(
+                "group relative h-full overflow-hidden bg-muted",
+                gridCorner(i),
+              )}
+            >
+              <img
+                src={img.url}
+                alt={img.alt ?? ""}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10" />
+            </button>
+          ))}
+          {Array.from({ length: placeholders }).map((_, i) => (
+            <div
+              key={`ph-${i}`}
+              className={cn(
+                "relative h-full overflow-hidden bg-gradient-to-br from-primary/10 via-violet-200/40 to-amber-200/30",
+                gridCorner(grid.length + i),
+              )}
+            >
+              <div className="absolute inset-0 flex items-center justify-center text-xs font-medium uppercase tracking-widest text-primary/40">
+                DJConnect
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Mobile: single hero */}
-      <button
-        type="button"
-        onClick={() => setOpenIdx(0)}
-        className="relative block aspect-[4/3] w-full overflow-hidden rounded-3xl bg-muted md:hidden"
-      >
-        <img src={hero.url} alt={hero.alt ?? ""} className="absolute inset-0 h-full w-full object-cover" />
-      </button>
+      {/* Mobile: swipeable carousel */}
+      <div className="md:hidden">
+        <div
+          ref={trackRef}
+          onScroll={onTrackScroll}
+          className="scrollbar-hide flex snap-x snap-mandatory overflow-x-auto"
+        >
+          {images.map((img, i) => (
+            <button
+              key={img.id}
+              type="button"
+              onClick={() => setOpenIdx(i)}
+              className={cn(
+                "relative block aspect-[4/3] max-h-[380px] w-full shrink-0 snap-start overflow-hidden bg-muted",
+                fullBleedMobile ? "rounded-none" : "rounded-3xl",
+              )}
+            >
+              <img
+                src={img.url}
+                alt={img.alt ?? ""}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* Photo counter */}
+        <span className="pointer-events-none absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
+          {activeIdx + 1}/{images.length} billeder
+        </span>
+
+        {/* Pagination dots */}
+        {images.length > 1 && (
+          <div className="pointer-events-none absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
+            {images.map((img, i) => (
+              <span
+                key={img.id}
+                className={cn(
+                  "h-1.5 rounded-full bg-white transition-all",
+                  i === activeIdx ? "w-4 opacity-100" : "w-1.5 opacity-50",
+                )}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {images.length > 1 && (
         <button
           type="button"
           onClick={() => setAllOpen(true)}
-          className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-foreground shadow-lg ring-1 ring-black/5 transition hover:bg-white/95 hover:shadow-xl"
+          className="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-xs font-medium text-foreground shadow-md ring-1 ring-black/5 backdrop-blur-sm transition hover:bg-white md:bottom-4 md:right-4 md:gap-2 md:px-4 md:py-2 md:text-sm md:shadow-lg md:hover:shadow-xl"
         >
-          <Grid2X2 className="h-4 w-4" />
-          Show all {images.length} photos
+          <Grid2X2 className="h-3.5 w-3.5 md:h-4 md:w-4" />
+          <span>Se alle{" "}
+            <span className="hidden md:inline">{images.length} </span>billeder
+          </span>
         </button>
       )}
 
@@ -160,7 +217,7 @@ export function ProfileGallery({ images, className }: Props) {
       <Dialog open={allOpen} onOpenChange={setAllOpen}>
         <DialogContent className="max-h-[90vh] max-w-5xl overflow-y-auto p-0 sm:rounded-3xl">
           <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-white px-6 py-4">
-            <h3 className="text-base font-semibold">All photos</h3>
+            <h3 className="text-base font-semibold">Alle billeder</h3>
             <button
               type="button"
               onClick={() => setAllOpen(false)}

@@ -6,18 +6,18 @@ export function WelcomeStep() {
       {[
         {
           Icon: Clock,
-          title: "Takes ~2 minutes",
-          body: "Mostly tap-and-go selections, no long forms.",
+          title: "Tager ~2 minutter",
+          body: "Mest hurtige valg, ingen lange formularer.",
         },
         {
           Icon: Sparkles,
-          title: "We match 3 DJs for you",
-          body: "Filtered by your event, date, location, vibe.",
+          title: "Vi matcher 3 DJs til dig",
+          body: "Filtreret efter dit event, dato, sted og stemning.",
         },
         {
           Icon: Mail,
-          title: "Personal offers in 24h",
-          body: "Each DJ replies directly with a custom quote.",
+          title: "Personlige tilbud på 24 timer",
+          body: "Hver DJ svarer direkte med et personligt tilbud.",
         },
       ].map((b) => (
         <div

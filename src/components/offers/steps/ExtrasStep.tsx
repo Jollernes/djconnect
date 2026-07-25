@@ -12,7 +12,7 @@ export function ExtrasStep({
   return (
     <div className="space-y-4">
       <p className="text-center text-xs text-muted-foreground">
-        Optional — pick anything that applies. Skip if nothing fits.
+        Valgfrit — vælg det, der passer. Spring over, hvis intet passer.
       </p>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
         {EXTRA_OPTIONS.map((x) => {

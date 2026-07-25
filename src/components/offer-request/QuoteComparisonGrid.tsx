@@ -1,21 +1,23 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CheckCircle2, MessageSquare, PhoneCall, ShieldCheck, Star } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Check, MessageSquare, PhoneCall, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import type { DJSlot, OfferRequestRecord } from "@/lib/offerRequestStore";
 import type { DJProfileWithRelations, Review } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
 /**
- * Side-by-side comparison of the customer's surfaced quotes.
+ * Side-by-side quote comparison.
  *
- * For each quote we show: photo, profile badge, quoted price, package
- * details, the DJ's personal message, response time, and the top 2
- * event-specific reviews. Action buttons trigger the customer-side flows
- * (on-platform message, request callback, escrow booking).
+ * Design intent (Danish-minimalist):
+ * - White card, hairline border, no gradient fills, no rose/amber blocks.
+ * - Single primary action ("Book"), one secondary ("Message"), one tertiary
+ *   text link ("Request a call") — not three competing buttons.
+ * - Price is the largest typographic element and sits in the regular flow.
+ * - Personal message reads as quiet body copy, not a coloured callout.
+ * - Reviews are two compact lines of italic text, no avatars or star pills.
+ * - Animation is a single subtle fade-in on first paint, then still.
  */
 export function QuoteComparisonGrid({
   record,
@@ -41,21 +43,19 @@ export function QuoteComparisonGrid({
   if (offers.length === 0) return null;
 
   return (
-    <section>
-      <div className="mb-3 flex items-baseline justify-between gap-3">
-        <div>
-          <h3 className="text-base font-semibold sm:text-lg">
-            Your {offers.length} {offers.length === 1 ? "quote" : "quotes"} so far
-          </h3>
-          <p className="text-xs text-muted-foreground">
-            Personalised offers from your matched DJs. Compare side-by-side, then message,
-            request a call, or book directly with escrow payment.
-          </p>
-        </div>
+    <section className="space-y-4">
+      <div>
+        <h2 className="text-lg font-semibold text-foreground">
+          {offers.length === 1
+            ? "Dit første tilbud"
+            : offers.length >= 3
+              ? "Dine 3 personlige tilbud"
+              : `Dine ${offers.length} tilbud indtil videre`}
+        </h2>
         {offers.length < 3 && (
-          <span className="hidden text-xs text-muted-foreground sm:inline">
-            Still waiting on a few more — we'll add them here as they arrive.
-          </span>
+          <p className="mt-0.5 text-sm text-muted-foreground">
+            Vi tilføjer det næste her, så snart det ankommer. Du behøver ikke opdatere.
+          </p>
         )}
       </div>
 
@@ -66,9 +66,9 @@ export function QuoteComparisonGrid({
           return (
             <motion.div
               key={slot.djId}
-              initial={{ opacity: 0, y: 12 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: idx * 0.08 }}
+              transition={{ duration: 0.35, delay: idx * 0.05 }}
             >
               <QuoteCard
                 slot={slot}
@@ -81,9 +81,8 @@ export function QuoteComparisonGrid({
           );
         })}
 
-        {/* Pending offer placeholders */}
         {Array.from({ length: Math.max(0, 3 - offers.length) }).map((_, i) => (
-          <PendingPlaceholder key={`pending-${i}`} />
+          <PendingPlaceholder key={`pending-${i}`} index={offers.length + i} />
         ))}
       </div>
     </section>
@@ -107,172 +106,187 @@ function QuoteCard({
   const reviews = (dj.reviews ?? []).slice(0, 2);
   const eventTypes = (dj.event_types ?? []).map((e) => e.id);
   const eventLabel = eventTypeLabel(eventTypes);
-  const responseLabel = formatResponseTime(quote.responseTimeMinutes);
   const booked = Boolean(slot.bookedAtMs);
+
+  const initials = dj.stage_name
+    .split(" ")
+    .map((p) => p[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <article
       className={cn(
-        "flex h-full flex-col rounded-2xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md",
-        booked && "ring-2 ring-emerald-300",
+        "flex h-full flex-col overflow-hidden rounded-2xl border border-border/70 bg-card transition-colors",
+        booked && "border-emerald-300 bg-emerald-50/30",
       )}
     >
-      <header className="flex items-start gap-3">
-        <Avatar className="h-12 w-12 ring-2 ring-rose-100">
-          <AvatarImage src={dj.profile.avatar_url ?? undefined} alt={dj.stage_name} />
-          <AvatarFallback>{dj.stage_name.slice(0, 2).toUpperCase()}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
+      {/* Hero image — DJ photo as the dominant visual of the card */}
+      <Link
+        to={`/djs/${dj.username}`}
+        aria-label={dj.stage_name}
+        className="relative block aspect-[4/3] w-full overflow-hidden bg-muted"
+      >
+        {dj.profile.avatar_url ? (
+          <img
+            src={dj.profile.avatar_url}
+            alt={dj.stage_name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform duration-500 hover:scale-[1.02]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-3xl font-medium tracking-wide text-muted-foreground">
+            {initials}
+          </div>
+        )}
+      </Link>
+
+      <div className="flex flex-1 flex-col p-5">
+        {/* DJ identity */}
+        <header>
           <Link
             to={`/djs/${dj.username}`}
-            className="block truncate text-base font-semibold hover:underline"
+            className="block truncate text-[15px] font-semibold text-foreground hover:underline"
           >
             {dj.stage_name}
           </Link>
-          <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-            {dj.profile.city && <span>{dj.profile.city}</span>}
-            {dj.rating_average && (
-              <span className="inline-flex items-center gap-0.5">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                {dj.rating_average.toFixed(1)} · {dj.rating_count}
-              </span>
-            )}
-          </div>
-        </div>
-        {dj.is_featured && (
-          <Badge className="bg-rose-100 text-rose-700">
-            <ShieldCheck className="mr-1 h-3 w-3" /> Verified
-          </Badge>
-        )}
-      </header>
-
-      <div className="mt-3 flex flex-wrap items-center gap-1.5">
-        {eventLabel && (
-          <Badge variant="outline" className="text-[11px]">
-            {eventLabel} · {dj.events_performed ?? "30+"} events
-          </Badge>
-        )}
-        <Badge variant="outline" className="text-[11px] capitalize">
-          {quote.packageId} setup
-        </Badge>
-        <Badge variant="outline" className="text-[11px]">
-          Replied in {responseLabel}
-        </Badge>
-      </div>
-
-      <div className="mt-4 rounded-xl bg-gradient-to-br from-rose-50 to-amber-50/60 p-3">
-        <p className="text-[11px] uppercase tracking-wider text-rose-700">Quoted price</p>
-        <p className="mt-0.5 text-2xl font-bold tabular-nums text-rose-900">
-          {formatPrice(quote.priceMinor)}
-        </p>
-        <p className="text-[11px] text-rose-900/70">
-          inkl. opsætning, lyd, lys og 5–6 timers spilletid
-        </p>
-      </div>
-
-      <blockquote className="mt-3 rounded-xl border-l-2 border-rose-200 bg-muted/30 p-3 text-sm italic text-foreground">
-        &ldquo;{quote.message}&rdquo;
-      </blockquote>
-
-      {reviews.length > 0 && (
-        <div className="mt-3 space-y-2">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Recent reviews
+          <p className="mt-0.5 truncate text-xs text-muted-foreground">
+            {[
+              eventLabel,
+              dj.events_performed ? `${dj.events_performed} events udført` : null,
+              dj.profile.city,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
           </p>
-          {reviews.map((r) => (
-            <ReviewSnippet key={r.id} review={r} />
-          ))}
-        </div>
-      )}
+        </header>
 
-      <footer className="mt-auto flex flex-col gap-2 pt-4">
-        <Button
-          onClick={onBook}
-          disabled={booked}
-          className={cn(
-            "w-full",
-            booked
-              ? "bg-emerald-500 hover:bg-emerald-500"
-              : "bg-gradient-to-r from-rose-500 to-rose-600 text-white hover:from-rose-600 hover:to-rose-700",
-          )}
-        >
-          {booked ? (
-            <>
-              <CheckCircle2 className="mr-1.5 h-4 w-4" /> Booked · escrow held
-            </>
-          ) : (
-            <>Book with escrow</>
-          )}
-        </Button>
-        <div className="grid grid-cols-2 gap-2">
-          <Button variant="outline" size="sm" onClick={onMessage} disabled={booked}>
-            <MessageSquare className="mr-1 h-4 w-4" /> Message
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onCallback}
-            disabled={booked || slot.callbackRequested}
-          >
-            <PhoneCall className="mr-1 h-4 w-4" />
-            {slot.callbackRequested ? "Call requested" : "Request call"}
-          </Button>
+        {/* Price — typography is the hierarchy, no coloured box */}
+        <div className="mt-5">
+          <p className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
+            Tilbudt pris
+          </p>
+          <p className="mt-0.5 text-[28px] font-semibold tabular-nums leading-none text-foreground">
+            {formatPrice(quote.priceMinor)}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {packageDescription(quote.packageId)}
+          </p>
         </div>
-        <p className="text-center text-[10px] text-muted-foreground">
-          All chat & payment stay on platform. Contact info shared after booking.
+
+        {/* Personal message */}
+        <p className="mt-5 text-[13px] leading-relaxed text-foreground/85">
+          &ldquo;{quote.message}&rdquo;
         </p>
-      </footer>
+
+        {/* Reviews — two quiet lines */}
+        {reviews.length > 0 && (
+          <ul className="mt-5 space-y-2 border-t border-border/60 pt-4">
+            {reviews.map((r) => (
+              <ReviewLine key={r.id} review={r} />
+            ))}
+          </ul>
+        )}
+
+        {/* Actions */}
+        <footer className="mt-auto pt-5">
+          <Button
+            onClick={onBook}
+            disabled={booked}
+            className={cn(
+              "h-10 w-full font-medium",
+              booked
+                ? "bg-emerald-600 text-white hover:bg-emerald-600"
+                : "bg-foreground text-background hover:bg-foreground/90",
+            )}
+          >
+            {booked ? (
+              <>
+                <Check className="mr-1.5 h-4 w-4" /> Booket
+              </>
+            ) : (
+              "Book med escrow"
+            )}
+          </Button>
+          <div className="mt-2 flex items-center justify-between gap-2 text-xs">
+            <button
+              type="button"
+              onClick={onMessage}
+              disabled={booked}
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+            >
+              <MessageSquare className="h-3.5 w-3.5" /> Skriv besked
+            </button>
+            <button
+              type="button"
+              onClick={onCallback}
+              disabled={booked || slot.callbackRequested}
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+            >
+              <PhoneCall className="h-3.5 w-3.5" />
+              {slot.callbackRequested ? "Opkald anmodet" : "Anmod om opkald"}
+            </button>
+          </div>
+        </footer>
+      </div>
     </article>
   );
 }
 
-function ReviewSnippet({ review }: { review: Review }) {
+function ReviewLine({ review }: { review: Review }) {
+  const rating = review.rating ?? 5;
   return (
-    <div className="rounded-lg bg-background/60 px-2 py-1.5 text-xs">
-      <div className="flex items-center gap-1 text-amber-500">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star
-            key={i}
-            className={cn(
-              "h-2.5 w-2.5",
-              i < (review.rating ?? 5) ? "fill-amber-400 text-amber-400" : "text-muted",
-            )}
-          />
-        ))}
-      </div>
+    <li className="text-xs text-muted-foreground">
+      <span className="mr-1 inline-flex items-center gap-0.5 text-amber-500">
+        <Star className="h-3 w-3 fill-current" />
+        {rating.toFixed(1)}
+      </span>
       {review.body && (
-        <p className="mt-1 line-clamp-2 text-muted-foreground">&ldquo;{review.body}&rdquo;</p>
+        <span className="italic">&ldquo;{truncate(review.body, 90)}&rdquo;</span>
       )}
-    </div>
+    </li>
   );
 }
 
-function PendingPlaceholder() {
+function PendingPlaceholder({ index }: { index: number }) {
   return (
-    <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-muted-foreground/20 bg-muted/10 p-4 text-center text-xs text-muted-foreground">
-      <span className="relative flex h-3 w-3">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-        <span className="relative inline-flex h-3 w-3 rounded-full bg-amber-500" />
-      </span>
-      <p>Waiting for the next quote</p>
-      <p className="text-[10px]">It'll appear here automatically</p>
+    <div
+      className="flex h-full min-h-[260px] flex-col items-start rounded-2xl border border-dashed border-border/60 bg-transparent p-5 text-sm text-muted-foreground"
+      aria-label={`Tilbudsplads ${index + 1} afventer`}
+    >
+      <p className="text-[11px] uppercase tracking-[0.08em] text-muted-foreground/80">
+        Plads {index + 1}
+      </p>
+      <p className="mt-1 text-foreground/70">Afventer næste tilbud</p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Det vises her automatisk.
+      </p>
     </div>
   );
 }
 
 function eventTypeLabel(ids: string[]): string {
-  if (ids.includes("wedding")) return "Wedding profile";
-  if (ids.includes("corporate_event") || ids.includes("corporate_party")) return "Corporate profile";
-  if (ids.includes("birthday")) return "Birthday profile";
-  if (ids.includes("private_party")) return "Private party profile";
-  return "DJ profile";
+  if (ids.includes("wedding")) return "Bryllup";
+  if (ids.includes("corporate_event") || ids.includes("corporate_party"))
+    return "Firma";
+  if (ids.includes("birthday")) return "Fødselsdag";
+  if (ids.includes("private_party")) return "Privatfest";
+  return "DJ";
+}
+
+function packageDescription(packageId: "small" | "medium" | "large"): string {
+  if (packageId === "small") return "Lille setup · lyd + varme lys · ~5t";
+  if (packageId === "medium") return "Mellem setup · lyd + lys · 5–6t";
+  return "Stor setup · fuld lyd + lysrig · 6t+";
 }
 
 function formatPrice(priceMinor: number): string {
   return `${(priceMinor / 100).toLocaleString("da-DK")} kr`;
 }
 
-function formatResponseTime(minutes: number): string {
-  if (minutes < 60) return `${minutes} min`;
-  return `${Math.round(minutes / 60)}h`;
+function truncate(s: string, n: number): string {
+  if (s.length <= n) return s;
+  return `${s.slice(0, n - 1)}…`;
 }

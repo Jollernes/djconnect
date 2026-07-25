@@ -20,23 +20,23 @@ export function DJBookingsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold">Bookings</h1>
+      <h1 className="mb-6 text-2xl font-semibold">Bookinger</h1>
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
-          <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
-          <TabsTrigger value="confirmed">Confirmed ({confirmed.length})</TabsTrigger>
-          <TabsTrigger value="completed">Completed ({completed.length})</TabsTrigger>
+          <TabsTrigger value="pending">Afventer ({pending.length})</TabsTrigger>
+          <TabsTrigger value="confirmed">Bekræftet ({confirmed.length})</TabsTrigger>
+          <TabsTrigger value="completed">Gennemført ({completed.length})</TabsTrigger>
         </TabsList>
-        <TabsContent value="pending"><List items={pending} loading={loading} empty="No pending requests" /></TabsContent>
-        <TabsContent value="confirmed"><List items={confirmed} loading={loading} empty="No confirmed bookings" /></TabsContent>
-        <TabsContent value="completed"><List items={completed} loading={loading} empty="No completed bookings" /></TabsContent>
+        <TabsContent value="pending"><List items={pending} loading={loading} empty="Ingen afventende forespørgsler" /></TabsContent>
+        <TabsContent value="confirmed"><List items={confirmed} loading={loading} empty="Ingen bekræftede bookinger" /></TabsContent>
+        <TabsContent value="completed"><List items={completed} loading={loading} empty="Ingen gennemførte bookinger" /></TabsContent>
       </Tabs>
     </div>
   );
 }
 
 function List({ items, loading, empty }: { items: ReturnType<typeof useBookings>["bookings"]; loading: boolean; empty: string }) {
-  if (loading) return <div className="py-6 text-sm text-muted-foreground">Loading…</div>;
+  if (loading) return <div className="py-6 text-sm text-muted-foreground">Indlæser…</div>;
   if (items.length === 0) return <EmptyState title={empty} className="mt-4" />;
   return (
     <div className="mt-4 space-y-3">
@@ -51,7 +51,7 @@ function List({ items, loading, empty }: { items: ReturnType<typeof useBookings>
             </div>
             <div className="flex items-center gap-2">
               <BookingStatusBadge status={b.status} />
-              <Button asChild size="sm"><Link to={`/dj/bookings/${b.id}`}>Open</Link></Button>
+              <Button asChild size="sm"><Link to={`/dj/bookings/${b.id}`}>Åbn</Link></Button>
             </div>
           </CardContent>
         </Card>

@@ -69,7 +69,7 @@ export function BookingHero({ booking }: { booking: BookingWithRelations }) {
             {booking.estimated_guests && (
               <span className="flex items-center gap-1.5">
                 <Users className="h-4 w-4" />
-                {booking.estimated_guests} guests
+                {booking.estimated_guests} gæster
               </span>
             )}
           </div>
@@ -78,7 +78,7 @@ export function BookingHero({ booking }: { booking: BookingWithRelations }) {
             <Button asChild variant="accent" className="gap-2">
               <a href="#messages">
                 <MessageCircle className="h-4 w-4" />
-                Message {dj.stage_name.split(" ")[0]}
+                Skriv til {dj.stage_name.split(" ")[0]}
               </a>
             </Button>
             <Button
@@ -86,7 +86,7 @@ export function BookingHero({ booking }: { booking: BookingWithRelations }) {
               variant="secondary"
               className="border-white/20 bg-white/10 text-white backdrop-blur hover:bg-white/20"
             >
-              <Link to={`/djs/${dj.username}`}>View profile</Link>
+              <Link to={`/djs/${dj.username}`}>Se profil</Link>
             </Button>
           </div>
         </div>
@@ -96,15 +96,15 @@ export function BookingHero({ booking }: { booking: BookingWithRelations }) {
             <div className="rounded-2xl border border-white/15 bg-white/5 p-4 backdrop-blur-sm">
               <div className="flex items-center justify-between text-xs uppercase tracking-wider text-white/65">
                 <span className="flex items-center gap-1.5">
-                  <Sparkles className="h-3.5 w-3.5" /> Time until showtime
+                  <Sparkles className="h-3.5 w-3.5" /> Tid til showtime
                 </span>
               </div>
               <div className="mt-3 grid grid-cols-4 gap-2 text-center">
                 {[
-                  { label: "Days", value: days },
-                  { label: "Hours", value: hours },
-                  { label: "Mins", value: minutes },
-                  { label: "Secs", value: seconds },
+                  { label: "Dage", value: days },
+                  { label: "Timer", value: hours },
+                  { label: "Min", value: minutes },
+                  { label: "Sek", value: seconds },
                 ].map((part) => (
                   <div
                     key={part.label}
@@ -132,7 +132,7 @@ export function BookingHero({ booking }: { booking: BookingWithRelations }) {
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-semibold">{dj.stage_name}</div>
                 <div className="truncate text-xs text-white/65">
-                  ★ {dj.rating_average.toFixed(2)} · {dj.rating_count} reviews
+                  ★ {dj.rating_average.toFixed(2)} · {dj.rating_count} anmeldelser
                 </div>
               </div>
               <div className="text-right">
@@ -140,7 +140,7 @@ export function BookingHero({ booking }: { booking: BookingWithRelations }) {
                 <div className="text-lg font-semibold">
                   {total !== null
                     ? formatCurrency(total, booking.currency)
-                    : "Quote pending"}
+                    : "Tilbud afventer"}
                 </div>
               </div>
             </div>

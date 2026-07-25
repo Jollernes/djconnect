@@ -16,11 +16,11 @@ export function ContactStep({
   return (
     <div className="space-y-5">
       <div className="rounded-2xl border bg-rose-50/60 px-4 py-3 text-xs text-rose-900/80">
-        We'll email this brief to 3 matching DJs. They reply directly to you — no spam from us.
+        Vi sender denne brief til 3 matchende DJs. De svarer dig direkte — ingen spam fra os.
       </div>
       <div>
         <Label className="flex items-center gap-2 text-sm font-semibold">
-          <User className="h-4 w-4 text-rose-500" /> Your name
+          <User className="h-4 w-4 text-rose-500" /> Dit navn
         </Label>
         <Input
           value={name}
@@ -31,7 +31,7 @@ export function ContactStep({
       </div>
       <div>
         <Label className="flex items-center gap-2 text-sm font-semibold">
-          <Mail className="h-4 w-4 text-rose-500" /> Email
+          <Mail className="h-4 w-4 text-rose-500" /> E-mail
         </Label>
         <Input
           type="email"
@@ -44,8 +44,8 @@ export function ContactStep({
       </div>
       <div>
         <Label className="flex items-center gap-2 text-sm font-semibold">
-          <Phone className="h-4 w-4 text-rose-500" /> Phone
-          <span className="text-[11px] font-normal text-muted-foreground">(optional)</span>
+          <Phone className="h-4 w-4 text-rose-500" /> Telefon
+          <span className="text-[11px] font-normal text-muted-foreground">(valgfrit)</span>
         </Label>
         <Input
           type="tel"
@@ -57,13 +57,13 @@ export function ContactStep({
         />
       </div>
       <p className="text-center text-[11px] text-muted-foreground">
-        By continuing you agree to our{" "}
+        Ved at fortsætte accepterer du vores{" "}
         <a href="/terms" className="underline">
-          Terms
+          Vilkår
         </a>
-        {" "}and{" "}
+        {" "}og{" "}
         <a href="/privacy" className="underline">
-          Privacy Policy
+          Privatlivspolitik
         </a>
         .
       </p>

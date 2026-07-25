@@ -21,7 +21,7 @@ export function AuthCallbackPage() {
   return (
     <div className="container py-16">
       <Skeleton className="mx-auto h-10 w-64" />
-      <p className="mt-4 text-center text-muted-foreground">Signing you in…</p>
+      <p className="mt-4 text-center text-muted-foreground">Logger dig ind…</p>
     </div>
   );
 }

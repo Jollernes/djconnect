@@ -1,20 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { mockDJs } from "@/data/mock";
-import type { DJProfileWithRelations, SearchFilters, Review } from "@/types/domain";
+import { readDemoDJProfile } from "@/lib/demoDJProfile";
+import type { DJProfileWithRelations, SearchFilters, Review, DJEquipmentPhoto } from "@/types/domain";
+import type { SetupSize } from "@/types/database";
 
 export function useDJs(filters: SearchFilters = {}) {
   const [djs, setDJs] = useState<DJProfileWithRelations[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const filtersKey = JSON.stringify(filters);
+
+  const loadDemoData = useCallback(() => {
+    const f: SearchFilters = JSON.parse(filtersKey);
+    const base = mockDJs.map((dj) =>
+      dj.id === mockDJs[0]!.id ? applyDemoEdits(dj) : dj,
+    );
+    return applyFilters(base, f);
+  }, [filtersKey]);
 
   useEffect(() => {
     let cancelled = false;
     async function run() {
       setLoading(true);
       if (!isSupabaseConfigured || !supabase) {
-        const filtered = applyFilters(mockDJs, filters);
         if (!cancelled) {
-          setDJs(filtered);
+          setDJs(loadDemoData());
           setLoading(false);
         }
         return;
@@ -43,7 +54,14 @@ export function useDJs(filters: SearchFilters = {}) {
     return () => {
       cancelled = true;
     };
-  }, [JSON.stringify(filters)]);
+  }, [filtersKey, loadDemoData]);
+
+  useEffect(() => {
+    if (isSupabaseConfigured) return;
+    const onUpdate = () => setDJs(loadDemoData());
+    window.addEventListener("demoDJProfile:update", onUpdate);
+    return () => window.removeEventListener("demoDJProfile:update", onUpdate);
+  }, [loadDemoData]);
 
   return { djs, loading };
 }
@@ -53,14 +71,19 @@ export function useDJ(username: string) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const loadDemoDJ = useCallback(() => {
+    const found = mockDJs.find((d) => d.username === username) ?? null;
+    if (found && found.id === mockDJs[0]!.id) return applyDemoEdits(found);
+    return found;
+  }, [username]);
+
   useEffect(() => {
     let cancelled = false;
     async function run() {
       setLoading(true);
       if (!isSupabaseConfigured || !supabase) {
-        const found = mockDJs.find((d) => d.username === username) ?? null;
         if (!cancelled) {
-          setDJ(found);
+          setDJ(loadDemoDJ());
           setLoading(false);
         }
         return;
@@ -94,9 +117,76 @@ export function useDJ(username: string) {
     return () => {
       cancelled = true;
     };
-  }, [username]);
+  }, [username, loadDemoDJ]);
+
+  useEffect(() => {
+    if (isSupabaseConfigured) return;
+    const onUpdate = () => setDJ(loadDemoDJ());
+    window.addEventListener("demoDJProfile:update", onUpdate);
+    return () => window.removeEventListener("demoDJProfile:update", onUpdate);
+  }, [loadDemoDJ]);
 
   return { dj, reviews, loading };
+}
+
+function applyDemoEdits(base: DJProfileWithRelations): DJProfileWithRelations {
+  const demo = readDemoDJProfile();
+  if (!demo) return base;
+
+  const activeKey = (typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("eventType")
+    : null) ?? "wedding";
+  const sub = demo.subProfiles?.[activeKey as keyof typeof demo.subProfiles];
+
+  const photos: DJEquipmentPhoto[] = [];
+  if (sub?.featuredPhotoDataUrl) {
+    photos.push(stubPhoto("featured", sub.featuredPhotoDataUrl));
+  }
+  sub?.gallery
+    ?.filter((g) => g.type === "photo")
+    .forEach((g) => photos.push(stubPhoto(g.id, g.dataUrl)));
+  if (demo.equipmentPhotoDataUrls?.length) {
+    demo.equipmentPhotoDataUrls.forEach((url, i) =>
+      photos.push(stubPhoto(`demo-equip-${i}`, url)),
+    );
+  }
+  // Append seed equipment photos as fallback grid content so the
+  // gallery stays populated even when only a hero photo is uploaded.
+  base.equipment_photos.forEach((p) => photos.push(p));
+
+  return {
+    ...base,
+    stage_name: demo.stageName?.trim() || base.stage_name,
+    tagline: sub?.tagline || base.tagline,
+    bio:
+      demo.subProfiles?.general?.bio?.trim() ||
+      sub?.bio?.trim() ||
+      demo.bio?.trim() ||
+      base.bio,
+    equipment_description: demo.equipmentDescription?.trim() || base.equipment_description,
+    setup_size: (demo.setupSize?.trim() as SetupSize) || base.setup_size,
+    price_from_minor: sub?.priceFromMajor
+      ? Math.round(sub.priceFromMajor * 100)
+      : base.price_from_minor,
+    profile: {
+      ...base.profile,
+      full_name: demo.fullName?.trim() || base.profile.full_name,
+      avatar_url: demo.profilePhotoDataUrl ?? base.profile.avatar_url,
+      city: demo.city?.trim() || base.profile.city,
+    },
+    equipment_photos: photos,
+  };
+}
+
+function stubPhoto(id: string, url: string): DJEquipmentPhoto {
+  return {
+    id,
+    dj_profile_id: "demo",
+    storage_path: "",
+    url,
+    sort_order: 0,
+    created_at: new Date().toISOString(),
+  } as DJEquipmentPhoto;
 }
 
 function applyFilters(djs: DJProfileWithRelations[], filters: SearchFilters): DJProfileWithRelations[] {

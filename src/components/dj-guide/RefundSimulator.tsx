@@ -16,17 +16,17 @@ export function RefundSimulator() {
   const keptAmount = bookingPrice - refundAmount;
 
   const band =
-    pct === 100 ? { label: "Full refund", color: "bg-emerald-500" }
-    : pct === 50 ? { label: "Partial refund", color: "bg-amber-500" }
-    : { label: "No refund", color: "bg-red-500" };
+    pct === 100 ? { label: "Fuld refundering", color: "bg-emerald-500" }
+    : pct === 50 ? { label: "Delvis refundering", color: "bg-amber-500" }
+    : { label: "Ingen refundering", color: "bg-red-500" };
 
   return (
     <div className="rounded-2xl border bg-card p-5 shadow-sm">
       <div className="flex items-center justify-between text-sm">
         <div>
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">If a customer cancels</div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground">Hvis en kunde afbestiller</div>
           <div className="text-lg font-semibold">
-            {days} day{days === 1 ? "" : "s"} before the event
+            {days} dag{days === 1 ? "" : "e"} før eventet
           </div>
         </div>
         <motion.span
@@ -56,15 +56,15 @@ export function RefundSimulator() {
       </div>
 
       <div className="mt-5 grid grid-cols-3 gap-2 text-xs">
-        <Stat label="Customer refunded" value={`DKK ${refundAmount.toLocaleString()}`} />
-        <Stat label="Retained" value={`DKK ${keptAmount.toLocaleString()}`} highlight />
-        <Stat label="Refund %" value={`${pct}%`} />
+        <Stat label="Kunde refunderet" value={`${refundAmount.toLocaleString("da-DK")} kr.`} />
+        <Stat label="Beholdt" value={`${keptAmount.toLocaleString("da-DK")} kr.`} highlight />
+        <Stat label="Refundering %" value={`${pct}%`} />
       </div>
 
       <ul className="mt-4 space-y-1 text-xs text-muted-foreground">
-        <Row active={days >= 14} label="14+ days before event — 100% refund" />
-        <Row active={days >= 7 && days < 14} label="7–14 days before event — 50% refund" />
-        <Row active={days < 7} label="Less than 7 days — no refund" />
+        <Row active={days >= 14} label="14+ dage før eventet — 100% refundering" />
+        <Row active={days >= 7 && days < 14} label="7–14 dage før eventet — 50% refundering" />
+        <Row active={days < 7} label="Mindre end 7 dage — ingen refundering" />
       </ul>
     </div>
   );

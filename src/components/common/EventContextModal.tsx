@@ -19,8 +19,8 @@ export function EventContextModal({
   value,
   onSelect,
   onBrowseAll,
-  title = "What kind of event are you planning?",
-  description = "We'll show DJs that match the event type — same photos, sets, and pricing they'd bring on the night.",
+  title = "Hvilken slags event planlægger du?",
+  description = "Vi viser DJs, der matcher eventtypen — samme billeder, sæt og priser, som de ville tage med på aftenen.",
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -47,10 +47,10 @@ export function EventContextModal({
               onOpenChange(false);
             }}
           >
-            Just let me browse all DJs
+Lad mig bare se alle DJs
           </button>
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
-            Close
+            Luk
           </Button>
         </div>
       </DialogContent>

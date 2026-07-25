@@ -6,7 +6,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 export function AdminBookingsPage() {
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">All bookings</h1>
+      <h1 className="text-2xl font-semibold">Alle bookinger</h1>
       <Card>
         <CardContent className="p-0">
           <table className="w-full text-sm">
@@ -15,7 +15,7 @@ export function AdminBookingsPage() {
                 <th className="p-3 font-medium">Ref</th>
                 <th className="p-3 font-medium">Event</th>
                 <th className="p-3 font-medium">DJ</th>
-                <th className="p-3 font-medium">Customer</th>
+                <th className="p-3 font-medium">Kunde</th>
                 <th className="p-3 font-medium">Total</th>
                 <th className="p-3 font-medium">Status</th>
               </tr>

@@ -44,7 +44,7 @@ export function ChapterShell({
             <Icon className="h-5 w-5" />
           </span>
           <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            {eyebrow} · Chapter {index + 1} of {total}
+            {eyebrow} · Kapitel {index + 1} af {total}
           </span>
         </div>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">{title}</h2>
@@ -67,7 +67,7 @@ export function ChapterShell({
           <span className="text-sm">
             <span className="font-medium">{ackLabel}</span>
             <span className="mt-0.5 block text-xs text-muted-foreground">
-              You can only advance once you've confirmed you've read and understood this chapter.
+              Du kan først gå videre, når du har bekræftet, at du har læst og forstået dette kapitel.
             </span>
           </span>
         </label>

@@ -15,63 +15,63 @@ type Question = {
 export const QUESTIONS: Question[] = [
   {
     id: "fee",
-    prompt: "What is DJConnect's platform fee?",
+    prompt: "Hvad er DJConnects platformsgebyr?",
     options: [
-      { id: "a", label: "5% of the booking value" },
-      { id: "b", label: "10% of the booking value" },
-      { id: "c", label: "20% of the booking value" },
-      { id: "d", label: "A flat DKK 100 per booking" },
+      { id: "a", label: "5% af bookingværdien" },
+      { id: "b", label: "10% af bookingværdien" },
+      { id: "c", label: "20% af bookingværdien" },
+      { id: "d", label: "Et fast beløb på 100 kr. pr. booking" },
     ],
     correct: "b",
-    explain: "DJConnect takes a flat 10% service fee from each booking. You keep the other 90%.",
+    explain: "DJConnect tager et fast servicegebyr på 10% af hver booking. Du beholder de resterende 90%.",
   },
   {
     id: "payout",
-    prompt: "When do payouts release to your Stripe account?",
+    prompt: "Hvornår frigives udbetalinger til din Stripe-konto?",
     options: [
-      { id: "a", label: "Immediately when the customer pays" },
-      { id: "b", label: "When the DJ accepts the booking" },
-      { id: "c", label: "24 hours after the event date" },
-      { id: "d", label: "At the end of each month" },
+      { id: "a", label: "Med det samme når kunden betaler" },
+      { id: "b", label: "Når DJ'en accepterer bookingen" },
+      { id: "c", label: "24 timer efter eventdatoen" },
+      { id: "d", label: "Ved udgangen af hver måned" },
     ],
     correct: "c",
-    explain: "Funds sit in escrow until 24h after the event date, then Stripe releases your 90%. Bank deposit usually lands 2–5 business days after that.",
+    explain: "Pengene ligger i escrow indtil 24 timer efter eventdatoen, hvorefter Stripe frigiver dine 90%. Bankindbetalingen lander normalt 2–5 bankdage efter det.",
   },
   {
     id: "cancel",
-    prompt: "A customer cancels 10 days before the event. What happens?",
+    prompt: "En kunde afbestiller 10 dage før eventet. Hvad sker der?",
     options: [
-      { id: "a", label: "Full refund to the customer" },
-      { id: "b", label: "50% refund to the customer" },
-      { id: "c", label: "No refund — you keep everything" },
-      { id: "d", label: "You decide on a case-by-case basis" },
+      { id: "a", label: "Fuld refundering til kunden" },
+      { id: "b", label: "50% refundering til kunden" },
+      { id: "c", label: "Ingen refundering — du beholder det hele" },
+      { id: "d", label: "Du afgør det fra sag til sag" },
     ],
     correct: "b",
-    explain: "The cancellation policy is: 14+ days = 100% refund, 7–14 days = 50% refund, <7 days = no refund. It's non-negotiable and applied automatically.",
+    explain: "Afbestillingspolitikken er: 14+ dage = 100% refundering, 7–14 dage = 50% refundering, <7 dage = ingen refundering. Den er ikke til forhandling og anvendes automatisk.",
   },
   {
     id: "messages",
-    prompt: "Where should all customer communication happen?",
+    prompt: "Hvor skal al kundekommunikation foregå?",
     options: [
-      { id: "a", label: "WhatsApp, for convenience" },
-      { id: "b", label: "Direct email so you have it in your inbox" },
-      { id: "c", label: "In-platform messaging on DJConnect" },
-      { id: "d", label: "Phone calls only" },
+      { id: "a", label: "WhatsApp, for nemheds skyld" },
+      { id: "b", label: "Direkte e-mail så du har det i din indbakke" },
+      { id: "c", label: "Beskeder på DJConnect-platformen" },
+      { id: "d", label: "Kun telefonopkald" },
     ],
     correct: "c",
-    explain: "Always use DJConnect messaging. It creates a paper trail, protects both parties, and is required for dispute resolution.",
+    explain: "Brug altid DJConnects beskeder. Det skaber dokumentation, beskytter begge parter og er nødvendigt for tvistløsning.",
   },
   {
     id: "equipment",
-    prompt: "You arrive at an event and realise you're missing a cable. What's the rule?",
+    prompt: "Du ankommer til et event og opdager, at du mangler et kabel. Hvad er reglen?",
     options: [
-      { id: "a", label: "Ask the customer if they have one" },
-      { id: "b", label: "Cancel the booking on the spot" },
-      { id: "c", label: "Always bring your own complete, tested mobile disco setup" },
-      { id: "d", label: "Borrow gear from the venue" },
+      { id: "a", label: "Spørg kunden, om de har et" },
+      { id: "b", label: "Afbestil bookingen på stedet" },
+      { id: "c", label: "Medbring altid dit eget komplette, testede mobildiskotek" },
+      { id: "d", label: "Lån udstyr af lokationen" },
     ],
     correct: "c",
-    explain: "DJConnect's promise is a verified, full mobile disco setup. Always bring your own complete kit plus spares. Venue equipment is a bonus, never a dependency.",
+    explain: "DJConnects løfte er et verificeret, komplet mobildiskotek. Medbring altid dit eget komplette grej plus reservedele. Lokationens udstyr er en bonus, aldrig en afhængighed.",
   },
 ];
 
@@ -127,9 +127,9 @@ export function QuizStep({ onPassed }: Props) {
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-accent/15 text-accent">
               <Sparkles className="h-6 w-6" />
             </span>
-            <h3 className="mt-4 text-2xl font-semibold">You nailed it — {score}/{QUESTIONS.length}</h3>
+            <h3 className="mt-4 text-2xl font-semibold">Du klarede det — {score}/{QUESTIONS.length}</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              You're ready to start accepting bookings. Review any chapter from the sidebar if you'd like.
+              Du er klar til at begynde at acceptere bookinger. Gennemgå gerne et kapitel fra sidemenuen, hvis du vil.
             </p>
             <Button
               className="mt-5"
@@ -140,7 +140,7 @@ export function QuizStep({ onPassed }: Props) {
                 onPassed();
               }}
             >
-              Finish the guide <Sparkles className="h-4 w-4" />
+              Afslut guiden <Sparkles className="h-4 w-4" />
             </Button>
           </>
         ) : (
@@ -148,9 +148,9 @@ export function QuizStep({ onPassed }: Props) {
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-amber-500/15 text-amber-600">
               <X className="h-6 w-6" />
             </span>
-            <h3 className="mt-4 text-2xl font-semibold">Almost there — {score}/{QUESTIONS.length}</h3>
+            <h3 className="mt-4 text-2xl font-semibold">Du er næsten der — {score}/{QUESTIONS.length}</h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              You need all {QUESTIONS.length} correct to finish the guide. Review the explanations and try again — it's quick.
+              Du skal have alle {QUESTIONS.length} rigtige for at gennemføre guiden. Gennemgå forklaringerne og prøv igen — det går hurtigt.
             </p>
             <div className="mt-4 space-y-2 text-left text-sm">
               {QUESTIONS.map((qq) => {
@@ -168,7 +168,7 @@ export function QuizStep({ onPassed }: Props) {
               })}
             </div>
             <Button className="mt-5" variant="accent" size="lg" onClick={retry}>
-              <RotateCcw className="h-4 w-4" /> Try again
+              <RotateCcw className="h-4 w-4" /> Prøv igen
             </Button>
           </>
         )}
@@ -179,8 +179,8 @@ export function QuizStep({ onPassed }: Props) {
   return (
     <div className="rounded-2xl border bg-card p-6">
       <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
-        <span>Question {index + 1} of {QUESTIONS.length}</span>
-        <span>{score} correct so far</span>
+        <span>Spørgsmål {index + 1} af {QUESTIONS.length}</span>
+        <span>{score} rigtige indtil videre</span>
       </div>
       <div className="h-1.5 overflow-hidden rounded-full bg-muted">
         <motion.div
@@ -230,7 +230,7 @@ export function QuizStep({ onPassed }: Props) {
             className={cn("mt-4 rounded-lg border p-3 text-sm", correct ? "border-emerald-300 bg-emerald-50" : "border-amber-300 bg-amber-50")}
           >
             <div className={cn("text-xs font-semibold", correct ? "text-emerald-700" : "text-amber-700")}>
-              {correct ? "Correct!" : "Not quite — here's why"}
+              {correct ? "Rigtigt!" : "Ikke helt — her er hvorfor"}
             </div>
             <p className="mt-1 text-muted-foreground">{q.explain}</p>
           </motion.div>
@@ -239,7 +239,7 @@ export function QuizStep({ onPassed }: Props) {
 
       <div className="mt-5 flex justify-end">
         <Button variant={didReveal ? "accent" : "outline"} disabled={!didReveal} onClick={next}>
-          {index === QUESTIONS.length - 1 ? "See results" : "Next question"}
+          {index === QUESTIONS.length - 1 ? "Se resultater" : "Næste spørgsmål"}
         </Button>
       </div>
     </div>

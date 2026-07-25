@@ -32,10 +32,10 @@ export function WhenWhereStep({
       {/* Date */}
       <div>
         <Label className="flex items-center gap-2 text-sm font-semibold">
-          <Calendar className="h-4 w-4 text-rose-500" /> Event date
+          <Calendar className="h-4 w-4 text-rose-500" /> Eventdato
         </Label>
         <p className="mt-1 text-xs text-muted-foreground">
-          Approximate is fine — DJs respond faster when they can check availability.
+          Cirka-dato er fint — DJs svarer hurtigere, når de kan tjekke tilgængelighed.
         </p>
         <Input
           type="date"
@@ -49,10 +49,10 @@ export function WhenWhereStep({
       {/* City */}
       <div>
         <Label className="flex items-center gap-2 text-sm font-semibold">
-          <MapPin className="h-4 w-4 text-rose-500" /> Where is the event?
+          <MapPin className="h-4 w-4 text-rose-500" /> Hvor afholdes eventet?
         </Label>
         <p className="mt-1 text-xs text-muted-foreground">
-          Pick a city or add your own — most DJs travel up to 100 km from their base.
+          Vælg en by eller tilføj din egen — de fleste DJs rejser op til 100 km fra deres base.
         </p>
         <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-3">
           {CITY_OPTIONS.map((c) => {
@@ -93,13 +93,13 @@ export function WhenWhereStep({
                 : "border-border bg-white hover:border-rose-300 hover:bg-rose-50/20",
             )}
           >
-            <span className="text-sm font-semibold">Other</span>
-            <span className="text-[11px] text-muted-foreground">Type your city</span>
+            <span className="text-sm font-semibold">Andet</span>
+            <span className="text-[11px] text-muted-foreground">Skriv din by</span>
           </button>
         </div>
         {showCustomCity && (
           <Input
-            placeholder="e.g. Helsingør, Frederiksberg…"
+            placeholder="f.eks. Helsingør, Frederiksberg…"
             value={customCity ?? ""}
             onChange={(e) => onCustomCityChange(e.target.value)}
             className="mt-3 h-11"
