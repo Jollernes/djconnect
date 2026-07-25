@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Camera, ChevronDown, Eye, EyeOff, Handshake, Sparkles,
-  Check, AlertCircle, Circle, ExternalLink, Crop, X,
+  Check, AlertCircle, Circle, ExternalLink, Crop, X, Package,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -17,7 +17,13 @@ import {
   MOCKUP_SUB_PROFILE_META,
   type MockupSubProfileKey,
 } from "./shared/types";
-import type { DemoDJSubProfileKey } from "@/lib/demoDJProfile";
+import {
+  PACKAGE_KEYS,
+  PACKAGE_META,
+  getSubProfilePackages,
+  type DemoDJPackageKey,
+  type DemoDJSubProfileKey,
+} from "@/lib/demoDJProfile";
 
 type SectionStatus = "complete" | "needs-attention" | "empty";
 
@@ -33,6 +39,7 @@ const SECTIONS: SectionDef[] = [
   { id: "visuals", label: "Billeder & video", scope: "sub-profile", icon: Camera },
   { id: "voice", label: "Om mig", scope: "sub-profile", icon: Sparkles },
   { id: "sound", label: "Din tilgang til et event", scope: "sub-profile", icon: Handshake },
+  { id: "packages", label: "Pakker", scope: "sub-profile", icon: Package },
 ];
 
 /**
@@ -81,6 +88,12 @@ export function GuidedSectionsMockup() {
       return "empty";
     }
     if (id === "sound") return sub.approach ? "complete" : "empty";
+    if (id === "packages") {
+      const pkgs = getSubProfilePackages(sub);
+      return PACKAGE_KEYS.some((k) => pkgs[k].enabled && pkgs[k].description.trim())
+        ? "complete"
+        : "empty";
+    }
     return "empty";
   }
 
@@ -355,9 +368,88 @@ function SectionBody({
         </div>
       );
 
+    case "packages":
+      return <PackagesSection activeKey={activeKey} state={state} />;
+
     default:
       return null;
   }
+}
+
+/** Per-sub-profile packages editor: three fixed packages (Festpakke,
+ * Middag + Fest, Andet) the DJ can toggle on/off and describe. */
+function PackagesSection({
+  activeKey,
+  state,
+}: {
+  activeKey: MockupSubProfileKey;
+  state: ReturnType<typeof useMockupState>["state"];
+}) {
+  const sub = state.subProfiles[activeKey];
+  const packages = getSubProfilePackages(sub);
+
+  function updatePackage(key: DemoDJPackageKey, patch: Partial<{ description: string; enabled: boolean }>) {
+    state.updateSubProfile(activeKey, "packages", {
+      ...packages,
+      [key]: { ...packages[key], ...patch },
+    });
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-muted-foreground">
+        Vælg hvilke pakker du tilbyder til denne profil, og beskriv kort hvad hver pakke indeholder.
+      </p>
+      {PACKAGE_KEYS.map((key) => {
+        const pkg = packages[key];
+        return (
+          <div
+            key={key}
+            className={cn(
+              "rounded-xl border p-4 transition-colors",
+              pkg.enabled ? "border-border bg-card" : "border-dashed bg-muted/20",
+            )}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4 text-muted-foreground" />
+                <p className="text-sm font-semibold">{PACKAGE_META[key].label}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => updatePackage(key, { enabled: !pkg.enabled })}
+                aria-pressed={pkg.enabled}
+                className={cn(
+                  "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
+                  pkg.enabled ? "bg-accent" : "bg-muted-foreground/30",
+                )}
+              >
+                <span
+                  className={cn(
+                    "inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform",
+                    pkg.enabled ? "translate-x-4" : "translate-x-0.5",
+                  )}
+                />
+              </button>
+            </div>
+            {pkg.enabled && (
+              <div className="mt-3 space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">
+                  Beskrivelse
+                </Label>
+                <Textarea
+                  value={pkg.description}
+                  onChange={(e) => updatePackage(key, { description: e.target.value })}
+                  rows={3}
+                  placeholder={`Hvad indeholder ${PACKAGE_META[key].label.toLowerCase()}? Fx varighed, lyd/lys, opsætning …`}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 /** Event types a gallery photo can be tagged with. "Generel" is

@@ -29,6 +29,48 @@ export type DemoDJMediaItem = {
   eventTags?: DemoDJSubProfileKey[];
 };
 
+/** The fixed set of packages a DJ can offer per sub-profile. */
+export type DemoDJPackageKey = "party" | "dinner_party" | "other";
+
+export type DemoDJPackage = {
+  /** Editable, customer-facing description of what the package includes. */
+  description: string;
+  /** Whether the package is offered on this sub-profile. */
+  enabled: boolean;
+};
+
+export const PACKAGE_KEYS: DemoDJPackageKey[] = [
+  "party",
+  "dinner_party",
+  "other",
+];
+
+export const PACKAGE_META: Record<DemoDJPackageKey, { label: string }> = {
+  party: { label: "Festpakke" },
+  dinner_party: { label: "Middag + Fest" },
+  other: { label: "Andet (reception, lounge etc.)" },
+};
+
+export function defaultPackages(): Record<DemoDJPackageKey, DemoDJPackage> {
+  return {
+    party: { description: "", enabled: true },
+    dinner_party: { description: "", enabled: true },
+    other: { description: "", enabled: false },
+  };
+}
+
+export function getSubProfilePackages(
+  sp: DemoDJSubProfile | undefined,
+): Record<DemoDJPackageKey, DemoDJPackage> {
+  const base = defaultPackages();
+  if (!sp?.packages) return base;
+  return {
+    party: { ...base.party, ...sp.packages.party },
+    dinner_party: { ...base.dinner_party, ...sp.packages.dinner_party },
+    other: { ...base.other, ...sp.packages.other },
+  };
+}
+
 export type DemoDJSubProfile = {
   /** Headline displayed at the top of the public profile for this event type. */
   tagline: string;
@@ -54,6 +96,12 @@ export type DemoDJSubProfile = {
    * with wedding moments and a corporate DJ can show conference setups.
    */
   gallery: DemoDJMediaItem[];
+  /**
+   * Optional per-event-type packages (Festpakke / Middag + Fest / Andet)
+   * the DJ offers. Optional so existing stored profiles stay valid;
+   * `getSubProfilePackages` fills in defaults.
+   */
+  packages?: Record<DemoDJPackageKey, DemoDJPackage>;
 };
 
 export const SUB_PROFILE_KEYS: DemoDJSubProfileKey[] = [
@@ -181,6 +229,7 @@ export function emptySubProfile(): DemoDJSubProfile {
     approach: "",
     priceFromMajor: 0,
     gallery: [],
+    packages: defaultPackages(),
   };
 }
 
