@@ -48,7 +48,7 @@ export const PACKAGE_KEYS: DemoDJPackageKey[] = [
 export const PACKAGE_META: Record<DemoDJPackageKey, { label: string }> = {
   party: { label: "Festpakke" },
   dinner_party: { label: "Middag + Fest" },
-  other: { label: "Andet (reception, lounge etc.)" },
+  other: { label: "Skræddersy" },
 };
 
 export function defaultPackages(): Record<DemoDJPackageKey, DemoDJPackage> {
