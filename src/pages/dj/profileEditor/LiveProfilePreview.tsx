@@ -136,7 +136,7 @@ export function buildPreviewDJ(state: DJProfileEditorState): DJProfileWithRelati
     ...seed,
     stage_name: stageName || seed.stage_name,
     tagline: sub.tagline || seed.tagline,
-    bio: sub.bio?.trim() || bio || seed.bio,
+    bio: subProfiles.general?.bio?.trim() || sub.bio?.trim() || bio || seed.bio,
     equipment_description: equipment || seed.equipment_description,
     setup_size: (setupSize as SetupSize) || seed.setup_size,
     travel_radius_km: travelRadius || seed.travel_radius_km,

@@ -158,7 +158,11 @@ function applyDemoEdits(base: DJProfileWithRelations): DJProfileWithRelations {
     ...base,
     stage_name: demo.stageName?.trim() || base.stage_name,
     tagline: sub?.tagline || base.tagline,
-    bio: sub?.bio?.trim() || demo.bio?.trim() || base.bio,
+    bio:
+      demo.subProfiles?.general?.bio?.trim() ||
+      sub?.bio?.trim() ||
+      demo.bio?.trim() ||
+      base.bio,
     equipment_description: demo.equipmentDescription?.trim() || base.equipment_description,
     setup_size: (demo.setupSize?.trim() as SetupSize) || base.setup_size,
     price_from_minor: sub?.priceFromMajor

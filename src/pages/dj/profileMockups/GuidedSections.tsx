@@ -114,9 +114,12 @@ export function GuidedSectionsMockup() {
         subheading="Klik på en profil for at skifte. Hvert afsnit nedenfor er specifikt for den aktive profil, medmindre andet er angivet."
       />
 
-      {/* Sections accordion */}
+      {/* Sections accordion. "Om mig" (voice) is only editable on the
+          general profile — wedding / corporate reuse the general bio. */}
       <div className="space-y-3">
-        {SECTIONS.map((section) => {
+        {SECTIONS.filter(
+          (section) => section.id !== "voice" || activeKey === "general",
+        ).map((section) => {
           const Icon = section.icon;
           const status = statusFor(section.id);
           const isOpen = openSections.has(section.id);

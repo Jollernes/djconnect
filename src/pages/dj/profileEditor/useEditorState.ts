@@ -138,15 +138,27 @@ export function useDJProfileEditor() {
   /* ------------------------------------------------------------------ */
   /* Computed completion                                                  */
   /* ------------------------------------------------------------------ */
+  /** Non-general profiles reuse the general "Om mig" bio, so fall back to
+   * it when scoring their completeness. */
+  function effectiveSub(k: DemoDJSubProfileKey): DemoDJSubProfile {
+    const sp = subProfiles[k];
+    if (k === "general" || sp.bio?.trim()) return sp;
+    return { ...sp, bio: subProfiles.general.bio };
+  }
+
   const completion = useMemo(
     () =>
-      SUB_PROFILE_KEYS.map((k) => ({
-        key: k,
-        textComplete: isSubProfileTextComplete(subProfiles[k]),
-        mediaComplete: isSubProfileMediaComplete(subProfiles[k]),
-        complete: isSubProfileComplete(subProfiles[k]),
-        ratio: subProfileCompleteness(subProfiles[k]),
-      })),
+      SUB_PROFILE_KEYS.map((k) => {
+        const sp = effectiveSub(k);
+        return {
+          key: k,
+          textComplete: isSubProfileTextComplete(sp),
+          mediaComplete: isSubProfileMediaComplete(sp),
+          complete: isSubProfileComplete(sp),
+          ratio: subProfileCompleteness(sp),
+        };
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [subProfiles],
   );
   const completedCount = completion.filter((c) => c.complete).length;
@@ -226,7 +238,7 @@ export function useDJProfileEditor() {
   }
 
   function handleSaveSubProfile(current: DemoDJSubProfileKey) {
-    if (!isSubProfileTextComplete(subProfiles[current])) {
+    if (!isSubProfileTextComplete(effectiveSub(current))) {
       toast.error("Udfyld alle tekstfelter for denne underprofil");
       return;
     }
