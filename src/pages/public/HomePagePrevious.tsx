@@ -110,47 +110,9 @@ export function HomePagePrevious() {
     .sort((a, b) => b.rating_average - a.rating_average)
     .slice(0, 8);
 
-  const [eventType, setEventType] = useState<string>("");
-  const [region, setRegion] = useState("");
-
-  function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (region) params.set("region", region);
-    // Event-type subpages: route to dedicated landing page when one exists.
-    const eventLandingPaths: Record<string, string> = {
-      wedding: "/wedding-djs",
-    };
-    if (eventType && eventLandingPaths[eventType]) {
-      const qs = params.toString();
-      navigate(`${eventLandingPaths[eventType]}${qs ? `?${qs}` : ""}`);
-      return;
-    }
-    if (eventType) params.set("eventType", eventType);
-    navigate(`/search?${params.toString()}`);
-  }
-
   return (
     <>
-      {/* Mobile-only: full-bleed video hero with headline + search */}
-      <MobileHeroV2
-        navigate={navigate}
-        eventType={eventType}
-        setEventType={setEventType}
-        region={region}
-        setRegion={setRegion}
-        onSubmit={submit}
-      />
-
-      {/* Desktop-only: full-bleed image hero with headline + search */}
-      <DesktopHeroV2
-        navigate={navigate}
-        eventType={eventType}
-        setEventType={setEventType}
-        region={region}
-        setRegion={setRegion}
-        onSubmit={submit}
-      />
+      <FormerHomeHero />
 
       {/* Popular event types — image chips under the search/trust area */}
       <PopularEventTypes navigate={navigate} />
@@ -195,6 +157,55 @@ export function HomePagePrevious() {
       <Testimonials />
 
       <DJCta />
+    </>
+  );
+}
+
+/** Former homepage video hero (mobile + desktop variants with search). */
+export function FormerHomeHero() {
+  const navigate = useNavigate();
+  const [eventType, setEventType] = useState<string>("");
+  const [region, setRegion] = useState("");
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (region) params.set("region", region);
+    // Event-type subpages: route to dedicated landing page when one exists.
+    const eventLandingPaths: Record<string, string> = {
+      wedding: "/wedding-djs",
+    };
+    if (eventType && eventLandingPaths[eventType]) {
+      const qs = params.toString();
+      navigate(`${eventLandingPaths[eventType]}${qs ? `?${qs}` : ""}`);
+      return;
+    }
+    if (eventType) params.set("eventType", eventType);
+    navigate(`/search?${params.toString()}`);
+  }
+
+  return (
+    <>
+      {/* Mobile-only: full-bleed video hero with headline + search */}
+      <MobileHeroV2
+        navigate={navigate}
+        eventType={eventType}
+        setEventType={setEventType}
+        region={region}
+        setRegion={setRegion}
+        onSubmit={submit}
+      />
+
+      {/* Desktop-only: full-bleed image hero with headline + search */}
+      <DesktopHeroV2
+        navigate={navigate}
+        eventType={eventType}
+        setEventType={setEventType}
+        region={region}
+        setRegion={setRegion}
+        onSubmit={submit}
+      />
+
     </>
   );
 }
@@ -352,7 +363,7 @@ function DesktopHeroV2({
           {/* Mode tabs — full-width segmented row across the top of the card */}
           <div className="flex border-b border-border/60">
             {([
-              { id: "browse", label: "Browse DJs", Icon: Users },
+              { id: "browse", label: "Find DJs", Icon: Users },
               { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
             ] as const).map(({ id, label, Icon }) => {
               const active = mode === id;
@@ -400,7 +411,7 @@ function DesktopHeroV2({
                 {mode === "offers" ? (
                   <>Få 3 tilbud <ArrowRight className="h-4 w-4" /></>
                 ) : (
-                  <><Search className="h-4 w-4" /> Browse DJs</>
+                  <><Search className="h-4 w-4" /> Find DJs</>
                 )}
               </Button>
             </div>
@@ -539,7 +550,7 @@ function MobileHeroV2({
           {/* Mode tabs */}
           <div className="flex border-b border-border/60">
             {([
-              { id: "browse", label: "Browse DJs", Icon: Users },
+              { id: "browse", label: "Find DJs", Icon: Users },
               { id: "offers", label: "Få 3 tilbud", Icon: CalendarCheck2 },
             ] as const).map(({ id, label, Icon }) => {
               const active = mode === id;
@@ -583,7 +594,7 @@ function MobileHeroV2({
               {mode === "offers" ? (
                 <>Få 3 tilbud <ArrowRight className="h-4 w-4" /></>
               ) : (
-                <><Search className="h-4 w-4" /> Browse DJs</>
+                <><Search className="h-4 w-4" /> Find DJs</>
               )}
             </Button>
           </form>
