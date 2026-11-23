@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { HeroDJCluster } from "@/components/common/HeroDJCluster";
-import { EventTypePicker } from "@/pages/public/HomePage";
+import { EventTypePicker } from "@/pages/public/HomePagePrevious";
 import { useDJs } from "@/hooks/useDJs";
 import type { DJProfileWithRelations } from "@/types/domain";
 

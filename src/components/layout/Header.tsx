@@ -41,6 +41,8 @@ type NavLinkSpec = {
    * of navigating. The `to` is still used by NavLink for isActive matching.
    */
   opensBrowseGate?: boolean;
+  /** In-page section id to scroll to instead of navigating. */
+  anchor?: string;
 };
 
 const STATIC_LINKS: NavLinkSpec[] = [
@@ -60,13 +62,18 @@ export function Header() {
   // Recompute the Browse-DJs link target on every navigation so the
   // NavLink's `to` (and therefore its isActive matching) stays in sync
   // with the current event-context, which may have just changed.
+  const isHome = location.pathname === "/";
   const navLinks = useMemo<NavLinkSpec[]>(
-    () => [
-      { to: browseDJsPath(), label: "Find DJs", opensBrowseGate: true },
-      ...STATIC_LINKS,
-    ],
+    () =>
+      isHome
+        ? [
+            { to: browseDJsPath(), label: "Find DJ", opensBrowseGate: true },
+            { to: "/#pakkeguide", label: "Pakkeguide", anchor: "pakkeguide" },
+            { to: "/signup/dj", label: "Bliv DJ" },
+          ]
+        : [{ to: browseDJsPath(), label: "Find DJs", opensBrowseGate: true }, ...STATIC_LINKS],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [location.pathname],
+    [location.pathname, isHome],
   );
 
   // Browse-DJs gate state. Opened by the header link, the search icon, or
@@ -85,37 +92,35 @@ export function Header() {
     return () => window.removeEventListener(BROWSE_GATE_EVENT, onOpen);
   }, []);
 
+  function handleNavClick(e: React.MouseEvent, link: NavLinkSpec) {
+    if (link.opensBrowseGate) {
+      e.preventDefault();
+      openGate();
+    } else if (link.anchor) {
+      const el = document.getElementById(link.anchor);
+      if (el) {
+        e.preventDefault();
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }
+
   function openGate(initial?: OpenBrowseGateDetail) {
     setGateInitial(initial);
     setGateOpen(true);
   }
 
-  const dashboardPath =
-    profile?.role === "admin" ? "/admin" : profile?.role === "dj" ? "/dj/dashboard" : "/dashboard";
-
-  return (
-    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
-      <div className="container flex h-16 items-center justify-between gap-4">
-        <div className="flex items-center gap-8">
-          <Link to="/" className="group flex items-center gap-2.5 font-semibold">
-            <BrandMark size="sm" className="transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
-            <span className="text-lg tracking-tight">{PLATFORM_NAME}</span>
-          </Link>
+  const navEl = (
           <nav className="hidden md:flex md:items-center md:gap-6">
             {navLinks.map((link) => (
               <NavLink
                 key={link.label}
                 to={link.to}
-                onClick={
-                  link.opensBrowseGate
-                    ? (e) => {
-                        e.preventDefault();
-                        openGate();
-                      }
-                    : undefined
-                }
+                onClick={(e) => handleNavClick(e, link)}
                 className={({ isActive }) =>
-                  cn(
+                  isHome
+                    ? "text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+                    : cn(
                     "text-sm font-medium transition-colors hover:text-foreground",
                     link.highlight === "primary"
                       ? cn(
@@ -137,16 +142,31 @@ export function Header() {
               </NavLink>
             ))}
           </nav>
+  );
+
+  const dashboardPath =
+    profile?.role === "admin" ? "/admin" : profile?.role === "dj" ? "/dj/dashboard" : "/dashboard";
+
+  return (
+    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
+      <div className="container flex h-16 items-center justify-between gap-4">
+        <div className="flex items-center gap-8">
+          <Link to="/" className="group flex items-center gap-2.5 font-semibold">
+            <BrandMark size="sm" className="transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
+            <span className="text-lg tracking-tight">{PLATFORM_NAME}</span>
+          </Link>
+          {!isHome && navEl}
         </div>
 
         <div className="flex items-center gap-2">
+          {isHome && <div className="mr-2 hidden md:block">{navEl}</div>}
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen((o) => !o)} aria-label="Menu">
             <Menu className="h-5 w-5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="hidden sm:inline-flex"
+            className={cn("hidden sm:inline-flex", isHome && "sm:hidden")}
             aria-label="Søg DJs"
             onClick={() => openGate()}
           >
@@ -208,12 +228,14 @@ export function Header() {
             </DropdownMenu>
           ) : (
             <div className="hidden gap-2 sm:flex">
-              <Button asChild variant="ghost">
+              <Button asChild variant={isHome ? "outline" : "ghost"} className={cn(isHome && "rounded-full px-5")}>
                 <Link to="/login">Log ind</Link>
               </Button>
-              <Button asChild variant="accent">
-                <Link to="/signup">Opret konto</Link>
-              </Button>
+              {!isHome && (
+                <Button asChild variant="accent">
+                  <Link to="/signup">Opret konto</Link>
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -229,10 +251,7 @@ export function Header() {
                 className="py-2 text-sm font-medium"
                 onClick={(e) => {
                   setMobileOpen(false);
-                  if (l.opensBrowseGate) {
-                    e.preventDefault();
-                    openGate();
-                  }
+                  handleNavClick(e, l);
                 }}
               >
                 {l.label}
@@ -245,11 +264,13 @@ export function Header() {
                     Log ind
                   </Link>
                 </Button>
-                <Button asChild variant="accent" className="flex-1">
-                  <Link to="/signup" onClick={() => setMobileOpen(false)}>
-                    Opret konto
-                  </Link>
-                </Button>
+                {!isHome && (
+                  <Button asChild variant="accent" className="flex-1">
+                    <Link to="/signup" onClick={() => setMobileOpen(false)}>
+                      Opret konto
+                    </Link>
+                  </Button>
+                )}
               </div>
             )}
           </div>

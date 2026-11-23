@@ -9,6 +9,7 @@ import { RoleSwitcher } from "@/components/dev/RoleSwitcher";
 
 import { HomePage } from "@/pages/public/HomePage";
 import { HomePageClassic } from "@/pages/public/HomePageClassic";
+import { HomePagePrevious } from "@/pages/public/HomePagePrevious";
 import { FrontPageMockups } from "@/pages/public/FrontPageMockups";
 import { SearchPage } from "@/pages/public/SearchPage";
 import { WeddingDJsPage } from "@/pages/public/WeddingDJsPage";
@@ -86,6 +87,7 @@ function App() {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/forside-original" element={<HomePageClassic />} />
+            <Route path="/forside-forrige" element={<HomePagePrevious />} />
             <Route path="/forside-mockups" element={<FrontPageMockups />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/wedding-djs" element={<WeddingDJsPage />} />

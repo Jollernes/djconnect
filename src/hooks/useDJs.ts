@@ -31,12 +31,12 @@ export function useDJs(filters: SearchFilters = {}) {
         return;
       }
       // Basic Supabase query — for more complex filtering use an RPC/view.
-      const { data, error } = await supabase
+      const { data, error } = await withTimeout(supabase
         .from("dj_profiles")
         .select(
           "*, profile:profiles!dj_profiles_user_id_fkey(*), equipment_photos:dj_equipment_photos(*), event_types:dj_event_types(event_type:event_types(*))",
         )
-        .eq("verification_status", "approved");
+        .eq("verification_status", "approved"));
       if (cancelled) return;
       if (error) {
         console.error(error);
@@ -88,16 +88,19 @@ export function useDJ(username: string) {
         }
         return;
       }
-      const { data } = await supabase
+      const { data } = await withTimeout(supabase
         .from("dj_profiles")
         .select(
           "*, profile:profiles!dj_profiles_user_id_fkey(*), equipment_photos:dj_equipment_photos(*), event_types:dj_event_types(event_type:event_types(*))",
         )
         .eq("username", username)
         .eq("verification_status", "approved")
-        .maybeSingle();
+        .maybeSingle());
       if (cancelled) return;
-      if (data) {
+      if (!data) {
+        // Seeded demo DJs stay viewable when their live account can't be loaded.
+        setDJ(loadDemoDJ());
+      } else {
         const row = data as unknown as any;
         setDJ({
           ...row,
@@ -127,6 +130,29 @@ export function useDJ(username: string) {
   }, [loadDemoDJ]);
 
   return { dj, reviews, loading };
+}
+
+const QUERY_TIMEOUT_MS = 6000;
+
+/** Resolves with an error result if the backend doesn't answer in time
+ * (e.g. an unreachable Supabase host), so pages never hang on loading. */
+async function withTimeout<T>(
+  query: PromiseLike<{ data: T | null; error: unknown }>,
+): Promise<{ data: T | null; error: unknown }> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<{ data: null; error: Error }>((resolve) => {
+    timer = setTimeout(
+      () => resolve({ data: null, error: new Error("Supabase request timed out") }),
+      QUERY_TIMEOUT_MS,
+    );
+  });
+  try {
+    return await Promise.race([Promise.resolve(query), timeout]);
+  } catch (error) {
+    return { data: null, error };
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function applyDemoEdits(base: DJProfileWithRelations): DJProfileWithRelations {
