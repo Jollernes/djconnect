@@ -18,7 +18,7 @@ export function DJRecruitment() {
             Har du dit eget lyd- og lysanlæg?
           </h2>
           <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-300 sm:text-lg">
-            Bliv en del af Danmarks marketplace for mobile DJs, og få flere bookinger til bryllupper, firmafester og
+            Bliv en del af Danmarks markedsplads for mobile DJs, og få flere bookinger til bryllupper, firmafester og
             private fester.
           </p>
           <ul className="mt-6 space-y-3">

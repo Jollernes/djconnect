@@ -97,10 +97,17 @@ export function Header() {
       e.preventDefault();
       openGate();
     } else if (link.anchor) {
-      const el = document.getElementById(link.anchor);
-      if (el) {
+      const anchor = link.anchor;
+      if (document.getElementById(anchor)) {
         e.preventDefault();
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Wait for the mobile menu to collapse so the header height is final.
+        setTimeout(() => {
+          const el = document.getElementById(anchor);
+          if (!el) return;
+          const headerHeight = document.querySelector("header")?.getBoundingClientRect().height ?? 0;
+          const top = el.getBoundingClientRect().top + window.scrollY - headerHeight;
+          window.scrollTo({ top, behavior: "smooth" });
+        }, 50);
       }
     }
   }

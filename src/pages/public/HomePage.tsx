@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { REGIONS } from "@/lib/djStandardSettings";
 import { useDJs } from "@/hooks/useDJs";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { mockDJs } from "@/data/mock";
@@ -188,9 +187,11 @@ function Hero() {
   );
 }
 
+const CITIES = ["København", "Aarhus", "Odense", "Aalborg", "Esbjerg", "Vejle", "Roskilde", "Herning"];
+
 function HeroSearch() {
   const navigate = useNavigate();
-  const [region, setRegion] = useState("");
+  const [city, setCity] = useState("");
   const [date, setDate] = useState("");
   const [eventType, setEventType] = useState("");
   const today = new Date().toISOString().slice(0, 10);
@@ -198,7 +199,7 @@ function HeroSearch() {
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (region) params.set("region", region);
+    if (city) params.set("city", city);
     if (date) params.set("date", date);
     const match = SEARCH_EVENT_TYPES.find((t) => t.id === eventType);
     if (match) {
@@ -217,12 +218,12 @@ function HeroSearch() {
       className="grid gap-2 rounded-3xl border border-slate-200 bg-white p-2 shadow-xl shadow-slate-900/5 md:grid-cols-[1fr_1fr_1fr_auto] md:gap-0 md:rounded-full"
     >
       <SearchField label="Hvor" icon={MapPin}>
-        <Select value={region || undefined} onValueChange={setRegion}>
+        <Select value={city || undefined} onValueChange={setCity}>
           <SelectTrigger className="h-auto border-0 p-0 text-left text-sm font-medium text-slate-900 shadow-none focus:ring-0 focus:ring-offset-0">
-            <SelectValue placeholder="Vælg region" />
+            <SelectValue placeholder="Vælg by" />
           </SelectTrigger>
           <SelectContent>
-            {REGIONS.map((r) => (
+            {CITIES.map((r) => (
               <SelectItem key={r} value={r}>
                 {r}
               </SelectItem>

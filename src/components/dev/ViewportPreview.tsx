@@ -73,7 +73,7 @@ export function ViewportPreview({ children }: { children: React.ReactNode }) {
       {/* Top toolbar */}
       <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-xs font-medium text-white shadow-lg backdrop-blur">
         <Smartphone className="h-3.5 w-3.5" />
-        Mobile preview · {w}×{h}
+        Mobilvisning · {w}×{h}
         <button
           type="button"
           onClick={() =>
@@ -117,7 +117,7 @@ export function ViewportPreview({ children }: { children: React.ReactNode }) {
           <iframe
             key={iframeKey}
             ref={iframeRef}
-            title="Mobile preview"
+            title="Mobilvisning"
             src={src}
             className="block h-full w-full"
             style={{ border: 0 }}
@@ -169,7 +169,7 @@ function ToggleButton({
       ) : (
         <>
           <Smartphone className="h-3.5 w-3.5" />
-          Mobile preview
+          Mobilvisning
         </>
       )}
     </button>

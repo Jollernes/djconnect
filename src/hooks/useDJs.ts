@@ -134,6 +134,8 @@ export function useDJ(username: string) {
 
 const QUERY_TIMEOUT_MS = 6000;
 
+const CITY_ALIASES: Record<string, string> = { "københavn": "copenhagen", "copenhagen": "københavn" };
+
 /** Resolves with an error result if the backend doesn't answer in time
  * (e.g. an unreachable Supabase host), so pages never hang on loading. */
 async function withTimeout<T>(
@@ -228,7 +230,11 @@ function applyFilters(djs: DJProfileWithRelations[], filters: SearchFilters): DJ
   }
   if (filters.city) {
     const c = filters.city.toLowerCase();
-    result = result.filter((d) => d.base_location.toLowerCase().includes(c));
+    const alias = CITY_ALIASES[c];
+    result = result.filter((d) => {
+      const loc = d.base_location.toLowerCase();
+      return loc.includes(c) || (alias !== undefined && loc.includes(alias));
+    });
   }
   if (filters.eventTypes && filters.eventTypes.length > 0) {
     result = result.filter((d) => d.event_types.some((et) => filters.eventTypes!.includes(et.id)));
