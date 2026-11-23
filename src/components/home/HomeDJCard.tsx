@@ -71,7 +71,7 @@ export function HomeDJCard({ dj }: { dj: DJProfileWithRelations }) {
           {dj.rating_count > 0 && (
             <span className="inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-slate-900">
               <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-              {dj.rating_average.toLocaleString("da-DK", { maximumFractionDigits: 1 })}
+              {dj.rating_average.toLocaleString("da-DK", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
               <span className="font-normal text-slate-500">({dj.rating_count})</span>
             </span>
           )}
