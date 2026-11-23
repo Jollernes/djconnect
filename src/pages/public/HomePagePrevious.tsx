@@ -162,7 +162,7 @@ export function HomePagePrevious() {
 }
 
 /** Former homepage video hero (mobile + desktop variants with search). */
-export function FormerHomeHero() {
+export function FormerHomeHero({ search }: { search?: React.ReactNode } = {}) {
   const navigate = useNavigate();
   const [eventType, setEventType] = useState<string>("");
   const [region, setRegion] = useState("");
@@ -194,6 +194,7 @@ export function FormerHomeHero() {
         region={region}
         setRegion={setRegion}
         onSubmit={submit}
+        search={search}
       />
 
       {/* Desktop-only: full-bleed image hero with headline + search */}
@@ -204,6 +205,7 @@ export function FormerHomeHero() {
         region={region}
         setRegion={setRegion}
         onSubmit={submit}
+        search={search}
       />
 
     </>
@@ -260,6 +262,7 @@ function DesktopHeroV2({
   region,
   setRegion,
   onSubmit,
+  search,
 }: {
   navigate: ReturnType<typeof useNavigate>;
   eventType: string;
@@ -267,6 +270,7 @@ function DesktopHeroV2({
   region: string;
   setRegion: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
+  search?: React.ReactNode;
 }) {
   const [mode, setMode] = useState<"offers" | "browse">("browse");
 
@@ -321,9 +325,11 @@ function DesktopHeroV2({
             custom={0.25}
             className="mx-auto mt-6 max-w-2xl text-lg text-white/85"
           >
-            Vælg selv blandt top-vurderede DJs eller få 3 tilbud fra
+            {search
+              ? "Vælg selv blandt top-vurderede, interviewede og udstyrs-verificerede DJs til bryllup, fødselsdag, privatfest eller firmaevent."
+              : <>Vælg selv blandt top-vurderede DJs eller få 3 tilbud fra
             interviewede, udstyrs-verificerede DJs til bryllup, fødselsdag,
-            privatfest eller firmaevent.
+            privatfest eller firmaevent.</>}
           </motion.p>
 
           <motion.div
@@ -358,8 +364,10 @@ function DesktopHeroV2({
           animate="visible"
           variants={fadeUp}
           custom={0.6}
-          className="rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"
+          className={search ? undefined : "rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"}
         >
+          {search ?? (
+            <>
           {/* Mode tabs — full-width segmented row across the top of the card */}
           <div className="flex border-b border-border/60">
             {([
@@ -416,6 +424,8 @@ function DesktopHeroV2({
               </Button>
             </div>
           </form>
+            </>
+          )}
         </motion.div>
 
         {/* Feature pills */}
@@ -450,6 +460,7 @@ function MobileHeroV2({
   region,
   setRegion,
   onSubmit,
+  search,
 }: {
   navigate: ReturnType<typeof useNavigate>;
   eventType: string;
@@ -457,6 +468,7 @@ function MobileHeroV2({
   region: string;
   setRegion: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
+  search?: React.ReactNode;
 }) {
   const [mode, setMode] = useState<"offers" | "browse">("browse");
 
@@ -510,9 +522,11 @@ function MobileHeroV2({
             custom={0.25}
             className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/85"
           >
-            Vælg selv blandt top-vurderede DJs eller få 3 tilbud fra
+            {search
+              ? "Vælg selv blandt top-vurderede, interviewede og udstyrs-verificerede DJs til bryllup, fødselsdag, privatfest eller firmaevent."
+              : <>Vælg selv blandt top-vurderede DJs eller få 3 tilbud fra
             interviewede, udstyrs-verificerede DJs til bryllup, fødselsdag,
-            privatfest eller firmaevent.
+            privatfest eller firmaevent.</>}
           </motion.p>
 
           <motion.div
@@ -545,8 +559,10 @@ function MobileHeroV2({
           animate="visible"
           variants={fadeUp}
           custom={0.55}
-          className="rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"
+          className={search ? undefined : "rounded-3xl bg-white text-foreground shadow-2xl ring-1 ring-black/5"}
         >
+          {search ?? (
+            <>
           {/* Mode tabs */}
           <div className="flex border-b border-border/60">
             {([
@@ -598,6 +614,8 @@ function MobileHeroV2({
               )}
             </Button>
           </form>
+            </>
+          )}
         </motion.div>
 
         {/* Feature pills — wrap into rows (no horizontal scroll) */}

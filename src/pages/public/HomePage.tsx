@@ -8,6 +8,7 @@ import { PackageGuide } from "@/components/home/PackageGuide";
 import { TrustSection } from "@/components/home/TrustSection";
 import { DJRecruitment } from "@/components/home/DJRecruitment";
 import { FormerHomeHero } from "@/pages/public/HomePagePrevious";
+import { HeroSearch } from "@/components/home/HeroSearch";
 
 export function HomePage() {
   useDocumentHead({
@@ -26,7 +27,7 @@ export function HomePage() {
 
   return (
     <div className="bg-white">
-      <FormerHomeHero />
+      <FormerHomeHero search={<HeroSearch />} />
 
       <section className="container py-16 sm:py-24">
         <SectionHeading
