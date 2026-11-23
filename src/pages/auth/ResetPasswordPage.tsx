@@ -18,10 +18,10 @@ export function ResetPasswordPage() {
     setLoading(true);
     try {
       await updatePassword(password);
-      toast.success("Password updated");
+      toast.success("Adgangskode opdateret");
       navigate("/dashboard");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed");
+      toast.error(err instanceof Error ? err.message : "Mislykkedes");
     } finally {
       setLoading(false);
     }
@@ -31,10 +31,10 @@ export function ResetPasswordPage() {
     <div className="container flex min-h-[80vh] items-center justify-center py-12">
       <Card className="w-full max-w-md">
         <CardContent className="space-y-4 p-8">
-          <h1 className="text-2xl font-semibold">Reset your password</h1>
+          <h1 className="text-2xl font-semibold">Nulstil din adgangskode</h1>
           <form onSubmit={submit} className="space-y-3">
             <div>
-              <Label htmlFor="password">New password</Label>
+              <Label htmlFor="password">Ny adgangskode</Label>
               <Input
                 id="password"
                 type="password"
@@ -45,7 +45,7 @@ export function ResetPasswordPage() {
               />
             </div>
             <Button type="submit" className="w-full" disabled={loading || !isConfigured}>
-              {loading ? "Updating…" : "Update password"}
+              {loading ? "Opdaterer…" : "Opdater adgangskode"}
             </Button>
           </form>
         </CardContent>

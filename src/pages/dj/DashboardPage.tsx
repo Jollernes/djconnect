@@ -28,23 +28,23 @@ export function DJDashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">DJ Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Welcome back, {profile?.full_name.split(" ")[0]}.</p>
+          <h1 className="text-2xl font-semibold">DJ-oversigt</h1>
+          <p className="text-sm text-muted-foreground">Velkommen tilbage, {profile?.full_name.split(" ")[0]}.</p>
         </div>
         {pending.length > 0 && (
           <Button asChild variant="accent">
             <Link to="/dj/bookings">
-              <Bell className="h-4 w-4" /> {pending.length} new request{pending.length === 1 ? "" : "s"}
+              <Bell className="h-4 w-4" /> {pending.length} ny{pending.length === 1 ? "" : "e"} forespørgsel{pending.length === 1 ? "" : "er"}
             </Link>
           </Button>
         )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <StatCard icon={<Bell />} label="Pending requests" value={pending.length.toString()} />
-        <StatCard icon={<Calendar />} label="Upcoming events" value={upcoming.length.toString()} />
-        <StatCard icon={<Wallet />} label="This month" value={formatCurrency(monthlyEarnings, "DKK")} />
-        <StatCard icon={<Star />} label="Rating" value={`${avgRating}/5`} />
+        <StatCard icon={<Bell />} label="Afventende forespørgsler" value={pending.length.toString()} />
+        <StatCard icon={<Calendar />} label="Kommende events" value={upcoming.length.toString()} />
+        <StatCard icon={<Wallet />} label="Denne måned" value={formatCurrency(monthlyEarnings, "DKK")} />
+        <StatCard icon={<Star />} label="Bedømmelse" value={`${avgRating}/5`} />
       </div>
 
       {profileCompletion < 100 && (
@@ -52,28 +52,28 @@ export function DJDashboardPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-semibold">Complete your profile</h3>
+                <h3 className="font-semibold">Færdiggør din profil</h3>
                 <p className="text-sm text-muted-foreground">
-                  Profiles with 100% completion get 2.5× more bookings.
+                  Profiler med 100% udfyldelse får 2,5× flere bookinger.
                 </p>
               </div>
-              <Button asChild><Link to="/dj/profile">Edit profile</Link></Button>
+              <Button asChild><Link to="/dj/profile">Rediger profil</Link></Button>
             </div>
             <Progress value={profileCompletion} className="mt-4" />
-            <p className="mt-1 text-xs text-muted-foreground">{profileCompletion}% complete</p>
+            <p className="mt-1 text-xs text-muted-foreground">{profileCompletion}% udfyldt</p>
           </CardContent>
         </Card>
       )}
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Pending requests</h2>
-          <Button asChild variant="link"><Link to="/dj/bookings">View all →</Link></Button>
+          <h2 className="text-lg font-semibold">Afventende forespørgsler</h2>
+          <Button asChild variant="link"><Link to="/dj/bookings">Se alle →</Link></Button>
         </div>
         {loading ? (
-          <div className="text-sm text-muted-foreground">Loading…</div>
+          <div className="text-sm text-muted-foreground">Indlæser…</div>
         ) : pending.length === 0 ? (
-          <EmptyState title="No pending requests" description="You'll be notified when a customer sends a booking request." />
+          <EmptyState title="Ingen afventende forespørgsler" description="Du får besked, når en kunde sender en bookingforespørgsel." />
         ) : (
           <div className="space-y-3">
             {pending.map((b) => (
@@ -87,7 +87,7 @@ export function DJDashboardPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <BookingStatusBadge status={b.status} />
-                    <Button asChild size="sm"><Link to={`/dj/bookings/${b.id}`}>Open</Link></Button>
+                    <Button asChild size="sm"><Link to={`/dj/bookings/${b.id}`}>Åbn</Link></Button>
                   </div>
                 </CardContent>
               </Card>
@@ -98,12 +98,12 @@ export function DJDashboardPage() {
 
       <section>
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Quick links</h2>
+          <h2 className="text-lg font-semibold">Genveje</h2>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
-          <QuickLink icon={<User />} label="Edit profile" href="/dj/profile" />
-          <QuickLink icon={<Calendar />} label="Manage availability" href="/dj/availability" />
-          <QuickLink icon={<Wallet />} label="View payouts" href="/dj/earnings" />
+          <QuickLink icon={<User />} label="Rediger profil" href="/dj/profile" />
+          <QuickLink icon={<Calendar />} label="Administrer tilgængelighed" href="/dj/availability" />
+          <QuickLink icon={<Wallet />} label="Se udbetalinger" href="/dj/earnings" />
         </div>
       </section>
     </div>

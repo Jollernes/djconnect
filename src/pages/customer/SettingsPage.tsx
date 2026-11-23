@@ -15,34 +15,34 @@ export function CustomerSettingsPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Settings</h1>
+      <h1 className="text-2xl font-semibold">Indstillinger</h1>
 
       <Card>
         <CardContent className="space-y-4 p-6">
-          <h2 className="text-lg font-semibold">Profile</h2>
+          <h2 className="text-lg font-semibold">Profil</h2>
           <div>
-            <Label htmlFor="fullName">Full name</Label>
+            <Label htmlFor="fullName">Fulde navn</Label>
             <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
           </div>
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">E-mail</Label>
             <Input id="email" type="email" value={profile?.email ?? ""} disabled />
           </div>
           <div>
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">Telefon</Label>
             <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
-          <Button onClick={() => toast.success("Profile saved")}>Save changes</Button>
+          <Button onClick={() => toast.success("Profil gemt")}>Gem ændringer</Button>
         </CardContent>
       </Card>
 
       <Card>
         <CardContent className="space-y-4 p-6">
-          <h2 className="text-lg font-semibold">Notifications</h2>
+          <h2 className="text-lg font-semibold">Notifikationer</h2>
           <label className="flex items-center justify-between">
             <div>
-              <div className="text-sm font-medium">Email notifications</div>
-              <div className="text-xs text-muted-foreground">Booking updates, messages, reminders</div>
+              <div className="text-sm font-medium">E-mailnotifikationer</div>
+              <div className="text-xs text-muted-foreground">Bookingopdateringer, beskeder, påmindelser</div>
             </div>
             <Switch checked={notifyEmail} onCheckedChange={setNotifyEmail} />
           </label>
@@ -51,9 +51,9 @@ export function CustomerSettingsPage() {
 
       <Card>
         <CardContent className="space-y-4 p-6">
-          <h2 className="text-lg font-semibold">Password</h2>
-          <p className="text-sm text-muted-foreground">Send yourself a reset link to update your password.</p>
-          <Button variant="outline" onClick={() => toast.success("Reset link sent to your email")}>Send reset link</Button>
+          <h2 className="text-lg font-semibold">Adgangskode</h2>
+          <p className="text-sm text-muted-foreground">Send dig selv et nulstillingslink for at opdatere din adgangskode.</p>
+          <Button variant="outline" onClick={() => toast.success("Nulstillingslink sendt til din e-mail")}>Send nulstillingslink</Button>
         </CardContent>
       </Card>
     </div>

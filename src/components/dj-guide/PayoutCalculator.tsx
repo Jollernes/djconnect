@@ -11,13 +11,13 @@ export function PayoutCalculator() {
   return (
     <div className="rounded-2xl border bg-card p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground">
-        <span>Booking price</span>
-        <span>Your payout</span>
+        <span>Bookingpris</span>
+        <span>Din udbetaling</span>
       </div>
       <div className="flex items-baseline justify-between">
         <div>
-          <div className="text-3xl font-semibold">DKK {price.toLocaleString()}</div>
-          <div className="text-xs text-muted-foreground">Customer pays this upfront</div>
+          <div className="text-3xl font-semibold">{price.toLocaleString("da-DK")} kr.</div>
+          <div className="text-xs text-muted-foreground">Kunden betaler dette forud</div>
         </div>
         <div className="text-right">
           <motion.div
@@ -27,9 +27,9 @@ export function PayoutCalculator() {
             transition={{ type: "spring", stiffness: 260, damping: 20 }}
             className="text-3xl font-semibold text-accent"
           >
-            DKK {payout.toLocaleString()}
+            {payout.toLocaleString("da-DK")} kr.
           </motion.div>
-          <div className="text-xs text-muted-foreground">{payoutPct}% goes to you</div>
+          <div className="text-xs text-muted-foreground">{payoutPct}% går til dig</div>
         </div>
       </div>
 
@@ -43,8 +43,8 @@ export function PayoutCalculator() {
         className="mt-5 w-full accent-[hsl(21,90%,53%)]"
       />
       <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
-        <span>DKK 500</span>
-        <span>DKK 25,000</span>
+        <span>500 kr.</span>
+        <span>25.000 kr.</span>
       </div>
 
       <div className="mt-5 overflow-hidden rounded-full border">
@@ -54,22 +54,22 @@ export function PayoutCalculator() {
             transition={{ duration: 0.35 }}
             className="flex items-center justify-center bg-accent"
           >
-            {payoutPct}% payout
+            {payoutPct}% udbetaling
           </motion.div>
           <motion.div
             animate={{ width: `${PLATFORM_FEE_PERCENT}%` }}
             transition={{ duration: 0.35 }}
             className="flex items-center justify-center bg-muted text-muted-foreground"
           >
-            {PLATFORM_FEE_PERCENT}% fee
+            {PLATFORM_FEE_PERCENT}% gebyr
           </motion.div>
         </div>
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2 text-xs">
-        <Stat label="Platform fee" value={`DKK ${fee.toLocaleString()}`} />
-        <Stat label="Released" value="24h after event" />
-        <Stat label="Bank deposit" value="2–5 business days" />
+        <Stat label="Platformsgebyr" value={`${fee.toLocaleString("da-DK")} kr.`} />
+        <Stat label="Frigives" value="24t efter event" />
+        <Stat label="Bankindbetaling" value="2–5 bankdage" />
       </div>
     </div>
   );

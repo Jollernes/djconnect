@@ -31,15 +31,15 @@ function maskContactInfo(text: string): {
   let redacted = false;
   let cleaned = text;
   if (phoneRe.test(cleaned)) {
-    cleaned = cleaned.replace(phoneRe, "[contact info hidden until booking]");
+    cleaned = cleaned.replace(phoneRe, "[kontaktoplysninger skjult indtil booking]");
     redacted = true;
   }
   if (emailRe.test(cleaned)) {
-    cleaned = cleaned.replace(emailRe, "[contact info hidden until booking]");
+    cleaned = cleaned.replace(emailRe, "[kontaktoplysninger skjult indtil booking]");
     redacted = true;
   }
   if (socialRe.test(cleaned)) {
-    cleaned = cleaned.replace(socialRe, " [contact info hidden until booking]");
+    cleaned = cleaned.replace(socialRe, " [kontaktoplysninger skjult indtil booking]");
     redacted = true;
   }
   return { cleaned, redacted };
@@ -71,9 +71,9 @@ export function OnPlatformChatDialog({
     if (!trimmed) return;
     const { cleaned, redacted } = maskContactInfo(trimmed);
     if (redacted) {
-      toast("Contact info auto-hidden", {
+      toast("Kontaktoplysninger skjult automatisk", {
         description:
-          "Phone numbers, emails, and handles stay hidden until your booking is confirmed and paid.",
+          "Telefonnumre, e-mails og brugernavne forbliver skjult, indtil din booking er bekræftet og betalt.",
       });
     }
     const ts = Date.now();
@@ -104,19 +104,18 @@ export function OnPlatformChatDialog({
               <AvatarImage src={dj.profile.avatar_url ?? undefined} alt={dj.stage_name} />
               <AvatarFallback>{dj.stage_name.slice(0, 2).toUpperCase()}</AvatarFallback>
             </Avatar>
-            Message {dj.stage_name}
+            Skriv til {dj.stage_name}
           </DialogTitle>
           <DialogDescription className="flex items-center gap-1.5 text-xs">
             <Lock className="h-3 w-3" />
-            On-platform chat. Contact info is hidden until booking is confirmed.
+            Chat på platformen. Kontaktoplysninger er skjult, indtil bookingen er bekræftet.
           </DialogDescription>
         </DialogHeader>
 
         <div className="max-h-[40vh] space-y-2 overflow-auto rounded-lg border bg-muted/30 p-3">
           {thread.length === 0 ? (
             <p className="py-4 text-center text-xs text-muted-foreground">
-              Start the conversation with a question — about playlist, equipment, dietary
-              breaks, anything.
+              Start samtalen med et spørgsmål — om playliste, udstyr, pauser, hvad som helst.
             </p>
           ) : (
             thread.map((m) => (
@@ -157,7 +156,7 @@ export function OnPlatformChatDialog({
         <DialogFooter className="flex flex-row items-center justify-between gap-2">
           <p className="text-[10px] text-muted-foreground">
             <ShieldCheck className="mr-1 inline h-3 w-3" />
-            All messages stored on the platform; contact details auto-hidden.
+            Alle beskeder gemmes på platformen; kontaktoplysninger skjules automatisk.
           </p>
           <Button onClick={handleSend} disabled={!draft.trim()}>
             <MessageSquare className="mr-1 h-4 w-4" /> Send
@@ -192,8 +191,8 @@ export function RequestCallbackDialog({
         s.djId === slot.djId ? { ...s, callbackRequested: true } : s,
       ),
     });
-    toast("Callback requested", {
-      description: `${dj.stage_name} has been notified to call you back today.`,
+    toast("Opkald anmodet", {
+      description: `${dj.stage_name} er blevet underrettet om at ringe dig op i dag.`,
     });
     onOpenChange(false);
   }
@@ -204,32 +203,32 @@ export function RequestCallbackDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <PhoneCall className="h-5 w-5 text-rose-500" />
-            Request a call from {dj.stage_name}
+            Anmod om opkald fra {dj.stage_name}
           </DialogTitle>
           <DialogDescription>
-            We'll send a callback request via app + email + SMS. {dj.stage_name} will
-            phone you — your number stays hidden, the DJ sees it once you confirm.
+            Vi sender en opkaldsanmodning via app + e-mail + SMS. {dj.stage_name} ringer
+            dig op — dit nummer forbliver skjult, DJ'en ser det, når du bekræfter.
           </DialogDescription>
         </DialogHeader>
         <ul className="space-y-2 rounded-lg border bg-muted/30 p-3 text-xs">
           <li className="flex items-center gap-2">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-            Your number is only shared with this DJ — not the others.
+            Dit nummer deles kun med denne DJ — ikke de andre.
           </li>
           <li className="flex items-center gap-2">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-            Callback usually within a few hours, max same day.
+            Opkald normalt inden for få timer, senest samme dag.
           </li>
           <li className="flex items-center gap-2">
             <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-            Decline at any time — the DJ won't see your number again.
+            Afvis når som helst — DJ'en ser ikke dit nummer igen.
           </li>
         </ul>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Annullér
           </Button>
-          <Button onClick={handleConfirm}>Yes, request callback</Button>
+          <Button onClick={handleConfirm}>Ja, anmod om opkald</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -264,8 +263,8 @@ export function EscrowBookingDialog({
         s.djId === slot.djId ? { ...s, bookedAtMs: Date.now() } : s,
       ),
     });
-    toast("Booking confirmed", {
-      description: `${dj.stage_name} is locked in for your event. We'll release escrow after the event.`,
+    toast("Booking bekræftet", {
+      description: `${dj.stage_name} er booket til dit event. Vi frigiver escrow efter eventet.`,
     });
     onOpenChange(false);
   }
@@ -276,27 +275,27 @@ export function EscrowBookingDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-            Book {dj.stage_name} with escrow
+            Book {dj.stage_name} med escrow
           </DialogTitle>
           <DialogDescription>
-            We hold the deposit until the event is confirmed. After the event, the balance
-            is released to the DJ. You can still message them on-platform anytime.
+            Vi holder depositummet, indtil eventet er bekræftet. Efter eventet frigives restbeløbet
+            til DJ'en. Du kan stadig skrive til dem på platformen når som helst.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           <div className="rounded-xl border bg-muted/30 p-3 text-sm">
             <div className="flex items-center justify-between">
-              <span className="text-muted-foreground">Quote total</span>
+              <span className="text-muted-foreground">Tilbud i alt</span>
               <span className="font-semibold">{price} kr</span>
             </div>
             <div className="mt-1 flex items-center justify-between">
-              <span className="text-muted-foreground">Deposit today (30%)</span>
+              <span className="text-muted-foreground">Depositum i dag (30%)</span>
               <span className="font-semibold text-rose-700">
                 {deposit.toLocaleString("da-DK")} kr
               </span>
             </div>
             <div className="mt-1 flex items-center justify-between">
-              <span className="text-muted-foreground">Balance after event</span>
+              <span className="text-muted-foreground">Restbeløb efter event</span>
               <span className="font-semibold">
                 {balance.toLocaleString("da-DK")} kr
               </span>
@@ -304,24 +303,24 @@ export function EscrowBookingDialog({
           </div>
           <ul className="space-y-1.5 rounded-lg bg-rose-50 p-3 text-xs text-rose-900">
             <li className="flex items-center gap-1.5">
-              <ShieldCheck className="h-3 w-3" /> Other quotes auto-released — DJs are
-              notified you've chosen.
+              <ShieldCheck className="h-3 w-3" /> Øvrige tilbud frigives automatisk — DJ'erne
+              får besked om, at du har valgt.
             </li>
             <li className="flex items-center gap-1.5">
-              <ShieldCheck className="h-3 w-3" /> Full refund if the DJ cancels.
+              <ShieldCheck className="h-3 w-3" /> Fuld tilbagebetaling, hvis DJ'en aflyser.
             </li>
             <li className="flex items-center gap-1.5">
-              <ShieldCheck className="h-3 w-3" /> Direct contact info exchanged after
-              booking is confirmed.
+              <ShieldCheck className="h-3 w-3" /> Direkte kontaktoplysninger udveksles, efter
+              bookingen er bekræftet.
             </li>
           </ul>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
+            Annullér
           </Button>
           <Button onClick={handleConfirm}>
-            Pay {deposit.toLocaleString("da-DK")} kr deposit
+            Betal {deposit.toLocaleString("da-DK")} kr depositum
           </Button>
         </DialogFooter>
       </DialogContent>

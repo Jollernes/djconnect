@@ -13,7 +13,7 @@ export function BudgetStep({
   return (
     <div className="space-y-4">
       <p className="text-center text-xs text-muted-foreground">
-        DJs use this as a sanity check. You'll see actual offers within this range — no surprises.
+        DJs bruger dette som en rettesnor. Du ser faktiske tilbud inden for dette interval — ingen overraskelser.
       </p>
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         {BUDGET_OPTIONS.map((b) => {

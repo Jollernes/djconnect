@@ -26,8 +26,8 @@ export function LivePreview({
   profilePhotoUrl,
   className,
 }: Props) {
-  const displayName = stageName || "Your stage name";
-  const location = [city, country].filter(Boolean).join(", ") || "City, Country";
+  const displayName = stageName || "Dit kunstnernavn";
+  const location = [city, country].filter(Boolean).join(", ") || "By, Land";
   const yearsLabel = EXPERIENCE_YEARS.find((y) => y.id === yearsExperience)?.label;
   const setupLabel = SETUP_SIZES.find((s) => s.id === setupSize)?.label;
 
@@ -35,7 +35,7 @@ export function LivePreview({
     <div className={cn("sticky top-24", className)}>
       <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
         <Sparkles className="h-3.5 w-3.5 text-accent" />
-        Live profile preview
+        Live profilforhåndsvisning
       </div>
       <motion.div
         layout
@@ -84,7 +84,7 @@ export function LivePreview({
               </p>
             </div>
             <span className="flex items-center gap-1 rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur">
-              <Verified className="h-3 w-3" /> Pending review
+              <Verified className="h-3 w-3" /> Afventer godkendelse
             </span>
           </div>
         </div>
@@ -92,7 +92,7 @@ export function LivePreview({
         <div className="space-y-4 p-5">
           <div className="flex items-center gap-3 text-xs">
             <span className="flex items-center gap-1 text-muted-foreground">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> New
+              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> Ny
             </span>
             {yearsLabel && (
               <span className="rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
@@ -101,13 +101,13 @@ export function LivePreview({
             )}
             {setupLabel && (
               <span className="rounded-full border px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                {setupLabel} setup
+                {setupLabel} opsætning
               </span>
             )}
           </div>
 
           <p className="line-clamp-4 text-sm text-muted-foreground">
-            {bio || "Your bio will appear here. Tell customers about your style, your experience, and what makes your sets unforgettable."}
+            {bio || "Din bio vises her. Fortæl kunderne om din stil, din erfaring, og hvad der gør dine sæt uforglemmelige."}
           </p>
 
           {eventTypes.length > 0 && (
@@ -131,14 +131,14 @@ export function LivePreview({
           )}
 
           <div className="flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
-            <span>From <span className="font-semibold text-foreground">DKK 3,500</span></span>
-            <span>Requests respond &lt; 24h</span>
+            <span>Fra <span className="font-semibold text-foreground">3.500 kr.</span></span>
+            <span>Svarer på forespørgsler &lt; 24t</span>
           </div>
         </div>
       </motion.div>
 
       <p className="mt-3 text-center text-xs text-muted-foreground">
-        This is what customers will see after you're approved.
+        Sådan ser kunderne dig, når du er godkendt.
       </p>
     </div>
   );

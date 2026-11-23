@@ -17,9 +17,9 @@ export function ForgotPasswordPage() {
     try {
       await sendPasswordReset(email);
       setSent(true);
-      toast.success("If that email exists, a reset link is on its way.");
+      toast.success("Hvis den e-mail findes, er et nulstillingslink på vej.");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed");
+      toast.error(err instanceof Error ? err.message : "Mislykkedes");
     }
   }
 
@@ -28,21 +28,21 @@ export function ForgotPasswordPage() {
       <Card className="w-full max-w-md">
         <CardContent className="space-y-4 p-8">
           <div>
-            <h1 className="text-2xl font-semibold">Forgot your password?</h1>
-            <p className="mt-1 text-sm text-muted-foreground">We'll send a reset link to your email.</p>
+            <h1 className="text-2xl font-semibold">Glemt din adgangskode?</h1>
+            <p className="mt-1 text-sm text-muted-foreground">Vi sender et nulstillingslink til din e-mail.</p>
           </div>
           {sent ? (
-            <div className="rounded-md bg-success/10 p-4 text-sm">Check your email for a reset link.</div>
+            <div className="rounded-md bg-success/10 p-4 text-sm">Tjek din e-mail for et nulstillingslink.</div>
           ) : (
             <form onSubmit={submit} className="space-y-3">
               <div>
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">E-mail</Label>
                 <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
-              <Button type="submit" className="w-full" disabled={!isConfigured}>Send reset link</Button>
+              <Button type="submit" className="w-full" disabled={!isConfigured}>Send nulstillingslink</Button>
             </form>
           )}
-          <Link to="/login" className="block text-center text-sm text-accent underline">Back to login</Link>
+          <Link to="/login" className="block text-center text-sm text-accent underline">Tilbage til login</Link>
         </CardContent>
       </Card>
     </div>

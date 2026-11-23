@@ -39,7 +39,7 @@ export function CancellationCard({
 
   function handleCancel() {
     toast.success(
-      `Cancellation submitted. ${refundPct}% refund will be processed within 5–7 business days.`,
+      `Annullering indsendt. ${refundPct}% tilbagebetaling behandles inden for 5–7 hverdage.`,
     );
     onCancel?.();
   }
@@ -48,7 +48,7 @@ export function CancellationCard({
     <div className="rounded-2xl border bg-card p-6">
       <div className="mb-4 flex items-center gap-2">
         <CalendarX className="h-5 w-5 text-accent" />
-        <h2 className="text-lg font-semibold">Cancellation policy</h2>
+        <h2 className="text-lg font-semibold">Annulleringspolitik</h2>
       </div>
 
       <div className="mb-4 grid gap-2">
@@ -89,33 +89,33 @@ export function CancellationCard({
       </div>
 
       <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 text-sm">
-        Today, your refund would be <strong>{refundPct}%</strong> ({days} day{days === 1 ? "" : "s"} until your event).
+        I dag ville din tilbagebetaling være <strong>{refundPct}%</strong> ({days} dag{days === 1 ? "" : "e"} til dit event).
       </div>
 
       {allowCancel && (
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline" className="mt-4 w-full">
-              <XCircle className="h-4 w-4" /> Request cancellation
+              <XCircle className="h-4 w-4" /> Anmod om annullering
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Cancel this booking?</DialogTitle>
+              <DialogTitle>Annullér denne booking?</DialogTitle>
               <DialogDescription>
-                Based on our cancellation policy, you'd receive a <strong>{refundPct}% refund</strong>.
-                We'll let your DJ know and process the refund within 5–7 business days.
+                Ifølge vores annulleringspolitik ville du modtage en <strong>{refundPct}% tilbagebetaling</strong>.
+                Vi giver din DJ besked og behandler tilbagebetalingen inden for 5–7 hverdage.
               </DialogDescription>
             </DialogHeader>
             <Textarea
               rows={3}
-              placeholder="Reason for cancellation (optional)"
+              placeholder="Årsag til annullering (valgfrit)"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
             <DialogFooter>
               <Button variant="destructive" onClick={handleCancel}>
-                Confirm cancellation
+                Bekræft annullering
               </Button>
             </DialogFooter>
           </DialogContent>

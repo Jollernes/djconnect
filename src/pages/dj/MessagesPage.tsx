@@ -1,32 +1,58 @@
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useBookings } from "@/hooks/useBookings";
-import { formatDate } from "@/lib/utils";
+import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { EmptyState } from "@/components/common/EmptyState";
+import { ConversationList } from "@/components/messaging/ConversationList";
+import {
+  listConversationsForDj,
+  type Conversation,
+} from "@/lib/messageStore";
 
+/** DJ-dashboard list of message threads with customers. */
 export function DJMessagesPage() {
+  useDocumentHead({
+    title: "Beskeder · DJConnect",
+    description: "Dine samtaler med kunder.",
+  });
+
   const { profile } = useAuth();
-  const { bookings } = useBookings(profile?.id, "dj");
+  const djId = profile?.role === "dj" ? profile.id : null;
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+
+  useEffect(() => {
+    function load() {
+      setConversations(listConversationsForDj(djId));
+    }
+    load();
+    const onUpdate = () => load();
+    window.addEventListener("message:update", onUpdate);
+    window.addEventListener("storage", onUpdate);
+    return () => {
+      window.removeEventListener("message:update", onUpdate);
+      window.removeEventListener("storage", onUpdate);
+    };
+  }, [djId]);
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-semibold">Messages</h1>
-      {bookings.length === 0 ? (
-        <EmptyState title="No messages" description="Conversations appear here once customers book you." />
+    <div className="mx-auto max-w-3xl space-y-6">
+      <header>
+        <h1 className="text-2xl font-semibold">Beskeder</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Svar kunder og send skræddersyede tilbud direkte i chatten.
+        </p>
+      </header>
+
+      {conversations.length === 0 ? (
+        <EmptyState
+          title="Ingen beskeder"
+          description="Samtaler vises her, når en kunde skriver til dig fra din profil."
+        />
       ) : (
-        <div className="divide-y rounded-xl border bg-card">
-          {bookings.map((b) => (
-            <Link key={b.id} to={`/dj/bookings/${b.id}`} className="flex items-center justify-between p-4 hover:bg-muted/40">
-              <div>
-                <div className="font-medium">{b.customer.full_name}</div>
-                <div className="text-xs text-muted-foreground">
-                  {b.event_type.label} · {formatDate(b.event_date)}
-                </div>
-              </div>
-              <div className="text-xs text-muted-foreground">Open booking →</div>
-            </Link>
-          ))}
-        </div>
+        <ConversationList
+          conversations={conversations}
+          basePath="/dj/messages"
+          viewer="dj"
+        />
       )}
     </div>
   );

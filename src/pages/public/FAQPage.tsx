@@ -3,45 +3,45 @@ import { PLATFORM_FEE_PERCENT } from "@/lib/constants";
 
 const faqs = [
   {
-    q: "How does DJ verification work?",
-    a: "Every DJ submits a full application including their equipment list, equipment photos, experience level, and optional references or certificates. Our team reviews each application before the DJ is allowed to accept bookings. Approved DJs receive a green 'Verified' badge on their profile.",
+    q: "Hvordan fungerer DJ-verificering?",
+    a: "Hver DJ indsender en fuld ansøgning inklusive udstyrsliste, billeder af udstyret, erfaringsniveau og valgfrie referencer eller certifikater. Vores team gennemgår hver ansøgning, før DJ'en må acceptere bookinger. Godkendte DJs får et grønt 'Verificeret'-mærke på deres profil.",
   },
   {
-    q: "Is my payment secure?",
-    a: "Yes. All payments are processed by Stripe, a leading global payment processor. Your card details never touch our servers. Funds are held in escrow by Stripe and only released to the DJ 24 hours after your event completes.",
+    q: "Er min betaling sikker?",
+    a: "Ja. Alle betalinger behandles af Stripe, en af verdens førende betalingsudbydere. Dine kortoplysninger rører aldrig vores servere. Pengene holdes i escrow af Stripe og frigives først til DJ'en 24 timer efter dit event er afsluttet.",
   },
   {
-    q: "What happens if I need to cancel?",
-    a: "Our cancellation policy is: cancel more than 14 days before the event and you get a 100% refund, cancel 7–14 days before and you get 50%, cancel less than 7 days before and no refund. The policy is shown clearly at checkout.",
+    q: "Hvad sker der, hvis jeg er nødt til at aflyse?",
+    a: "Vores annulleringspolitik er: aflys mere end 14 dage før eventet og få 100% tilbagebetaling, aflys 7–14 dage før og få 50%, aflys mindre end 7 dage før og ingen tilbagebetaling. Politikken vises tydeligt ved betaling.",
   },
   {
-    q: "What is a mobile disco setup?",
-    a: "A complete, self-contained DJ rig that a DJ brings to your venue — including decks/controller, mixer, speakers, subwoofer, lighting, and microphones. You don't need to provide any equipment beyond power.",
+    q: "Hvad er et mobilt diskotek?",
+    a: "Et komplet, selvstændigt DJ-setup, som DJ'en medbringer til dit lokale — inklusive afspillere/controller, mixer, højttalere, subwoofer, lys og mikrofoner. Du behøver ikke stille andet udstyr til rådighed end strøm.",
   },
   {
-    q: "How do I know the DJ will show up?",
-    a: "Every DJ on the platform is identity-verified and has gone through our equipment review. Payments are held in escrow — if a DJ fails to show, you're entitled to a full refund and we'll help you find a last-minute replacement where possible.",
+    q: "Hvordan ved jeg, at DJ'en møder op?",
+    a: "Hver DJ på platformen er identitetsverificeret og har gennemgået vores udstyrskontrol. Betalinger holdes i escrow — hvis en DJ ikke møder op, har du ret til fuld tilbagebetaling, og vi hjælper dig med at finde en afløser i sidste øjeblik, hvor det er muligt.",
   },
   {
-    q: "How do I leave a review?",
-    a: "After your event date passes, you'll receive an email with a link to leave a review. You have 14 days to submit it. Only customers with a completed booking can review a DJ.",
+    q: "Hvordan skriver jeg en anmeldelse?",
+    a: "Efter din eventdato er passeret, modtager du en e-mail med et link til at skrive en anmeldelse. Du har 14 dage til at indsende den. Kun kunder med en gennemført booking kan anmelde en DJ.",
   },
   {
-    q: "How do DJs get paid?",
-    a: "DJs connect a Stripe account during onboarding. Once a booking is completed, the DJ's share (90% of the booking amount by default) is released to their Stripe account 24 hours after the event.",
+    q: "Hvordan får DJs betaling?",
+    a: "DJs tilknytter en Stripe-konto under onboarding. Når en booking er gennemført, frigives DJ'ens andel (90% af bookingbeløbet som standard) til deres Stripe-konto 24 timer efter eventet.",
   },
   {
-    q: "What is the platform service fee?",
-    a: `The platform takes a ${PLATFORM_FEE_PERCENT}% service fee, shown clearly at checkout. This covers secure payments, customer support, dispute resolution, DJ verification, and platform development.`,
+    q: "Hvad er platformens servicegebyr?",
+    a: `Platformen tager et servicegebyr på ${PLATFORM_FEE_PERCENT}%, som vises tydeligt ved betaling. Det dækker sikre betalinger, kundesupport, tvistløsning, DJ-verificering og udvikling af platformen.`,
   },
 ];
 
 export function FAQPage() {
   return (
     <div className="container max-w-3xl py-16">
-      <h1 className="text-3xl font-semibold">Frequently asked questions</h1>
+      <h1 className="text-3xl font-semibold">Ofte stillede spørgsmål</h1>
       <p className="mt-2 text-muted-foreground">
-        Didn't find what you're looking for? <a className="text-accent underline" href="/contact">Contact us</a>.
+        Fandt du ikke det, du ledte efter? <a className="text-accent underline" href="/contact">Kontakt os</a>.
       </p>
       <div className="mt-8">
         <Accordion type="single" collapsible className="w-full">

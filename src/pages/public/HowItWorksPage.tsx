@@ -8,35 +8,35 @@ export function HowItWorksPage() {
     <div>
       <section className="bg-primary text-primary-foreground">
         <div className="container py-16">
-          <h1 className="text-4xl font-semibold">How DJConnect works</h1>
+          <h1 className="text-4xl font-semibold">Sådan fungerer DJConnect</h1>
           <p className="mt-2 max-w-2xl text-primary-foreground/80">
-            Book verified DJs in three steps — or earn steady income as a DJ on our platform.
+            Book verificerede DJs i tre trin — eller tjen en stabil indkomst som DJ på vores platform.
           </p>
         </div>
       </section>
 
       <section className="container py-16">
-        <h2 className="text-2xl font-semibold">For customers</h2>
-        <p className="mt-1 text-muted-foreground">Private and corporate events made easy.</p>
+        <h2 className="text-2xl font-semibold">For kunder</h2>
+        <p className="mt-1 text-muted-foreground">Private og firmaarrangementer gjort nemt.</p>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {[
             {
               icon: Search,
-              title: "1. Search",
+              title: "1. Søg",
               body:
-                "Browse verified DJs in your area, filter by event type, date, setup size, and budget. View equipment, reviews, and availability.",
+                "Find verificerede DJs i dit område, filtrer efter eventtype, dato, setup-størrelse og budget. Se udstyr, anmeldelser og tilgængelighed.",
             },
             {
               icon: CalendarCheck2,
               title: "2. Book",
               body:
-                "Send a booking request with event details and pay securely via Stripe. Funds are held in escrow — your DJ isn't paid until 24 hours after the event.",
+                "Send en bookingforespørgsel med eventdetaljer og betal sikkert via Stripe. Pengene holdes i escrow — din DJ får først betaling 24 timer efter eventet.",
             },
             {
               icon: Sparkles,
-              title: "3. Celebrate",
+              title: "3. Fejr",
               body:
-                "Your DJ arrives with the agreed mobile disco setup ready. Leave a review afterwards to help the community.",
+                "Din DJ ankommer med det aftalte mobile diskotek klar. Skriv en anmeldelse bagefter for at hjælpe fællesskabet.",
             },
           ].map(({ icon: Icon, title, body }) => (
             <Card key={title}>
@@ -55,26 +55,26 @@ export function HowItWorksPage() {
       <section id="djs" className="bg-muted/40 py-16">
         <div className="container">
           <h2 className="text-2xl font-semibold">For DJs</h2>
-          <p className="mt-1 text-muted-foreground">Join our roster of verified professionals.</p>
+          <p className="mt-1 text-muted-foreground">Bliv en del af vores hold af verificerede professionelle.</p>
           <div className="mt-8 grid gap-6 md:grid-cols-3">
             {[
               {
                 icon: UserPlus,
-                title: "1. Create your profile",
+                title: "1. Opret din profil",
                 body:
-                  "Share your bio, equipment, experience, and pricing. Upload photos of your setup so customers can see what they're booking.",
+                  "Del din bio, dit udstyr, erfaring og priser. Upload billeder af dit setup, så kunderne kan se, hvad de booker.",
               },
               {
                 icon: ShieldCheck,
-                title: "2. Get verified",
+                title: "2. Bliv verificeret",
                 body:
-                  "Our team reviews your equipment and experience. Verified DJs get a badge on their profile that customers trust.",
+                  "Vores team gennemgår dit udstyr og din erfaring. Verificerede DJs får et mærke på deres profil, som kunderne stoler på.",
               },
               {
                 icon: Wallet,
-                title: "3. Earn",
+                title: "3. Tjen",
                 body:
-                  "Accept booking requests and get paid directly to your bank account via Stripe Connect — 24 hours after each event.",
+                  "Acceptér bookingforespørgsler og få betaling direkte til din bankkonto via Stripe Connect — 24 timer efter hvert event.",
               },
             ].map(({ icon: Icon, title, body }) => (
               <Card key={title}>
@@ -90,7 +90,7 @@ export function HowItWorksPage() {
           </div>
           <div className="mt-10 text-center">
             <Button asChild variant="accent" size="lg">
-              <Link to="/signup/dj">Start your DJ application</Link>
+              <Link to="/signup/dj">Start din DJ-ansøgning</Link>
             </Button>
           </div>
         </div>

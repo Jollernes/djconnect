@@ -12,13 +12,26 @@ type Stage = {
 };
 
 const STAGES: Stage[] = [
-  { id: "requested", label: "Request sent", description: "We've sent your event details to the DJ.", icon: FileText },
-  { id: "quoted", label: "Quote received", description: "DJ has responded with a price.", icon: MessageSquare },
-  { id: "paid", label: "Payment held in escrow", description: "Funds are protected until your event.", icon: CreditCard },
-  { id: "confirmed", label: "Booking confirmed", description: "DJ is locked in for your date.", icon: ShieldCheck },
-  { id: "event", label: "Event day", description: "Sit back — the DJ takes it from here.", icon: PartyPopper },
-  { id: "completed", label: "Completed & paid out", description: "Hope it was a hit. Leave a review!", icon: Trophy },
+  { id: "requested", label: "Forespørgsel sendt", description: "Vi har sendt dine eventdetaljer til DJ'en.", icon: FileText },
+  { id: "quoted", label: "Tilbud modtaget", description: "DJ'en har svaret med en pris.", icon: MessageSquare },
+  { id: "paid", label: "Betaling i escrow", description: "Pengene er beskyttet indtil dit event.", icon: CreditCard },
+  { id: "confirmed", label: "Booking bekræftet", description: "DJ'en er booket til din dato.", icon: ShieldCheck },
+  { id: "event", label: "Eventdag", description: "Len dig tilbage — DJ'en tager over herfra.", icon: PartyPopper },
+  { id: "completed", label: "Gennemført & udbetalt", description: "Håber, det blev en succes. Skriv en anmeldelse!", icon: Trophy },
 ];
+
+function translateStatus(status: BookingStatus): string {
+  switch (status) {
+    case "cancelled":
+      return "annulleret";
+    case "declined":
+      return "afslået";
+    case "refunded":
+      return "refunderet";
+    default:
+      return status;
+  }
+}
 
 function indexFromStatus(status: BookingStatus, eventDate: Date, now: Date): number {
   const isEventDay = now.toDateString() === eventDate.toDateString();
@@ -52,9 +65,9 @@ export function StatusTimeline({ booking }: { booking: BookingWithRelations }) {
   if (currentIndex === -1) {
     return (
       <div className="rounded-2xl border bg-card p-6">
-        <h2 className="text-lg font-semibold">Booking timeline</h2>
+        <h2 className="text-lg font-semibold">Bookingforløb</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          This booking was {booking.status}. {booking.cancellation_reason ?? ""}
+          Denne booking blev {translateStatus(booking.status)}. {booking.cancellation_reason ?? ""}
         </p>
       </div>
     );
@@ -63,9 +76,9 @@ export function StatusTimeline({ booking }: { booking: BookingWithRelations }) {
   return (
     <div className="rounded-2xl border bg-card p-6">
       <div className="mb-1 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Booking timeline</h2>
+        <h2 className="text-lg font-semibold">Bookingforløb</h2>
         <span className="text-xs text-muted-foreground">
-          Step {currentIndex + 1} of {STAGES.length}
+          Trin {currentIndex + 1} af {STAGES.length}
         </span>
       </div>
       <p className="mb-5 text-sm text-muted-foreground">

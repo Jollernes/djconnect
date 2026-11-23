@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ChevronLeft, ChevronRight, Lock, CheckCircle2, Pencil } from "lucide-react";
+import { ChevronLeft, ChevronRight, Send, CheckCircle2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,10 +17,16 @@ import { useDJ } from "@/hooks/useDJs";
 import { useAuth } from "@/hooks/useAuth";
 import { useEventContext } from "@/hooks/useEventContext";
 import { EventContextModal } from "@/components/common/EventContextModal";
-import { EVENT_TYPES, PLATFORM_FEE_PERCENT, CANCELLATION_POLICY } from "@/lib/constants";
+import { EVENT_TYPES, DEPOSIT_PERCENT, CANCELLATION_POLICY } from "@/lib/constants";
 import { getEventTypeOption } from "@/lib/eventTypeOptions";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import {
+  newBookingRequestId,
+  writeBookingRequest,
+  computeBookingPricing,
+  type BookingRequest,
+} from "@/lib/bookingRequestStore";
 
 const eventSchema = z.object({
   eventTypeId: z.string().min(1, "Required"),
@@ -40,14 +46,32 @@ export function BookingRequestPage() {
   const { dj, loading } = useDJ(username ?? "");
   const { profile } = useAuth();
   const { eventTypeId: contextEventTypeId, set: setEventType } = useEventContext();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [eventPickerOpen, setEventPickerOpen] = useState(false);
+  const [submittedRef, setSubmittedRef] = useState<string | null>(null);
+
+  const initialDate = searchParams.get("date") ?? "";
+  const initialGuestsParam = searchParams.get("guests");
+  const initialGuests =
+    initialGuestsParam && Number(initialGuestsParam) > 0
+      ? Number(initialGuestsParam)
+      : undefined;
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
-    defaultValues: { eventTypeId: contextEventTypeId, eventDate: "", startTime: "", endTime: "", venueName: "", venueAddress: "", notes: "" },
+    defaultValues: {
+      eventTypeId: contextEventTypeId,
+      eventDate: initialDate,
+      startTime: "",
+      endTime: "",
+      venueName: "",
+      venueAddress: "",
+      estimatedGuests: initialGuests,
+      notes: "",
+    },
   });
 
   // Keep the form's event type in sync with context (URL / sessionStorage).
@@ -59,17 +83,13 @@ export function BookingRequestPage() {
 
   const selectedOption = getEventTypeOption(form.watch("eventTypeId"));
 
-  const totals = useMemo(() => {
+  const pricing = useMemo(() => {
     if (!dj || dj.price_on_request) return null;
-    const price = dj.price_from_minor ?? 0;
-    const fee = Math.round((price * PLATFORM_FEE_PERCENT) / 100);
-    const total = price + fee;
-    const payout = price - fee;
-    return { price, fee, total, payout };
+    return computeBookingPricing(dj.price_from_minor ?? 0);
   }, [dj]);
 
-  if (loading) return <div className="container py-12">Loading…</div>;
-  if (!dj) return <div className="container py-12">DJ not found.</div>;
+  if (loading) return <div className="container py-12">Indlæser…</div>;
+  if (!dj) return <div className="container py-12">DJ ikke fundet.</div>;
 
   async function handleContinueFromDetails() {
     const ok = await form.trigger();
@@ -77,24 +97,45 @@ export function BookingRequestPage() {
     setStep(1);
   }
 
-  async function handlePay() {
-    if (!profile) {
-      toast.error("Please log in first.");
-      navigate("/login");
-      return;
-    }
+  async function handleSendRequest() {
+    if (!dj) return;
     setSubmitting(true);
     try {
-      form.getValues();
-      // In production: call create-checkout-session edge function, redirect to Stripe.
-      //   const { sessionId } = await fetch("/api/create-checkout-session", { ... }).then(r => r.json());
-      //   const stripe = await getStripe();
-      //   await stripe!.redirectToCheckout({ sessionId });
-      await new Promise((r) => setTimeout(r, 800));
-      toast.success(`Booking submitted (${dj?.price_on_request ? "awaiting quote" : "paid, confirming"})`);
+      const values = form.getValues();
+      const id = newBookingRequestId();
+      const customerId = profile?.role === "customer" ? profile.id : undefined;
+      const record: BookingRequest = {
+        id,
+        customerId,
+        customerName: profile?.full_name ?? undefined,
+        createdAtMs: Date.now(),
+        status: "pending_dj",
+        djId: dj.id,
+        djUsername: dj.username,
+        djStageName: dj.stage_name,
+        djAvatarUrl: dj.profile.avatar_url ?? undefined,
+        djCity: dj.base_location ?? undefined,
+        djCurrency: dj.currency,
+        pricing,
+        event: {
+          eventTypeId: values.eventTypeId,
+          eventDate: values.eventDate,
+          startTime: values.startTime,
+          endTime: values.endTime || undefined,
+          venueName: values.venueName,
+          venueAddress: values.venueAddress,
+          estimatedGuests: values.estimatedGuests,
+          notes: values.notes || undefined,
+        },
+      };
+      writeBookingRequest(record);
+      // Tiny delay so the button shows its loading state and feels deliberate.
+      await new Promise((r) => setTimeout(r, 400));
+      setSubmittedRef(id);
+      toast.success(`Bookingforespørgsel sendt til ${dj.stage_name}`);
       setStep(2);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Payment failed");
+      toast.error(err instanceof Error ? err.message : "Kunne ikke sende forespørgsel");
     } finally {
       setSubmitting(false);
     }
@@ -102,15 +143,17 @@ export function BookingRequestPage() {
 
   return (
     <div className="container max-w-3xl py-8">
-      <Button variant="ghost" onClick={() => (step > 0 ? setStep(step - 1) : navigate(-1))} className="mb-4">
-        <ChevronLeft className="h-4 w-4" /> Back
-      </Button>
+      {step < 2 && (
+        <Button variant="ghost" onClick={() => (step > 0 ? setStep(step - 1) : navigate(-1))} className="mb-4">
+          <ChevronLeft className="h-4 w-4" /> Tilbage
+        </Button>
+      )}
 
       <div className="mb-6 flex items-center gap-3">
         <img src={dj.equipment_photos[0]?.url ?? dj.profile.avatar_url ?? ""} alt="" className="h-14 w-14 rounded-md object-cover" />
         <div>
           <h1 className="text-2xl font-semibold">Book {dj.stage_name}</h1>
-          <p className="text-sm text-muted-foreground">{dj.base_location} · Travels up to {dj.travel_radius_km}km</p>
+          <p className="text-sm text-muted-foreground">{dj.base_location} · Rejser op til {dj.travel_radius_km}km</p>
         </div>
       </div>
 
@@ -119,10 +162,10 @@ export function BookingRequestPage() {
       {step === 0 && (
         <Card>
           <CardContent className="space-y-4 p-6">
-            <h2 className="text-lg font-semibold">Step 1 · Event details</h2>
+            <h2 className="text-lg font-semibold">Trin 1 · Eventdetaljer</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label>Event type</Label>
+                <Label>Eventtype</Label>
                 <div
                   className={cn(
                     "mt-1 flex items-center justify-between gap-3 rounded-md border bg-muted/30 px-3 py-2.5",
@@ -142,62 +185,69 @@ export function BookingRequestPage() {
                         </span>
                         <div className="min-w-0">
                           <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                            Booking for
+                            Booking til
                           </div>
                           <div className="truncate text-sm font-semibold">{selectedOption.label}</div>
                         </div>
                       </>
                     ) : (
-                      <span className="text-sm text-muted-foreground">No event selected yet</span>
+                      <span className="text-sm text-muted-foreground">Intet event valgt endnu</span>
                     )}
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEventPickerOpen(true)}
-                    className="rounded-full"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    {selectedOption ? "Change" : "Choose event"}
-                  </Button>
+                  {!selectedOption && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEventPickerOpen(true)}
+                      className="rounded-full"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Vælg event
+                    </Button>
+                  )}
                 </div>
                 {form.formState.errors.eventTypeId && <p className="mt-1 text-xs text-destructive">{form.formState.errors.eventTypeId.message}</p>}
                 <p className="mt-1.5 text-xs text-muted-foreground">
-                  Set on the homepage. Switching events may change the DJ's pricing or what they bring.
+                  Angivet tidligere i din søgning.
                 </p>
               </div>
               <div>
-                <Label htmlFor="eventDate">Event date</Label>
+                <Label htmlFor="eventDate">Eventdato</Label>
                 <Input id="eventDate" type="date" {...form.register("eventDate")} />
+                {form.formState.errors.eventDate && <p className="mt-1 text-xs text-destructive">Vælg en dato.</p>}
               </div>
               <div>
-                <Label htmlFor="startTime">Start time</Label>
+                <Label htmlFor="startTime">Starttidspunkt</Label>
                 <Input id="startTime" type="time" {...form.register("startTime")} />
+                {form.formState.errors.startTime && <p className="mt-1 text-xs text-destructive">Angiv et starttidspunkt.</p>}
               </div>
               <div>
-                <Label htmlFor="endTime">Estimated end time</Label>
+                <Label htmlFor="endTime">Forventet sluttidspunkt</Label>
                 <Input id="endTime" type="time" {...form.register("endTime")} />
               </div>
               <div>
-                <Label htmlFor="estimatedGuests">Estimated guests</Label>
+                <Label htmlFor="estimatedGuests">Forventet antal gæster</Label>
                 <Input id="estimatedGuests" type="number" min={1} {...form.register("estimatedGuests", { valueAsNumber: true })} />
+                {form.formState.errors.estimatedGuests && <p className="mt-1 text-xs text-destructive">Angiv et gyldigt antal gæster.</p>}
               </div>
               <div className="sm:col-span-2">
-                <Label htmlFor="venueName">Venue name</Label>
+                <Label htmlFor="venueName">Lokationens navn</Label>
                 <Input id="venueName" {...form.register("venueName")} />
+                {form.formState.errors.venueName && <p className="mt-1 text-xs text-destructive">Angiv lokationens navn.</p>}
               </div>
               <div className="sm:col-span-2">
-                <Label htmlFor="venueAddress">Venue address</Label>
+                <Label htmlFor="venueAddress">Lokationens adresse</Label>
                 <Input id="venueAddress" {...form.register("venueAddress")} />
+                {form.formState.errors.venueAddress && <p className="mt-1 text-xs text-destructive">Angiv lokationens adresse.</p>}
               </div>
               <div className="sm:col-span-2">
-                <Label htmlFor="notes">Special requests / notes (optional)</Label>
+                <Label htmlFor="notes">Særlige ønsker / noter (valgfrit)</Label>
                 <Textarea id="notes" rows={3} {...form.register("notes")} />
               </div>
             </div>
             <Button onClick={handleContinueFromDetails} variant="accent" className="w-full">
-              Continue <ChevronRight className="h-4 w-4" />
+              Fortsæt <ChevronRight className="h-4 w-4" />
             </Button>
           </CardContent>
         </Card>
@@ -206,51 +256,53 @@ export function BookingRequestPage() {
       {step === 1 && (
         <Card>
           <CardContent className="space-y-5 p-6">
-            <h2 className="text-lg font-semibold">Step 2 · Review and pay</h2>
+            <h2 className="text-lg font-semibold">Trin 2 · Gennemse og send forespørgsel</h2>
             <ReviewRow label="DJ" value={dj.stage_name} />
-            <ReviewRow label="Event type" value={EVENT_TYPES.find((e) => e.id === form.getValues("eventTypeId"))?.label ?? ""} />
-            <ReviewRow label="Event date" value={formatDate(form.getValues("eventDate"))} />
+            <ReviewRow label="Eventtype" value={EVENT_TYPES.find((e) => e.id === form.getValues("eventTypeId"))?.label ?? ""} />
+            <ReviewRow label="Eventdato" value={formatDate(form.getValues("eventDate"))} />
             <ReviewRow
-              label="Time"
+              label="Tidspunkt"
               value={`${form.getValues("startTime")}${form.getValues("endTime") ? ` – ${form.getValues("endTime")}` : ""}`}
             />
-            <ReviewRow label="Venue" value={`${form.getValues("venueName")} · ${form.getValues("venueAddress")}`} />
-            {form.getValues("estimatedGuests") && <ReviewRow label="Estimated guests" value={String(form.getValues("estimatedGuests"))} />}
-            {form.getValues("notes") && <ReviewRow label="Notes" value={form.getValues("notes") ?? ""} />}
+            <ReviewRow label="Lokation" value={`${form.getValues("venueName")} · ${form.getValues("venueAddress")}`} />
+            {form.getValues("estimatedGuests") && <ReviewRow label="Forventet antal gæster" value={String(form.getValues("estimatedGuests"))} />}
+            {form.getValues("notes") && <ReviewRow label="Noter" value={form.getValues("notes") ?? ""} />}
 
             <Separator />
 
             {dj.price_on_request ? (
               <div className="rounded-md bg-muted/40 p-4 text-sm">
-                <Badge variant="warning" className="mb-2">Price on request</Badge>
+                <Badge variant="warning" className="mb-2">Pris efter forespørgsel</Badge>
                 <p>
-                  You won't be charged yet. Your request will go to {dj.stage_name}, who will reply with a quote.
-                  Once you approve, you'll be asked to pay.
+                  Du bliver ikke opkrævet endnu. Din forespørgsel sendes til {dj.stage_name}, som bekræfter prisen (eller justerer den). Først når du bekræfter endeligt, betaler du depositum på {DEPOSIT_PERCENT}%.
                 </p>
               </div>
-            ) : totals ? (
+            ) : pricing ? (
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">DJ price</span><span>{formatCurrency(totals.price, dj.currency)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Platform service fee ({PLATFORM_FEE_PERCENT}%)</span><span>{formatCurrency(totals.fee, dj.currency)}</span></div>
-                <Separator />
-                <div className="flex justify-between text-base font-semibold"><span>Total today</span><span>{formatCurrency(totals.total, dj.currency)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Fuld pris (estimat)</span><span>{formatCurrency(pricing.fullPriceMinor, dj.currency)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Depositum nu ({DEPOSIT_PERCENT}%)</span><span>{formatCurrency(pricing.depositMinor, dj.currency)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Rest til DJ efter event</span><span>{formatCurrency(pricing.payoutMinor, dj.currency)}</span></div>
                 <p className="text-xs text-muted-foreground">
-                  Your DJ is paid 24 hours after your event, provided everything goes well. Funds are held securely by Stripe.
+                  <strong className="font-semibold text-foreground">Du bliver ikke opkrævet endnu.</strong>{" "}
+                  {dj.stage_name} bekræfter først prisen (eller justerer den, hvis der er ekstra ønsker). Når du derefter bekræfter endeligt, betaler du et depositum på {DEPOSIT_PERCENT}% (platformsgebyret). Resten udbetales til DJ'en efter eventet.
                 </p>
               </div>
             ) : null}
 
             <div className="rounded-md border p-3 text-xs">
-              <div className="font-medium">Cancellation policy</div>
+              <div className="font-medium">Afbestillingspolitik</div>
               <ul className="mt-1 space-y-0.5 text-muted-foreground">
                 {CANCELLATION_POLICY.map((c) => <li key={c.label}>• {c.label}</li>)}
               </ul>
             </div>
 
-            <Button variant="accent" className="w-full" onClick={handlePay} disabled={submitting}>
-              <Lock className="h-4 w-4" />
-              {dj.price_on_request ? "Submit request" : submitting ? "Redirecting to Stripe…" : "Pay securely with Stripe"}
+            <Button variant="accent" className="w-full" onClick={handleSendRequest} disabled={submitting}>
+              <Send className="h-4 w-4" />
+              {submitting ? "Sender forespørgsel…" : "Send bookingforespørgsel"}
             </Button>
+            <p className="text-center text-xs text-muted-foreground">
+              Ingen betaling nu. {dj.stage_name} svarer typisk inden for få timer.
+            </p>
           </CardContent>
         </Card>
       )}
@@ -263,8 +315,8 @@ export function BookingRequestPage() {
           form.setValue("eventTypeId", id, { shouldValidate: true });
           setEventType(id);
         }}
-        title="Change the event you're booking"
-        description="Switching events may change the DJ's pricing or what they bring."
+        title="Ændr det event, du booker til"
+        description="At skifte event kan ændre DJ'ens pris eller hvad de medbringer."
       />
 
       {step === 2 && (
@@ -273,23 +325,21 @@ export function BookingRequestPage() {
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-success/20 text-success">
               <CheckCircle2 className="h-6 w-6" />
             </div>
-            <h2 className="text-xl font-semibold">
-              {dj.price_on_request ? "Request sent" : "Booking confirmed"}
-            </h2>
+            <h2 className="text-xl font-semibold">Forespørgsel sendt til {dj.stage_name}</h2>
             <p className="max-w-md text-sm text-muted-foreground">
-              {dj.price_on_request
-                ? `${dj.stage_name} will review your event details and send you a quote shortly.`
-                : `We've emailed your confirmation. ${dj.stage_name} has been notified.`}
+              {dj.stage_name} gennemgår dine eventdetaljer og bekræfter prisen (eller justerer den). Så snart de har svaret, kan du bekræfte booking endeligt og betale depositummet på {DEPOSIT_PERCENT}%. Følg status under Mine forespørgsler.
             </p>
             <div className="rounded-md bg-muted/40 px-4 py-2 text-sm">
-              Booking reference: <span className="font-mono font-semibold">DJC-{Math.random().toString(36).slice(2, 8).toUpperCase()}</span>
+              Reference: <span className="font-mono font-semibold">{submittedRef ?? "—"}</span>
             </div>
-            <div className="flex gap-2">
-              <Button asChild variant="outline">
-                <a href="/dashboard">View dashboard</a>
-              </Button>
+            <div className="flex flex-wrap justify-center gap-2">
+              {profile?.role === "customer" && (
+                <Button asChild variant="outline">
+                  <a href="/dashboard/requests">Se mine forespørgsler</a>
+                </Button>
+              )}
               <Button asChild variant="accent">
-                <a href="/search">Browse more DJs</a>
+                <a href="/search">Find flere DJs</a>
               </Button>
             </div>
           </CardContent>

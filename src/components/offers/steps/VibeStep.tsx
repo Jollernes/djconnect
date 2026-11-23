@@ -12,7 +12,7 @@ export function VibeStep({
   return (
     <div className="space-y-4">
       <p className="text-center text-xs text-muted-foreground">
-        Pick as many as you like. The DJs will use these as a starting point — final playlist is built with you.
+        Vælg så mange du vil. DJs bruger dem som udgangspunkt — den endelige playliste laver I sammen.
       </p>
       <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
         {GENRE_OPTIONS.map((g) => {
@@ -50,7 +50,7 @@ export function VibeStep({
       </div>
       {genres.length > 0 && (
         <p className="text-center text-xs text-muted-foreground">
-          {genres.length} genre{genres.length === 1 ? "" : "s"} selected
+          {genres.length} genre{genres.length === 1 ? "" : "r"} valgt
         </p>
       )}
     </div>

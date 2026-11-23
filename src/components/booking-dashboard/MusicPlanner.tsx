@@ -14,9 +14,9 @@ const DEFAULT: MusicState = {
   mustPlay: [],
   doNotPlay: [],
   specialMoments: [
-    { label: "First dance", song: "" },
-    { label: "Walk-in / entrance", song: "" },
-    { label: "Last song of the night", song: "" },
+    { label: "Første dans", song: "" },
+    { label: "Entré / indgang", song: "" },
+    { label: "Aftenens sidste sang", song: "" },
   ],
 };
 
@@ -79,7 +79,7 @@ export function MusicPlanner({ bookingId }: { bookingId: string }) {
   function addMoment() {
     persist({
       ...state,
-      specialMoments: [...state.specialMoments, { label: "Custom moment", song: "" }],
+      specialMoments: [...state.specialMoments, { label: "Eget øjeblik", song: "" }],
     });
   }
 
@@ -89,25 +89,25 @@ export function MusicPlanner({ bookingId }: { bookingId: string }) {
     <div className="rounded-2xl border bg-card p-6">
       <div className="mb-1 flex items-center gap-2">
         <Music className="h-5 w-5 text-accent" />
-        <h2 className="text-lg font-semibold">Music planner</h2>
+        <h2 className="text-lg font-semibold">Musikplanlægger</h2>
         <span className="ml-auto text-xs text-muted-foreground">
-          {total} item{total === 1 ? "" : "s"} shared with your DJ
+          {total} {total === 1 ? "emne" : "emner"} delt med din DJ
         </span>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">
-        Tell your DJ what to play and what to avoid. Edits save automatically.
+        Fortæl din DJ, hvad der skal spilles, og hvad der skal undgås. Ændringer gemmes automatisk.
       </p>
 
       <Tabs defaultValue="must">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="must" className="gap-1.5">
-            <Heart className="h-3.5 w-3.5" /> Must play
+            <Heart className="h-3.5 w-3.5" /> Skal spilles
           </TabsTrigger>
           <TabsTrigger value="avoid" className="gap-1.5">
-            <Ban className="h-3.5 w-3.5" /> Avoid
+            <Ban className="h-3.5 w-3.5" /> Undgå
           </TabsTrigger>
           <TabsTrigger value="moments" className="gap-1.5">
-            <Star className="h-3.5 w-3.5" /> Moments
+            <Star className="h-3.5 w-3.5" /> Øjeblikke
           </TabsTrigger>
         </TabsList>
 
@@ -117,15 +117,15 @@ export function MusicPlanner({ bookingId }: { bookingId: string }) {
               value={mustInput}
               onChange={(e) => setMustInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addMust(mustInput))}
-              placeholder="e.g. Don't Stop Me Now — Queen"
+              placeholder="f.eks. Don't Stop Me Now — Queen"
             />
             <Button type="button" onClick={() => addMust(mustInput)}>
-              <Plus className="h-4 w-4" /> Add
+              <Plus className="h-4 w-4" /> Tilføj
             </Button>
           </div>
           {state.mustPlay.length === 0 ? (
             <div className="space-y-2">
-              <div className="text-xs text-muted-foreground">Need ideas? Tap to add:</div>
+              <div className="text-xs text-muted-foreground">Mangler du idéer? Tryk for at tilføje:</div>
               <div className="flex flex-wrap gap-2">
                 {SUGGESTIONS.map((s) => (
                   <button
@@ -152,7 +152,7 @@ export function MusicPlanner({ bookingId }: { bookingId: string }) {
                     type="button"
                     onClick={() => removeMust(song)}
                     className="rounded-full p-0.5 text-rose-700/60 transition-colors hover:bg-rose-200 hover:text-rose-900"
-                    aria-label={`Remove ${song}`}
+                    aria-label={`Fjern ${song}`}
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -168,15 +168,15 @@ export function MusicPlanner({ bookingId }: { bookingId: string }) {
               value={avoidInput}
               onChange={(e) => setAvoidInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addAvoid(avoidInput))}
-              placeholder="Songs, artists, or genres to avoid"
+              placeholder="Sange, kunstnere eller genrer, der skal undgås"
             />
             <Button type="button" onClick={() => addAvoid(avoidInput)}>
-              <Plus className="h-4 w-4" /> Add
+              <Plus className="h-4 w-4" /> Tilføj
             </Button>
           </div>
           {state.doNotPlay.length === 0 ? (
             <div className="rounded-md border border-dashed bg-muted/30 p-4 text-center text-xs text-muted-foreground">
-              No tracks on the do-not-play list yet.
+              Ingen numre på må-ikke-spilles-listen endnu.
             </div>
           ) : (
             <ul className="flex flex-wrap gap-2">
@@ -191,7 +191,7 @@ export function MusicPlanner({ bookingId }: { bookingId: string }) {
                     type="button"
                     onClick={() => removeAvoid(song)}
                     className="rounded-full p-0.5 text-slate-500 hover:bg-slate-200 hover:text-slate-900"
-                    aria-label={`Remove ${song}`}
+                    aria-label={`Fjern ${song}`}
                   >
                     <X className="h-3.5 w-3.5" />
                   </button>
@@ -208,12 +208,12 @@ export function MusicPlanner({ bookingId }: { bookingId: string }) {
               <Input
                 value={m.song}
                 onChange={(e) => setMoment(i, e.target.value)}
-                placeholder="Song & artist"
+                placeholder="Sang & kunstner"
               />
             </div>
           ))}
           <Button type="button" variant="outline" size="sm" onClick={addMoment}>
-            <Plus className="h-4 w-4" /> Add another moment
+            <Plus className="h-4 w-4" /> Tilføj endnu et øjeblik
           </Button>
         </TabsContent>
       </Tabs>

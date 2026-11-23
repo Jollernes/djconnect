@@ -17,7 +17,7 @@ export function EventContextBanner({ eventTypeId, onChange, variant = "search", 
   const [open, setOpen] = useState(false);
   const selected = getEventTypeOption(eventTypeId);
 
-  const verb = variant === "profile" ? "Viewing this DJ for" : variant === "booking" ? "Booking for" : "Browsing DJs for";
+  const verb = variant === "profile" ? "Ser denne DJ til" : variant === "booking" ? "Booker til" : "Finder DJs til";
 
   return (
     <>
@@ -48,10 +48,10 @@ export function EventContextBanner({ eventTypeId, onChange, variant = "search", 
               {verb}
             </div>
             <div className="truncate text-base font-semibold leading-tight sm:text-lg">
-              {selected ? selected.label : "Any event"}
+              {selected ? selected.label : "Alle events"}
               {selected && variant === "search" && (
                 <span className="ml-2 hidden text-sm font-normal text-muted-foreground sm:inline">
-                  · DJ profiles tailored for {selected.longLabel}
+                  · DJ-profiler tilpasset {selected.longLabel}
                 </span>
               )}
             </div>
@@ -67,7 +67,7 @@ export function EventContextBanner({ eventTypeId, onChange, variant = "search", 
             className="rounded-full"
           >
             <Pencil className="h-3.5 w-3.5" />
-            Change event
+            Skift event
           </Button>
           {selected && variant === "search" && (
             <Button
@@ -78,7 +78,7 @@ export function EventContextBanner({ eventTypeId, onChange, variant = "search", 
               className="rounded-full text-muted-foreground"
             >
               <X className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Browse all</span>
+              <span className="hidden sm:inline">Se alle</span>
             </Button>
           )}
         </div>
@@ -92,15 +92,15 @@ export function EventContextBanner({ eventTypeId, onChange, variant = "search", 
         onBrowseAll={() => onChange("")}
         title={
           variant === "booking"
-            ? "Change the event you're booking"
+            ? "Skift det event, du booker til"
             : variant === "profile"
-              ? "Change the event you're planning"
-              : "Change your event"
+              ? "Skift det event, du planlægger"
+              : "Skift dit event"
         }
         description={
           variant === "booking"
-            ? "Switching events may change pricing and what the DJ brings — confirm before continuing."
-            : "We'll re-tailor the DJ profiles you see to match."
+            ? "At skifte event kan ændre prisen og hvad DJ'en tager med — bekræft før du fortsætter."
+            : "Vi tilpasser de DJ-profiler, du ser, så de matcher."
         }
       />
     </>

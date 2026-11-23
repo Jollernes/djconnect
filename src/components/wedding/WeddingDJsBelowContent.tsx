@@ -59,17 +59,17 @@ export function WeddingDJsBelowContent() {
         <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:items-start">
           <div>
             <Badge variant="outline" className="rounded-full border-rose-200 bg-rose-50 text-rose-700">
-              <Heart className="h-3 w-3 fill-current" /> Sample run-of-show
+              <Heart className="h-3 w-3 fill-current" /> Eksempel på køreplan
             </Badge>
             <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              A wedding night, hour by hour.
+              En bryllupsaften, time for time.
             </h2>
             <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-              The rhythm most DJConnect couples follow. Once booked, your DJ builds your exact
-              run-of-show with you in the dashboard — editable right up to the day.
+              Rytmen de fleste par på DJConnect følger. Når du har booket, bygger din DJ jeres præcise
+              køreplan sammen med dig i dashboardet — redigerbar helt frem til dagen.
             </p>
             <Button asChild variant="link" className="-ml-3 mt-2 text-rose-700">
-              <Link to="/how-it-works">See the planning flow <ChevronRight className="h-3.5 w-3.5" /></Link>
+              <Link to="/how-it-works">Se planlægningsforløbet <ChevronRight className="h-3.5 w-3.5" /></Link>
             </Button>
           </div>
           <ol className="relative space-y-3 border-l-2 border-rose-100 pl-5">
@@ -99,13 +99,13 @@ export function WeddingDJsBelowContent() {
         <div className="container py-14 sm:py-16">
           <div className="mx-auto max-w-2xl text-center">
             <Badge variant="outline" className="rounded-full border-rose-200 bg-rose-50 text-rose-700">
-              <Music4 className="h-3 w-3" /> Energy curve
+              <Music4 className="h-3 w-3" /> Energikurve
             </Badge>
             <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              How a wedding DJ builds the night.
+              Sådan bygger en bryllups-DJ aftenen op.
             </h2>
             <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-              The arc most wedding DJs work to — soft start, room-warming, peak, then a closer everyone sings.
+              Den kurve de fleste bryllups-DJs arbejder efter — blød start, opvarmning, højdepunkt og så en afslutning, alle synger med på.
             </p>
           </div>
 
@@ -145,31 +145,31 @@ export function WeddingDJsBelowContent() {
         <div className="grid gap-8 lg:grid-cols-[1fr_1.2fr] lg:items-center">
           <div>
             <Badge variant="outline" className="rounded-full border-rose-200 bg-rose-50 text-rose-700">
-              <Sparkles className="h-3 w-3" /> What's included
+              <Sparkles className="h-3 w-3" /> Hvad er inkluderet
             </Badge>
             <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              The full mobile disco — all in.
+              Hele det mobile diskotek — alt inklusive.
             </h2>
             <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-              No hidden hire fees, no surprise add-ons. The price you see covers PA, lighting,
-              mic, and travel within the DJ's region.
+              Ingen skjulte lejegebyrer, ingen overraskende tillæg. Prisen, du ser, dækker PA, lys,
+              mikrofon og transport inden for DJ'ens region.
             </p>
             {pricing && (
               <div className="mt-5 rounded-2xl border bg-card p-5">
                 <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Wedding DJ pricing in Denmark
+                  Priser for bryllups-DJs i Danmark
                 </div>
                 <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="text-2xl font-semibold tabular-nums sm:text-3xl">
                     {formatCurrency(pricing.min, "DKK")}
                   </span>
-                  <span className="text-muted-foreground">to</span>
+                  <span className="text-muted-foreground">til</span>
                   <span className="text-xl font-semibold tabular-nums sm:text-2xl">
                     {formatCurrency(pricing.max, "DKK")}
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Average around {formatCurrency(pricing.avg, "DKK")} for a full evening including PA, lighting, mic, and travel.
+                  Gennemsnitligt omkring {formatCurrency(pricing.avg, "DKK")} for en hel aften inklusive PA, lys, mikrofon og transport.
                 </p>
               </div>
             )}
@@ -193,10 +193,10 @@ export function WeddingDJsBelowContent() {
       <section className="container py-14 sm:py-16">
         <div className="mx-auto max-w-2xl text-center">
           <Badge variant="outline" className="rounded-full border-rose-200 bg-rose-50 text-rose-700">
-            <Star className="h-3 w-3 fill-current" /> Real wedding reviews
+            <Star className="h-3 w-3 fill-current" /> Rigtige bryllupsanmeldelser
           </Badge>
           <h2 className="mt-2 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-            What couples say after their wedding.
+            Hvad par siger efter deres bryllup.
           </h2>
         </div>
         <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -219,7 +219,7 @@ export function WeddingDJsBelowContent() {
                   {dj && (
                     <div className="mt-4 flex items-center justify-between gap-3 border-t pt-3 text-sm">
                       <span className="text-muted-foreground">
-                        Booked{" "}
+                        Bookede{" "}
                         <Link
                           to={`/djs/${dj.username}?eventType=wedding`}
                           className="font-semibold text-foreground underline-offset-4 hover:underline"
@@ -228,7 +228,7 @@ export function WeddingDJsBelowContent() {
                         </Link>
                       </span>
                       <Badge variant="secondary" className="rounded-full">
-                        <Heart className="h-3 w-3 fill-rose-500 text-rose-500" /> Wedding
+                        <Heart className="h-3 w-3 fill-rose-500 text-rose-500" /> Bryllup
                       </Badge>
                     </div>
                   )}
@@ -249,11 +249,11 @@ export function WeddingDJsBelowContent() {
               FAQ
             </Badge>
             <h2 className="mt-3 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-              Wedding DJ questions, answered.
+              Spørgsmål om bryllups-DJs, besvaret.
             </h2>
             <p className="mt-2 text-pretty text-sm text-muted-foreground sm:text-base">
-              Still wondering? Drop a message in the booking thread once you've shortlisted a DJ —
-              every DJ replies within 2 hours.
+              Stadig i tvivl? Skriv en besked i bookingtråden, når du har udvalgt en DJ —
+              alle DJs svarer inden for 2 timer.
             </p>
           </div>
           <Accordion type="single" collapsible className="rounded-2xl border bg-card px-5">
@@ -284,26 +284,26 @@ export function WeddingDJsBelowContent() {
           <div className="relative flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                Ready to find your wedding DJ?
+                Klar til at finde din bryllups-DJ?
               </h2>
               <p className="mt-1.5 max-w-xl text-pretty text-sm text-white/80 sm:text-base">
-                Browse {totalWeddingDJs} verified wedding DJs above, compare profiles, and message
-                any of them before you decide. No payment until you book.
+                Se {totalWeddingDJs} verificerede bryllups-DJs ovenfor, sammenlign profiler og skriv
+                til hvem som helst af dem, før du beslutter dig. Ingen betaling, før du booker.
               </p>
               <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-white/70">
                 <span className="inline-flex items-center gap-1.5">
-                  <Users className="h-3.5 w-3.5" /> 100% verified
+                  <Users className="h-3.5 w-3.5" /> 100% verificeret
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <Shield className="h-3.5 w-3.5" /> Stripe-protected
+                  <Shield className="h-3.5 w-3.5" /> Stripe-beskyttet
                 </span>
                 <span className="inline-flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5" /> Free cancellation up to 14 days
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Gratis annullering op til 14 dage
                 </span>
               </div>
             </div>
             <Button asChild variant="accent" size="lg" className="rounded-full shadow-xl">
-              <a href="#top">Browse wedding DJs</a>
+              <a href="#top">Se bryllups-DJs</a>
             </Button>
           </div>
         </div>

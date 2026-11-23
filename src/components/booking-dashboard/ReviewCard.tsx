@@ -14,20 +14,20 @@ export function ReviewCard({ booking }: { booking: BookingWithRelations }) {
 
   function submit() {
     if (text.trim().length < 20) {
-      toast.error("Review must be at least 20 characters");
+      toast.error("Anmeldelsen skal være mindst 20 tegn");
       return;
     }
     setSubmitted(true);
-    toast.success("Review submitted — thanks!");
+    toast.success("Anmeldelse sendt — tak!");
   }
 
   if (submitted) {
     return (
       <div className="rounded-2xl border bg-card p-6 text-center">
         <Trophy className="mx-auto h-10 w-10 text-amber-500" />
-        <h3 className="mt-3 text-lg font-semibold">Thanks for the review!</h3>
+        <h3 className="mt-3 text-lg font-semibold">Tak for din anmeldelse!</h3>
         <p className="text-sm text-muted-foreground">
-          Your feedback helps other event hosts find great DJs.
+          Din feedback hjælper andre værter med at finde gode DJs.
         </p>
       </div>
     );
@@ -35,9 +35,9 @@ export function ReviewCard({ booking }: { booking: BookingWithRelations }) {
 
   return (
     <div className="rounded-2xl border bg-card p-6">
-      <h2 className="text-lg font-semibold">How did it go?</h2>
+      <h2 className="text-lg font-semibold">Hvordan gik det?</h2>
       <p className="text-sm text-muted-foreground">
-        Leave a review for {booking.dj_profile.stage_name}.
+        Skriv en anmeldelse af {booking.dj_profile.stage_name}.
       </p>
 
       <div className="mt-4 flex items-center gap-1">
@@ -49,7 +49,7 @@ export function ReviewCard({ booking }: { booking: BookingWithRelations }) {
             onMouseEnter={() => setHover(n)}
             onMouseLeave={() => setHover(0)}
             className="p-1 transition-transform hover:scale-110"
-            aria-label={`${n} star${n === 1 ? "" : "s"}`}
+            aria-label={`${n} stjerne${n === 1 ? "" : "r"}`}
           >
             <Star
               className={cn(
@@ -66,13 +66,13 @@ export function ReviewCard({ booking }: { booking: BookingWithRelations }) {
       <Textarea
         rows={4}
         className="mt-4"
-        placeholder="What stood out about the night? (min. 20 characters)"
+        placeholder="Hvad var særligt ved aftenen? (min. 20 tegn)"
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
 
       <Button onClick={submit} className="mt-3 w-full" variant="accent">
-        Submit review
+        Send anmeldelse
       </Button>
     </div>
   );

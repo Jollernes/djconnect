@@ -20,13 +20,13 @@ export function WeddingDJsHero() {
               />
               <div className="min-w-0">
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Wedding DJs · Denmark
+                  Bryllups-DJs · Danmark
                 </p>
                 <h1 className="mt-1 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
-                  Find your wedding DJ.
+                  Find din bryllups-DJ.
                 </h1>
                 <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-                  Verified DJs across Denmark. Written contract and escrow-protected payment included.
+                  Verificerede DJs i hele Danmark. Skriftlig kontrakt og escrow-beskyttet betaling inkluderet.
                 </p>
               </div>
             </div>
@@ -35,7 +35,7 @@ export function WeddingDJsHero() {
               onClick={() => setSwitchOpen(true)}
               className="shrink-0 text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline sm:text-sm"
             >
-              Switch event
+              Skift event
             </button>
           </div>
         </div>
@@ -52,8 +52,8 @@ export function WeddingDJsHero() {
             window.location.href = `/search?eventType=${id}`;
           }
         }}
-        title="Switch event"
-        description="Browsing for a different event will change the DJ profiles you see."
+        title="Skift event"
+        description="Hvis du browser efter et andet event, ændres de DJ-profiler, du ser."
       />
     </>
   );

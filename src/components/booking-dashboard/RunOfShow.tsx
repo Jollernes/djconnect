@@ -7,30 +7,30 @@ type Slot = { id: string; time: string; label: string };
 
 const DEFAULTS: Record<string, Slot[]> = {
   wedding: [
-    { id: "1", time: "16:00", label: "Ceremony / arrival music" },
-    { id: "2", time: "18:00", label: "Cocktail hour" },
-    { id: "3", time: "19:30", label: "Dinner & speeches" },
-    { id: "4", time: "21:00", label: "First dance" },
-    { id: "5", time: "21:15", label: "Dancefloor open" },
-    { id: "6", time: "00:30", label: "Last song" },
+    { id: "1", time: "16:00", label: "Ceremoni / ankomstmusik" },
+    { id: "2", time: "18:00", label: "Velkomstdrinks" },
+    { id: "3", time: "19:30", label: "Middag & taler" },
+    { id: "4", time: "21:00", label: "Første dans" },
+    { id: "5", time: "21:15", label: "Dansegulvet åbner" },
+    { id: "6", time: "00:30", label: "Sidste sang" },
   ],
   birthday: [
-    { id: "1", time: "19:00", label: "Guests arriving — chill set" },
-    { id: "2", time: "20:30", label: "Cake & toast" },
-    { id: "3", time: "21:00", label: "Dancefloor open" },
-    { id: "4", time: "23:30", label: "Last song" },
+    { id: "1", time: "19:00", label: "Gæster ankommer — roligt sæt" },
+    { id: "2", time: "20:30", label: "Kage & skål" },
+    { id: "3", time: "21:00", label: "Dansegulvet åbner" },
+    { id: "4", time: "23:30", label: "Sidste sang" },
   ],
   corporate_event: [
-    { id: "1", time: "18:00", label: "Reception / networking" },
-    { id: "2", time: "19:30", label: "Dinner & program" },
-    { id: "3", time: "21:00", label: "Dancefloor open" },
-    { id: "4", time: "00:00", label: "Closing" },
+    { id: "1", time: "18:00", label: "Reception / netværk" },
+    { id: "2", time: "19:30", label: "Middag & program" },
+    { id: "3", time: "21:00", label: "Dansegulvet åbner" },
+    { id: "4", time: "00:00", label: "Afslutning" },
   ],
   default: [
-    { id: "1", time: "19:00", label: "Arrival" },
-    { id: "2", time: "20:00", label: "Dinner" },
-    { id: "3", time: "21:30", label: "Dancefloor open" },
-    { id: "4", time: "00:00", label: "Last song" },
+    { id: "1", time: "19:00", label: "Ankomst" },
+    { id: "2", time: "20:00", label: "Middag" },
+    { id: "3", time: "21:30", label: "Dansegulvet åbner" },
+    { id: "4", time: "00:00", label: "Sidste sang" },
   ],
 };
 
@@ -75,7 +75,7 @@ export function RunOfShow({
   function add() {
     persist([
       ...slots,
-      { id: crypto.randomUUID(), time: "22:00", label: "Custom moment" },
+      { id: crypto.randomUUID(), time: "22:00", label: "Eget øjeblik" },
     ]);
   }
 
@@ -83,10 +83,10 @@ export function RunOfShow({
     <div className="rounded-2xl border bg-card p-6">
       <div className="mb-1 flex items-center gap-2">
         <Clock className="h-5 w-5 text-accent" />
-        <h2 className="text-lg font-semibold">Run of show</h2>
+        <h2 className="text-lg font-semibold">Køreplan</h2>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">
-        Lay out the timeline of your event. Your DJ will use this to plan transitions and pacing.
+        Læg tidsplanen for dit event. Din DJ bruger den til at planlægge overgange og tempo.
       </p>
 
       <div className="space-y-2">
@@ -109,14 +109,14 @@ export function RunOfShow({
               <Input
                 value={slot.label}
                 onChange={(e) => update(slot.id, { label: e.target.value })}
-                placeholder="Moment"
+                placeholder="Øjeblik"
               />
               <Button
                 type="button"
                 variant="ghost"
                 size="icon"
                 onClick={() => remove(slot.id)}
-                aria-label={`Remove ${slot.label}`}
+                aria-label={`Fjern ${slot.label}`}
               >
                 <Trash2 className="h-4 w-4 text-muted-foreground" />
               </Button>
@@ -125,7 +125,7 @@ export function RunOfShow({
       </div>
 
       <Button type="button" variant="outline" size="sm" onClick={add} className="mt-3">
-        <Plus className="h-4 w-4" /> Add moment
+        <Plus className="h-4 w-4" /> Tilføj øjeblik
       </Button>
     </div>
   );

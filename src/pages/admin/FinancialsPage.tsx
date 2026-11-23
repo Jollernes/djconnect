@@ -11,15 +11,15 @@ export function AdminFinancialsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Financials</h1>
+      <h1 className="text-2xl font-semibold">Økonomi</h1>
       <div className="grid gap-4 md:grid-cols-4">
-        <Stat label="Gross booking value" value={formatCurrency(gross, "DKK")} />
-        <Stat label={`Platform revenue (${PLATFORM_FEE_PERCENT}%)`} value={formatCurrency(fees, "DKK")} />
-        <Stat label="Paid out to DJs" value={formatCurrency(paidOut, "DKK")} />
-        <Stat label="Pending payouts" value={formatCurrency(pending, "DKK")} />
+        <Stat label="Samlet bookingværdi" value={formatCurrency(gross, "DKK")} />
+        <Stat label={`Platformomsætning (${PLATFORM_FEE_PERCENT}%)`} value={formatCurrency(fees, "DKK")} />
+        <Stat label="Udbetalt til DJs" value={formatCurrency(paidOut, "DKK")} />
+        <Stat label="Afventende udbetalinger" value={formatCurrency(pending, "DKK")} />
       </div>
       <p className="text-sm text-muted-foreground">
-        Hook up Stripe reports + webhooks for real-time data once Stripe is configured in production.
+        Forbind Stripe-rapporter + webhooks for realtidsdata, når Stripe er konfigureret i produktion.
       </p>
     </div>
   );

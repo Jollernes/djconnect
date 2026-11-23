@@ -3,42 +3,42 @@ import { PLATFORM_NAME } from "@/lib/constants";
 export function AboutPage() {
   return (
     <div className="container max-w-3xl py-16 prose prose-slate prose-headings:font-semibold">
-      <h1>About {PLATFORM_NAME}</h1>
+      <h1>Om {PLATFORM_NAME}</h1>
       <p>
-        {PLATFORM_NAME} is a two-sided marketplace connecting people hosting events with professional DJs who
-        bring a complete mobile disco setup. We're exclusively focused on DJs — not bands, not general
-        entertainment — because booking a DJ with the right gear, personality, and track selection is a
-        specialist job.
+        {PLATFORM_NAME} er en markedsplads, der forbinder mennesker, der holder events, med professionelle DJs, der
+        medbringer et komplet mobilt diskotek. Vi fokuserer udelukkende på DJs — ikke bands, ikke generel
+        underholdning — fordi det at booke en DJ med det rette udstyr, personlighed og musikvalg er et
+        specialistjob.
       </p>
-      <h2>Why we exist</h2>
+      <h2>Hvorfor vi findes</h2>
       <p>
-        Hosting a wedding, corporate event, or milestone party is stressful enough. Finding a DJ you can
-        actually trust — who'll turn up with the right setup, play what your guests will dance to, and
-        handle themselves professionally — should be simple. {PLATFORM_NAME} exists to make it simple.
+        At holde et bryllup, firmaarrangement eller en stor mærkedag er stressende nok i forvejen. At finde en DJ, du
+        faktisk kan stole på — som møder op med det rette setup, spiller det, dine gæster vil danse til, og
+        opfører sig professionelt — burde være enkelt. {PLATFORM_NAME} findes for at gøre det enkelt.
       </p>
-      <h2>How we're different</h2>
+      <h2>Hvordan vi adskiller os</h2>
       <ul>
         <li>
-          <strong>Verified DJs only.</strong> Every DJ is reviewed by our team before they can accept bookings.
-          We look at equipment, experience, and references.
+          <strong>Kun verificerede DJs.</strong> Hver DJ gennemgås af vores team, før de kan acceptere bookinger.
+          Vi ser på udstyr, erfaring og referencer.
         </li>
         <li>
-          <strong>Escrow payments.</strong> Your payment is held by Stripe and only released to the DJ 24
-          hours after your event completes — protecting both sides.
+          <strong>Escrow-betalinger.</strong> Din betaling holdes af Stripe og frigives først til DJ'en 24
+          timer efter dit event er afsluttet — hvilket beskytter begge parter.
         </li>
         <li>
-          <strong>Transparent pricing.</strong> See starting prices upfront, with a clear platform service fee.
-          No hidden charges.
+          <strong>Gennemsigtig prissætning.</strong> Se startpriser på forhånd, med et tydeligt platformsgebyr.
+          Ingen skjulte omkostninger.
         </li>
         <li>
-          <strong>Real reviews.</strong> Only customers with completed bookings can leave reviews, so what you
-          read is what you'll get.
+          <strong>Ægte anmeldelser.</strong> Kun kunder med gennemførte bookinger kan skrive anmeldelser, så det, du
+          læser, er det, du får.
         </li>
       </ul>
-      <h2>Get in touch</h2>
+      <h2>Kom i kontakt</h2>
       <p>
-        Have questions? Email us at <a href="mailto:support@djconnect.example">support@djconnect.example</a>
-        {" "}or check our <a href="/faq">FAQ</a>.
+        Har du spørgsmål? Skriv til os på <a href="mailto:support@djconnect.example">support@djconnect.example</a>
+        {" "}eller se vores <a href="/faq">FAQ</a>.
       </p>
     </div>
   );

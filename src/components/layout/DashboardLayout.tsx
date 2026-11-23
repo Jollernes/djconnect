@@ -13,6 +13,8 @@ import {
   Star,
   Clapperboard,
   PartyPopper,
+  Inbox,
+  Wallet,
 } from "lucide-react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
@@ -22,34 +24,41 @@ import { getCustomerType } from "@/lib/customerType";
 import type { Profile, UserRole } from "@/types/domain";
 
 const corporateCustomerNav = [
-  { to: "/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/dashboard/bookings", label: "Bookings", icon: Calendar },
-  { to: "/dashboard/favourites", label: "Favourites", icon: Heart },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
+  { to: "/dashboard", label: "Oversigt", icon: LayoutDashboard, end: true },
+  { to: "/dashboard/requests", label: "Mine forespørgsler", icon: Inbox },
+  { to: "/dashboard/messages", label: "Beskeder", icon: MessageSquare },
+  { to: "/dashboard/bookings", label: "Bookinger", icon: Calendar },
+  { to: "/dashboard/favourites", label: "Favoritter", icon: Heart },
+  { to: "/dashboard/settings", label: "Indstillinger", icon: Settings },
 ];
 
 const privateCustomerNav = [
-  { to: "/dashboard", label: "My event", icon: PartyPopper, end: true },
-  { to: "/dashboard/settings", label: "Settings", icon: Settings },
+  { to: "/dashboard", label: "Mit event", icon: PartyPopper, end: true },
+  { to: "/dashboard/requests", label: "Mine forespørgsler", icon: Inbox },
+  { to: "/dashboard/messages", label: "Beskeder", icon: MessageSquare },
+  { to: "/dashboard/settings", label: "Indstillinger", icon: Settings },
 ];
 
 const djNav = [
-  { to: "/dj/dashboard", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/dj/bookings", label: "Bookings", icon: Calendar },
-  { to: "/dj/messages", label: "Messages", icon: MessageSquare },
-  { to: "/dj/availability", label: "Availability", icon: Calendar },
-  { to: "/dj/earnings", label: "Earnings", icon: BarChart3 },
-  { to: "/dj/profile", label: "Edit profile", icon: User },
+  { to: "/dj/dashboard", label: "Oversigt", icon: LayoutDashboard, end: true },
+  { to: "/dj/requests", label: "Forespørgsler", icon: Inbox },
+  { to: "/dj/bookings", label: "Bookinger", icon: Calendar },
+  { to: "/dj/messages", label: "Beskeder", icon: MessageSquare },
+  { to: "/dj/availability", label: "Tilgængelighed", icon: Calendar },
+  { to: "/dj/earnings", label: "Indtjening", icon: BarChart3 },
+  { to: "/dj/pricing", label: "Priser & Udstyr", icon: Wallet },
+  { to: "/dj/profile", label: "Rediger profil", icon: User },
+  { to: "/dj/settings", label: "Indstillinger", icon: Settings },
 ];
 
 const adminNav = [
-  { to: "/admin", label: "Overview", icon: LayoutDashboard, end: true },
-  { to: "/admin/verification", label: "Verification queue", icon: ShieldCheck },
-  { to: "/admin/users", label: "Users", icon: Users },
-  { to: "/admin/bookings", label: "Bookings", icon: Calendar },
-  { to: "/admin/financials", label: "Financials", icon: DollarSign },
-  { to: "/admin/reviews", label: "Reviews", icon: Star },
-  { to: "/admin/featured", label: "Featured DJs", icon: Clapperboard },
+  { to: "/admin", label: "Oversigt", icon: LayoutDashboard, end: true },
+  { to: "/admin/verification", label: "Verificeringskø", icon: ShieldCheck },
+  { to: "/admin/users", label: "Brugere", icon: Users },
+  { to: "/admin/bookings", label: "Bookinger", icon: Calendar },
+  { to: "/admin/financials", label: "Økonomi", icon: DollarSign },
+  { to: "/admin/reviews", label: "Anmeldelser", icon: Star },
+  { to: "/admin/featured", label: "Fremhævede DJs", icon: Clapperboard },
 ];
 
 function navFor(role: UserRole, profile: Profile) {
@@ -89,7 +98,7 @@ export function DashboardLayout() {
             ))}
           </nav>
         </aside>
-        <main className="flex-1">
+        <main className="min-w-0 flex-1">
           {/* Mobile sub-nav */}
           <nav className="no-scrollbar flex gap-2 overflow-x-auto border-b bg-card p-3 md:hidden">
             {nav.map((item) => (

@@ -9,14 +9,23 @@ import type { DJProfileWithRelations } from "@/types/domain";
 export function DJCard({
   dj,
   eventTypeId,
+  selectedDate,
+  guests,
   unavailable,
 }: {
   dj: DJProfileWithRelations;
   eventTypeId?: string;
+  selectedDate?: string;
+  guests?: string;
   unavailable?: { reason: string; subReason?: string } | null;
 }) {
   const heroImage = dj.equipment_photos[0]?.url ?? dj.profile.avatar_url;
-  const href = eventTypeId ? `/djs/${dj.username}?eventType=${eventTypeId}` : `/djs/${dj.username}`;
+  const params = new URLSearchParams();
+  if (eventTypeId) params.set("eventType", eventTypeId);
+  if (selectedDate) params.set("date", selectedDate);
+  if (guests) params.set("guests", guests);
+  const query = params.toString();
+  const href = query ? `/djs/${dj.username}?${query}` : `/djs/${dj.username}`;
   const isUnavailable = Boolean(unavailable);
 
   return (
@@ -41,7 +50,7 @@ export function DJCard({
               loading="lazy"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-muted-foreground">No photo</div>
+            <div className="flex h-full items-center justify-center text-muted-foreground">Intet foto</div>
           )}
           {isUnavailable && (
             <>
@@ -52,20 +61,20 @@ export function DJCard({
                   className="gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wide shadow-md"
                 >
                   <CalendarX2 className="h-3.5 w-3.5" />
-                  Not available
+                  Ikke ledig
                 </Badge>
               </div>
             </>
           )}
           {!isUnavailable && dj.is_featured && (
             <Badge variant="accent" className="absolute left-3 top-3">
-              Featured
+              Fremhævet
             </Badge>
           )}
           {!isUnavailable && (
             <Badge variant="success" className="absolute right-3 top-3 gap-1">
               <Shield className="h-3 w-3" />
-              Verified
+              Verificeret
             </Badge>
           )}
         </div>
@@ -101,9 +110,9 @@ export function DJCard({
             </span>
             <span className={cn("font-semibold", isUnavailable && "text-muted-foreground line-through")}>
               {dj.price_on_request
-                ? "Price on request"
+                ? "Pris på forespørgsel"
                 : dj.price_from_minor
-                ? `From ${formatCurrency(dj.price_from_minor, dj.currency)}`
+                ? `Fra ${formatCurrency(dj.price_from_minor, dj.currency)}`
                 : "—"}
             </span>
           </div>

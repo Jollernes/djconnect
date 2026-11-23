@@ -39,23 +39,23 @@ export function DJSidebar({ booking }: { booking: BookingWithRelations }) {
           <div className="mt-4 grid gap-2">
             <Button asChild variant="accent" size="sm" className="w-full gap-2">
               <a href="#messages">
-                <MessageCircle className="h-4 w-4" /> Message
+                <MessageCircle className="h-4 w-4" /> Skriv besked
               </a>
             </Button>
             <Button asChild variant="outline" size="sm" className="w-full gap-2">
               <Link to={`/djs/${dj.username}`}>
-                <ExternalLink className="h-4 w-4" /> View public profile
+                <ExternalLink className="h-4 w-4" /> Se offentlig profil
               </Link>
             </Button>
             <div className="grid grid-cols-2 gap-2">
               <Button asChild variant="ghost" size="sm" className="gap-2 text-xs">
                 <a href={`mailto:${dj.profile.email ?? ""}`}>
-                  <Mail className="h-3.5 w-3.5" /> Email
+                  <Mail className="h-3.5 w-3.5" /> E-mail
                 </a>
               </Button>
               <Button asChild variant="ghost" size="sm" className="gap-2 text-xs">
                 <a href={`tel:${dj.profile.phone ?? ""}`}>
-                  <Phone className="h-3.5 w-3.5" /> Call
+                  <Phone className="h-3.5 w-3.5" /> Ring
                 </a>
               </Button>
             </div>
@@ -65,20 +65,20 @@ export function DJSidebar({ booking }: { booking: BookingWithRelations }) {
 
       <div className="rounded-2xl border bg-card p-5 text-sm">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Your booking is protected
+          Din booking er beskyttet
         </h3>
         <ul className="mt-3 space-y-2.5">
           <li className="flex items-start gap-2">
             <ShieldCheck className="mt-0.5 h-4 w-4 text-emerald-600" />
-            <span>Money-back protection if your DJ no-shows</span>
+            <span>Pengene-tilbage-garanti, hvis din DJ udebliver</span>
           </li>
           <li className="flex items-start gap-2">
             <Lock className="mt-0.5 h-4 w-4 text-emerald-600" />
-            <span>Funds held in escrow until after your event</span>
+            <span>Pengene holdes i escrow indtil efter dit event</span>
           </li>
           <li className="flex items-start gap-2">
             <MessageCircle className="mt-0.5 h-4 w-4 text-emerald-600" />
-            <span>24/7 support whenever you need it</span>
+            <span>24/7 support, når du har brug for det</span>
           </li>
         </ul>
       </div>
